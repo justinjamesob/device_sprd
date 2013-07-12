@@ -35,6 +35,7 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/sensor_drv_u.c \
 	sc8830/src/cmr_arith.c \
 	sensor/sensor_ov8825_mipi_raw.c \
+	sensor/sensor_ov5648_mipi_raw.c \
 	sensor/sensor_ov5640_mipi.c \
 	sensor/sensor_gc2035.c \
 	vsp/sc8830/src/jpg_drv_sc8830.c \
