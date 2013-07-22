@@ -13,9 +13,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
-
-#define LOG_TAG "audio_hw_primary"
-
 aud_mode_t *s_audiomode =NULL;
 
 //#define PARSE_DEBUG
@@ -850,6 +847,7 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	int f=0;
 	//char numbuf2[10] = {0};
 	int aud_modenum = adev_get_audiomodenum4eng();
+	int destfd = 0;
 
 	arm_name = calloc(aud_modenum,NAME_LEN_MAX);
 	if(!arm_name)
@@ -889,7 +887,7 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	{
 		ALOGW("nvstruct2stringfile :%d ----> %s,%s,%s\n",aud_mode->num,(aud_mode->audio_mode_item_info+f)->mode_name,&arm_name[i*NAME_LEN_MAX],&eq_name[i*NAME_LEN_MAX]);
 	}
-	if(lenbytes!=(sizeof(AUDIO_TOTAL_T)*aud_modenum))
+	if((unsigned int)lenbytes!=(sizeof(AUDIO_TOTAL_T)*aud_modenum))
 	{
 		ALOGE("nvstruct2stringfile len is not ok:%d, %d.\n", 
 			lenbytes, (sizeof(AUDIO_TOTAL_T)*aud_modenum));
@@ -897,24 +895,28 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	}
 	audio_total = (AUDIO_TOTAL_T *)para_ptr;
 	file = fopen(filename,"a+");//
-	if(file == NULL)
-	{
-		//todo
-		//ALOG(f"open file wrong during writing ");
-		return;
-	}
-	else
+	if(file)
 	{
 		fclose(file);
 		remove(filename);
+		ALOGE("nvstruct2stringfile remove outdata file.\n");
 	}
-	
-	file = fopen(filename,"a+");//
+
+	destfd = open(filename,O_CREAT|O_RDWR, 0660);
+	if (destfd < 0) {
+		ALOGE("file Cannot create \"%s\": %s", filename, strerror(errno));
+		return;
+	}
+	close(destfd);
+	if(chmod(filename, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 0) {
+        ALOGE("nvstruct2stringfile Cannot set RW to \"%s\": %s", filename, strerror(errno));
+    }
+	file = fopen(filename,"w");
 	if(file == NULL)
 	{
 		//todo
-		//ALOG(f"open file wrong during writing ");
-		//return;
+		ALOGE("open file wrong during writing ");
+		return;
 	}
 	
 	for( i = 0;i<aud_modenum;i++)//

@@ -21,6 +21,9 @@
 #include <ctype.h>
 #include "cutils/properties.h"
 #include <sys/reboot.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
@@ -74,6 +77,9 @@ static const char *at_calibr="AT+CALIBR";
 static int at_sadm_cmd_to_handle[] = {7,8,9,10,11,12,-1};
 //static int at_spenha_cmd_to_handle[] = {0,1,2,3,4,-1};
 static int at_spenha_cmd_to_handle[] = {0,1,2,3,4,-1};
+
+#define AUDFIFO "/data/audiopara_tuning"
+
 
 struct eut_cmd eut_cmds[]={
 		{EUT_REQ_INDEX,ENG_EUT_REQ},
@@ -1102,6 +1108,36 @@ static void eng_setpara(AUDIO_TOTAL_T * ptr)
 	ALOGW("wangzuo eng_setpara 2");
 	nvstruct2stringfile(ENG_AUDIO_PARA_DEBUG, ptr, len);
 }
+static void eng_notify_mediaserver_updatapara(void)
+{
+	int result = 0;
+    int fifo_id = -1;
+	int ret;
+    ALOGE("eng_notify_mediaserver_updatapara E!\n");
+    ret = access(AUDFIFO, R_OK|W_OK);
+    if ((ret == 0) || (errno == EACCES)) {
+        if ((ret != 0) &&
+            (chmod(AUDFIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP) != 0)) {
+            ALOGE("eng_vdiag Cannot set RW to \"%s\": %s", AUDFIFO, strerror(errno));
+            return -1;
+        }
+    } else if (errno != ENOENT) {
+        ALOGE("eng_notify_mediaserver_updatapara Cannot access \"%s\": %s", AUDFIFO, strerror(errno));
+        return -1;
+    }
+	fifo_id = open( AUDFIFO ,O_WRONLY|O_NONBLOCK);
+    if(fifo_id != -1) {
+       int buff = 1;
+	ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");       
+       result = write(fifo_id,&buff,sizeof(int));
+        close(fifo_id);
+    } else {
+       ALOGE("%s open audio FIFO error %s,fifo_id:%d\n",__FUNCTION__,strerror(errno),fifo_id);
+    }
+ 
+   ALOGE("eng_notify_mediaserver_updatapara X,result:%d!\n",result);
+   return result;
+}
 void * eng_getpara(void)
 {
 	int srcfd;
@@ -1135,7 +1171,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 	char *ptr = NULL;
 	AUDIO_TOTAL_T *audio_ptr;
 	int audio_fd = -1;
-		int audiomode_count =0;
+	int audiomode_count =0;
+	int ram_ofs = 0;
 	if(rsp != NULL){
 		sprintf(rsp,"\r\nERROR\r\n");
 	}
@@ -1164,6 +1201,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 	}
 //end kenyliu added
     //audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
+	ENG_LOG("Call %s, ptr=%s\n",__FUNCTION__, ptr);
+    
 	if(g_is_data){
 		ENG_LOG("HEY,DATA HAS COME!!!!");
 		g_is_data = g_is_data;
@@ -1178,6 +1217,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 
 
 		if ( g_is_data&AUDIO_NV_ARM_DATA_MEMORY){
+			ram_ofs = 1;
 			g_is_data &= (~AUDIO_NV_ARM_DATA_MEMORY);
 			g_indicator |= AUDIO_NV_ARM_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),(unsigned char *)ptr,wlen);
@@ -1189,6 +1229,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct; 
 		}
 		if ( g_is_data&AUDIO_ENHA_DATA_MEMORY){
+			ram_ofs = 1;
 			g_is_data &= (~AUDIO_ENHA_DATA_MEMORY);
 			g_indicator |= AUDIO_ENHA_EQ_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_enha_eq),(unsigned char *)ptr,wlen);
@@ -1200,21 +1241,24 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			audio_ptr[g_index].audio_enha_eq=audio_total[g_index].audio_enha_eq; 
 		}
 		if ( g_is_data&AUDIO_ENHA_TUN_DATA_MEMORY){
+			ram_ofs = 1;
 			g_is_data &= (~AUDIO_ENHA_TUN_DATA_MEMORY);
 			ascii2bin((unsigned char *)tun_data,(unsigned char *)ptr,wlen);
 		}
 		
 		ENG_LOG("g_indicator = 0x%x,%x\n",g_indicator,AUDIO_DATA_READY_INDI_FLAG);
 
-		if ( audio_ptr ) {
-			//msync((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T),MS_ASYNC);
-			ALOGW("wangzuo eng_diag_audio 5");
-			eng_setpara(audio_ptr);
+		if ( audio_ptr) {
+			if(!ram_ofs)
+			{
+				eng_setpara(audio_ptr);
+				eng_notify_mediaserver_updatapara();
+			}
 			free(audio_ptr);
 		}
 
 		if ( g_indicator ) {
-			ENG_LOG("data is ready!g_indicator = 0x%x\n",g_indicator);
+			ENG_LOG("data is ready!g_indicator = 0x%x,g_index:%d\n",g_indicator,g_index);
 			g_indicator = 0;
 			parse_vb_effect_params((void *)audio_total, adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T));
 			SetAudio_pga_parameter_eng(&audio_total[g_index],sizeof(AUDIO_TOTAL_T),1);
