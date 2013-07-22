@@ -66,6 +66,7 @@ struct camera_context        *g_cxt = &cmr_cxt;
 #define IS_CHN_BUSY(x)       (g_cxt->v4l2_cxt.chn_status[x] == CHN_BUSY)
 #define IS_ZSL_MODE(x)       ((CAMERA_ZSL_MODE == x) || (CAMERA_ZSL_CONTINUE_SHOT_MODE == x))
 #define IS_NON_ZSL_MODE(x)   ((CAMERA_ZSL_MODE != x) && (CAMERA_ZSL_CONTINUE_SHOT_MODE != x))
+#define IS_NO_MALLOC_MEM   ((CAMERA_HDR_MODE == g_cxt->cap_mode) && ((1 == g_cxt->cap_cnt)||(2 == g_cxt->cap_cnt)))
 
 static void camera_sensor_evt_cb(int evt, void* data);
 static int  camera_isp_evt_cb(int evt, void* data);
@@ -1717,10 +1718,12 @@ int camera_start_preview_internal(void)
 		return -CAMERA_FAILED;
 	}
 
-	g_cxt->total_cap_num = CAMERA_CAP_FRM_CNT;
 	/*g_cxt->total_capture_num = CAMERA_NORMAL_CAP_FRM_CNT;*/
 	if (IS_ZSL_MODE(g_cxt->cap_mode)) {
+		g_cxt->total_cap_num = CAMERA_CAP_FRM_CNT;
 		ret = camera_capture_init();
+	} else {
+		g_cxt->total_cap_num = CAMERA_NORMAL_CAP_FRM_CNT;
 	}
 
 	if (IMG_SKIP_HW == g_cxt->skip_mode) {
@@ -4328,31 +4331,32 @@ int camera_capture_ability(SENSOR_MODE_INFO_T *sn_mode,
 
 	sensor_size.width  = sn_mode->width;
 	sensor_size.height = sn_mode->height;
-	if (g_cxt->cap_2_mems.minor_frm.buf_size > 0) {
-		ret = camera_arrange_capture_buf(&g_cxt->cap_2_mems,
-					&sensor_size,
-					&sn_trim_rect,
-					&g_cxt->max_size,
-					g_cxt->cap_original_fmt,
-					&g_cxt->cap_orig_size,
-					&g_cxt->thum_size,
-					g_cxt->cap_mem,
-					((IMG_ROT_0 != g_cxt->cap_rot) || g_cxt->is_cfg_rot_cap),
-					g_cxt->total_cap_num);
-	} else {
-		g_cxt->cap_2_mems.free_mem(g_cxt->cap_2_mems.handle);
-		ret = camera_arrange_capture_buf2(&g_cxt->cap_2_mems,
-					&sensor_size,
-					&sn_trim_rect,
-					&g_cxt->max_size,
-					g_cxt->cap_original_fmt,
-					&g_cxt->cap_orig_size,
-					&g_cxt->thum_size,
-					g_cxt->cap_mem,
-					((IMG_ROT_0 != g_cxt->cap_rot) || g_cxt->is_cfg_rot_cap),
-					g_cxt->total_cap_num);
+	if (!IS_NO_MALLOC_MEM) {
+		if (g_cxt->cap_2_mems.minor_frm.buf_size > 0) {
+			ret = camera_arrange_capture_buf(&g_cxt->cap_2_mems,
+						&sensor_size,
+						&sn_trim_rect,
+						&g_cxt->max_size,
+						g_cxt->cap_original_fmt,
+						&g_cxt->cap_orig_size,
+						&g_cxt->thum_size,
+						g_cxt->cap_mem,
+						((IMG_ROT_0 != g_cxt->cap_rot) || g_cxt->is_cfg_rot_cap),
+						g_cxt->total_cap_num);
+		} else {
+			g_cxt->cap_2_mems.free_mem(g_cxt->cap_2_mems.handle);
+			ret = camera_arrange_capture_buf2(&g_cxt->cap_2_mems,
+						&sensor_size,
+						&sn_trim_rect,
+						&g_cxt->max_size,
+						g_cxt->cap_original_fmt,
+						&g_cxt->cap_orig_size,
+						&g_cxt->thum_size,
+						g_cxt->cap_mem,
+						((IMG_ROT_0 != g_cxt->cap_rot) || g_cxt->is_cfg_rot_cap),
+						g_cxt->total_cap_num);
+		}
 	}
-
 	if (0 == ret) {
 		if ((IMG_ROT_0 != g_cxt->cap_rot) || g_cxt->is_cfg_rot_cap) {
 			rot_frm = &g_cxt->cap_mem[g_cxt->cap_cnt].cap_yuv_rot;
