@@ -208,7 +208,7 @@ on post-fs-data
     # create resource-cache and double-check the perms
     mkdir /data/resource-cache 0771 system system
     chown system system /data/resource-cache
-    chmod 0771 /data/resource-cache
+    chmod 0777 /data/resource-cache
 
     # create the lost+found directories, so as to enforce our permissions
     mkdir /data/lost+found 0770 root root
