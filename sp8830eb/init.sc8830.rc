@@ -128,21 +128,21 @@ service modemd /system/bin/modemd
 service engservicet /system/bin/engservice -t 1
     socket engtd stream 660 system system
     class core
-    user system
+    user root
     group system
     disabled
     oneshot
 
 service engmodemclientt /system/bin/engmodemclient -t 1
     class core
-    user system
+    user root
     group system radio
     disabled
     oneshot
 
 service engpcclientt /system/bin/engpcclient -t 1
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot
@@ -150,21 +150,21 @@ service engpcclientt /system/bin/engpcclient -t 1
 service engservicew /system/bin/engservice -t 0
     socket engw stream 660 system system
     class core
-    user system
+    user root
     group system
     disabled
     oneshot
 
 service engmodemclientw /system/bin/engmodemclient -t 0
     class core
-    user system
+    user root
     group system radio
     disabled
     oneshot
 
 service engpcclientw /system/bin/engpcclient -t 0
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot
