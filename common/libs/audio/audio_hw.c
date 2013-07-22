@@ -139,6 +139,8 @@
 /* sampling rate when using VX port for wide band */
 #define VX_WB_SAMPLING_RATE 16000
 
+#define AUDFIFO "/data/audiopara_tuning"
+
 struct pcm_config pcm_config_mm = {
     .channels = 2,
     .rate = DEFAULT_OUT_SAMPLING_RATE,
@@ -271,6 +273,7 @@ struct tiny_audio_device {
 
     audio_modem_t *cp;
     AUDIO_TOTAL_T *audio_para;
+    pthread_t        audiopara_tuning_thread;
 
     struct stream_routing_manager  routing_mgr;
 };
@@ -3579,7 +3582,7 @@ static void vb_effect_getpara(struct tiny_audio_device *adev)
 	int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
 	int srcfd;
 	char *filename = NULL;
-
+#if 0
 	if(read_already)
 	{
 		ALOGI("vb_effect_getpara read already.");
@@ -3590,6 +3593,7 @@ static void vb_effect_getpara(struct tiny_audio_device *adev)
 		ALOGI("vb_effect_getpara read first.");
 		read_already = 1;
 	}
+#endif	
 	//adev->audio_para = vb_effect_readpara();//get data from audio_para
 	adev->audio_para = calloc(1, len);
 	if (!adev->audio_para)
@@ -3606,6 +3610,72 @@ static void vb_effect_getpara(struct tiny_audio_device *adev)
 	stringfile2nvstruct(filename, adev->audio_para, len); //get data from audio_hw.txt.
 	audio_para_ptr = adev->audio_para;
 }
+
+static void *audiopara_tuning_thread_entry(void * param)
+{
+    struct tiny_audio_device *adev = (struct tiny_audio_device *)param;
+    int fd = -1;
+    int fd_dum = -1;
+    int req = 0;
+    int result = -1;
+    //mode_t mode_f = 0;
+    ALOGE("%s E\n",__FUNCTION__); 
+    if (mkfifo(AUDFIFO,S_IFIFO|0666) <0) {
+      if (errno != EEXIST) {
+        ALOGE("%s create audio fifo error %s\n",__FUNCTION__,strerror(errno));
+        return NULL;
+      }
+    }
+	if(chmod(AUDFIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 0) {
+		ALOGE("%s Cannot set RW to \"%s\": %s", __FUNCTION__,AUDFIFO, strerror(errno));
+	}
+    fd = open(AUDFIFO,O_RDONLY);
+    if (fd == -1) {
+      ALOGE("%s open audio FIFO error %s\n",__FUNCTION__,strerror(errno));
+      return NULL;
+    }
+    fd_dum = open(AUDFIFO,O_WRONLY);
+    if (fd_dum == -1) {
+      ALOGE("%s open dummy audio FIFO error %s\n",__FUNCTION__,strerror(errno));
+      return NULL;
+    }
+    while (req != -1) {
+      result = read(fd,&req,sizeof(int));
+      ALOGE("%s read audio FIFO result %d\n",__FUNCTION__,result);
+      if (result >0) {
+		pthread_mutex_lock(&adev->lock);
+		if (adev->audio_para)  
+		{
+			free(adev->audio_para);
+		}
+		vb_effect_getpara(adev);
+		vb_effect_setpara(adev->audio_para);
+		pthread_mutex_unlock(&adev->lock);
+		ALOGE("%s read audio FIFO X.\n",__FUNCTION__);
+      }
+    }
+    ALOGE("exit from audio tuning thread");
+    close(fd_dum);
+    close(fd);
+    unlink(AUDFIFO);
+    pthread_exit(NULL);
+    return NULL;
+}
+
+static int audiopara_tuning_manager_create(struct tiny_audio_device *adev)
+{
+    int ret;
+    /* create a thread to manager audiopara tuning.*/
+    ret = pthread_create(&adev->audiopara_tuning_thread, NULL,
+                            audiopara_tuning_thread_entry, (void *)adev);
+    if (ret) {
+        ALOGE("pthread_create falied, code is %d", ret);
+        return ret;
+    }
+    return ret;
+}
+
+
 static int adev_open(const hw_module_t* module, const char* name,
                      hw_device_t** device)
 {
@@ -3731,6 +3801,9 @@ static int adev_open(const hw_module_t* module, const char* name,
 #endif
     ret = mmi_audio_loop_open();
     if (ret)  ALOGW("Warning: audio loop can NOT work.");
+
+    ret =audiopara_tuning_manager_create(adev);
+    if (ret)  ALOGW("Warning: audio tuning can NOT work.");
     
     ret = stream_routing_manager_create(adev);
     if (ret) {
