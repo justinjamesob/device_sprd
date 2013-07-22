@@ -1108,12 +1108,12 @@ static void eng_setpara(AUDIO_TOTAL_T * ptr)
 	ALOGW("wangzuo eng_setpara 2");
 	nvstruct2stringfile(ENG_AUDIO_PARA_DEBUG, ptr, len);
 }
-static void eng_notify_mediaserver_updatapara(void)
+static void eng_notify_mediaserver_updatapara(int ram_ops,int index,AUDIO_TOTAL_T *aud_params_ptr)
 {
 	int result = 0;
     int fifo_id = -1;
 	int ret;
-    ALOGE("eng_notify_mediaserver_updatapara E!\n");
+    ALOGE("eng_notify_mediaserver_updatapara E,%d:%d!\n",ram_ops,index);
     ret = access(AUDFIFO, R_OK|W_OK);
     if ((ret == 0) || (errno == EACCES)) {
         if ((ret != 0) &&
@@ -1127,9 +1127,15 @@ static void eng_notify_mediaserver_updatapara(void)
     }
 	fifo_id = open( AUDFIFO ,O_WRONLY|O_NONBLOCK);
     if(fifo_id != -1) {
-       int buff = 1;
+	int buff = 1;
 	ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");       
-       result = write(fifo_id,&buff,sizeof(int));
+        result = write(fifo_id,&ram_ops,sizeof(int));
+        if(ram_ops)
+        {
+        	result = write(fifo_id,&index,sizeof(int));
+        	result = write(fifo_id,aud_params_ptr,sizeof(AUDIO_TOTAL_T));
+			ALOGE("eng_notify_mediaserver_updatapara,index:%d,size:%d!\n",index,sizeof(AUDIO_TOTAL_T));
+        }
         close(fifo_id);
     } else {
        ALOGE("%s open audio FIFO error %s,fifo_id:%d\n",__FUNCTION__,strerror(errno),fifo_id);
@@ -1252,8 +1258,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			if(!ram_ofs)
 			{
 				eng_setpara(audio_ptr);
-				eng_notify_mediaserver_updatapara();
-			}
+			}				
+			eng_notify_mediaserver_updatapara(ram_ofs,g_index,&audio_total[g_index]);
 			free(audio_ptr);
 		}
 
