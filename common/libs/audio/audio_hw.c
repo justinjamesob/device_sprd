@@ -3616,10 +3616,13 @@ static void *audiopara_tuning_thread_entry(void * param)
     struct tiny_audio_device *adev = (struct tiny_audio_device *)param;
     int fd = -1;
     int fd_dum = -1;
-    int req = 0;
+    int ram_req = 0;
     int result = -1;
+    AUDIO_TOTAL_T ram_from_eng;
+    int mode_index = 0;
     //mode_t mode_f = 0;
     ALOGE("%s E\n",__FUNCTION__); 
+    memset(&ram_from_eng,0x00,sizeof(AUDIO_TOTAL_T));
     if (mkfifo(AUDFIFO,S_IFIFO|0666) <0) {
       if (errno != EEXIST) {
         ALOGE("%s create audio fifo error %s\n",__FUNCTION__,strerror(errno));
@@ -3639,17 +3642,29 @@ static void *audiopara_tuning_thread_entry(void * param)
       ALOGE("%s open dummy audio FIFO error %s\n",__FUNCTION__,strerror(errno));
       return NULL;
     }
-    while (req != -1) {
-      result = read(fd,&req,sizeof(int));
-      ALOGE("%s read audio FIFO result %d\n",__FUNCTION__,result);
+    while (ram_req != -1) {
+      result = read(fd,&ram_req,sizeof(int));
+      ALOGE("%s read audio FIFO result %d,ram_req:%d\n",__FUNCTION__,result,ram_req);
       if (result >0) {
 		pthread_mutex_lock(&adev->lock);
-		if (adev->audio_para)  
+		if(!ram_req)
 		{
-			free(adev->audio_para);
+			ALOGE("%s audio para --> update from flash\n",__FUNCTION__);
+			if (adev->audio_para)  
+			{
+				free(adev->audio_para);
+			}
+			vb_effect_getpara(adev);
+			vb_effect_setpara(adev->audio_para);
 		}
-		vb_effect_getpara(adev);
-		vb_effect_setpara(adev->audio_para);
+		else
+		{
+			ALOGE("%s audio para --> update from RAM\n",__FUNCTION__);
+			result = read(fd,&mode_index,sizeof(int));
+			result = read(fd,&ram_from_eng,sizeof(AUDIO_TOTAL_T));
+			ALOGE("%s read audio FIFO result %d,mode_index:%d,size:%d\n",__FUNCTION__,result,mode_index,sizeof(AUDIO_TOTAL_T));
+			adev->audio_para[mode_index] = ram_from_eng;
+		}
 		pthread_mutex_unlock(&adev->lock);
 		ALOGE("%s read audio FIFO X.\n",__FUNCTION__);
       }
