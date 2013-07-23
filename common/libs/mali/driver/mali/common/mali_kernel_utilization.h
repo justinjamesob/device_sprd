@@ -12,6 +12,7 @@
 #define __MALI_KERNEL_UTILIZATION_H__
 
 #include "mali_osk.h"
+#include "mali_pm.h"
 
 /**
  * Initialize/start the Mali GPU utilization metrics reporting.
@@ -28,7 +29,7 @@ void mali_utilization_term(void);
 /**
  * Should be called when a job is about to execute a job
  */
-void mali_utilization_core_start(u64 time_now);
+void mali_utilization_core_start(u64 time_now,enum mali_core_event core_event,u32 active_gps,u32 active_pps);
 
 /**
  * Should be called to stop the utilization timer during system suspend
@@ -38,7 +39,7 @@ void mali_utilization_suspend(void);
 /**
  * Should be called when a job has completed executing a job
  */
-void mali_utilization_core_end(u64 time_now);
+void mali_utilization_core_end(u64 time_now,enum mali_core_event core_event,u32 active_gps,u32 active_pps);
 
 
 #endif /* __MALI_KERNEL_UTILIZATION_H__ */

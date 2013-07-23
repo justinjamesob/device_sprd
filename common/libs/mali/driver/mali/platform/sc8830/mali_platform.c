@@ -16,6 +16,7 @@
 #include <linux/kernel.h>
 #include <linux/delay.h>
 #include <linux/clk.h>
+#include <linux/workqueue.h>
 #include <asm/system.h>
 #include <asm/io.h>
 
@@ -26,21 +27,58 @@
 #include "mali_kernel_common.h"
 #include "mali_osk.h"
 #include "mali_platform.h"
+#include "mali_device_pause_resume.h"
 
+#define GPU_GLITCH_FREE_DFS 0
+#define GPU_FREQ_CONTROL	0
 
+#define GPU_MIN_DIVISION	1
+#define GPU_MAX_DIVISION	3
+
+#if GPU_FREQ_CONTROL
+#define GPU_LEVEL0_MAX		208
+#define GPU_LEVEL0_MIN		(GPU_LEVEL0_MAX/GPU_MAX_DIVISION)
+#define GPU_LEVEL1_MAX		256
+#define GPU_LEVEL1_MIN		(GPU_LEVEL1_MAX/GPU_MAX_DIVISION)
+#endif
+
+extern int gpuinfo_min_freq;
+extern int gpuinfo_max_freq;
+extern int gpuinfo_transition_latency;
+extern int scaling_min_freq;
+extern int scaling_max_freq;
+extern int scaling_cur_freq;
 static struct clk* g_gpu_clock = NULL;
+static int max_div = GPU_MAX_DIVISION;
+const int min_div = GPU_MIN_DIVISION;
+#if GPU_FREQ_CONTROL
+static int mali_freq_level = 1;
+static int old_mali_freq_level = 1;
+#endif
+static int g_gpu_clock_div = 1;
+static int old_g_gpu_clock_div = 1;
 
 static int g_gpu_clock_on = 0;
 static int g_gpu_power_on = 0;
+#if !GPU_GLITCH_FREE_DFS
+static struct workqueue_struct *gpu_dfs_workqueue = NULL;
+#endif
+static void gpu_change_freq_div(void);
 
 _mali_osk_errcode_t mali_platform_init(void)
 {
 	g_gpu_clock = clk_get(NULL, "clk_gpu");
 
+	gpuinfo_min_freq=64;
+	gpuinfo_max_freq=256;
+	scaling_max_freq=256;
+	gpuinfo_transition_latency=300;
+
 	MALI_DEBUG_ASSERT(g_gpu_clock);
 
 	if(!g_gpu_power_on)
 	{
+		old_g_gpu_clock_div = 1;
 		g_gpu_power_on = 1;
 		sci_glb_clr(REG_PMU_APB_PD_GPU_TOP_CFG, BIT_PD_GPU_TOP_FORCE_SHUTDOWN);
 		mdelay(2);
@@ -49,12 +87,26 @@ _mali_osk_errcode_t mali_platform_init(void)
 	{
 		g_gpu_clock_on = 1;
 		clk_enable(g_gpu_clock);
+		udelay(300);
 	}
+#if !GPU_GLITCH_FREE_DFS
+	if(gpu_dfs_workqueue == NULL)
+	{
+		gpu_dfs_workqueue = create_singlethread_workqueue("gpu_dfs");
+	}
+#endif
 	MALI_SUCCESS;
 }
 
 _mali_osk_errcode_t mali_platform_deinit(void)
 {
+#if !GPU_GLITCH_FREE_DFS
+	if(gpu_dfs_workqueue)
+	{
+		destroy_workqueue(gpu_dfs_workqueue);
+		gpu_dfs_workqueue = NULL;
+	}
+#endif
 	if(g_gpu_clock_on)
 	{
 		g_gpu_clock_on = 0;
@@ -76,6 +128,7 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 	case MALI_POWER_MODE_ON:
 		if(!g_gpu_power_on)
 		{
+			old_g_gpu_clock_div = 1;
 			g_gpu_power_on = 1;
 			sci_glb_clr(REG_PMU_APB_PD_GPU_TOP_CFG, BIT_PD_GPU_TOP_FORCE_SHUTDOWN);
 			mdelay(2);
@@ -84,6 +137,7 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 		{
 			g_gpu_clock_on = 1;
 			clk_enable(g_gpu_clock);
+			udelay(300);
 		}
 		break;
 	case MALI_POWER_MODE_LIGHT_SLEEP:
@@ -115,37 +169,164 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 	MALI_SUCCESS;
 }
 
-static int g_gpu_clock_div = 1;
+static inline void mali_dfs(void)
+{
+	MALI_DEBUG_PRINT(3,("GPU_DFS g_gpu_clock_div %d\n",g_gpu_clock_div));
+	sci_glb_write(REG_GPU_APB_APB_CLK_CTRL,BITS_CLK_GPU_DIV(g_gpu_clock_div-1),BITS_CLK_GPU_DIV(3));
+}
+
+#if GPU_FREQ_CONTROL
+static inline void mali_set_freq(u32 gpu_freq)
+{
+	MALI_DEBUG_PRINT(3,("GPU_DFS gpu_freq select %u\n",gpu_freq));
+	sci_glb_write(REG_GPU_APB_APB_CLK_CTRL,BITS_CLK_GPU_DIV(gpu_freq),BITS_CLK_GPU_SEL(3));
+	return;
+}
+#endif
+#if !GPU_GLITCH_FREE_DFS
+static void gpu_dfs_func(struct work_struct *work);
+static DECLARE_WORK(gpu_dfs_work, &gpu_dfs_func);
+
+static void gpu_dfs_func(struct work_struct *work)
+{
+	gpu_change_freq_div();
+}
+#endif
 
 void mali_gpu_utilization_handler(u32 utilization)
 {
-	#if 0
+#if GPU_FREQ_CONTROL
+	if(scaling_max_freq<=GPU_LEVEL0_MAX)
+	{
+		mali_freq_level=0;
+		scaling_max_freq=GPU_LEVEL0_MAX;
+		if((scaling_min_freq >= GPU_LEVEL0_MIN)&&(scaling_min_freq<=GPU_LEVEL0_MAX))
+		{
+			max_div=GPU_LEVEL0_MAX/scaling_min_freq;
+		}
+		else
+		{
+			max_div=GPU_MAX_DIVISION;
+		}
+	}
+	else
+	{
+		mali_freq_level=1;
+		scaling_max_freq=GPU_LEVEL1_MAX;
+		if((scaling_min_freq >= GPU_LEVEL1_MIN)&&(scaling_min_freq<=GPU_LEVEL1_MAX))
+		{
+			max_div=GPU_LEVEL1_MAX/scaling_min_freq;
+		}
+		else
+		{
+			max_div=GPU_MAX_DIVISION;
+		}
+	}
+#endif
+
 	// if the loading ratio is greater then 90%, switch the clock to the maximum
 	if(utilization >= (256*9/10))
 	{
-		g_gpu_clock_div = 1;
-		sci_glb_write(REG_GLB_GEN2, BITS_CLK_GPU_AXI_DIV(g_gpu_clock_div-1), BITS_CLK_GPU_AXI_DIV(7));
-		return;
+		g_gpu_clock_div = min_div;
 	}
-
-	if(utilization == 0)
+	else
 	{
-		utilization = 1;
+		if(utilization == 0)
+		{
+			utilization = 1;
+		}
+
+		// the absolute loading ratio is 1/g_gpu_clock_div * utilization/256
+		// to keep the loading ratio above 70% at a certain level,
+		// the absolute loading level is ceil(1/(1/g_gpu_clock_div * utilization/256 / (7/10)))
+		g_gpu_clock_div = g_gpu_clock_div*(256*7/10)/utilization + 1;
+
+		// if the 90% of max loading ratio of new level is smaller than the current loading ratio, shift up
+		// 1/old_div * utilization/256 > 1/g_gpu_clock_div * 90%
+		if(g_gpu_clock_div*utilization > old_g_gpu_clock_div*256*9/10)
+			g_gpu_clock_div--;
+
+		if(g_gpu_clock_div < min_div) g_gpu_clock_div = min_div;
+		if(g_gpu_clock_div > max_div) g_gpu_clock_div = max_div;
 	}
-
-	// the absolute loading ratio is 1/g_gpu_clock_div * utilization/256
-	// to keep the loading ratio under 70% at a certain level,
-	// the absolute loading level is 1/(1/g_gpu_clock_div * utilization/256 / (7/10))
-	g_gpu_clock_div = (256*7/10)*g_gpu_clock_div/utilization;
-
-	if(g_gpu_clock_div < 1) g_gpu_clock_div = 1;
-	if(g_gpu_clock_div > 8) g_gpu_clock_div = 8;
-
-	sci_glb_write(REG_GLB_GEN2, BITS_CLK_GPU_AXI_DIV(g_gpu_clock_div-1), BITS_CLK_GPU_AXI_DIV(7));
-	#endif
+#if GPU_FREQ_CONTROL
+	MALI_DEBUG_PRINT(3,("GPU_DFS gpu util %d -> div %d  old_freq %d ->new_freq %d \n", utilization, g_gpu_clock_div,old_mali_freq_level,mali_freq_level));
+	if((g_gpu_clock_div != old_g_gpu_clock_div)||(old_mali_freq_level!=mali_freq_level))
+#else
+	MALI_DEBUG_PRINT(3,("GPU_DFS gpu util %d -> div %d \n", utilization, g_gpu_clock_div));
+	if(g_gpu_clock_div != old_g_gpu_clock_div)
+#endif
+	{
+#if !GPU_GLITCH_FREE_DFS
+		if(gpu_dfs_workqueue)
+			queue_work(gpu_dfs_workqueue, &gpu_dfs_work);
+#else
+		gpu_change_freq();
+		mali_dfs();
+#endif
+	}
 }
 
 void set_mali_parent_power_domain(void* dev)
 {
 }
 
+#if GPU_FREQ_CONTROL
+static void gpu_change_freq_div(void)
+{
+	mali_bool power_on;
+	mali_dev_pause(&power_on);
+	if(g_gpu_power_on)
+	{
+		if(old_mali_freq_level!=mali_freq_level)
+		{
+			old_mali_freq_level=mali_freq_level;
+			clk_disable(g_gpu_clock);
+			switch(mali_freq_level)
+			{
+				case 0:
+					scaling_cur_freq=208;
+					mali_set_freq(0x0);
+					break;
+				case 1:
+					scaling_cur_freq=256;
+					mali_set_freq(0x1);
+					break;
+				default:
+					scaling_cur_freq=256;
+					mali_set_freq(0x1);
+					break;
+			}
+
+			if(1!=old_g_gpu_clock_div)
+			{
+				old_g_gpu_clock_div=1;
+				g_gpu_clock_div=1;
+				mali_dfs();
+			}
+			udelay(100);
+			clk_enable(g_gpu_clock);
+		}
+		else
+		{
+			old_g_gpu_clock_div = g_gpu_clock_div;
+			scaling_cur_freq=scaling_max_freq/g_gpu_clock_div;
+			mali_dfs();
+		}
+	}
+	mali_dev_resume();
+}
+#else
+static void gpu_change_freq_div(void)
+{
+	mali_bool power_on;
+	mali_dev_pause(&power_on);
+	if(g_gpu_power_on)
+	{
+		old_g_gpu_clock_div = g_gpu_clock_div;
+		scaling_cur_freq=scaling_max_freq/g_gpu_clock_div;
+		mali_dfs();
+	}
+	mali_dev_resume();
+}
+#endif

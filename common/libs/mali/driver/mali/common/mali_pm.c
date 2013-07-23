@@ -475,6 +475,9 @@ void mali_pm_core_event(enum mali_core_event core_event)
 				transition_working = MALI_TRUE;
 			}
 			num_active_gps++;
+			#ifdef CONFIG_MALI400_GPU_UTILIZATION
+			mali_utilization_core_start(_mali_osk_time_get_ns(),core_event,num_active_gps,num_active_pps);
+			#endif
 			break;
 		case MALI_CORE_EVENT_GP_STOP:
 			if (num_active_pps + num_active_gps == 1)
@@ -482,6 +485,9 @@ void mali_pm_core_event(enum mali_core_event core_event)
 				transition_idle = MALI_TRUE;
 			}
 			num_active_gps--;
+			#ifdef CONFIG_MALI400_GPU_UTILIZATION
+			mali_utilization_core_end(_mali_osk_time_get_ns(),core_event,num_active_gps,num_active_pps);
+			#endif
 			break;
 		case MALI_CORE_EVENT_PP_START:
 			if (num_active_pps + num_active_gps == 0)
@@ -489,6 +495,9 @@ void mali_pm_core_event(enum mali_core_event core_event)
 				transition_working = MALI_TRUE;
 			}
 			num_active_pps++;
+			#ifdef CONFIG_MALI400_GPU_UTILIZATION
+			mali_utilization_core_start(_mali_osk_time_get_ns(),core_event,num_active_gps,num_active_pps);
+			#endif
 			break;
 		case MALI_CORE_EVENT_PP_STOP:
 			if (num_active_pps + num_active_gps == 1)
@@ -496,21 +505,18 @@ void mali_pm_core_event(enum mali_core_event core_event)
 				transition_idle = MALI_TRUE;
 			}
 			num_active_pps--;
+			#ifdef CONFIG_MALI400_GPU_UTILIZATION
+			mali_utilization_core_end(_mali_osk_time_get_ns(),core_event,num_active_gps,num_active_pps);
+			#endif
 			break;
 	}
 
 	if (transition_working == MALI_TRUE)
 	{
-#ifdef CONFIG_MALI400_GPU_UTILIZATION
-		mali_utilization_core_start(_mali_osk_time_get_ns());
-#endif
 		mali_pm_event(MALI_PM_EVENT_CORES_WORKING, MALI_FALSE, 0); /* process event in same thread */
 	}
 	else if (transition_idle == MALI_TRUE)
 	{
-#ifdef CONFIG_MALI400_GPU_UTILIZATION
-		mali_utilization_core_end(_mali_osk_time_get_ns());
-#endif
 		mali_pm_event(MALI_PM_EVENT_CORES_IDLE, MALI_FALSE, 0); /* process event in same thread */
 	}
 

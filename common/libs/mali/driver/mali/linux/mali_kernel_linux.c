@@ -50,6 +50,30 @@ int mali_debug_level = 2;
 module_param(mali_debug_level, int, S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP | S_IROTH); /* rw-rw-r-- */
 MODULE_PARM_DESC(mali_debug_level, "Higher number, more dmesg output");
 
+int gpuinfo_min_freq=0;
+module_param(gpuinfo_min_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
+MODULE_PARM_DESC(gpuinfo_min_freq, "GPU min frequency");
+
+int gpuinfo_max_freq=0;
+module_param(gpuinfo_max_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
+MODULE_PARM_DESC(gpuinfo_max_freq, "GPU max frequency");
+
+int gpuinfo_transition_latency=0;
+module_param(gpuinfo_transition_latency, int, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
+MODULE_PARM_DESC(gpuinfo_transition_latency, "GPU transition latency");
+
+int scaling_min_freq=0;
+module_param(scaling_min_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* rw-rw-r-- */
+MODULE_PARM_DESC(scaling_min_freq, "GPU scaling_min_freq");
+
+int scaling_max_freq=0;
+module_param(scaling_max_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* rw-rw-r-- */
+MODULE_PARM_DESC(scaling_max_freq, "GPU scaling_max_freq");
+
+unsigned int scaling_cur_freq=0;
+module_param(scaling_cur_freq, uint, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
+MODULE_PARM_DESC(scaling_cur_freq, "GPU scaling_cur_freq");
+
 /* By default the module uses any available major, but it's possible to set it at load time to a specific number */
 int mali_major = 0;
 module_param(mali_major, int, S_IRUGO); /* r--r--r-- */
