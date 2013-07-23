@@ -116,6 +116,7 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/scripts/ext_kill.sh:system/bin/ext_kill.sh \
 	$(BOARDDIR)/scripts/ext_chown.sh:system/bin/ext_chown.sh \
 	$(BOARDDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
+	$(BOARDDIR)/patch.record:system/patch/patch.record \
 	device/sprd/common/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	device/sprd/common/libs/audio/audio_policy.conf:system/etc/audio_policy.conf \
 	device/sprd/sp8830ec/media_codecs.xml:system/etc/media_codecs.xml \

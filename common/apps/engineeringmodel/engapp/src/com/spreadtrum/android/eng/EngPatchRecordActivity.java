@@ -20,8 +20,8 @@ public class EngPatchRecordActivity extends Activity {
 		
         try{
 		        int count;
-		        char[] buf = new char[LOAD_STRING_MAX_LENTH];
-		        FileReader rd = new FileReader("/data/patch/patch.record");	
+		        char[] buf = new char[LOAD_STRING_MAX_LENTH+1];
+		        FileReader rd = new FileReader("/system/patch/patch.record");
 		        count = rd.read(buf, 0, LOAD_STRING_MAX_LENTH);
 		        buf[count] = '\n';
 		        text = new String(buf).substring(0, count - 1);
