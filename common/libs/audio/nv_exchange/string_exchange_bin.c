@@ -859,6 +859,7 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	eq_name = calloc(aud_modenum,NAME_LEN_MAX);
 	if(!eq_name)
 	{
+		free(arm_name);
 		ALOGW("nvstruct2stringfile modename malloc  eqname memory error\n");
 		return;
 	}
@@ -891,6 +892,8 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	{
 		ALOGE("nvstruct2stringfile len is not ok:%d, %d.\n", 
 			lenbytes, (sizeof(AUDIO_TOTAL_T)*aud_modenum));
+		free(arm_name);
+		free(eq_name);
 		return;
 	}
 	audio_total = (AUDIO_TOTAL_T *)para_ptr;
@@ -905,6 +908,8 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	destfd = open(filename,O_CREAT|O_RDWR, 0660);
 	if (destfd < 0) {
 		ALOGE("file Cannot create \"%s\": %s", filename, strerror(errno));
+		free(arm_name);
+		free(eq_name);
 		return;
 	}
 	close(destfd);
@@ -916,6 +921,8 @@ void  nvstruct2stringfile(char* filename,void *para_ptr, int lenbytes)
 	{
 		//todo
 		ALOGE("open file wrong during writing ");
+		free(arm_name);
+		free(eq_name);
 		return;
 	}
 	
