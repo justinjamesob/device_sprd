@@ -512,6 +512,8 @@ int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index)
 		ret = 0;
 		return ret;
 	}
+	bzero(&v4l2_buf, sizeof(struct v4l2_buffer));
+	v4l2_buf.flags = 1;
 	v4l2_buf.index = index;
 	if (CHN_0 == channel_id) {
 
@@ -520,7 +522,8 @@ int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index)
 	} else {
 		v4l2_buf.type  = V4L2_BUF_TYPE_PRIVATE;
 	}
-	ret = ioctl(fd, VIDIOC_QBUF, &v4l2_buf);
+	//ret = ioctl(fd, VIDIOC_QBUF, &v4l2_buf);
+	ret = write(fd, &v4l2_buf, sizeof(struct v4l2_buffer));
 	if (ret) {
 		CMR_LOGE("Failed to free frame, %d", ret);
 		ret = 0;
@@ -587,14 +590,14 @@ static int   cmr_v4l2_create_thread(void)
 static int cmr_v4l2_kill_thread(void)
 {
 	int                      ret = 0;
-	char                     write_ch = 0;
+	struct v4l2_buffer       v4l2_buf;
 	void                     *dummy;
 
 	CMR_CHECK_FD;
 
 	CMR_LOGV("Call write function to kill v4l2 manage thread");
-
-	ret = write(fd, &write_ch, 1); // kill thread;
+	bzero(&v4l2_buf, sizeof(struct v4l2_buffer));
+	ret = write(fd, &v4l2_buf, sizeof(struct v4l2_buffer)); // kill thread;
 	if (ret > 0) {
 		CMR_LOGV("write OK!");
 		ret = pthread_join(v4l2_thread, &dummy);
