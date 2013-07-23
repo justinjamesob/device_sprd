@@ -468,6 +468,10 @@ int i2s_pin_mux_sel(struct tiny_audio_device *adev, int type)
     else if(type == 2) {
 	ctl_str = "0";
     }
+    else
+    {
+        return 0;
+    }
 
     ALOGW("i2s_pin_mux_sel in bt fd is %d, extspk fd is %d,type is %d,str is %s",modem->i2s_bt.fd,modem->i2s_extspk.fd,type,ctl_str);
 
