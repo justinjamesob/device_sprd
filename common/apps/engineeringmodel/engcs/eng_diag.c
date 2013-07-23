@@ -1046,6 +1046,11 @@ int eng_diag_adc(char *buf, int *Irsp)
 	if(Irsp != NULL){
 		sprintf(Irsp,"\r\nERROR\r\n");
 	}
+	else
+	{
+		ENG_LOG("%s,in eng_diag_adc,Irsp is null",__FUNCTION__);
+		return 0;
+	}
 	
       head_ptr = (MSG_HEAD_T *)(buf+1);
       memset(buf1, 0, 8);
@@ -1053,7 +1058,7 @@ int eng_diag_adc(char *buf, int *Irsp)
       adc_get_result(buf1);
       result = atoi(buf1);
       Irsp[0] = result;
-      return Irsp != NULL ? strlen(Irsp):0;
+      return strlen(Irsp);
 }
 //end kenyliu add
 
@@ -1204,7 +1209,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 		}
 		At_cmd_back_sig();
 		//return rsp != NULL ? strlen(rsp):0;
-                return strlen(rsp);
+		return strlen(rsp);
 	}
 //end kenyliu added
     //audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
