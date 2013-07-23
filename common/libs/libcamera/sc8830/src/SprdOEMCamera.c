@@ -1400,8 +1400,12 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 		g_cxt->display_size.height = display_height;
 		ret = camera_preview_sensor_mode();
 
-		g_cxt->picture_size.width  = picture_width;
-		g_cxt->picture_size.height = picture_height;
+		g_cxt->picture_size.width  = CAMERA_ALIGNED_16(picture_width);
+		g_cxt->picture_size.height = CAMERA_ALIGNED_16(picture_height);
+		CMR_LOGV("picture after ALIGNED_16 is %d %d",
+			g_cxt->picture_size.width,
+			g_cxt->picture_size.height);
+
 		g_cxt->picture_size_backup = g_cxt->picture_size;
 		ret = camera_capture_sensor_mode();
 	} else {
