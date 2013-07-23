@@ -1216,7 +1216,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 		ENG_LOG("NOTICE:length is %x,%x,%x,%x",wlen,sizeof(AUDIO_TOTAL_T),sizeof(AUDIO_NV_ARM_MODE_INFO_T),sizeof(AUDIO_ENHA_EQ_STRUCT_T));
 
 		audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//audio_ptr = (AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
-		if ((AUDIO_TOTAL_T *)(-1) == audio_ptr ) {
+		if ((AUDIO_TOTAL_T *)(-1) == audio_ptr || (AUDIO_TOTAL_T *)(0) == audio_ptr ) {
 			ALOGE("mmap failed %s",strerror(errno));
 			goto out;
 		}
