@@ -1203,7 +1203,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			sprintf(rsp,"\r\ndisable_calibration   \r\n");
 		}
 		At_cmd_back_sig();
-		return rsp != NULL ? strlen(rsp):0;
+		//return rsp != NULL ? strlen(rsp):0;
+                return strlen(rsp);
 	}
 //end kenyliu added
     //audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
