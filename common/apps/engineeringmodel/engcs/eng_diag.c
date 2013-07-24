@@ -1098,7 +1098,11 @@ static AUDIO_TOTAL_T * eng_regetpara(void)
     memset(aud_params_ptr, 0, len);
 	srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
 	filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
-    close(srcfd); 
+	if(srcfd >= 0)
+	{
+		close(srcfd);
+	}
+     
 
     ALOGW("eng_regetpara %s", filename);////done,into
 	stringfile2nvstruct(filename,aud_params_ptr,len);
@@ -1169,7 +1173,10 @@ void * eng_getpara(void)
     memset(audio_total, 0, len);
 	srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
 	filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
-	close(srcfd); 
+	if(srcfd >= 0)
+	{
+		close(srcfd); 
+	}
 	ALOGW("wangzuo eng_getpara %s", filename);////done,into
 	stringfile2nvstruct(filename, audio_total, len); //get data from audio_hw.txt.
     return  audio_total;

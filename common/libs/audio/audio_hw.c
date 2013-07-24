@@ -3608,7 +3608,10 @@ static void vb_effect_getpara(struct tiny_audio_device *adev)
     #else
     srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
     filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
-    close(srcfd);
+    if(srcfd >= 0)
+    {
+    	close(srcfd);
+    }
     #endif
     ALOGI("vb_effect_getpara read name:%s.", filename);
 	stringfile2nvstruct(filename, adev->audio_para, len); //get data from audio_hw.txt.
