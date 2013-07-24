@@ -282,6 +282,7 @@ void SprdCameraHardware::release()
 	}
 
 	mMetadataHeap = NULL;
+	deinitCapture();
 
 	LOGV("release X");
 	LOGV("mLock:release E.\n");
