@@ -84,7 +84,9 @@ PRODUCT_PACKAGES += \
 
 # packages files
 PRODUCT_PACKAGES += \
-	
+	Wo3G \
+	WoReader
+
 # add  system properties
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.operator=cucc \
