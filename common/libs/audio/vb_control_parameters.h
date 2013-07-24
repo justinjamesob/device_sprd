@@ -23,7 +23,7 @@
 
 #define I2S_CTL_PATH_MAX      16
 #define I2S_CTL_INDEX_MAX     3
-#define AUDIO_MODE_NAME_MAX_LEN 24
+#define AUDIO_MODE_NAME_MAX_LEN 16
 
 #define AUDIO_XML_PATH "/system/etc/audio_hw.xml"
 

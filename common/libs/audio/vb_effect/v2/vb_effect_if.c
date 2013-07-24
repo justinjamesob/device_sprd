@@ -55,12 +55,12 @@
 #define MIXER_CTL_VBC_EQ_PROFILE_SELECT    "VBC EQ Profile Select"
 
 struct vbc_fw_header {
-	char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
-	unsigned profile_version;
-	unsigned num_profile; /*total num =  num_da + num_ad01 + num_ad23  */
-	unsigned num_da;   /*DA profile num*/
-	unsigned num_ad01; /*ad01 profile num*/
-	unsigned num_ad23; /*ad23 profile num*/
+    char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
+    unsigned profile_version;
+    unsigned num_profile; /*total num =  num_da + num_ad01 + num_ad23  */
+    unsigned num_da;   /*DA profile num*/
+    unsigned num_ad01; /*ad01 profile num*/
+    unsigned num_ad23; /*ad23 profile num*/
 
 };
 #define VBC_AD_CTL_PARAS_LEN            (2)
@@ -70,26 +70,26 @@ struct vbc_eq_profile {
     char name[VBC_EQ_PROFILE_NAME_MAX];
     /* FIXME */
     unsigned effect_paras[VBC_EFFECT_PARAS_LEN];
-	unsigned ad_ctl_paras[VBC_AD_CTL_PARAS_LEN];
+    unsigned ad_ctl_paras[VBC_AD_CTL_PARAS_LEN];
 };
 #define VBC_DA_EFFECT_PARAS_LEN            (20+72*2)
 
 struct vbc_da_eq_profile {
-	char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
-	char name[VBC_EQ_PROFILE_NAME_MAX];
-	unsigned effect_paras[VBC_DA_EFFECT_PARAS_LEN];
+    char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
+    char name[VBC_EQ_PROFILE_NAME_MAX];
+    unsigned effect_paras[VBC_DA_EFFECT_PARAS_LEN];
 };
 
 #define VBC_AD_EFFECT_PARAS_LEN             (2+ 43*2 )
 
 struct vbc_ad_eq_profile{
-	char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
-	char name[VBC_EQ_PROFILE_NAME_MAX];
-	unsigned effect_paras[VBC_AD_EFFECT_PARAS_LEN];
+    char magic[VBC_EQ_FIRMWARE_MAGIC_LEN];
+    char name[VBC_EQ_PROFILE_NAME_MAX];
+    unsigned effect_paras[VBC_AD_EFFECT_PARAS_LEN];
 };
 static const unsigned vbc_ad_ctrl_reg_default[VBC_AD_CTL_PARAS_LEN] = {
-	0x0, 	 /*  ADPATCHCTL      */
-	0x0,    /*  ADHPCTL         */
+    0x0, 	 /*  ADPATCHCTL      */
+    0x0,    /*  ADHPCTL         */
 };
 
 static const unsigned vbc_reg_default[VBC_EFFECT_PARAS_LEN] = {
@@ -108,11 +108,11 @@ static const unsigned vbc_reg_default[VBC_EFFECT_PARAS_LEN] = {
     0x0,       /*DAALCCTL10*/
     0x183,     /*STCTL0    */
     0x183,     /*STCTL1    */  
-	0x00000000,	 /*  DACSRCCTL       */
-	0x00000000,	 /*  MIXERCTL        */
-	0x00000000,	 /*  VBNGCVTHD       */
-	0x00000000,	 /*  VBNGCTTHD       */
-	0x00000000,	 /*  VBNGCTL         */
+    0x00000000,	 /*  DACSRCCTL       */
+    0x00000000,	 /*  MIXERCTL        */
+    0x00000000,	 /*  VBNGCVTHD       */
+    0x00000000,	 /*  VBNGCTTHD       */
+    0x00000000,	 /*  VBNGCTL         */
     0x0,       /*HPCOEF0_H   */
     0x0,       /*HPCOEF0_L   */
     0x0,       /*HPCOEF1_H   */
@@ -430,7 +430,7 @@ static const unsigned vbc_reg_default[VBC_EFFECT_PARAS_LEN] = {
     0x0,       /*ADC23_HPCOEF42_H     */
     0x0,       /*ADC23_HPCOEF42_L     */
 
-       
+
 };
 
 static int fd_src_paras;
@@ -464,8 +464,8 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
     uint32_t i = 0;
 
     if (NULL == audio_params_ptr) {
-       ALOGE(" Error: audio_params_ptr is NULL.");
-       return -1;
+        ALOGE(" Error: audio_params_ptr is NULL.");
+        return -1;
     }
     if (adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T) != params_size) {
         ALOGE("Error: params_size = %d, total size = %d", params_size, adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T));
@@ -476,20 +476,29 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
     vbc_da_effect_profile = (struct vbc_da_eq_profile *)malloc(sizeof(struct vbc_da_eq_profile));
     vbc_ad01_effect_profile = (struct vbc_ad_eq_profile *)malloc(sizeof(struct vbc_ad_eq_profile));
     vbc_ad23_effect_profile = (struct vbc_ad_eq_profile *)malloc(sizeof(struct vbc_ad_eq_profile));
-  
+
     if ((fw_header != NULL) && (effect_profile != NULL) && (vbc_da_effect_profile != NULL) && (vbc_ad01_effect_profile != NULL)&& (vbc_ad23_effect_profile != NULL)) {
         memset(fw_header, 0, sizeof(struct vbc_fw_header));
         memset(effect_profile, 0, sizeof(struct vbc_eq_profile));
         memset(vbc_da_effect_profile, 0, sizeof(struct vbc_da_eq_profile));
         memset(vbc_ad01_effect_profile, 0, sizeof(struct vbc_ad_eq_profile));
-		memset(vbc_ad23_effect_profile, 0, sizeof(struct vbc_ad_eq_profile));
-        
+        memset(vbc_ad23_effect_profile, 0, sizeof(struct vbc_ad_eq_profile));
+
     } else {
         ALOGE("Error: malloc failed for internal struct.");
         if (fw_header)
             free(fw_header);
         if (effect_profile)
             free(effect_profile);
+        if(vbc_da_effect_profile){
+            free(vbc_da_effect_profile);
+        }
+        if(vbc_ad01_effect_profile){
+            free(vbc_ad01_effect_profile);
+        }
+        if(vbc_ad23_effect_profile){
+            free(vbc_ad23_effect_profile);
+        }
         return -1;
     }
     ALOGI("do_parse...start");
@@ -499,6 +508,9 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
     if (NULL  == fd_dest_paras) {
         free(fw_header);
         free(effect_profile);
+        free(vbc_da_effect_profile);
+        free(vbc_ad01_effect_profile);
+        free(vbc_ad23_effect_profile);
         ALOGE("file %s open failed:%s", STORED_VBC_EFFECT_PARAS_PATH, strerror(errno));
         return -1;
     }
@@ -512,7 +524,7 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
     fw_header->num_profile = VBC_EFFECT_PROFILE_CNT; //TODO
 
     ALOGI("fd_dest_paras(0x%x), header_len(%d), da_profile_len(%d),ad_profile_len(%d)", (unsigned int)fd_dest_paras,
-         sizeof(struct vbc_fw_header), sizeof(struct vbc_da_eq_profile),sizeof(struct vbc_ad_eq_profile));
+            sizeof(struct vbc_fw_header), sizeof(struct vbc_da_eq_profile),sizeof(struct vbc_ad_eq_profile));
     //write dest file header
     fwrite(fw_header, sizeof(struct vbc_fw_header), 1, fd_dest_paras);
     temp_params_ptr = audio_params_ptr;
@@ -522,7 +534,7 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
         memset(effect_profile, 0, sizeof(struct vbc_eq_profile));
         memcpy(effect_profile->effect_paras, &vbc_reg_default[0], sizeof(vbc_reg_default));
         memcpy(effect_profile->ad_ctl_paras, &vbc_ad_ctrl_reg_default[0], sizeof(vbc_ad_ctrl_reg_default));
-        
+
         //set paras to buffer.
         AUDENHA_SetPara(cur_params_ptr, effect_profile->effect_paras,effect_profile->ad_ctl_paras);
 
@@ -533,36 +545,36 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
         ALOGI("vbc_da_effect_profile->name is %s", vbc_da_effect_profile->name);
         fseek(fd_dest_paras,i*sizeof(struct vbc_da_eq_profile)+sizeof(struct vbc_fw_header), SEEK_SET);
         fwrite(vbc_da_effect_profile, sizeof(struct vbc_da_eq_profile), 1, fd_dest_paras);
-        
-		//second,write AD01 eq.
-		memcpy(vbc_ad01_effect_profile->magic, VBC_EQ_FIRMWARE_MAGIC_ID, VBC_EQ_FIRMWARE_MAGIC_LEN);
-		memcpy(vbc_ad01_effect_profile->name, cur_params_ptr->audio_nv_arm_mode_info.ucModeName, 16);
-		vbc_ad01_effect_profile->effect_paras[0] = *(uint32_t*)(effect_profile->ad_ctl_paras + 0X00);
-		vbc_ad01_effect_profile->effect_paras[1] = *(uint32_t*)(effect_profile->ad_ctl_paras + 0X04);
-        memcpy((void*)(vbc_ad01_effect_profile->effect_paras)+sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN, (void*)(effect_profile->effect_paras)+sizeof(vbc_da_effect_profile->effect_paras), sizeof(vbc_ad01_effect_profile->effect_paras)-sizeof(uint32_t)*2);
-		ALOGI("vbc_ad01_effect_profile->name is %s", vbc_ad01_effect_profile->name);
-		fseek(fd_dest_paras,sizeof(struct vbc_fw_header)+i*sizeof(struct vbc_ad_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_da_eq_profile), SEEK_SET);
-		fwrite(vbc_ad01_effect_profile, sizeof(struct vbc_ad_eq_profile), 1, fd_dest_paras);
 
-		//third,wirte AD23 eq.
-		memcpy(vbc_ad23_effect_profile->magic, VBC_EQ_FIRMWARE_MAGIC_ID, VBC_EQ_FIRMWARE_MAGIC_LEN);
-		memcpy(vbc_ad23_effect_profile->name, cur_params_ptr->audio_nv_arm_mode_info.ucModeName, 16);
-		vbc_ad23_effect_profile->effect_paras[0] = *(uint32_t*)(effect_profile->ad_ctl_paras + 0X00);
-		vbc_ad23_effect_profile->effect_paras[1] = *(uint32_t*)(effect_profile->ad_ctl_paras + 0X04);
-        memcpy((void*)(vbc_ad23_effect_profile->effect_paras)+sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN, (void*)(effect_profile->effect_paras)+sizeof(vbc_da_effect_profile->effect_paras)+sizeof(vbc_ad01_effect_profile->effect_paras), sizeof(vbc_ad23_effect_profile->effect_paras)-sizeof(uint32_t)*2);
- 		ALOGI("vbc_ad23_effect_profile->name is %s", vbc_ad23_effect_profile->name);
-		fseek(fd_dest_paras,sizeof(struct vbc_fw_header)+i*sizeof(struct vbc_ad_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_da_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_ad_eq_profile), SEEK_SET);
-		fwrite(vbc_ad23_effect_profile, sizeof(struct vbc_ad_eq_profile), 1, fd_dest_paras);
-		
-        
+        //second,write AD01 eq.
+        memcpy(vbc_ad01_effect_profile->magic, VBC_EQ_FIRMWARE_MAGIC_ID, VBC_EQ_FIRMWARE_MAGIC_LEN);
+        memcpy(vbc_ad01_effect_profile->name, cur_params_ptr->audio_nv_arm_mode_info.ucModeName, 16);
+        vbc_ad01_effect_profile->effect_paras[0] = effect_profile->ad_ctl_paras[0];
+        vbc_ad01_effect_profile->effect_paras[1] = effect_profile->ad_ctl_paras[1];
+        memcpy((void*)(vbc_ad01_effect_profile->effect_paras)+sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN, (void*)(effect_profile->effect_paras)+sizeof(vbc_da_effect_profile->effect_paras), sizeof(vbc_ad01_effect_profile->effect_paras)-sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN);
+        ALOGI("vbc_ad01_effect_profile->name is %s", vbc_ad01_effect_profile->name);
+        fseek(fd_dest_paras,sizeof(struct vbc_fw_header)+i*sizeof(struct vbc_ad_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_da_eq_profile), SEEK_SET);
+        fwrite(vbc_ad01_effect_profile, sizeof(struct vbc_ad_eq_profile), 1, fd_dest_paras);
+
+        //third,wirte AD23 eq.
+        memcpy(vbc_ad23_effect_profile->magic, VBC_EQ_FIRMWARE_MAGIC_ID, VBC_EQ_FIRMWARE_MAGIC_LEN);
+        memcpy(vbc_ad23_effect_profile->name, cur_params_ptr->audio_nv_arm_mode_info.ucModeName, 16);
+        vbc_ad23_effect_profile->effect_paras[0] = effect_profile->ad_ctl_paras[0];
+        vbc_ad23_effect_profile->effect_paras[1] = effect_profile->ad_ctl_paras[1];
+        memcpy((void*)(vbc_ad23_effect_profile->effect_paras)+sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN, (void*)(effect_profile->effect_paras)+sizeof(vbc_da_effect_profile->effect_paras)+sizeof(vbc_ad01_effect_profile->effect_paras)-sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN, sizeof(vbc_ad23_effect_profile->effect_paras)-sizeof(uint32_t)*VBC_AD_CTL_PARAS_LEN);
+        ALOGI("vbc_ad23_effect_profile->name is %s", vbc_ad23_effect_profile->name);
+        fseek(fd_dest_paras,sizeof(struct vbc_fw_header)+i*sizeof(struct vbc_ad_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_da_eq_profile)+VBC_EFFECT_PROFILE_CNT*sizeof(struct vbc_ad_eq_profile), SEEK_SET);
+        fwrite(vbc_ad23_effect_profile, sizeof(struct vbc_ad_eq_profile), 1, fd_dest_paras);
+
+
     }
     fclose(fd_dest_paras);
     free(fw_header);
     free(effect_profile);
-	free(vbc_da_effect_profile);
-	free(vbc_ad01_effect_profile);
-	free(vbc_ad23_effect_profile);
-   
+    free(vbc_da_effect_profile);
+    free(vbc_ad01_effect_profile);
+    free(vbc_ad23_effect_profile);
+
     ALOGI("do_parse...end");
     return 0;
 }
@@ -570,7 +582,7 @@ static int do_parse(AUDIO_TOTAL_T *audio_params_ptr, unsigned int params_size)
 /* to initialize vbc eq parameters at productinfo
    soft link to vendor/firmware/vbc_eq
    when system boot
-*/
+   */
 int create_vb_effect_params(void)
 {
     AUDIO_TOTAL_T * aud_params_ptr = NULL;
@@ -580,7 +592,7 @@ int create_vb_effect_params(void)
     //read audio params from source file.
     aud_params_ptr = get_aud_paras();
 
-	 ALOGI("create_vb_effect_params...start,aud_params_ptr:0x%x",aud_params_ptr);
+    ALOGI("create_vb_effect_params...start,aud_params_ptr:0x%x",aud_params_ptr);
     //close fd
     if (aud_params_ptr) {
         ret = do_parse(aud_params_ptr, adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T));
@@ -607,14 +619,14 @@ void vb_effect_config_mixer_ctl(struct mixer_ctl *eq_update, struct mixer_ctl *p
 
 void vb_da_effect_config_mixer_ctl(struct mixer_ctl *da_profile_select)
 {
-	s_ctl_da_eq_profile_select = da_profile_select;
+    s_ctl_da_eq_profile_select = da_profile_select;
 }
 
 
 void vb_ad_effect_config_mixer_ctl(struct mixer_ctl *ad01_profile_select, struct mixer_ctl *ad23_profile_select)
 {
-	s_ctl_ad01_eq_profile_select = ad01_profile_select;
-	s_ctl_ad23_eq_profile_select = ad23_profile_select;
+    s_ctl_ad01_eq_profile_select = ad01_profile_select;
+    s_ctl_ad23_eq_profile_select = ad23_profile_select;
 }
 
 
@@ -639,45 +651,45 @@ int vb_effect_loading(void)
 
 int  vb_da_effect_profile_apply(int index)
 {
-	int ret = 0;
-	ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
-	if(index < VBC_EFFECT_PROFILE_CNT)
-	{
-		ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, index);
-	}
-	else
-	{
-		ret = -1;
-	}
-	return ret;
+    int ret = 0;
+    ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
+    if(index < VBC_EFFECT_PROFILE_CNT)
+    {
+        ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, index);
+    }
+    else
+    {
+        ret = -1;
+    }
+    return ret;
 }
 int  vb_ad01_effect_profile_apply(int index)
 {
-	int ret = 0;
-	ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
+    int ret = 0;
+    ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
     if(index < VBC_EFFECT_PROFILE_CNT)
     {
-   		ret = mixer_ctl_set_value(s_ctl_ad01_eq_profile_select, 0, index); 
+        ret = mixer_ctl_set_value(s_ctl_ad01_eq_profile_select, 0, index); 
     }
-	else
-	{
-		ret = -1;
-	}
-	return ret;
+    else
+    {
+        ret = -1;
+    }
+    return ret;
 }
 int  vb_ad23_effect_profile_apply(int index)
 {
-	int ret = 0;
-	ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
-	if(index < VBC_EFFECT_PROFILE_CNT)
-	{
-		ret = mixer_ctl_set_value(s_ctl_ad23_eq_profile_select, 0, index);
-	}
-	else
-	{
-		ret = -1;
-	}
-	return ret;
+    int ret = 0;
+    ALOGI("s_cur_devices(0x%08x),index(%d)", s_cur_devices,index);
+    if(index < VBC_EFFECT_PROFILE_CNT)
+    {
+        ret = mixer_ctl_set_value(s_ctl_ad23_eq_profile_select, 0, index);
+    }
+    else
+    {
+        ret = -1;
+    }
+    return ret;
 }
 
 int vb_effect_profile_apply(void)
@@ -688,7 +700,7 @@ int vb_effect_profile_apply(void)
     if (s_ctl_da_eq_profile_select) {
 
         if(((s_cur_devices & AUDIO_DEVICE_OUT_WIRED_HEADSET)&&(s_cur_devices & AUDIO_DEVICE_OUT_SPEAKER))
-               ||((s_cur_devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE)&&(s_cur_devices & AUDIO_DEVICE_OUT_SPEAKER))){
+                ||((s_cur_devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE)&&(s_cur_devices & AUDIO_DEVICE_OUT_SPEAKER))){
             //ret = mixer_ctl_set_enum_by_string(s_ctl_eq_select, "Headfree");
             ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, 1);
             ALOGI("profile is Headfree, ret=%d", ret);
@@ -735,14 +747,14 @@ int parse_vb_effect_params(void *audio_params_ptr, unsigned int params_size)
         return -1;
     }
     eq_update = mixer_get_ctl_by_name(mixer, MIXER_CTL_VBC_EQ_UPDATE);
-     
+
     do_parse((AUDIO_TOTAL_T *) audio_params_ptr, params_size);
-    
+
     //Loading and enable vb effect.
     ret = mixer_ctl_set_enum_by_string(eq_update, "loading");
     ALOGI("parse_vb_effect_params, ret(%d)", ret);
-    
+
     mixer_close(mixer);
-    
+
     return 0;
 }
