@@ -235,6 +235,7 @@ void stringfile2nvstruct(char *filename, void *para_ptr, int lenbytes)
 	if (NULL == fpRead) 
 	{
 		ALOGW("file %s open failed\n",filename);
+		return;
 	}   
 	ALOGW("stringfile2nvstruct :%d ----> %s\n",aud_mode->num,(aud_mode->audio_mode_item_info+aud_mode->num-1)->mode_name);
 	while(!feof(fpRead))////////////////////todo
