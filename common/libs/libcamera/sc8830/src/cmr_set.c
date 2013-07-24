@@ -57,6 +57,42 @@ static int camera_param_to_isp(uint32_t cmd, uint32_t in_param, uint32_t *ptr_ou
 		*ptr_out_param = in_param;
 		break;
 
+    case ISP_CTRL_AE_MODE:
+	{
+		switch (in_param)
+		{
+			case 0:
+			case 5:
+			{
+				*ptr_out_param = ISP_AUTO;
+				break;
+			}
+			case 2:
+			{
+				*ptr_out_param = ISP_SPORT;
+				break;
+			}
+			case 1:
+			{
+				*ptr_out_param = ISP_NIGHT;
+				break;
+			}
+			case 3:
+			{
+				*ptr_out_param = ISP_PORTRAIT;
+				break;
+			}
+			case 4:
+			{
+				*ptr_out_param = ISP_LANDSCAPE;
+				break;
+			}
+			default :
+				break;
+		}
+		break;
+	}
+
 	case ISP_CTRL_AWB_MODE:
 	{
 		switch (in_param) 
@@ -292,6 +328,7 @@ int camera_set_contrast(uint32_t contrast, uint32_t *skip_mode, uint32_t *skip_n
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		camera_param_to_isp(ISP_CTRL_CONTRAST, contrast, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_CONTRAST, (void *)&isp_param);
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_CONTRAST, contrast);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
@@ -399,6 +436,8 @@ int camera_set_wb(uint32_t wb_mode, uint32_t *skip_mode, uint32_t *skip_num)
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		camera_param_to_isp(ISP_CTRL_AWB_MODE, wb_mode, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_AWB_MODE, (void *)&isp_param);
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_LIGHTSOURCE, wb_mode);
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_WHITEBALANCE, wb_mode);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
@@ -412,11 +451,15 @@ int camera_set_scene(uint32_t scene_mode, uint32_t *skip_mode, uint32_t *skip_nu
 {
 	struct camera_context    *cxt = camera_get_cxt();
 	int                      ret = CAMERA_SUCCESS;
+    uint32_t                 isp_param = 0;
 
 	CMR_LOGI("scene_mode %d", scene_mode);
 	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = 0;
+		camera_param_to_isp(ISP_CTRL_AE_MODE, scene_mode, &isp_param);
+		ret = isp_ioctl(ISP_CTRL_AE_MODE,(void *)&isp_param);
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_SCENECAPTURETYPE,scene_mode);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
