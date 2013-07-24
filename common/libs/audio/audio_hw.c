@@ -1333,7 +1333,7 @@ static bool out_bypass_data(struct tiny_stream_out *out, uint32_t frame_size, ui
         MY_TRACE("out_write throw away data call_start(%d) mode(%d) devices(0x%x) call_connected(%d) vbc_2arm(%d) call_prestop(%d)...",adev->call_start,adev->mode,adev->devices,adev->call_connected,adev->vbc_2arm,adev->call_prestop);
         pthread_mutex_unlock(&adev->lock);
         pthread_mutex_unlock(&out->lock);
-        usleep(bytes * 1000000 / frame_size / sample_rate);
+        usleep((int64_t)bytes * 1000000 / frame_size / sample_rate);
         return true;
     }else{
         return false;
@@ -2288,9 +2288,9 @@ static bool in_bypass_data(struct tiny_stream_in *in,uint32_t frame_size, uint32
    if ((!adev->call_start) && ((in->device == AUDIO_DEVICE_IN_VOICE_CALL))){
        ALOGW("in_bypass_data write 0 data call_start(%d) mode(%d) devices(0x%x) in_device(0x%x) call_connected(%d) call_prestop(%d) ",adev->call_start,adev->mode,adev->devices,in->device,adev->call_connected,adev->call_prestop);
        memset(buffer,0,bytes);
-        pthread_mutex_unlock(&adev->lock);
-        pthread_mutex_unlock(&in->lock);
-       usleep(bytes * 1000000 / frame_size / sample_rate);
+       pthread_mutex_unlock(&adev->lock);
+       pthread_mutex_unlock(&in->lock);
+       usleep((int64_t)bytes * 1000000 / frame_size / sample_rate);
        return true;
    }else{
      return false;
