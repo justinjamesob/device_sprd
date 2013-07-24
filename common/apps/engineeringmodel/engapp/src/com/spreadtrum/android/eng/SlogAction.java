@@ -143,7 +143,6 @@ public class SlogAction {
 
     private static Context mContext;
 
-
     // Temp Solution.
     private static boolean MMC_SUPPORT = "1".equals(android.os.SystemProperties.get("ro.device.support.mmc"));
 
@@ -285,19 +284,14 @@ public class SlogAction {
                             + keyName.length() + 1), // ending cursor
                     result, 0);//
         } catch(Exception e) {
-            // TODO REMOVE LOG AFTER DEBUG.
             Log.d(TAG, "Catch exception");
             e.printStackTrace();
             return DECODE_ERROR;
         }
-        Log.d(TAG, "return value is " + String.valueOf(result).trim() + "and keyName=" + keyName);
-        Thread.dumpStack();
         return String.valueOf(result).trim();
     }
 
     private static synchronized void resetSlogConf() {
-        // TODO REMOVE LOG AFTER DEBUG.
-        Log.d(TAG, "found slog.conf has something wrong, reset theme");
         new Thread() {
             @Override
             public void run() {
@@ -428,7 +422,7 @@ public class SlogAction {
             conf = new StringBuilder(EncodingUtils.getString(buffer, "UTF-8"));
             int searchCursor = conf.indexOf(keyName);
             if (searchCursor < 0) {
-                Log.e(TAG, "start index <0, reset slog.conf");
+                Log.e(TAG, "start index < 0, reset slog.conf");
                 resetSlogConf();
                 return;
             }
@@ -926,7 +920,7 @@ public class SlogAction {
             } catch (NameNotFoundException e) {
                 Log.e(TAG, "NameNotFoundException " + e);
                 return ;
-            } 
+            }
         } else {
             Log.e(TAG, "Failed registBroadcast, unknown command " + command);
         }
@@ -1020,7 +1014,7 @@ public class SlogAction {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         try {
-            dos.writeBytes(String.format("%d,%d,%d", atCommandCode , 1, openLog ? 1 : 1));
+            dos.writeBytes(String.format("%d,%d,%d", atCommandCode , 1, openLog ? 1 : 0));
         } catch (IOException ioException) {
             Log.e(TAG, "IOException has catched, see logs " + ioException);
             return false;
@@ -1215,32 +1209,28 @@ public class SlogAction {
                 /*Add 20130527 Spreadst of 169012 No init Looper end*/
                 try {
                     Thread.sleep(500);
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec(SLOG_COMMAND_SCREENSHOT);
-                    try {
-                        if (proc.waitFor() != 0) {
-                        Log.d("Snap", "Exit value=" + proc.exitValue()
-                            + ".Maybe not correct");
-                        }
-
-                        msg.what = MESSAGE_SNAP_SUCCESSED;
-                        LogSettingSlogUITabHostActivity.mTabHostHandler.sendMessage(msg);
-                    } catch (InterruptedException e) {
-                        msg.what = MESSAGE_SNAP_FAILED;
+                    
+                    if (runSlogCommand(SLOG_COMMAND_SCREENSHOT) == 0) {
                         try {
-                            LogSettingSlogUITabHostActivity.mTabHostHandler.sendMessage(msg);
+                            LogSettingSlogUITabHostActivity.mTabHostHandler
+                                    .sendEmptyMessage(MESSAGE_SNAP_SUCCESSED);
                         } catch (ExceptionInInitializerError initError) {
-                            Log.e(TAG, "Can't send message");
+                            Log.e(TAG, "Failed send message, dump stack trace");
+                            initError.printStackTrace();
                         }
-                        Log.e("Snap", e.toString());
+                    } else {
+                        try {
+                            LogSettingSlogUITabHostActivity.mTabHostHandler
+                                    .sendEmptyMessage(MESSAGE_SNAP_FAILED);
+                        } catch (ExceptionInInitializerError initError) {
+                            Log.e(TAG, "Failed send message, dump stack trace");
+                            initError.printStackTrace();
+                        }
                     }
-
                 } catch (Exception e) {
-                    System.err.println(SLOG_COMMAND_RESTART
-                        + " has Exception, log followed");
-                    msg.what = MESSAGE_SNAP_FAILED;
                     try {
-                        LogSettingSlogUITabHostActivity.mTabHostHandler.sendMessage(msg);
+                        LogSettingSlogUITabHostActivity.mTabHostHandler
+                                .sendEmptyMessage(MESSAGE_SNAP_FAILED);
                     } catch (ExceptionInInitializerError initError) {
                         Log.e(TAG, "Can't send message");
                     }
