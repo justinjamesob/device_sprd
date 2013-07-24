@@ -464,6 +464,7 @@ int cmr_scale_init(void)
 	}
 
 	scaler_evt_cb = NULL;
+	CMR_LOGV("Out");
 	return ret;
 }
 
