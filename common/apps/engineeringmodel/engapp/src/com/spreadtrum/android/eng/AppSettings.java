@@ -1,10 +1,6 @@
 
 package com.spreadtrum.android.eng;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -30,6 +26,7 @@ public class AppSettings extends PreferenceActivity {
     public static final String PREFS_NAME = "ENGINEERINGMODEL";
 
     private static final String AUTO_ANSWER = "autoanswer_call";
+    private static final String ENABLE_MASS_STORAGE = "enable_mass_storage";
     private static final String ENABLE_VSER_GSER = "enable_vser_gser"; // add by
                                                                        // liguxiang
                                                                        // 07-12-11
@@ -46,6 +43,7 @@ public class AppSettings extends PreferenceActivity {
     private static final String ENG_TESTMODE = "engtestmode";
 
     private CheckBoxPreference mAutoAnswer;
+    private CheckBoxPreference mEnableMassStorage;
     private CheckBoxPreference mEnableVserGser; // add by liguxiang 07-12-11 for
                                                 // engineeringmoodel usb
                                                 // settings
@@ -61,6 +59,7 @@ public class AppSettings extends PreferenceActivity {
         addPreferencesFromResource(R.layout.appset);
 
         mAutoAnswer = (CheckBoxPreference) findPreference(AUTO_ANSWER);
+        mEnableMassStorage = (CheckBoxPreference) findPreference(ENABLE_MASS_STORAGE);
         mEnableVserGser = (CheckBoxPreference) findPreference(ENABLE_VSER_GSER); // add
                                                                                  // by
                                                                                  // liguxiang
@@ -100,6 +99,7 @@ public class AppSettings extends PreferenceActivity {
         if (DEBUG)
             Log.d(LOG_TAG, " usbMode = " + usbMode);
         mEnableVserGser.setChecked(usbMode.endsWith("vser,gser"));
+        mEnableMassStorage.setChecked(usbMode.startsWith("mass_storage"));
         boolean test = mEngSqlite.queryData(ENG_TESTMODE);
         if (!test) {
             mEnableUsbFactoryMode.setChecked(true);
@@ -138,6 +138,11 @@ public class AppSettings extends PreferenceActivity {
 
             if (DEBUG)
                 Log.d(LOG_TAG, "auto answer state " + newState);
+            return true;
+        }else if(preference == mEnableMassStorage){
+            boolean newState = mEnableMassStorage.isChecked();
+            Settings.Secure.putInt(getContentResolver(),
+                    Settings.Secure.USB_MASS_STORAGE_ENABLED, newState ? 1 : 0);
             return true;
             // add by liguxiang 07-12-11 for engineeringmoodel usb settings
             // begin

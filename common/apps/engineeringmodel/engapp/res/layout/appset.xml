@@ -63,6 +63,13 @@
         android:title="Power Key Menu Setting" >
     </CheckBoxPreference>
 
+        <CheckBoxPreference android:key="enable_mass_storage"
+                android:title="Enable Mass_Storage"
+                android:summaryOn="Open"
+                android:summaryOff="Close"
+                android:defaultValue="true">
+	</CheckBoxPreference>
+
 	<!-- add by liguxiang 07-12-11 for engineeringmodel usb settings begin -->
 	<CheckBoxPreference android:key="enable_vser_gser"
 			android:title="Enable Vser Gser"
