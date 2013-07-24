@@ -508,8 +508,6 @@ static int handle_isp_data(unsigned char *buf, unsigned int len)
 					fun_ptr->take_picture(0, 0);
 					sem_wait(&capture_sem_lock);
 
-					usleep(1000*1000);
-
 					if(NULL!=fun_ptr->stop_preview){
 						fun_ptr->stop_preview(0, 0);
 					}
@@ -519,6 +517,7 @@ static int handle_isp_data(unsigned char *buf, unsigned int len)
 					if(NULL!=fun_ptr->start_preview){
 						fun_ptr->start_preview(0, 0);
 					}
+
 				}
 			}
 
@@ -716,14 +715,14 @@ void send_img_data(uint32_t format, uint32_t width, uint32_t height, char *imgpt
 		int img_len;
 		uint32_t img_w;
 		uint32_t img_h;
-
+		/*if preview size more than vga that is subsample to less than vga for preview frame ratio*/
 		ispvideo_Scale(format, width, height, imgptr, imagelen, &img_w, &img_h, &img_ptr, &img_len);
 
 		ret = handle_img_data(format, img_w, img_h, img_ptr, img_len, 0, 0, 0, 0);
-		//ret = handle_img_data(format, width, height, imgptr, imagelen, 0, 0, 0, 0);
+
 		sem_post(&preview_sem_lock);
 		if (ret != 0) {
-			DBG("ISP_TOOL:Fail to handle_img_data(). ret = %d.", ret);
+			DBG("ISP_TOOL:handle_img_data().error ret = %d.", ret);
 		}
 	}
 }
@@ -731,8 +730,8 @@ void send_img_data(uint32_t format, uint32_t width, uint32_t height, char *imgpt
 void send_capture_data_end(uint32_t format)
 {
 	if ((capture_flag == 1) && (1 == capture_img_end_flag) && (ISP_VIDEO_JPG == format))
-	{
-		DBG("ISP_TOOL: format: %d \n", format);
+	{/* first raw data -> second yuv data -> the ned jpg data: jpg data end the the capture action complete */
+		usleep(1000*1000);
 		sem_post(&capture_sem_lock);
 		capture_flag = 0;
 	}
@@ -744,11 +743,11 @@ void send_capture_data(uint32_t format, uint32_t width, uint32_t height, char *c
 
 	if ((0 == capture_img_end_flag)&&(format == capture_format))
 	{
-		DBG("ISP_TOOL: format: %d, width: %d, height: %d.\n", format, width, height);
+		DBG("ISP_TOOL: capture format: %d, width: %d, height: %d.\n", format, width, height);
 		ret = handle_img_data(format, width, height, ch0_ptr, ch0_len, ch1_ptr, ch1_len, ch2_ptr, ch2_len);
 		capture_img_end_flag=1;
 		if (ret != 0) {
-			DBG("ISP_TOOL: Fail to handle_img_data(). ret = %d.", ret);
+			DBG("ISP_TOOL: handle_img_data().error  ret = %d.", ret);
 		}
 	}
 

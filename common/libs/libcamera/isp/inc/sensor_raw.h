@@ -293,13 +293,17 @@ struct sensor_saturation_param{
 };
 
 struct sensor_af_param{
-	uint32_t total_step;
 	uint32_t max_step;
+	uint16_t min_step;
+	uint16_t max_tune_step;
 	uint32_t stab_period;
-	uint16_t af_step_info[32];
-	uint16_t af_step_count;
-	uint16_t alg_id;
-	uint32_t reserved[23];
+	uint16_t af_rough_step[32];
+	uint16_t af_fine_step[32];
+	uint8_t rough_count;
+	uint8_t fine_count;
+	uint8_t alg_id;
+	uint8_t debug;
+	uint32_t reserved[7];
 };
 
 struct sensor_emboss_param{
@@ -467,7 +471,8 @@ struct sensor_raw_info{
 struct raw_param_info_tab{
 	uint32_t param_id;
 	struct sensor_raw_info* info_ptr;
-	uint32_t(*cfg) (void* param_ptr);
+	uint32_t(*identify_otp) (void* param_ptr);
+	uint32_t(*cfg_otp) (void* param_ptr);
 };
 
 #endif

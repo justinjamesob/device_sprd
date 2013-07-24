@@ -770,7 +770,10 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	    ((sensor_info_ptr->hw_signal_polarity >> 4) & 0x1);
 	exp_info_ptr->pclk_delay =
 	    ((sensor_info_ptr->hw_signal_polarity >> 5) & 0x07);
-	exp_info_ptr->raw_info_ptr = (struct sensor_raw_info*)sensor_info_ptr->raw_info_ptr;
+
+	if ((NULL!=sensor_info_ptr) && (NULL!=sensor_info_ptr->raw_info_ptr)) {
+		exp_info_ptr->raw_info_ptr = (struct sensor_raw_info*)*sensor_info_ptr->raw_info_ptr;
+	}
 
 	exp_info_ptr->source_width_max = sensor_info_ptr->source_width_max;
 	exp_info_ptr->source_height_max = sensor_info_ptr->source_height_max;
@@ -1558,7 +1561,7 @@ static int _sensor_cali_lnc_param_update(char *cfg_file_dir,SENSOR_INFO_T *senso
 	}
 
 	trim_ptr = (SENSOR_TRIM_T *)(s_sensor_info_ptr->ioctl_func_tab_ptr->get_trim(0));
-	raw_fix_info_ptr = sensor_info_ptr->raw_info_ptr->fix_ptr;
+	raw_fix_info_ptr = (*(sensor_info_ptr->raw_info_ptr))->fix_ptr;
 	i = 1;
 	while(1) {
 		height = trim_ptr[i].trim_height;
@@ -1635,8 +1638,8 @@ static int _sensor_cali_awb_param_update(char *cfg_file_dir,SENSOR_INFO_T *senso
 	if(SENSOR_IMAGE_FORMAT_RAW != sensor_info_ptr->image_format){
 		return SENSOR_FAIL;
 	}
-	raw_tune_info_ptr = (struct sensor_raw_tune_info*)sensor_info_ptr->raw_info_ptr->tune_ptr;
-	cali_info_ptr = (struct sensor_cali_info*)&sensor_info_ptr->raw_info_ptr->cali_ptr->awb.cali_info;
+	raw_tune_info_ptr = (struct sensor_raw_tune_info*)(*(sensor_info_ptr->raw_info_ptr))->tune_ptr;
+	cali_info_ptr = (struct sensor_cali_info*)&(*(sensor_info_ptr->raw_info_ptr))->cali_ptr->awb.cali_info;
 
 	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
 	file_name_ptr = (char*)&file_name[0] + str_len;
@@ -1690,7 +1693,7 @@ static int _sensor_cali_awb_param_update(char *cfg_file_dir,SENSOR_INFO_T *senso
 	sprintf(file_name_ptr, "_awb_gldn.dat");
 
 	SENSOR_PRINT("_sensor_cali_awb_param_update: %s\n", file_name);
-	cali_info_ptr = (struct sensor_cali_info*)&sensor_info_ptr->raw_info_ptr->cali_ptr->awb.golden_cali_info;
+	cali_info_ptr = (struct sensor_cali_info*)&(*(sensor_info_ptr->raw_info_ptr))->cali_ptr->awb.golden_cali_info;
 	fp = fopen(file_name, "rb");
 	if (0 == fp) {
 
@@ -1751,8 +1754,8 @@ static int _sensor_cali_flashlight_param_update(char *cfg_file_dir,SENSOR_INFO_T
 	if(SENSOR_IMAGE_FORMAT_RAW != sensor_info_ptr->image_format){
 		return SENSOR_FAIL;
 	}
-	raw_tune_info_ptr = (struct sensor_raw_tune_info*)sensor_info_ptr->raw_info_ptr->tune_ptr;
-	cali_info_ptr = (struct sensor_cali_info*)&sensor_info_ptr->raw_info_ptr->cali_ptr->flashlight.cali_info;
+	raw_tune_info_ptr = (struct sensor_raw_tune_info*)(*(sensor_info_ptr->raw_info_ptr))->tune_ptr;
+	cali_info_ptr = (struct sensor_cali_info*)&(*(sensor_info_ptr->raw_info_ptr))->cali_ptr->flashlight.cali_info;
 
 	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
 	file_name_ptr = (char*)&file_name[0] + str_len;
@@ -1806,7 +1809,7 @@ static int _sensor_cali_flashlight_param_update(char *cfg_file_dir,SENSOR_INFO_T
 	sprintf(file_name_ptr, "_flashlight_gldn.dat");
 
 	SENSOR_PRINT("_sensor_cali_flashlight_param_update: %s\n", file_name);
-	cali_info_ptr = (struct sensor_cali_info*)&sensor_info_ptr->raw_info_ptr->cali_ptr->flashlight.golden_cali_info;
+	cali_info_ptr = (struct sensor_cali_info*)&(*(sensor_info_ptr->raw_info_ptr))->cali_ptr->flashlight.golden_cali_info;
 	fp = fopen(file_name, "rb");
 	if (0 == fp) {
 
@@ -1981,12 +1984,22 @@ int Sensor_Open(uint32_t sensor_id)
 			return SENSOR_FAIL;
 		}
 
+		Sensor_SetExportInfo(&s_sensor_exp_info);
+
 		ret_val = SENSOR_SUCCESS;
 		if (SENSOR_SUCCESS != Sensor_SetMode(SENSOR_MODE_COMMON_INIT)) {
 			SENSOR_PRINT_ERR("Sensor set init mode error!");
 			_Sensor_I2CDeInit(sensor_id);
 			ret_val = SENSOR_FAIL;
 		}
+
+		if((NULL != s_sensor_info_ptr)
+			&&(NULL != s_sensor_info_ptr->ioctl_func_tab_ptr)
+			&&(PNULL != s_sensor_info_ptr->ioctl_func_tab_ptr->cfg_otp))
+		{
+			s_sensor_info_ptr->ioctl_func_tab_ptr->cfg_otp(0);
+		}
+
 		SENSOR_PRINT("Sensor_Open: 4\n");
 		//s_sensor_init = SENSOR_TRUE;
 		SENSOR_PRINT("SENSOR: Sensor_Init  Success");

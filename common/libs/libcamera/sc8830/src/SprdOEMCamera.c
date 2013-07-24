@@ -3753,7 +3753,7 @@ int camera_preview_init(int format_mode)
 		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[g_cxt->sn_cxt.capture_mode].ae_info[video_mode];
 		CMR_LOGE("%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
 			     sensor_aec_info->line_time,sensor_aec_info->gain);
-		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)&sensor_aec_info);
+		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
 		if (CAMERA_SUCCESS != ret) {
 			CMR_LOGE("set ae information error.");
 		}
@@ -4893,6 +4893,8 @@ int camera_start_isp_process(struct frm_info *data)
 	uint32_t                 frm_id;
 	int                      ret = CAMERA_SUCCESS;
 	struct ips_out_param     ips_out;
+	uint32_t                 raw_pixel_width = 0;
+	uint32_t raw_format;
 
 	TAKE_PIC_CANCEL;
 
@@ -4904,8 +4906,12 @@ int camera_start_isp_process(struct frm_info *data)
 
 	if (g_cxt->sn_cxt.sn_if.if_type) {
 		ips_in.src_frame.img_fmt = ISP_DATA_CSI2_RAW10;
+		raw_pixel_width=0xa;
+		raw_format=0x08;
 	} else {
 		ips_in.src_frame.img_fmt = ISP_DATA_NORMAL_RAW10;
+		raw_pixel_width=0x10;
+		raw_format=0x04;
 	}
 	ips_in.src_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].cap_raw.addr_phy.addr_y;
 	ips_in.src_frame.img_size.w = g_cxt->cap_mem[frm_id].cap_raw.size.width;
@@ -4930,11 +4936,11 @@ int camera_start_isp_process(struct frm_info *data)
 	/*ips_in.src_slice_height = CMR_SLICE_HEIGHT;
 	ips_in.dst_slice_height = CMR_SLICE_HEIGHT;*/
 
-	send_capture_data(0x08,/* raw */
+	send_capture_data(raw_format,/* raw */
 			g_cxt->cap_mem[frm_id].cap_raw.size.width,
 			g_cxt->cap_mem[frm_id].cap_raw.size.height,
 			(char *)g_cxt->cap_mem[frm_id].cap_raw.addr_vir.addr_y,
-			g_cxt->cap_mem[frm_id].cap_raw.size.width*g_cxt->cap_mem[frm_id].cap_raw.size.height * 5 /4,
+			g_cxt->cap_mem[frm_id].cap_raw.size.width*g_cxt->cap_mem[frm_id].cap_raw.size.height * raw_pixel_width /8,
 			0, 0, 0, 0);
 
 #if 0

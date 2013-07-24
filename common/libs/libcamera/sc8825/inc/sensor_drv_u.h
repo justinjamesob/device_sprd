@@ -546,6 +546,7 @@ typedef struct sensor_trim_tag {
 	uint16_t trim_height;
 	uint32_t line_time;
 	uint32_t pclk;
+	uint32_t frame_line;
 } SENSOR_TRIM_T, *SENSOR_TRIM_T_PTR;
 
 typedef struct _sensor_rect_tag {
