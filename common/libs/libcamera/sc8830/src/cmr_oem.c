@@ -273,7 +273,7 @@ JINF_EXIF_INFO_T* camera_get_exif(struct camera_context *p_cxt)
 	}
 
 	time(&timep);
-	p = gmtime(&timep);
+	p = localtime(&timep);
 	sprintf(datetime_buf,
 			"%4d:%02d:%02d %02d:%02d:%02d",
 			(1900+p->tm_year),
@@ -285,12 +285,12 @@ JINF_EXIF_INFO_T* camera_get_exif(struct camera_context *p_cxt)
 	datetime_buf[19] = '\0';
 	datetime = datetime_buf;
 
-	CMR_LOGI("datetime %s.",datetime);
+	CMR_LOGI("datetime %s",datetime);
 
 	if(0 == s_position.timestamp)
 		time(&s_position.timestamp);
-	p = gmtime(&s_position.timestamp);
-	sprintf(gps_date_buf, "%4d:%2d:%2d", (1900+p->tm_year), (1+p->tm_mon),p->tm_mday);
+	p = localtime(&s_position.timestamp);
+	sprintf(gps_date_buf, "%4d:%02d:%02d", (1900+p->tm_year), (1+p->tm_mon),p->tm_mday);
 	gps_date_buf[10] = '\0';
 	gps_date = gps_date_buf;
 	gps_hour = p->tm_hour;
@@ -410,7 +410,6 @@ JINF_EXIF_INFO_T* camera_get_exif(struct camera_context *p_cxt)
 			CMR_LOGI("set DateTimeOriginal.");
 		}
 	}
-
 	memset(&s_position, 0, sizeof(camera_position_type));
 	return p_exif_info;
 }
