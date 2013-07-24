@@ -450,8 +450,8 @@ int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci
 	stream_parm.parm.capture.capability = PATH_RESUME;
 
 	stream_parm.parm.capture.reserved[0] = channel_id;
-	ret = ioctl(fd, VIDIOC_S_PARM, &stream_parm);
 	chn_status[channel_id] = CHN_BUSY;
+	ret = ioctl(fd, VIDIOC_S_PARM, &stream_parm);
 	return ret;
 }
 

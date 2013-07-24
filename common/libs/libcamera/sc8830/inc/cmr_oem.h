@@ -40,6 +40,9 @@ extern "C"
 #define CMR_EVT_EXIT                                 (CMR_EVT_OEM_BASE + 3)
 #define CMR_EVT_BEFORE_SET                           (CMR_EVT_OEM_BASE + 4)
 #define CMR_EVT_AFTER_SET                            (CMR_EVT_OEM_BASE + 5)
+#define CMR_EVT_BEFORE_CAPTURE                       (CMR_EVT_OEM_BASE + 6)
+#define CMR_EVT_AFTER_CAPTURE                        (CMR_EVT_OEM_BASE + 7)
+#define CMR_EVT_CONVERT_THUM                         (CMR_EVT_OEM_BASE + 8)
 #define CMR_EVT_AF_START                             (CMR_EVT_OEM_BASE + 10)
 #define CMR_EVT_AF_EXIT                              (CMR_EVT_OEM_BASE + 11)
 #define CMR_EVT_AF_INIT                              (CMR_EVT_OEM_BASE + 12)
@@ -312,9 +315,13 @@ struct camera_context {
 	sem_t                    prev_sync_sem;
 	/* capture thread */
 	pthread_t                cap_thread;
+	pthread_t                cap_sub_thread;
 	uint32_t                 cap_msg_que_handle;
+	uint32_t                 cap_sub_msg_que_handle;
 	uint32_t                 cap_inited;
+	uint32_t                 cap_sub_inited;
 	sem_t                    cap_sync_sem;
+	sem_t                    cap_sub_sync_sem;
 
 	int32_t                  set_flag;
 	sem_t                    set_sem;
@@ -359,6 +366,10 @@ struct camera_context {
 	uint32_t                 cap_original_fmt;
 	uint32_t                 cap_target_fmt;
 	uint32_t                 cap_zoom_mode;
+	sem_t                    cap_path_sem;
+	sem_t                    scale_path_sem;
+
+	sem_t                    thum_sem;
 	uint32_t                 thum_from;
 	uint32_t                 thum_ready;
 	struct img_size          thum_size;
@@ -397,6 +408,12 @@ int camera_wait_start(struct camera_context *p_cxt);
 int camera_start_done(struct camera_context *p_cxt);
 int camera_wait_set(struct camera_context *p_cxt);
 int camera_set_done(struct camera_context *p_cxt);
+int camera_wait_cap_path(struct camera_context *p_cxt);
+int camera_cap_path_done(struct camera_context *p_cxt);
+int camera_wait_scale_path(struct camera_context *p_cxt);
+int camera_scale_path_done(struct camera_context *p_cxt);
+int camera_wait_convert_thum(struct camera_context *p_cxt);
+int camera_convert_thum_done(struct camera_context *p_cxt);
 int camera_wait_stop(struct camera_context *p_cxt);
 int camera_stop_done(struct camera_context *p_cxt);
 int camera_wait_init(struct camera_context *p_cxt);
