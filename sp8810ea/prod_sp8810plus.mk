@@ -29,6 +29,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
 	persist.sys.sprd.modemreset=1 \
+	h_bright=true \
 	ro.msms.phone_count=2 \
 	ro.modem.count=1 \
 	ro.modem.t.enable=1 \

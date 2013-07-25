@@ -27,6 +27,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.com.android.dataroaming=false \
 	persist.msms.phone_count=2 \
 	ro.msms.phone_count=2 \
+	h_bright=true \
 	persist.msms.phone_default=0 \
 	ro.modem.count=1 \
 	ro.modem.t.enable=1 \

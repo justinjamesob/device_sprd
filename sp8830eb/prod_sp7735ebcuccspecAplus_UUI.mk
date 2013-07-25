@@ -26,6 +26,7 @@ PRODUCT_AAPT_CONFIG := hdpi xhdpi
 PRODUCT_PROPERTY_OVERRIDES := \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
+	h_bright=true \
 	persist.msms.phone_count=2 \
 	universe_ui_support=true \
 	ro.msms.phone_count=2 \

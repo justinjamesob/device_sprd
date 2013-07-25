@@ -29,6 +29,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	persist.msms.phone_count=1 \
 	persist.sys.sprd.modemreset=1 \
 	ro.msms.phone_count=1 \
+	h_bright=true \
 	ro.modem.count=1 \
 	ro.modem.t.enable=1 \
 	ro.modem.t.tty=/dev/ts0710mux \

@@ -28,6 +28,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.com.android.dataroaming=false \
 	persist.msms.phone_count=1 \
 	ro.nativemodem=true \
+	h_bright=true \
     persist.surpport.oplpnn=true \
     persist.surpport.cphsfirst=false
 

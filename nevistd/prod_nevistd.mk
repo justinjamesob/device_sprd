@@ -26,6 +26,7 @@ PRODUCT_AAPT_CONFIG := hdpi
 PRODUCT_PROPERTY_OVERRIDES := \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
+	ro.device.support.h_bright=true \
 	persist.msms.phone_count=1 \
 	persist.sys.sprd.modemreset=1 \
 	ro.msms.phone_count=1 \

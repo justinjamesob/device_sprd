@@ -24,6 +24,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
 	ro.device.support.abroad.apn=1\
+	h_bright=true \
 	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
         lmk.autocalc=false \

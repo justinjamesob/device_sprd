@@ -27,6 +27,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
 	persist.msms.phone_count=1 \
+	h_bright=true \
 	ro.msms.phone_count=1 \
 	ro.modem.count=1 \
 	ro.modem.t.enable=1 \
