@@ -1781,12 +1781,14 @@ int camera_after_set_internal(enum restart_mode re_mode)
 				CMR_LOGE("Failed to init capture when preview");
 				return -CAMERA_FAILED;
 			}
-
+			SET_CHN_BUSY(CHN_2);
 			ret = cmr_v4l2_cap_resume(CHN_2,
 					skip_number_l,
 					g_cxt->v4l2_cxt.chn_frm_deci[CHN_2]);
-
-			SET_CHN_BUSY(CHN_2);
+			if (ret) {
+				SET_CHN_IDLE(CHN_2);
+				CMR_LOGE("error.");
+			}
 		}
 		break;
 	default:
@@ -2384,6 +2386,7 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 			message.msg_type = CMR_EVT_BEFORE_CAPTURE;
 			message.alloc_flag = 0;
 			ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
+			CMR_LOGI("send post.");
 		}
 	}
 	return ret;
@@ -3210,6 +3213,7 @@ int camera_internal_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info
 	case CMR_EVT_AFTER_CAPTURE:
 		if (IS_ZSL_MODE(g_cxt->cap_mode)) {
 			if (IS_CHN_IDLE(CHN_2)) {
+				SET_CHN_BUSY(CHN_2);
 				ret = cmr_v4l2_cap_resume(CHN_2,
 				0,
 				g_cxt->v4l2_cxt.chn_frm_deci[CHN_2]);
@@ -3217,8 +3221,10 @@ int camera_internal_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info
 					(CAMERA_HDR_MODE == g_cxt->cap_mode)) {
 					g_cxt->is_take_picture = TAKE_PICTURE_NO;
 				}
-
-				SET_CHN_BUSY(CHN_2);
+				if (ret) {
+					SET_CHN_IDLE(CHN_2);
+					CMR_LOGE("error.");
+				}
 			}
 		}
 		break;
@@ -6123,9 +6129,9 @@ int camera_set_change_size(uint32_t cap_width,uint32_t cap_height,uint32_t previ
 			ret = 1;
 		}
 		if (IS_ZSL_MODE(g_cxt->cap_mode)) {
-			if ((g_cxt->picture_size.width != cap_width)
-			   || (g_cxt->picture_size.height != cap_height)) {
-				CMR_LOGI("need to change size.");
+			if ((g_cxt->picture_size.width != CAMERA_ALIGNED_16(cap_width))
+			   || (g_cxt->picture_size.height != CAMERA_ALIGNED_16(cap_height))) {
+				CMR_LOGI("need to change size for ZSL.");
 				ret = 2;
 			}
 		}
