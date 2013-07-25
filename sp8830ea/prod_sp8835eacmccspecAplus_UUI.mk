@@ -29,6 +29,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	persist.msms.phone_count=2 \
 	universe_ui_support=true \
 	ro.msms.phone_count=2 \
+	h_bright=true \
 	persist.msms.phone_default=0 \
 	ro.modem.count=1 \
 	ro.digital.fm.support=0 \

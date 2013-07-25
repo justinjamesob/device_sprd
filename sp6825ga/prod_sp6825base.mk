@@ -25,6 +25,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.com.android.dataroaming=false \
 	persist.msms.phone_count=1 \
 	ro.device.support.abroad.apn=1\
+	h_bright=true \
         lmk.autocalc=false \
         zram.support=true \
 	persist.blcr.enable=0 \

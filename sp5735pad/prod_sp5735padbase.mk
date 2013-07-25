@@ -29,6 +29,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	persist.msms.phone_count=1 \
        persist.surpport.oplpnn=true \
        persist.surpport.cphsfirst=false \
+	h_bright=true \
        ro.msms.phone_count=1 \
 	ro.digital.fm.support=0 \
        persist.msms.phone_default=0 \

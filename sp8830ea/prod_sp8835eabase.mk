@@ -29,6 +29,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.msms.phone_count=1 \
 	ro.digital.fm.support=0 \
 	persist.msms.phone_default=0 \
+	h_bright=true \
 	ro.modem.count=1 \
 	ro.modem.t.enable=1 \
 	ro.modem.t.dev=/dev/cpt \

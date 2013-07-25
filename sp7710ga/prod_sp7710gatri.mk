@@ -33,6 +33,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
         zram.support=true \
         zram_for_android.enable=true  \
         ro.build.product.lowmem=1 \
+	h_bright=true \
         universe_ui_support=true \
         ro.callfirewall.disabled=true \
 	ro.msms.phone_count=3 \

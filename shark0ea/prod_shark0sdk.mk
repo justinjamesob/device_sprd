@@ -23,6 +23,7 @@ DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay
 PRODUCT_PROPERTY_OVERRIDES := \
     ro.ril.hsxpa=1 \
     ro.ril.gprsclass=10 \
+	ro.device.support.h_bright=true \
     ro.adb.qemud=1
 
 PRODUCT_COPY_FILES := \
