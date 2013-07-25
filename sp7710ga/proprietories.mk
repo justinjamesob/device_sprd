@@ -5,7 +5,7 @@ ifneq ($(shell ls -d vendor/sprd/proprietories-source 2>/dev/null),)
 #OPENCORE :=  libopencore_common libomx_sharedlibrary libomx_m4vdec_sharedlibrary libomx_m4venc_sharedlibrary \
 #	libomx_avcdec_sharedlibrary pvplayer.cfg
 
-OPENMAX := libomx_m4vh263dec_sw_sprd libomx_m4vh263enc_hw_sprd libomx_avcdec_hw_sprd libomx_avcdec_sw_sprd \
+OPENMAX := libomx_m4vh263dec_hw_sprd libomx_m4vh263dec_sw_sprd libomx_m4vh263enc_hw_sprd libomx_avcdec_hw_sprd libomx_avcdec_sw_sprd \
 	libstagefright_sprd_soft_mpeg4dec libstagefright_sprd_soft_h264dec
 
 PRODUCT_PACKAGES := \
@@ -21,6 +21,7 @@ else
 # for spreadtrum customer proprietories modules: only support direct copy
 
 PROPMODS := \
+	system/lib/libomx_m4vh263dec_hw_sprd.so \
 	system/lib/libomx_m4vh263dec_sw_sprd.so \
 	system/lib/libomx_m4vh263enc_hw_sprd.so \
 	system/lib/libomx_avcdec_hw_sprd.so \
