@@ -24,7 +24,6 @@
 #include "img_scale_u.h"
 #include "cmr_cvt.h"
 #include "sprd_rot_k.h"
-#include "sprd_dma_copy_k.h"
 
 #define CVT_EXIT_IF_ERR(n)                                             \
 		do {                                                   \
@@ -1117,10 +1116,8 @@ int cmr_dma_copy_deinit(void)
 	return 0;
 }
 
-int cmr_dma_cpy(uint32_t dst_addr, uint32_t src_addr,
-			uint32_t len)
+int cmr_dma_cpy(struct _dma_copy_cfg_tag dma_copy_cfg)
 {
-	struct _dma_copy_cfg_tag      dma_copy_cfg;
 	int                      ret = 0;
 
 	CMR_LOGV("dma copy start");
@@ -1130,14 +1127,20 @@ int cmr_dma_cpy(uint32_t dst_addr, uint32_t src_addr,
 		return -ENODEV;
 	}
 
-	if (0 == src_addr || 0 == dst_addr || 0 == len) {
+	if (DMA_COPY_YUV400 <= dma_copy_cfg.format ||
+		(dma_copy_cfg.src_size.w & 0x01) || (dma_copy_cfg.src_size.h & 0x01) ||
+		(dma_copy_cfg.src_rec.x & 0x01) || (dma_copy_cfg.src_rec.y & 0x01) ||
+		(dma_copy_cfg.src_rec.w & 0x01) || (dma_copy_cfg.src_rec.h & 0x01) ||
+		0 == dma_copy_cfg.src_addr.y_addr || 0 == dma_copy_cfg.src_addr.uv_addr ||
+		0 == dma_copy_cfg.dst_addr.y_addr || 0 == dma_copy_cfg.dst_addr.uv_addr ||
+		0 == dma_copy_cfg.src_rec.w || 0 == dma_copy_cfg.src_rec.h ||
+		0 == dma_copy_cfg.src_size.w|| 0 == dma_copy_cfg.src_size.h ||
+		(dma_copy_cfg.src_rec.x + dma_copy_cfg.src_rec.w > dma_copy_cfg.src_size.w) ||
+		(dma_copy_cfg.src_rec.y + dma_copy_cfg.src_rec.h > dma_copy_cfg.src_size.h)) {
+
 		CMR_LOGE("dma copy wrong parameter.");
 		return -EINVAL;
 	}
-
-	dma_copy_cfg.src_addr = src_addr;
-	dma_copy_cfg.dst_addr = dst_addr;
-	dma_copy_cfg.len = len;
 
 	sem_wait(&dma_copy_sem);
 

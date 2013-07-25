@@ -33,6 +33,7 @@ extern "C" {
 #include <camera/CameraParameters.h>
 #include "SprdCameraParameters.h"
 #include "SprdOEMCamera.h"
+#include "sprd_dma_copy_k.h"
 
 namespace android {
 
@@ -88,7 +89,10 @@ public:
 	virtual status_t             storeMetaDataInBuffers(bool enable);
 	virtual status_t             dump(int fd) const;
 	void                            setCaptureRawMode(bool mode);
-
+	void		antiShakeParamSetup();
+	int		uv420CopyTrim(struct _dma_copy_cfg_tag dma_copy_cfg);
+	int		displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_addr,
+				uint32_t src_phy_addr, uint32_t src_virtual_addr, uint32_t src_w, uint32_t src_h);
 
 	enum camera_flush_mem_type_e {
 		CAMERA_FLUSH_RAW_HEAP,
@@ -292,7 +296,11 @@ private:
 	camera_memory_t                 *mMetadataHeap;
 	sprd_camera_memory_t            *mReDisplayHeap;
 	//TODO: put the picture dimensions in the CameraParameters object;
-	SprdCameraParameters            mParameters;	
+	SprdCameraParameters            mParameters;
+	uint32_t                   mPreviewHeight_trimy;
+	uint32_t                   mPreviewWidth_trimx;
+	int                             mPreviewHeight_backup;
+	int                             mPreviewWidth_backup;
 	int                             mPreviewHeight;
 	int                             mPreviewWidth;
 	int                             mRawHeight;
