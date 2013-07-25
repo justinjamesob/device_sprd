@@ -567,7 +567,7 @@ int32_t gsp_hal_open(void)
 {
     int32_t gsp_fd = -1;
 
-    gsp_fd = open("/dev/sprd_gsp", O_RDWR, 0);
+    gsp_fd = open("/dev/sprd_gsp", O_RDONLY, 0);
     if (-1 == gsp_fd) {
         ALOGE("open gsp device failed! Line:%d \n", __LINE__);
     }
