@@ -6,8 +6,9 @@
 	<cp name="w" pipe="/dev/spipe_w6" vbchannel="0" />
 </modem>
 
-<i2s_for_btcall ctl_path="/sys/kernel/debug/pin_switch/iis-0" index="0" switch="1" />
-<i2s_for_extspeaker ctl_path="/sys/kernel/debug/pin_switch/iis-1" index="1" switch="0" />
+
+<i2s_for_btcall ctl_path="/d/efuse/iis-0" index="0" switch="1" />
+<i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
 
 <audiomode num="4">
 	<item name="Headset" index="0" />
