@@ -489,7 +489,7 @@ exit:
 	return ret;
 }
 
-int camera_dma_copy_data(uint32_t dst_addr, uint32_t src_addr, uint32_t len)
+int camera_dma_copy_data(struct _dma_copy_cfg_tag dma_copy_cfg)
 {
 
 	int                      ret = CAMERA_SUCCESS;
@@ -499,7 +499,7 @@ int camera_dma_copy_data(uint32_t dst_addr, uint32_t src_addr, uint32_t len)
 		return ret;
 	}
 
-	return cmr_dma_cpy(dst_addr, src_addr, len);
+	return cmr_dma_cpy(dma_copy_cfg);
 }
 
 int camera_rotation_init(void)

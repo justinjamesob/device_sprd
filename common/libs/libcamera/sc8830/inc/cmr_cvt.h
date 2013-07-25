@@ -22,6 +22,7 @@ extern "C"
 #endif
 
 #include "cmr_common.h"
+#include "sprd_dma_copy_k.h"
 
 enum cmr_img_cvt_evt {
 	CMR_IMG_CVT_ROT_DONE = CMR_EVT_CVT_BASE,
@@ -74,7 +75,7 @@ int cmr_scale_deinit(void);
 int cmr_scale_capability(uint32_t *width, uint32_t *sc_factor);
 int cmr_dma_copy_init(void);
 int cmr_dma_copy_deinit(void);
-int cmr_dma_cpy(uint32_t dst_addr, uint32_t src_addr, uint32_t len);
+int cmr_dma_cpy(struct _dma_copy_cfg_tag dma_copy_cfg);
 
 #ifdef __cplusplus
 }
