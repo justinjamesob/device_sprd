@@ -5,6 +5,10 @@
 	<cp name="t" pipe="/dev/vbpipe6" vbchannel="0" />
 </modem>
 
+
+<i2s_for_btcall ctl_path="/d/efuse/iis-0" index="0" switch="1" />
+<i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
+
 <audiomode num="4">
 	<item name="Headset" index="0" />
 	<item name="Headfree" index="1" />
