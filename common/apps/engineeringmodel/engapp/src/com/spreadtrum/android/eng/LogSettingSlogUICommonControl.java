@@ -347,7 +347,7 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         } else {
             rdoGeneralOff.setChecked(true);
         }
-        
+
         boolean tempHost = tempHostOn || tempHostLowPower;
         SlogAction.SetCheckBoxBranchState(chkAndroid, tempHost,
                 SlogAction.GetState(SlogAction.ANDROIDKEY));

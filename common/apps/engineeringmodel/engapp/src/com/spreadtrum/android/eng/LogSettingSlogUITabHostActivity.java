@@ -81,7 +81,7 @@ public class LogSettingSlogUITabHostActivity extends TabActivity {
                 countAndroidLogBranchComplete = 1;
                 try {
                     mProgressDialog.show();
-                } catch (BadTokenException error) {
+                } catch (Exception error) {
                     Log.e(TAG, "failed show progress dialog, maybe "
                             + "the activity was finished."
                             + error.getMessage());
