@@ -646,6 +646,11 @@ err:
         mLibHandle = NULL;
     }
 
+    if (mHandle != NULL)
+    {
+        free (mHandle);
+    }
+
     if (pbuf_extra != NULL)
     {
         pmem_extra.clear();
