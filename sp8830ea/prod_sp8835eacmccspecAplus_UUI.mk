@@ -105,7 +105,8 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/sci-keypad.kl:system/usr/keylayout/sci-keypad.kl \
 	$(BOARDDIR)/pixcir_ts.kl:system/usr/keylayout/pixcir_ts.kl \
 	$(BOARDDIR)/pixcir_ts.idc:system/usr/idc/pixcir_ts.idc \
-	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc
+	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc \
+        device/sprd/common/res/spn/spn-conf.xml:system/etc/spn-conf.xml
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
