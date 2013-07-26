@@ -5421,7 +5421,7 @@ int camera_start_jpeg_encode(struct frm_info *data)
 		in_parm.temp_buf_size);
 
 	g_cxt->jpeg_cxt.proc_status.frame_info = *data;
-
+    g_cxt->jpeg_cxt.jpeg_state = JPEG_ENCODE;
 	ret = jpeg_enc_start(&in_parm, &out_parm);
 	if (0 == ret) {
 		CMR_LOGV("OK, handle 0x%x", out_parm.handle);
@@ -5429,7 +5429,6 @@ int camera_start_jpeg_encode(struct frm_info *data)
 		g_cxt->jpeg_cxt.proc_status.slice_height_in  = in_parm.size.height;
 		g_cxt->jpeg_cxt.proc_status.slice_height_out = 0;
 		g_cxt->jpeg_cxt.index = frm_id;
-		g_cxt->jpeg_cxt.jpeg_state = JPEG_ENCODE;
 	} else {
 		CMR_LOGV("Failed, 0x%x", ret);
 		g_cxt->jpeg_cxt.jpeg_state = JPEG_ERR;
