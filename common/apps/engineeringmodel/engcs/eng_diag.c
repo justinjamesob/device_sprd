@@ -156,8 +156,8 @@ int eng_diag_parse(char *buf,int len)
 		case DIAG_CMD_ADC_F:
 			ret =CMD_USER_ADC;
 			break;
-//end kenyliu added			
-		case DIAG_CMD_AUDIO:	
+//end kenyliu added
+		case DIAG_CMD_AUDIO:
 			if(is_audio_at_cmd_need_to_handle(buf,len)){
 				ENG_LOG("%s: Handle DIAG_CMD_AUDIO\n",__FUNCTION__);
 				ret = CMD_USER_AUDIO;
@@ -192,9 +192,9 @@ int eng_diag_user_handle(int type, char *buf,int len)
 
 	memset(rsp, 0, sizeof(rsp));
 	memset(adc_rsp, 0, sizeof(adc_rsp)); //add by kenyliu on 2013 07 12 for get ADCV  bug 188809
-	
+
 	ENG_LOG("%s: type=%d\n",__FUNCTION__, type);
-		
+
 	switch(type){
 		case CMD_USER_VER:
 			rlen=eng_diag_getver((unsigned char*)buf,len, rsp);
@@ -228,7 +228,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
 		default:
 			break;
 	}
-	
+
 	memcpy((char*)&head,buf+1,sizeof(MSG_HEAD_T));
 	head.len = sizeof(MSG_HEAD_T)+rlen-extra_len;
 	ENG_LOG("%s: head.len=%d\n",__FUNCTION__, head.len);
@@ -488,7 +488,7 @@ int get_sub_str(char *buf,char **revdata, char a, char b)
 			memcpy(revdata[0],start,len);
 			memcpy(revdata[1],current,len1);
 		}
-		return 0;			
+		return 0;
 }
 int get_cmd_index(char *buf)
 {
@@ -512,7 +512,7 @@ int eng_diag(char *buf,int len)
         int ret_val=0;
 	char rsp[512];
 	MSG_HEAD_T head,*head_ptr=NULL;
-	
+
 	memset(rsp, 0, sizeof(rsp));
 
 	type = eng_diag_parse(buf,len);
@@ -520,7 +520,7 @@ int eng_diag(char *buf,int len)
 	ENG_LOG("%s:write type=%d\n",__FUNCTION__, type);
 
 	if (type != CMD_COMMON){
-		ENG_LOG("%s:write cmd user\n",__FUNCTION__);		
+		ENG_LOG("%s:write cmd user\n",__FUNCTION__);
 		ret_val = eng_diag_user_handle(type, buf,len);
 		ENG_LOG("%s:user handle\n",__FUNCTION__);
 
@@ -549,7 +549,7 @@ int eng_diag(char *buf,int len)
 	}
 
 	ENG_LOG("%s: ret=%d\n",__FUNCTION__, ret);
-	
+
 	return ret;
 }
 
@@ -624,7 +624,7 @@ int eng_diag_getband(char *buf,int len, char *rsp)
 {
 	char cmdbuf[64];
 	int wlen, rlen, cmdlen;
-	
+
 	memset(cmdbuf, 0, sizeof(cmdbuf));
 	sprintf(cmdbuf, "%d,%d",ENG_AT_CURRENT_BAND,0);
 	cmdlen=strlen(cmdbuf);
@@ -669,7 +669,7 @@ int eng_diag_decode7d7e(char *buf,int len)
 			buf[i] = tmp;
 			j = i+1;
 			memcpy(&buf[j], &buf[j+1],len-j);
-			len--;	
+			len--;
 			ENG_LOG("%s AFTER:",__FUNCTION__);
 			for(j=0; j<len; j++) {
 				ENG_LOG("%x,",buf[j]);
@@ -686,7 +686,7 @@ int eng_diag_encode7d7e(char *buf, int len,int *extra_len)
 	char tmp;
 
 	ENG_LOG("%s: len=%d",__FUNCTION__, len);
-		
+
 	for(i=0; i<len; i++) {
 		if((buf[i]==0x7d)||(buf[i]==0x7e)){
 			tmp=buf[i]^0x20;
@@ -715,7 +715,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 {
 	int rlen,i;
 	int ret=-1;
-	unsigned short crc=0; 
+	unsigned short crc=0;
 	unsigned char crc1, crc2, crc3, crc4;
 	char address[32], *addr, *btaddr, *wifiaddr, tmp;
 	REF_NVWriteDirect_T *direct;
@@ -734,7 +734,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 		crc4 = (crc>>8)&0xff;
 		ENG_LOG("%s: crc [%x,%x], [%x,%x]\n",__func__,crc3,crc4,crc1,crc2);
 
-		if((crc1==crc3)&&(crc2==crc4)){		
+		if((crc1==crc3)&&(crc2==crc4)){
 			//write bt address
 			if((head_ptr->subtype&DIAG_CMD_BTBIT)>0) {
 				memset(address, 0, sizeof(address));
@@ -742,7 +742,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 					direct->btaddr[5],direct->btaddr[4],direct->btaddr[3], \
 					direct->btaddr[2],direct->btaddr[1],direct->btaddr[0]);
 				ENG_LOG("%s: BTADDR:%s\n",__func__, address);
-				ret = eng_sql_string2string_set("btaddr",address); 
+				ret = eng_sql_string2string_set("btaddr",address);
 			}
 
 			//write wifi address
@@ -752,7 +752,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 					direct->wifiaddr[0],direct->wifiaddr[1],direct->wifiaddr[2], \
 					direct->wifiaddr[3],direct->wifiaddr[4],direct->wifiaddr[5]);
 				ENG_LOG("%s: WIFIADDR:%s\n",__func__,address);
-				ret = eng_sql_string2string_set("wifiaddr",address); 
+				ret = eng_sql_string2string_set("wifiaddr",address);
 			}
 		}
 
@@ -761,7 +761,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 			head_ptr->subtype = 0x01;
 			rsp[0]=0x00; rsp[1]=0x00;
 			rlen=2;
-		} else { 
+		} else {
 			//write fail
 			head_ptr->subtype = 0x00;
 			rsp[0]=0x00; rsp[1]=0x00;
@@ -784,7 +784,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 				tmp=btaddr[2]; btaddr[2]=btaddr[3];btaddr[3]=tmp;
 			}
 		}
-		
+
 		//read wifiaddr
 		if((head_ptr->subtype&DIAG_CMD_WIFIBIT)>0) {
 			addr=eng_sql_string2string_get("wifiaddr");
@@ -800,7 +800,7 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 		crc = crc16(crc,(const unsigned char*)direct,sizeof(REF_NVWriteDirect_T));
 
 		rlen = eng_diag_encode7d7e((char *)direct, rlen, extra_len);
-		memcpy(rsp, direct, rlen);		
+		memcpy(rsp, direct, rlen);
 		*(rsp+rlen) = crc&0xff;
 		*(rsp+rlen+1) = (crc>>8)&0xff;
 		ENG_LOG("%s: read crc = %d, [%x,%x],extra_len=%d\n",__func__, \
@@ -817,7 +817,7 @@ int eng_diag_factorymode(char *buf,int len, char *rsp)
 	MSG_HEAD_T *head_ptr=NULL;
 	char value[PROPERTY_VALUE_MAX];
 
-	head_ptr = (MSG_HEAD_T *)(buf+1);		
+	head_ptr = (MSG_HEAD_T *)(buf+1);
 	pdata = buf + DIAG_HEADER_LENGTH + 1; //data content;
 
 	ENG_LOG("%s: operation=%x; end=%x\n",__func__, *pdata, *(pdata+1));
@@ -839,8 +839,8 @@ int eng_diag_factorymode(char *buf,int len, char *rsp)
 			head_ptr->subtype = 0x01;
 			break;
 	}
-	
-	return 0;	
+
+	return 0;
 }
 
 
@@ -857,8 +857,8 @@ int ascii2bin(unsigned char *dst,unsigned char *src,unsigned long size){
 			h = *src - '0';
 		}else{
 			h = *src - 'A' + 10;
-		}	
-		
+		}
+
 		src++;
 
 		if((*src>='0')&&(*src<='9')){
@@ -874,7 +874,7 @@ int ascii2bin(unsigned char *dst,unsigned char *src,unsigned long size){
 		dst++;
 	}
 
-	return 0;	
+	return 0;
 }
 
 int bin2ascii(unsigned char *dst,unsigned char *src,unsigned long size){
@@ -890,8 +890,8 @@ int bin2ascii(unsigned char *dst,unsigned char *src,unsigned long size){
 			*dst = semi_octet + '0';
 		}else{
 			*dst = semi_octet + 'A' - 10;
-		}	
-		
+		}
+
 		dst++;
 
 		semi_octet = ((*src)&0x0f);
@@ -907,7 +907,7 @@ int bin2ascii(unsigned char *dst,unsigned char *src,unsigned long size){
 	        count ++;
 	}
 
-	return 0;	
+	return 0;
 }
 
 int at_tok_equel_start(char **p_cur)
@@ -952,14 +952,14 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
 	ptr = buf + 1 + sizeof(MSG_HEAD_T);
 
 	if(g_is_data)
-	{	
-		//if not AT cmd		
+	{
+		//if not AT cmd
 		ret = strncmp(ptr,"AT",strlen("AT"));
 		if((ret!=0&&isdigit(*ptr))||(ret!=0&&isupper(*ptr))){
 			return 1;
 		}
 	}
-	
+
 	//AT+SADM4AP
 	ret = strncmp(ptr,at_sadm,strlen(at_sadm));
 	if ( 0==ret ) {
@@ -972,14 +972,14 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
 				return 0;
 			}
 			if ( at_sadm_cmd_to_handle[i]==cmd_type ) {
-				ENG_LOG("at_sadm_cmd_to_handle=%d",at_sadm_cmd_to_handle[i]);	
+				ENG_LOG("at_sadm_cmd_to_handle=%d",at_sadm_cmd_to_handle[i]);
 				if ( GET_ARM_VOLUME_MODE_COUNT!=cmd_type ) {
 					ENG_LOG("NOT CMD TO GET COUNT");
 					g_index = atoi(ptr);
 					//g_index -= '0';
 					ENG_LOG("index = %d",g_index);
 					if ( g_index>=adev_get_audiomodenum4eng()) {
-						return 0;	
+						return 0;
 					}
 				}
 				return 1;
@@ -999,13 +999,13 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
 				ENG_LOG("end of at_spenha_cmd_to_handle");
 				return 0;
 			}
-			
+
 			if ( at_spenha_cmd_to_handle[i]==cmd_type ) {
-				ENG_LOG("at_spenha_cmd_to_handle=%d",at_spenha_cmd_to_handle[i]);	
+				ENG_LOG("at_spenha_cmd_to_handle=%d",at_spenha_cmd_to_handle[i]);
 				if ( GET_AUDIO_ENHA_MODE_COUNT!=cmd_type ) {
 					at_tok_nextint(&ptr,&g_index);
 					if (( g_index>adev_get_audiomodenum4eng())||( g_index<=0)) {
-						return 0;	
+						return 0;
 					}
 					g_index--;
 					ENG_LOG("BINARY index = %x",g_index);
@@ -1051,7 +1051,7 @@ int eng_diag_adc(char *buf, int *Irsp)
 		ENG_LOG("%s,in eng_diag_adc,Irsp is null",__FUNCTION__);
 		return 0;
 	}
-	
+
       head_ptr = (MSG_HEAD_T *)(buf+1);
       memset(buf1, 0, 8);
       sprintf(buf1,"%d", head_ptr->subtype);
@@ -1102,7 +1102,7 @@ static AUDIO_TOTAL_T * eng_regetpara(void)
 	{
 		close(srcfd);
 	}
-     
+
 
     ALOGW("eng_regetpara %s", filename);////done,into
 	stringfile2nvstruct(filename,aud_params_ptr,len);
@@ -1123,23 +1123,12 @@ static void eng_notify_mediaserver_updatapara(int ram_ops,int index,AUDIO_TOTAL_
     int fifo_id = -1;
 	int ret;
     ALOGE("eng_notify_mediaserver_updatapara E,%d:%d!\n",ram_ops,index);
-    ret = access(AUDFIFO, R_OK|W_OK);
-    if ((ret == 0) || (errno == EACCES)) {
-        if ((ret != 0) &&
-            (chmod(AUDFIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP) != 0)) {
-            ALOGE("eng_vdiag Cannot set RW to \"%s\": %s", AUDFIFO, strerror(errno));
-            return -1;
-        }
-    } else if (errno != ENOENT) {
-        ALOGE("eng_notify_mediaserver_updatapara Cannot access \"%s\": %s", AUDFIFO, strerror(errno));
-        return -1;
-    }
 	fifo_id = open( AUDFIFO ,O_WRONLY|O_NONBLOCK);
     if(fifo_id != -1) {
 	int buff = 1;
-	ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");       
+	ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");
         result = write(fifo_id,&ram_ops,sizeof(int));
-        if(ram_ops)
+        if(ram_ops & ENG_RAM_OPS)
         {
         	result = write(fifo_id,&index,sizeof(int));
         	result = write(fifo_id,aud_params_ptr,sizeof(AUDIO_TOTAL_T));
@@ -1149,7 +1138,7 @@ static void eng_notify_mediaserver_updatapara(int ram_ops,int index,AUDIO_TOTAL_
     } else {
        ALOGE("%s open audio FIFO error %s,fifo_id:%d\n",__FUNCTION__,strerror(errno),fifo_id);
     }
- 
+
    ALOGE("eng_notify_mediaserver_updatapara X,result:%d!\n",result);
    return result;
 }
@@ -1175,7 +1164,7 @@ void * eng_getpara(void)
 	filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
 	if(srcfd >= 0)
 	{
-		close(srcfd); 
+		close(srcfd);
 	}
 	ALOGW("wangzuo eng_getpara %s", filename);////done,into
 	stringfile2nvstruct(filename, audio_total, len); //get data from audio_hw.txt.
@@ -1198,7 +1187,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 	if (( NULL == buf )||( NULL == rsp)) {
 		goto out;
 	}
-	
+
 	head_ptr = (MSG_HEAD_T *)(buf+1);
 	ENG_LOG("Call %s, subtype=%x\n",__FUNCTION__, head_ptr->subtype);
 	ptr = buf + 1 + sizeof(MSG_HEAD_T);
@@ -1221,7 +1210,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 //end kenyliu added
     //audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
 	ENG_LOG("Call %s, ptr=%s\n",__FUNCTION__, ptr);
-    
+
 	if(g_is_data){
 		ENG_LOG("HEY,DATA HAS COME!!!!");
 		g_is_data = g_is_data;
@@ -1236,42 +1225,49 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 
 
 		if ( g_is_data&AUDIO_NV_ARM_DATA_MEMORY){
-			ram_ofs = 1;
+			ram_ofs |=ENG_RAM_OPS;
 			g_is_data &= (~AUDIO_NV_ARM_DATA_MEMORY);
 			g_indicator |= AUDIO_NV_ARM_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),(unsigned char *)ptr,wlen);
 		}
 		if ( g_is_data&AUDIO_NV_ARM_DATA_FLASH){
+			ram_ofs |=ENG_FLASH_OPS;
 			g_is_data &= (~AUDIO_NV_ARM_DATA_FLASH);
 			g_indicator |= AUDIO_NV_ARM_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),(unsigned char *)ptr,wlen);
-			audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct; 
+			audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
 		}
 		if ( g_is_data&AUDIO_ENHA_DATA_MEMORY){
-			ram_ofs = 1;
+			ram_ofs |=ENG_RAM_OPS;
 			g_is_data &= (~AUDIO_ENHA_DATA_MEMORY);
 			g_indicator |= AUDIO_ENHA_EQ_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_enha_eq),(unsigned char *)ptr,wlen);
 		}
 		if ( g_is_data&AUDIO_ENHA_DATA_FLASH){
+			ram_ofs |=ENG_FLASH_OPS;
 			g_is_data &= (~AUDIO_ENHA_DATA_FLASH);
 			g_indicator |= AUDIO_ENHA_EQ_INDI_FLAG;
 			ascii2bin((unsigned char *)(&audio_total[g_index].audio_enha_eq),(unsigned char *)ptr,wlen);
-			audio_ptr[g_index].audio_enha_eq=audio_total[g_index].audio_enha_eq; 
+			audio_ptr[g_index].audio_enha_eq=audio_total[g_index].audio_enha_eq;
 		}
 		if ( g_is_data&AUDIO_ENHA_TUN_DATA_MEMORY){
-			ram_ofs = 1;
+            ram_ofs |=ENG_RAM_OPS;
 			g_is_data &= (~AUDIO_ENHA_TUN_DATA_MEMORY);
 			ascii2bin((unsigned char *)tun_data,(unsigned char *)ptr,wlen);
 		}
-		
+
 		ENG_LOG("g_indicator = 0x%x,%x\n",g_indicator,AUDIO_DATA_READY_INDI_FLAG);
 
 		if ( audio_ptr) {
-			if(!ram_ofs)
+			if(ram_ofs & ENG_FLASH_OPS)
 			{
 				eng_setpara(audio_ptr);
-			}				
+			}
+	
+			if(g_indicator)
+			{
+				ram_ofs |= ENG_PGA_OPS;
+			}
 			eng_notify_mediaserver_updatapara(ram_ofs,g_index,&audio_total[g_index]);
 			free(audio_ptr);
 		}
@@ -1280,9 +1276,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			ENG_LOG("data is ready!g_indicator = 0x%x,g_index:%d\n",g_indicator,g_index);
 			g_indicator = 0;
 			parse_vb_effect_params((void *)audio_total, adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T));
-			SetAudio_pga_parameter_eng(&audio_total[g_index],sizeof(AUDIO_TOTAL_T),1);
 		}
-
 		sprintf(rsp,"\r\nOK\r\n");
 		goto out;
 	}
@@ -1296,7 +1290,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 				sprintf(rsp,"+SADM4AP: %d",adev_get_audiomodenum4eng());
 				ENG_LOG("%s,GET MODE COUNT:%s\n",__FUNCTION__,rsp);
 				break;
-			case GET_ARM_VOLUME_MODE_NAME:	
+			case GET_ARM_VOLUME_MODE_NAME:
 				ENG_LOG("ARM VOLUME NAME is %s",audio_total[g_index].audio_nv_arm_mode_info.ucModeName);
 				sprintf(rsp,"+SADM4AP: %d,\"%s\"",g_index,audio_total[g_index].audio_nv_arm_mode_info.ucModeName);
 				ENG_LOG("%s,GET_ARM_VOLUME_MODE_NAME:%d ---- >%s \n",__FUNCTION__,g_index,rsp);
@@ -1304,14 +1298,14 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 			case SET_ARM_VOLUME_DATA_TO_RAM:
 				ENG_LOG("%s,set arm nv mode data to memory\n",__FUNCTION__);
 				g_is_data |= AUDIO_NV_ARM_DATA_MEMORY;
-				sprintf(rsp,"\r\n> ");	
+				sprintf(rsp,"\r\n> ");
 				break;
 			case SET_ARM_VOLUME_DATA_TO_FLASH:
 				ENG_LOG("%s,set arm nv mode data to flash\n",__FUNCTION__);
 				g_is_data |= AUDIO_NV_ARM_DATA_FLASH;
-				sprintf(rsp,"\r\n> ");	
+				sprintf(rsp,"\r\n> ");
 				break;
-			case GET_ARM_VOLUME_DATA_FROM_FLASH:	
+			case GET_ARM_VOLUME_DATA_FROM_FLASH:
 				audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//(AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
 				if ((AUDIO_TOTAL_T *)( -1 )!= audio_ptr ) {
 					//audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
@@ -1320,13 +1314,13 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 					free(audio_ptr);
 				}
 				//there is no break in this case,'cause it will share the code with the following case
-			case GET_ARM_VOLUME_DATA_FROM_RAM:	
+			case GET_ARM_VOLUME_DATA_FROM_RAM:
 				ENG_LOG("%s,get arm volume data,audio_total:0x%0x,--->%d \n",__FUNCTION__,audio_total,g_index);
 				sprintf(rsp,"+SADM4AP: 0,\"%s\",",audio_total[g_index].audio_nv_arm_mode_info.ucModeName);
 				bin2ascii((unsigned char *)(rsp+strlen(rsp)),(unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),sizeof(AUDIO_NV_ARM_MODE_STRUCT_T));
 				break;
 
-			default:	
+			default:
 				sprintf(rsp,"\r\nERROR\r\n");
 				break;
 		}				/* -----  end switch  ----- */
@@ -1339,59 +1333,59 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 		ENG_LOG("receive AT+SPENHA cmd\n");
 		if ( 1 == eq_or_tun_type ) {
 			switch ( cmd_type ) {
-				case GET_AUDIO_ENHA_MODE_COUNT:	
+				case GET_AUDIO_ENHA_MODE_COUNT:
 					sprintf(rsp,"+SPENHA: 1");
 					break;
-				case SET_AUDIO_ENHA_DATA_TO_MEMORY:	
-				case SET_AUDIO_ENHA_DATA_TO_FLASH:	
+				case SET_AUDIO_ENHA_DATA_TO_MEMORY:
+				case SET_AUDIO_ENHA_DATA_TO_FLASH:
 					ENG_LOG("%s,set enha tun data to flash\n",__FUNCTION__);
 					g_is_data |= AUDIO_ENHA_TUN_DATA_MEMORY;
-					sprintf(rsp,"\r\n> ");	
+					sprintf(rsp,"\r\n> ");
 					break;
-				case GET_AUDIO_ENHA_DATA_FROM_FLASH:	
-				case GET_AUDIO_ENHA_DATA_FROM_MEMORY:	
+				case GET_AUDIO_ENHA_DATA_FROM_FLASH:
+				case GET_AUDIO_ENHA_DATA_FROM_MEMORY:
 					ENG_LOG("%s,get audio enha data\n",__FUNCTION__);
 					sprintf(rsp,"+SPENHA: %d,",g_index);
 					bin2ascii((unsigned char *)(rsp+strlen(rsp)),(unsigned char *)tun_data,sizeof(tun_data));
 					break;
-				default:	
+				default:
 					break;
-			}	
+			}
 		}else{
 
 			switch ( cmd_type ) {
-				case GET_AUDIO_ENHA_MODE_COUNT:	
+				case GET_AUDIO_ENHA_MODE_COUNT:
 					sprintf(rsp,"+SPENHA: %d",adev_get_audiomodenum4eng());
 					break;
-					
-				case SET_AUDIO_ENHA_DATA_TO_MEMORY:	
+
+				case SET_AUDIO_ENHA_DATA_TO_MEMORY:
 					ENG_LOG("%s,set enha data to memory\n",__FUNCTION__);
 					g_is_data |=  AUDIO_ENHA_DATA_MEMORY;
-					sprintf(rsp,"\r\n> ");	
+					sprintf(rsp,"\r\n> ");
 					break;
-				case SET_AUDIO_ENHA_DATA_TO_FLASH:	
+				case SET_AUDIO_ENHA_DATA_TO_FLASH:
 					ENG_LOG("%s,set enha data to flash\n",__FUNCTION__);
 					g_is_data |= AUDIO_ENHA_DATA_FLASH;
-					sprintf(rsp,"\r\n> ");	
+					sprintf(rsp,"\r\n> ");
 					break;
-				case GET_AUDIO_ENHA_DATA_FROM_FLASH:	
+				case GET_AUDIO_ENHA_DATA_FROM_FLASH:
 					audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();// (AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
 					if ( NULL != audio_ptr ) {
 						audio_total[g_index].audio_enha_eq=audio_ptr[g_index].audio_enha_eq;
 						free(audio_ptr);//munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
 					}
 					//there is no break in this case,'cause it will share the code with the following case
-				case GET_AUDIO_ENHA_DATA_FROM_MEMORY:	
+				case GET_AUDIO_ENHA_DATA_FROM_MEMORY:
 					ENG_LOG("%s,get audio enha data\n",__FUNCTION__);
 					sprintf(rsp,"+SPENHA: %d,",g_index);
 					bin2ascii((unsigned char *)(rsp+strlen(rsp)),(unsigned char *)(&audio_total[g_index].audio_enha_eq),sizeof(AUDIO_ENHA_EQ_STRUCT_T));
 					break;
-				default:	
+				default:
 					break;
 			}				/* -----  end switch  ----- */
 		}
 	}
-	
+
 out:
 	//if (audio_fd >=0)
 		//close(audio_fd);
