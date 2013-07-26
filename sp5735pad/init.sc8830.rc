@@ -140,7 +140,7 @@ service engmodemclientw /system/bin/engmodemclient -t 0
 
 service engpcclientw /system/bin/engpcclient -t 0
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot
