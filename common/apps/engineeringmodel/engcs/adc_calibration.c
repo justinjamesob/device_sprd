@@ -18,7 +18,7 @@ void	disconnect_vbus_charger(void)
 	int fd;
 	if(vbus_charger_disconnect == 0){
 		vbus_charger_disconnect = 1;
-		fd = open(CHARGER_STOP_PATH,O_RDWR);
+		fd = open(CHARGER_STOP_PATH,O_WRONLY);
 		if(fd >= 0){
 			write(fd,"1",2);
 			close(fd);

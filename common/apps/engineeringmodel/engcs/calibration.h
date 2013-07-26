@@ -3,7 +3,7 @@
 #define	BATTERY_VOL_PATH	"/sys/class/power_supply/battery/real_time_voltage"
 #define	BATTERY_ADC_PATH	"/sys/class/power_supply/battery/real_time_vbat_adc"
 #define	CALI_CTRL_FILE_PATH	"/dev/block/mmcblk0p24"
-#define	CHARGER_STOP_PATH	"/dev/class/power_supply/battery/stop_charge"
+#define	CHARGER_STOP_PATH	"/sys/class/power_supply/battery/stop_charge"
 #define	ADC_CHAN_FILE_PATH	"/sys/kernel/debug/sc2713-regulator/adc_chan"  //add by kenyliu on 2013 07 12 for get ADCV  bug 188809
 #define	BATTER_CALI_CONFIG_FILE	CALI_CTRL_FILE_PATH
 typedef enum
