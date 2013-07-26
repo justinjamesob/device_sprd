@@ -1593,15 +1593,26 @@ allocate_capture_mem_failed:
 
 void SprdCameraHardware::freeCaptureMem()
 {
-	FreePmem(mRawHeap);
-	mRawHeap = NULL;
-	mRawHeapSize = 0;
+    FreePmem(mRawHeap);
+    mRawHeap = NULL;
+    mRawHeapSize = 0;
 
-	FreePmem(mMiscHeap);
-	mMiscHeap = NULL;
-	mMiscHeapSize = 0;
-
-	//mJpegHeap = NULL;
+    if (mMiscHeapSize > 0) {
+        FreePmem(mMiscHeap);
+        mMiscHeap = NULL;
+        mMiscHeapSize = 0;
+    } else {
+        uint32_t i;
+        for (i=0; i<mMiscHeapNum; i++) {
+            sp<MemoryHeapIon> pHeapIon = mMiscHeapArray[i];
+            if (pHeapIon != NULL) {
+                pHeapIon.clear();
+            }
+            mMiscHeapArray[i] = NULL;
+        }
+        mMiscHeapNum = 0;
+    }
+    //mJpegHeap = NULL;
 }
 
 
@@ -1664,21 +1675,11 @@ bool SprdCameraHardware::initCapture(bool initJpegHeap)
 
 void SprdCameraHardware::deinitCapture()
 {
-	if (NULL != mMiscHeap) {
-		camera_set_capture_mem(0, 0, 0, 0, 0, 0, 0);
-	} else {
-		uint32_t i;
-		for (i=0; i<mMiscHeapNum; i++) {
-			sp<MemoryHeapIon> pHeapIon = mMiscHeapArray[i];
-			if (pHeapIon != NULL) {
-				pHeapIon.clear();
-			}
-			mMiscHeapArray[i] = NULL;
-		}
-		mMiscHeapNum = 0;
-	}
+    if (NULL != mMiscHeap) {
+        camera_set_capture_mem(0, 0, 0, 0, 0, 0, 0);
+    }
 
-	freeCaptureMem();
+    freeCaptureMem();
 }
 
 void SprdCameraHardware::changeEmcFreq(char flag)
