@@ -102,10 +102,10 @@ int32_t ISP_Cali_GetLensTabs(struct isp_addr_t img_addr,
 	#else
 	uint32_t img_pttn;
 	struct sensor_raw_fix_info* fix_ptr ;
-	struct sensor_lnc_map lnc_map ;
+	struct sensor_lnc_map *lnc_map ;
 	 img_pttn = sensor_exp_info->image_pattern;
 	fix_ptr = sensor_exp_info->raw_info_ptr->fix_ptr;
-	lnc_map =  fix_ptr->lnc;
+	lnc_map = (struct sensor_lnc_map*)&(fix_ptr->lnc);
 	#endif
 
 	ISP_Cali_GetLNCTabSize(img_size, grid, &length);
@@ -142,8 +142,8 @@ int32_t ISP_Cali_GetLensTabs(struct isp_addr_t img_addr,
 			goto LensTabs_Exit;
 		}
 		fread(lnc_tmp_buf, 1, length, fp);
-                fclose(fp);
-		tg_lnc.y_addr = (uint32_t)lnc_map.map[x][y].param_addr;
+		fclose(fp);
+		tg_lnc.y_addr = (uint32_t)lnc_map->map[x][y].param_addr;
 		mg_lnc.y_addr = (uint32_t)lnc_tmp_buf;
 		mr_lnc.y_addr = (uint32_t)lnc_tab_buf;
 		final_lnc.y_addr = (uint32_t)lens_tab;

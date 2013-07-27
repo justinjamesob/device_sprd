@@ -405,6 +405,7 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 	uint16_t shf_bit = shf;
 	uint32_t map_gain = 0x00;
 	uint32_t x = 0x00;
+	uint32_t tmp_val = 0;
 
 	uint32_t prc_00 = 0x00;
 	uint32_t prc_01 = 0x00;
@@ -457,25 +458,33 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain -= std_gain;
 		map_gain *= prc_00;
 		map_gain >>= shf_bit;
-		rtn_param_ptr->chn_00[x] = std_gain + map_gain;
+		tmp_val = std_gain + map_gain;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_00[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_01.max_stat << shf_bit) / (in_param_ptr->chn_01.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_01;
 		map_gain >>= shf_bit;
-		rtn_param_ptr->chn_01[x] = std_gain + map_gain;
+		tmp_val = std_gain + map_gain;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_01[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_10.max_stat << shf_bit) / (in_param_ptr->chn_10.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_10;
 		map_gain >>= shf_bit;
-		rtn_param_ptr->chn_10[x] = std_gain + map_gain;
+		tmp_val = std_gain + map_gain;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_10[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_11.max_stat << shf_bit) / (in_param_ptr->chn_11.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_11;
 		map_gain >>= shf_bit;
-		rtn_param_ptr->chn_11[x] = std_gain + map_gain;
+		tmp_val = std_gain + map_gain;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_11[x] = tmp_val;
 	}
 
 	return rtn;
@@ -852,6 +861,7 @@ int32_t ISP_Cali_Get_Advanced_LensShading(struct isp_addr_t *lnc_tg,
 	uint16_t mg_v = 0, lnc_v = 0;
 	uint16_t *tg_data = 0, *mr_data = 0;
 	uint16_t *mg_data = 0, *lnc_data = 0;
+
 	if ((!lnc_tg)||
 	(!lnc_mr)
 	||(!lnc_mg)
@@ -866,9 +876,11 @@ int32_t ISP_Cali_Get_Advanced_LensShading(struct isp_addr_t *lnc_tg,
 	||(0 == lnc_mr->y_addr)
 	||(0 == lnc_mg->y_addr)
 	||(0 == lnc_final->y_addr)) {
+
 		ISP_CALI_LOG("ISP_Cali_Get_Advanced_LensShading: tg addr=0x%x, mr addr=0x%x,\
 			mg addr=0x%x, final addr =0x%dx\n",\
 			lnc_tg->y_addr, lnc_mr->y_addr, lnc_mg->y_addr, lnc_final->y_addr);
+
 		return ISP_CALI_RTN_PT_NULL;
 	}
 
@@ -878,17 +890,12 @@ int32_t ISP_Cali_Get_Advanced_LensShading(struct isp_addr_t *lnc_tg,
 	lnc_data = (uint16_t*)lnc_final->y_addr;
 	for ( i = 0; i < (size/2); i++)
 	{
-	#if 0
 		tg_v = *tg_data++;
 		mg_v = *mg_data++;
-	#else
-		tg_v = 256;
-		mg_v = 256;
-	#endif
 		mr_v = *mr_data++;
+
 		tmp = ((uint32_t)tg_v) * mr_v;
-		//tmp = (tmp + (mg_v>>1)) / (mg_v+1);
-		tmp = mr_v;
+		tmp = (tmp + (mg_v>>1)) / (mg_v+1);
 		*lnc_data++ = (uint16_t)tmp;
 	}
 
@@ -907,7 +914,7 @@ uint32_t ISP_Cali_LNCCorrection(struct isp_addr_t * src_data, struct isp_addr_t 
 	uint16_t u, v;
 	uint8_t LNC_GRID;
 	uint16_t GridX, GridY;//total grid number
-	int16_t temp1,temp2,temp3,temp4;
+	int32_t temp1,temp2,temp3,temp4;
 	uint16_t *r0c0_ptr;
 	uint16_t *r0c1_ptr;
 	uint16_t *r1c0_ptr;
