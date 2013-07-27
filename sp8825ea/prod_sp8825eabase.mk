@@ -72,7 +72,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/sprd-keypad.kl:system/usr/keylayout/sprd-keypad.kl \
 	$(BOARDDIR)/sec_touchscreen.idc:system/usr/idc/sec_touchscreen.idc \
-	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc
+	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc \
+        device/sprd/common/res/spn/spn-conf.xml:system/etc/spn-conf.xml
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-dalvik-heap.mk)
 

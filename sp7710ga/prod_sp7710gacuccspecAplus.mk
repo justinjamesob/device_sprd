@@ -104,7 +104,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/sprd-keypad.kl:system/usr/keylayout/sprd-keypad.kl \
 	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc \
-	$(BOARDDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl
+	$(BOARDDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
+        device/sprd/common/res/spn/spn-conf.xml:system/etc/spn-conf.xml
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-256-dalvik-heap.mk)
 
