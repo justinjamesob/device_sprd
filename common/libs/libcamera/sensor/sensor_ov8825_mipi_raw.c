@@ -2339,8 +2339,6 @@ LOCAL uint32_t _ov8825_BeforeSnapshot(uint32_t param)
 
 	capture_exposure = preview_exposure * prv_linetime/cap_linetime;
 
-	capture_exposure = capture_exposure*2;
-
 	if(0 == capture_exposure){
 		capture_exposure = 1;
 	}
