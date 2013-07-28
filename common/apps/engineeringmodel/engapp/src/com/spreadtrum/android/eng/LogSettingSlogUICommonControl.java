@@ -49,6 +49,8 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
     private CheckBox chkAlwaysRun;
     private CheckBox chkSnap;
     private CheckBox chkClearLogAuto;
+    private CheckBox chkTCP;
+    private CheckBox chkBlueTooth;
     private RadioButton rdoNAND;
     private RadioButton rdoSDCard;
     private Intent intentSvc;
@@ -84,7 +86,7 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
     private IMediaContainerService mMediaContainer;
     private static final ComponentName DEFAULT_CONTAINER_COMPONENT = new ComponentName(
             "com.android.defcontainer", "com.android.defcontainer.DefaultContainerService");
-    // Only to prepare to get freespace from sdcard because engmode is a system process.     
+    // Only to prepare to get freespace from sdcard because engmode is a system process.
     final private ServiceConnection mMediaContainerConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
             final IMediaContainerService imcs = IMediaContainerService.Stub
@@ -112,6 +114,8 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         chkAlwaysRun = (CheckBox) findViewById(R.id.chk_general_alwaysrun);
         chkSnap = (CheckBox) findViewById(R.id.chk_general_snapsvc);
         chkClearLogAuto = (CheckBox) findViewById(R.id.chk_general_autoclear);
+        chkTCP = (CheckBox) findViewById(R.id.chk_general_tcp);
+        chkBlueTooth = (CheckBox) findViewById(R.id.chk_general_bluetooth);
         rdoNAND = (RadioButton) findViewById(R.id.rdo_general_nand);
         rdoSDCard = (RadioButton) findViewById(R.id.rdo_general_sdcard);
         btnClear = (Button) findViewById(R.id.btn_general_clearall);
@@ -174,6 +178,8 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         rdoGeneralLowPower.setOnClickListener(clickListen);
         chkAndroid.setOnClickListener(clickListen);
         chkModem.setOnClickListener(clickListen);
+        chkTCP.setOnClickListener(clickListen);
+        chkBlueTooth.setOnClickListener(clickListen);
         rdoNAND.setOnClickListener(clickListen);
         rdoSDCard.setOnClickListener(clickListen);
         btnClear.setOnClickListener(clickListen);
@@ -349,6 +355,8 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         }
 
         boolean tempHost = tempHostOn || tempHostLowPower;
+        boolean isSDCard = SlogAction.GetState(SlogAction.STORAGEKEY);
+        boolean isMountSDCard = SlogAction.IsHaveSDCard();
         SlogAction.SetCheckBoxBranchState(chkAndroid, tempHost,
                 SlogAction.GetState(SlogAction.ANDROIDKEY));
 
@@ -356,9 +364,14 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
                 SlogAction.GetState(SlogAction.MODEMKEY));
         SlogAction.SetCheckBoxBranchState(chkClearLogAuto, tempHost,
                 SlogAction.GetState(SlogAction.CLEARLOGAUTOKEY));
+        SlogAction.SetCheckBoxBranchState(chkTCP, tempHost && isSDCard && isMountSDCard,
+                SlogAction.GetState(SlogAction.TCPKEY));
+        SlogAction.SetCheckBoxBranchState(chkBlueTooth, tempHost && isSDCard && isMountSDCard,
+                SlogAction.GetState(SlogAction.BLUETOOTHKEY));
+
+        btnDump.setEnabled(isSDCard && isMountSDCard);
 
         // Set Radio buttons
-        boolean isSDCard = SlogAction.GetState(SlogAction.STORAGEKEY);
         rdoSDCard.setEnabled(SlogAction.IsHaveSDCard() ? true : false);
         rdoSDCard.setChecked(isSDCard);
         rdoNAND.setChecked(!isSDCard);
@@ -406,7 +419,29 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
             case R.id.chk_general_modem_switch:
                 SlogAction.SetState(SlogAction.MODEMKEY, chkModem.isChecked(),
                         false);
-                break;
+                new Thread() {
+                    @Override
+                    public void run() {
+                        SlogAction.sendATCommand(engconstents.ENG_AT_SETARMLOG, chkModem.isChecked());
+                    }
+                } .start();
+            break;
+
+            case R.id.chk_general_bluetooth:
+                SlogAction.SetState(SlogAction.BLUETOOTHKEY,
+                        chkBlueTooth.isChecked(), false);
+            break;
+
+            case R.id.chk_general_tcp:
+                SlogAction.SetState(SlogAction.TCPKEY, chkTCP.isChecked(),
+                        false);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        SlogAction.sendATCommand(engconstents.ENG_AT_SETCAPLOG, chkTCP.isChecked());
+                    }
+                }.start();
+            break;
 
             case R.id.chk_general_alwaysrun:
                 SlogAction.setAlwaysRun(SlogAction.SERVICESLOG,
@@ -469,6 +504,8 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
                 SlogAction.SetState(SlogAction.STORAGEKEY,
                         rdoSDCard.isChecked(), true);
                 btnDump.setEnabled(false);
+                chkBlueTooth.setEnabled(false);
+                chkTCP.setEnabled(false);
                 break;
             case R.id.rdo_general_sdcard:
                 if (SlogAction.IsHaveSDCard()) {
@@ -481,7 +518,9 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
                 }
                 SlogAction.SetState(SlogAction.STORAGEKEY,
                         rdoSDCard.isChecked(), true);
-                btnDump.setEnabled(true);
+                btnDump.setEnabled(true && SlogAction.IsHaveSDCard());
+                chkBlueTooth.setEnabled(true);
+                chkTCP.setEnabled(true);
                 break;
 
             case R.id.btn_general_clearall:

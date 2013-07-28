@@ -18,6 +18,7 @@ public class LogSettingSlogUIAndroidPage extends Activity implements SlogUISyncS
     private CheckBox chkRadio;
     private CheckBox chkKernel;
     private CheckBox chkMain;
+    private CheckBox chkEvent;
 
     // public static Handler mHandler;
     @Override
@@ -31,6 +32,7 @@ public class LogSettingSlogUIAndroidPage extends Activity implements SlogUISyncS
         chkRadio = (CheckBox) findViewById(R.id.chk_android_radio);
         chkKernel = (CheckBox) findViewById(R.id.chk_android_kernel);
         chkMain = (CheckBox) findViewById(R.id.chk_android_main);
+        chkEvent = (CheckBox) findViewById(R.id.chk_android_event);
 
         // Make sure that, views match to slog.conf
         // No need to run syncState in onCreate.
@@ -43,6 +45,7 @@ public class LogSettingSlogUIAndroidPage extends Activity implements SlogUISyncS
         chkRadio.setOnClickListener(chklisten);
         chkKernel.setOnClickListener(chklisten);
         chkMain.setOnClickListener(chklisten);
+        chkEvent.setOnClickListener(chklisten);
 
     }
 
@@ -69,6 +72,11 @@ public class LogSettingSlogUIAndroidPage extends Activity implements SlogUISyncS
 
             case R.id.chk_android_main:
                 SlogAction.SetState(SlogAction.MAINKEY, chkMain.isChecked(),
+                        false);
+                break;
+
+            case R.id.chk_android_event:
+                SlogAction.SetState(SlogAction.EVENTKEY, chkEvent.isChecked(),
                         false);
                 break;
 
@@ -115,6 +123,8 @@ public class LogSettingSlogUIAndroidPage extends Activity implements SlogUISyncS
                 SlogAction.GetState(SlogAction.KERNELKEY));
         SlogAction.SetCheckBoxBranchState(chkMain, tempHost,
                 SlogAction.GetState(SlogAction.MAINKEY));
+        SlogAction.SetCheckBoxBranchState(chkEvent, tempHost,
+                SlogAction.GetState(SlogAction.EVENTKEY));
 
     }
     

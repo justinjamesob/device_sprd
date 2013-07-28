@@ -58,6 +58,21 @@
             android:paddingTop="10dip"
             android:text="@string/chk_general_modem" />
 
+        <CheckBox
+            android:id="@+id/chk_general_tcp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dip"
+            android:text="@string/chk_modem_tcp" />
+
+        <CheckBox
+            android:id="@+id/chk_general_bluetooth"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dip"
+            android:text="@string/chk_modem_bluetooth" />
+
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

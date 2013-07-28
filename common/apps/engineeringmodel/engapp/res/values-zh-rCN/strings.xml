@@ -33,13 +33,14 @@
     <string name="chk_android_kernel">启用Kernel</string>
     <string name="chk_android_system">启用System</string>
     <string name="chk_android_main">启用Main</string>
+    <string name="chk_android_event">启用Event</string>
     <string name="chk_android_radio">启用Radio</string>
     <string name="chk_modem_switch">启用Modem Log</string>
     <string name="chk_muti_modem_switch0">启用Modem Log</string>
     <string name="chk_muti_modem_switch1">启用Modem1 Log</string>
     <string name="txv_modem_other">其他选项</string>
     <string name="chk_modem_bluetooth">蓝牙 Log</string>
-    <string name="chk_modem_tcp">Tcp Log</string>
+    <string name="chk_modem_tcp">Cap Log</string>
     <string name="chk_modem_misc">其他 Log</string>
     <string name="txv_alert_dump">请输入包名</string>
     <string name="txv_alert_clearlog">确实要清除所有Log?</string>

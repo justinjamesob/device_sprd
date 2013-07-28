@@ -96,6 +96,7 @@ public class SlogAction {
     public static final String MUTI_MODEM_0KEY = "stream\tmodem0\t";
     public static final String MUTI_MODEM_1KEY = "stream\tmodem1\t";
     public static final String MAINKEY = "stream\tmain\t";
+    public static final String EVENTKEY = "stream\tevents\t";
     public static final String TCPKEY = "stream\ttcp\t";
     public static final String BLUETOOTHKEY = "stream\tbt\t";
     public static final String MISCKEY = "misc\tmisc\t";
@@ -206,6 +207,8 @@ public class SlogAction {
                 else if (GetState(RADIOKEY, false).equals(ON))
                     return true;
                 else if (GetState(MAINKEY, false).equals(ON))
+                    return true;
+                else if (GetState(EVENTKEY, false).equals(ON))
                     return true;
                 break;
             default:
@@ -381,6 +384,7 @@ public class SlogAction {
             SetState(KERNELKEY, status, false);
             SetState(RADIOKEY, status, false);
             SetState(MAINKEY, status, false);
+            SetState(EVENTKEY, status, false);
             break;
         default:
             Log.w("SetState(int,boolean)", "You have given a invalid case");
@@ -483,6 +487,9 @@ public class SlogAction {
         SetState(MAINKEY, (cursor.getInt(
                 cursor.getColumnIndex(
                         SlogProvider.Contract.COLUMN_MAIN)) == 1), false);
+        SetState(EVENTKEY, (cursor.getInt(
+                cursor.getColumnIndex(
+                        SlogProvider.Contract.COLUMN_EVENT)) == 1), false);
         SetState(RADIOKEY, (cursor.getInt(
                 cursor.getColumnIndex(
                         SlogProvider.Contract.COLUMN_RADIO)) == 1), false);
@@ -536,6 +543,7 @@ public class SlogAction {
         cv.put(SlogProvider.Contract.COLUMN_GENERAL, GetState(GENERALKEY, true));
         cv.put(SlogProvider.Contract.COLUMN_KERNEL, GetState(KERNELKEY) ? 1:0);
         cv.put(SlogProvider.Contract.COLUMN_MAIN, GetState(MAINKEY) ? 1:0);
+        cv.put(SlogProvider.Contract.COLUMN_EVENT, GetState(EVENTKEY) ? 1:0);
         cv.put(SlogProvider.Contract.COLUMN_RADIO, GetState(RADIOKEY) ? 1:0);
         cv.put(SlogProvider.Contract.COLUMN_SYSTEM, GetState(SYSTEMKEY) ? 1:0);
         cv.put(SlogProvider.Contract.COLUMN_MODEM, GetState(MODEMKEY) ? 1:0);

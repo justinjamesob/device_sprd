@@ -40,7 +40,7 @@
     <string name="chk_muti_modem_switch1">啓用Modem1 Log</string>
     <string name="txv_modem_other">其他選項</string>
     <string name="chk_modem_bluetooth">藍牙 Log</string>
-    <string name="chk_modem_tcp">Tcp Log</string>
+    <string name="chk_modem_tcp">Cap Log</string>
     <string name="chk_modem_misc">其他 Log</string>
     <string name="txv_alert_dump">請輸入包名</string>
     <string name="txv_alert_clearlog">確實要清除所有Log?</string>

@@ -350,9 +350,6 @@
         </activity>
         <activity android:name=".LogSettingSlogUIAndroidPage"
             android:configChanges="orientation|screenSize|locale"/>
-        <activity android:name=".LogSettingSlogUIModemPage"
-            android:configChanges="orientation|screenSize|locale" >
-        </activity>
 
         <service android:name=".SlogService" >
         </service>
