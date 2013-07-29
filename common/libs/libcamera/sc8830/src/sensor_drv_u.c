@@ -2066,6 +2066,7 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 
 	_Sensor_save_sensor_type();
 
+#if 0
 	if (SENSOR_SUCCESS == ret_val) {
 
 		//SENSOR_PRINT("hait_test: g_is_calibration: %d\n", g_is_calibration);
@@ -2076,6 +2077,8 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 		}
 
 	}
+
+#endif
 
 	*sensor_num_ptr = sensor_num;
 
@@ -2357,10 +2360,12 @@ ERR_SENSOR_E Sensor_Close(void)
 {
 	SENSOR_PRINT("SENSOR: Sensor_close");
 
+#if 0
 	if (0 == g_is_calibration) {
 
 		_sensor_calil_lnc_param_recover(s_sensor_info_ptr);
 	}
+#endif
 
 	if (1 == g_is_register_sensor) {
 		if (1 == g_is_main_sensor) {
