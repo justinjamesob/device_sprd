@@ -2553,21 +2553,7 @@ void SprdCameraHardware::receivePostLpmRawPicture(camera_frame_type *frame)
 	}
 
 	if (mData_cb!= NULL) {
-		bool encode_location = true;
-		camera_position_type pt = {0, 0, 0, 0, NULL};
-
-		encode_location = getCameraLocation(&pt);
-		if (encode_location) {
-			if (camera_set_position(&pt, NULL, NULL) != CAMERA_SUCCESS) {
-				LOGE("receiveRawPicture: camera_set_position: error");
-				// return;  // not a big deal
-			}
-		}
-		else
-			LOGV("receiveRawPicture: not setting image location");
-
 		mJpegSize = 0;
-
 		camera_handle_type camera_handle;
 		if(CAMERA_SUCCESS != camera_encode_picture(frame, &camera_handle, camera_cb, this)) {
 			setCameraState(SPRD_ERROR, STATE_CAPTURE);
@@ -2897,6 +2883,9 @@ void SprdCameraHardware::HandleTakePicture(camera_cb_type cb,
 {
 	LOGV("HandleTakePicture in: cb = %d, parm4 = 0x%x, state = %s",
 				cb, parm4, getCameraStateStr(getCaptureState()));
+	bool encode_location = true;
+	camera_position_type pt = {0, 0, 0, 0, NULL};
+	encode_location = getCameraLocation(&pt);
 
 	switch (cb) {
 	case CAMERA_RSP_CB_SUCCESS:
@@ -2908,6 +2897,14 @@ void SprdCameraHardware::HandleTakePicture(camera_cb_type cb,
 
 	case CAMERA_EVT_CB_SNAPSHOT_DONE:
 		LOGV("HandleTakePicture: CAMERA_EVT_CB_SNAPSHOT_DONE");
+		if (encode_location) {
+			if (camera_set_position(&pt, NULL, NULL) != CAMERA_SUCCESS) {
+			LOGE("receiveRawPicture: camera_set_position: error");
+			// return;	// not a big deal
+			}
+		}
+		else
+			LOGV("receiveRawPicture: not setting image location");
 		notifyShutter();
 		receiveRawPicture((camera_frame_type *)parm4);
 		break;
