@@ -70,7 +70,7 @@ static struct eng_param cmdparam = {
     .connect_type = CONNECT_USB,
     .nativeflag = 0
 };
-
+extern void    disconnect_vbus_charger(void);
 #if PC_DATA_FROM_AT_ROUTER
 int create_pty(char *path)
 {
@@ -929,6 +929,7 @@ static int eng_parse_cmdline(struct eng_param * cmdvalue)
             str = strstr(cmdline, "calibration");
             if ( str  != NULL){
                 cmdvalue->califlag = 1;
+		disconnect_vbus_charger();
                 /*calibration= mode,freq, device. Example: calibration=8,10096,146*/
                 str = strchr(str, '=');
                 if(str != NULL){
