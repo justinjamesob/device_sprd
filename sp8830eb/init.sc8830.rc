@@ -249,6 +249,12 @@ service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 ./nvitem_w.cfg        FALSE
     user root
     group system radio shell
     oneshot
+#apnvd
+service apnvd
+    class core
+    user root
+    group system radio shell
+    oneshot
 
 #service bootsound /system/bin/mplayer /system/media/bootsound
 #    user media
