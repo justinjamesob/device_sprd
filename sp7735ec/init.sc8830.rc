@@ -235,7 +235,7 @@ service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 ./nvitem_w.cfg      FALSE
     oneshot
 
 #apnvd
-service apnvd
+service apnvd  /bin/apnvd
     class core
     user root
     group system radio shell

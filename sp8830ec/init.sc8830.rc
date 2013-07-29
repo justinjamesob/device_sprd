@@ -231,7 +231,7 @@ service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 ./nvitem_td.cfg   FALSE
 #    oneshot
 
 #apnvd
-service apnvd
+service apnvd /bin/apnvd
     class core
     user root
     group system radio shell
