@@ -1200,6 +1200,7 @@ public class SlogAction {
             }
             synchronized void screenShot() {
                 Message msg = new Message();
+                Looper.prepare();
                 /*Add 20130527 Spreadst of 169012 No init Looper start*/
                 try {
                     Looper.prepare();
@@ -1249,7 +1250,7 @@ public class SlogAction {
                     Log.e(TAG, "Failed loop the Looper");
                 }
                 /*Add 20130527 Spreadst of 169012 No init Looper end*/
-
+                Looper.loop();
             }
         }
 
