@@ -72,4 +72,5 @@ service engpcclient /system/bin/engpcclient
 service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 ./nvitem_td.cfg   TRUE
     user root
 
-
+service apnvd
+    user root
