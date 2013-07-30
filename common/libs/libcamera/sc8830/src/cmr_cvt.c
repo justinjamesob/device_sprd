@@ -489,6 +489,12 @@ int cmr_scale_local_init(uint32_t slice_height,
 		return -1;
 	}
 
+	ret = ioctl(scaler_fd, SCALE_IO_INIT, NULL);
+	if (ret) {
+		CMR_LOGE("Scale hw init error! 0x%x ", ret);
+		return -1;
+	}
+
 	bzero(sc_cxt, sizeof(struct scale_cxt));
 	read(scaler_fd, &sc_cxt->sc_threshold, sizeof(uint32_t));
 
@@ -909,7 +915,6 @@ int cmr_scale_deinit(void)
 	pthread_mutex_unlock(&scaler_cb_mutex);
 	sem_wait(&scaler_sem);
 	sem_post(&scaler_sem);
-	ioctl(scaler_fd, SCALE_IO_STOP, NULL);
 	/* thread should be killed before fd deinited */
 	ret = cmr_scale_kill_thread();
 	if (ret) {
@@ -988,8 +993,12 @@ static void* cmr_scale_thread_proc(void* data)
 			CMR_LOGV("To exit scaler thread");
 			break;
 		} else {
+			CMR_PRINT_TIME;
 			pthread_mutex_lock(&scaler_cb_mutex);
 			if (NULL == scaler_evt_cb) {
+				CMR_LOGI("IO Deinit");
+				ioctl(scaler_fd, SCALE_IO_STOP, NULL);
+				ioctl(scaler_fd, SCALE_IO_DEINIT);
 				pthread_cond_signal(&scaler_cond);
 			} else {
 				evt_id = CMR_IMG_CVT_SC_DONE;
@@ -1025,6 +1034,16 @@ static void* cmr_scale_thread_proc(void* data)
 				} else {
 					sc_cxt->last_out_height_y = sc_frm.height;
 					sc_cxt->last_out_height_u = sc_cxt->last_out_height_y;
+				}
+
+				CMR_LOGI("out height %d, dst height %d",
+					sc_cxt->last_out_height_y,
+					sc_cxt->dst_frame.size.height);
+
+				if (sc_cxt->last_out_height_y == sc_cxt->dst_frame.size.height) {
+					CMR_LOGI("IO Deinit");
+					ioctl(scaler_fd, SCALE_IO_STOP, NULL);
+					ioctl(scaler_fd, SCALE_IO_DEINIT);
 				}
 				frame.reserved        = sc_cxt->sc_user_data;
 				frame.size.width      = sc_frm.width;

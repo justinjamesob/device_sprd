@@ -1283,6 +1283,12 @@ int camera_init_internal(uint32_t camera_id)
 		goto jpeg_deinit;
 	}
 
+	ret = camera_scaler_init();
+	if (ret) {
+		CMR_LOGE("Failed to init scaler %d", ret);
+		goto scale_deinit;
+	}
+
 	ret = camera_dma_copy_init();
 	if (ret) {
 		CMR_LOGE("Fail to init dma copy device %d", ret);
@@ -1301,17 +1307,16 @@ dma_copy_deinit:
 	camera_dma_copy_deinit();
 rot_deinit:
 	camera_rotation_deinit();
+scale_deinit:
+	camera_scaler_deinit();
 jpeg_deinit:
 	camera_jpeg_deinit();
 isp_deinit:
 	camera_isp_deinit();
-
 prev_thread_deinit:
 	camera_prev_thread_deinit();
-
 cap_sub_deinit:
 	camera_cap_subthread_deinit();
-
 cap_deinit:
 	camera_cap_thread_deinit();
 v4l2_deinit:
@@ -1363,6 +1368,8 @@ int camera_stop_internal(void)
 	camera_setting_deinit();
 
 	camera_dma_copy_deinit();
+
+	camera_scaler_deinit();
 
 	camera_rotation_deinit();
 
@@ -1991,7 +1998,6 @@ int camera_stop_preview_internal(void)
 	}
 	g_cxt->chn_1_status   = CHN_IDLE;
 
-	camera_scaler_deinit();
 	CMR_PRINT_TIME;
 
 	g_cxt->pre_frm_cnt = 0;
@@ -3090,6 +3096,7 @@ void camera_scaler_evt_cb(int evt, void* data)
 	struct img_frm           frame;
 	int                      ret = CAMERA_SUCCESS;
 	struct frm_info          *info = &g_cxt->scaler_cxt.proc_status.frame_info;
+
 	if (NULL == data || CMR_EVT_CVT_BASE != (CMR_EVT_CVT_BASE & evt)) {
 		CMR_LOGE("Error param, 0x%x 0x%x", (uint32_t)data, evt);
 		return;
@@ -3345,6 +3352,8 @@ int camera_isp_handle(uint32_t evt_type, uint32_t sub_type, void *data)
 void camera_start_convert_thum(void)
 {
 	int ret = CAMERA_SUCCESS;
+
+	CMR_PRINT_TIME;
 	if ((0 != g_cxt->thum_size.width) && (0 != g_cxt->thum_size.height)) {
 		ret = camera_convert_to_thumb();
 		if (ret) {
@@ -5074,6 +5083,8 @@ int camera_v4l2_capture_handle(struct frm_info *data)
 		CMR_LOGV("wait cap path IDLE ...");
 		camera_wait_cap_path(g_cxt);
 		CMR_LOGV("wait cap path IDLE OK");
+	} else {
+		SET_CHN_IDLE(CHN_2);
 	}
 
 	switch (g_cxt->cap_original_fmt) {
@@ -5456,11 +5467,6 @@ int camera_start_scale(struct frm_info *data)
 	struct scaler_context    *cxt = &g_cxt->scaler_cxt;
 
 	TAKE_PIC_CANCEL;
-	ret = camera_scaler_init();
-	if (ret) {
-		CMR_LOGE("Failed to init scaler, %d", ret);
-		return ret;
-	}
 
 	frm_id = data->frame_id - CAMERA_CAP0_ID_BASE;
 
@@ -5566,7 +5572,6 @@ int camera_start_scale(struct frm_info *data)
 	if (ret) {
 		CMR_LOGE("Failed to start scaler, %d", ret);
 		g_cxt->scaler_cxt.scale_state = IMG_CVT_IDLE;
-		camera_scaler_deinit();
 		return ret;
 	}
 
@@ -5597,7 +5602,6 @@ int camera_scale_done(struct frm_info *data)
 #endif
 
 	CMR_PRINT_TIME;
-	ret = camera_scaler_deinit();
 	if (ret) {
 		CMR_LOGV("Failed to deinit scaler, %d", ret);
 		return ret;
@@ -5767,14 +5771,6 @@ int camera_copy_data(uint32_t width, uint32_t height, uint32_t in_addr, uint32_t
 #else
 	pthread_mutex_lock(&g_cxt->prev_mutex);
 
-	ret = camera_scaler_init();
-	if (ret) {
-		CMR_LOGE("Failed to init scaler %d", ret);
-		ret = -CAMERA_NOT_SUPPORTED;
-	} else {
-		cmr_scale_evt_reg(NULL);
-	}
-
 	src_frame.addr_phy.addr_y = in_addr;
 	src_frame.addr_phy.addr_u = in_addr + img_len;
 	src_frame.size.width      = width;
@@ -5793,15 +5789,16 @@ int camera_copy_data(uint32_t width, uint32_t height, uint32_t in_addr, uint32_t
 	rect.start_y              = 0;
 	rect.width                = width;
 	rect.height               = height;
+	cmr_scale_evt_reg(NULL);
 	ret = cmr_scale_start(height,
 			&src_frame,
 			&rect,
 			&dst_frame,
 			NULL,
 			NULL);
+	cmr_scale_evt_reg(camera_scaler_evt_cb);
 
 	CMR_LOGV("Done, %d", ret);
-	ret = camera_scaler_deinit();
 	if (ret) {
 		CMR_LOGE("Failed to deinit scaler, %d", ret);
 	}
@@ -5832,13 +5829,6 @@ int camera_get_data_redisplay(int output_addr,
 		CMR_LOGE("Capture Stoped");
 		return ret;
 	}
-	ret = camera_scaler_init();
-	if (ret) {
-		CMR_LOGE("Failed to init scaler %d", ret);
-		ret = -CAMERA_NOT_SUPPORTED;
-	} else {
-		cmr_scale_evt_reg(NULL);
-	}
 
 	src_frame.addr_phy.addr_y = input_addr_y;
 	src_frame.addr_phy.addr_u = input_addr_uv;
@@ -5858,18 +5848,15 @@ int camera_get_data_redisplay(int output_addr,
 	rect.start_y              = 0;
 	rect.width                = input_width;
 	rect.height               = input_height;
+	cmr_scale_evt_reg(NULL);
 	ret = cmr_scale_start(input_height,
 			&src_frame,
 			&rect,
 			&dst_frame,
 			NULL,
 			NULL);
-
+	cmr_scale_evt_reg(camera_scaler_evt_cb);
 	CMR_LOGV("Done, %d", ret);
-	ret = camera_scaler_deinit();
-	if (ret) {
-		CMR_LOGE("Failed to deinit scaler, %d", ret);
-	}
 	return 0;
 }
 
@@ -5916,23 +5903,16 @@ static int camera_convert_to_thumb(void)
 	struct img_rect          rect;
 	int                      ret = CAMERA_SUCCESS;
 
-	if(!NO_SCALING){
+	if (!NO_SCALING) {
 		camera_wait_scale_path(g_cxt);
 	}
 
 	if (IS_CHN_BUSY(CHN_2)) {
 		CMR_LOGE("abnormal! path is busy yet! stop it");
-		ret = cmr_v4l2_cap_pause(CHN_2,0);
+		ret = cmr_v4l2_cap_pause(CHN_2, 0);
 		SET_CHN_IDLE(CHN_2);
 	}
 
-	ret = camera_scaler_init();
-	if (ret) {
-		CMR_LOGE("Failed to init scaler %d", ret);
-		ret = -CAMERA_NOT_SUPPORTED;
-	} else {
-		cmr_scale_evt_reg(NULL);
-	}
 	if (IMG_ROT_90 == g_cxt->cfg_cap_rot || IMG_ROT_270 == g_cxt->cfg_cap_rot) {
 		uint32_t temp = 0;
 		temp = g_cxt->thum_size.width;
@@ -5962,17 +5942,18 @@ static int camera_convert_to_thumb(void)
 	rect.start_y              = 0;
 	rect.width                = src_frame.size.width;
 	rect.height               = src_frame.size.height;
+
+	cmr_scale_evt_reg(NULL);
 	ret = cmr_scale_start(src_frame.size.height,
 			&src_frame,
 			&rect,
 			&dst_frame,
 			NULL,
 			NULL);
-
+	cmr_scale_evt_reg(camera_scaler_evt_cb);
 	CMR_LOGV("Done, %d", ret);
 	g_cxt->thum_ready = 1;
 	camera_convert_thum_done(g_cxt);
-	ret = camera_scaler_deinit();
 	if (ret) {
 		CMR_LOGE("Failed to deinit scaler, %d", ret);
 	}
