@@ -116,4 +116,3 @@ ifeq ($(MULTILANGUAGE_SUPPORT),true)
 endif
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=zh
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=CN
-HAVE_WLAN_CMCC_FEATURE := true

@@ -96,7 +96,6 @@ TARGET_BOARD_CAMERA_SUPPORT_CIF := true
 #BOARD_HOSTAPD_DRIVER        := NL80211
 #BOARD_HOSTAPD_PRIVATE_LIB   :=  lib_driver_cmd_rtl
 #BOARD_WLAN_DEVICE           := realtek
-#HAVE_WLAN_CMCC_FEATURE      := true
 
 #WIFI_DRIVER_FW_PATH_PARAM   := ""
 #WIFI_DRIVER_FW_PATH_STA     := "/etc/wifi/fw_rtk_sta.bin"
