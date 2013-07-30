@@ -432,6 +432,7 @@ struct config_element sprd_front_camera_hardware_config[] = {
 	{"max-contrast", "6"},
 	{"contrast-values", "0,1,2,3,4,5,6"},
 	{"contrast", "3"},
+#if 0
 	{"saturation-supported", "true"},
 	{"saturation-values", "0,1,2,3,4,5,6"},
 	{"saturation", "3"},
@@ -439,6 +440,7 @@ struct config_element sprd_front_camera_hardware_config[] = {
 	{"max-sharpness", "6"},
 	{"sharpness-values", "0,1,2,3,4,5,6"},
 	{"sharpness", "3"},
+#endif
 	{"min-exposure-compensation", "0"},
 	{"max-exposure-compensation", "0"},
 	{"exposure-compensation","0"},
