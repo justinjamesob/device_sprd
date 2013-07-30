@@ -152,6 +152,7 @@ static int camera_get_take_picture(void);
 static int camera_set_take_picture(int set_val);
 static int camera_capture_init_raw(void);
 static void camera_start_convert_thum(void);
+static int camera_capture_get_max_size(SENSOR_MODE_INFO_T *sn_mode, uint32_t *io_width, uint32_t *io_height);
 
 camera_ret_code_type camera_encode_picture(camera_frame_type *frame,
 					camera_handle_type *handle,
@@ -1521,9 +1522,14 @@ int camera_capture_sensor_mode(void)
 		ret = -CAMERA_NOT_SUPPORTED;
 	}
 
+	g_cxt->max_size.width = g_cxt->picture_size.width;
+	g_cxt->max_size.height = g_cxt->picture_size.height;
+
+	ret = camera_capture_get_max_size(sensor_mode, &g_cxt->max_size.width, &g_cxt->max_size.height);
+/*
 	g_cxt->max_size.width  = MAX(g_cxt->picture_size.width,  sensor_mode->width);
 	g_cxt->max_size.height = MAX(g_cxt->picture_size.height, sensor_mode->height);
-
+*/
 	return ret;
 }
 
@@ -3871,6 +3877,7 @@ int camera_preview_init(int format_mode)
 	int                      ret = CAMERA_SUCCESS;
 	struct cap_cfg           v4l2_cfg;
 	struct sn_cfg            sensor_cfg;
+	uint32_t                 sn_work_mode;
 	SENSOR_MODE_INFO_T       *sensor_mode;
 	struct buffer_cfg        buffer_info;
 	struct isp_video_start   isp_param;
@@ -3878,10 +3885,11 @@ int camera_preview_init(int format_mode)
 
 	memset(&v4l2_cfg,0,sizeof(v4l2_cfg));
 	if (IS_ZSL_MODE(g_cxt->cap_mode)) {
-		sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.capture_mode];
+		sn_work_mode = g_cxt->sn_cxt.capture_mode;
 	} else {
-		sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.preview_mode];
+		sn_work_mode = g_cxt->sn_cxt.preview_mode;
 	}
+	sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[sn_work_mode];
 
 	sensor_cfg.sn_size.width  = sensor_mode->width;
 	sensor_cfg.sn_size.height = sensor_mode->height;
@@ -3964,7 +3972,7 @@ int camera_preview_init(int format_mode)
 		isp_param.size.h = sensor_mode->height;
 		isp_param.format = ISP_DATA_NORMAL_RAW10;
 		CMR_LOGV("isp w h, %d %d", isp_param.size.w, isp_param.size.h);
-		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[g_cxt->sn_cxt.capture_mode].ae_info[video_mode];
+		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[sn_work_mode].ae_info[video_mode];
 		CMR_LOGE("%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
 			     sensor_aec_info->line_time,sensor_aec_info->gain);
 		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
@@ -4498,48 +4506,28 @@ int camera_capture_ability(SENSOR_MODE_INFO_T *sn_mode,
 			g_cxt->isp_cxt.drop_slice_cnt,
 			g_cxt->isp_cxt.drop_slice_num);
 	} else {
-		if (g_cxt->capture_size.width >= CMR_SCALING_TH) {
-			/* for those need scaling and it's width is longer than CMR_SCALING_TH, should bypass scaling */
+		tmp_width = (uint32_t)(g_cxt->v4l2_cxt.sc_factor * img_cap->src_img_rect.width);
+		if (img_cap->src_img_rect.width >= CAMERA_SAFE_SCALE_DOWN(g_cxt->capture_size.width) ||
+			g_cxt->capture_size.width <= CMR_SCALING_TH) {
+			//if the out size is smaller than the in size, try to use scaler on the fly
+			if (g_cxt->capture_size.width > tmp_width) {
+				if (tmp_width > g_cxt->v4l2_cxt.sc_capability) {
+					img_cap->dst_img_size.width  = g_cxt->v4l2_cxt.sc_capability;
+				} else {
+					img_cap->dst_img_size.width  = tmp_width;
+				}
+				img_cap->dst_img_size.height = (uint32_t)(img_cap->src_img_rect.height * g_cxt->v4l2_cxt.sc_factor);
+			} else {
+				// just use scaler on the fly
+				img_cap->dst_img_size.width  = g_cxt->capture_size.width;
+				img_cap->dst_img_size.height = g_cxt->capture_size.height;
+			}
+		} else {
+			//if the out size is larger than the in size
 			img_cap->dst_img_size.width   = img_cap->src_img_rect.width;
 			img_cap->dst_img_size.height  = img_cap->src_img_rect.height;
-		} else {
-			tmp_width = (uint32_t)(g_cxt->v4l2_cxt.sc_factor * img_cap->src_img_rect.width);
-
-			if (g_cxt->capture_size.width <= g_cxt->v4l2_cxt.sc_capability) {
-				/* if the capture size is smaller than the scale capability,
-					just set the output as capture_size*/
-				if ( tmp_width > g_cxt->capture_size.width) {
-					img_cap->dst_img_size.width  = g_cxt->capture_size.width;
-					img_cap->dst_img_size.height = g_cxt->capture_size.height;
-				} else {
-					img_cap->dst_img_size.width = tmp_width;
-					img_cap->dst_img_size.height =
-					(uint32_t)((img_cap->src_img_rect.height * img_cap->dst_img_size.width) /
-						img_cap->src_img_rect.width);
-
-				}
-			} else {
-				/* if the capture size is larger than the scale capability */
-				if (g_cxt->capture_size.width > img_cap->src_img_rect.width &&
-					g_cxt->v4l2_cxt.sc_capability > img_cap->src_img_rect.width) {
-					/* if the scale capability is large than src_img_rect, maybe the output can be sc_capability
-					 or g_cxt->v4l2_cxt.sc_factor * img_cap->dst_img_size.width */
-					if ( tmp_width > g_cxt->v4l2_cxt.sc_capability) {
-						img_cap->dst_img_size.width = g_cxt->v4l2_cxt.sc_capability;
-					} else {
-						img_cap->dst_img_size.width = tmp_width;
-					}
-					img_cap->dst_img_size.height =
-						(uint32_t)((img_cap->src_img_rect.height * img_cap->dst_img_size.width) /
-						img_cap->src_img_rect.width);
-					img_cap->dst_img_size.height = CAMERA_HEIGHT(img_cap->dst_img_size.height);
-				} else {
-					img_cap->dst_img_size.width   = img_cap->src_img_rect.width;
-					img_cap->dst_img_size.height  = img_cap->src_img_rect.height;
-				}
-			}
-
 		}
+
 	}
 
 	g_cxt->cap_orig_size.width    = img_cap->dst_img_size.width;
@@ -6198,4 +6186,84 @@ void camera_isp_ae_stab_set (uint32_t is_ae_stab_eb)
 
 	g_cxt-> is_isp_ae_stab_eb = is_ae_stab_eb;
 
+}
+
+int camera_capture_get_max_size(SENSOR_MODE_INFO_T *sn_mode, uint32_t *io_width, uint32_t *io_height)
+{
+	uint32_t                   zoom_mode = ZOOM_BY_CAP;
+	uint32_t                   original_fmt = IMG_DATA_TYPE_YUV420;
+	uint32_t                   need_isp = 0;
+	struct img_rect            img_rc;
+	struct img_size            img_sz;
+	uint32_t                   tmp_width;
+	int                        ret = CAMERA_SUCCESS;
+
+	img_sz.width  = *io_width;
+	img_sz.height = *io_height;
+	if (SENSOR_IMAGE_FORMAT_YUV422 == sn_mode->image_format) {
+		original_fmt = IMG_DATA_TYPE_YUV420;
+		zoom_mode = ZOOM_BY_CAP;
+	} else if (SENSOR_IMAGE_FORMAT_RAW == sn_mode->image_format) {
+		if (*io_width <= g_cxt->isp_cxt.width_limit) {
+			CMR_LOGV("Need ISP to work at video mode");
+			need_isp = 1;
+			original_fmt = IMG_DATA_TYPE_YUV420;
+			zoom_mode = ZOOM_BY_CAP;
+		} else {
+			need_isp = 0;
+			original_fmt = IMG_DATA_TYPE_RAW;
+			zoom_mode = ZOOM_POST_PROCESS;
+		}
+	} else if (SENSOR_IMAGE_FORMAT_JPEG == sn_mode->image_format) {
+		original_fmt = IMG_DATA_TYPE_JPEG;
+		zoom_mode = ZOOM_POST_PROCESS;
+	} else {
+		CMR_LOGE("Unsupported sensor format %d for capture", sn_mode->image_format);
+		ret = -CAMERA_INVALID_FORMAT;
+		goto exit;
+	}
+
+	img_rc.start_x = sn_mode->trim_start_x;
+	img_rc.start_y = sn_mode->trim_start_y;
+	img_rc.width   = sn_mode->trim_width;
+	img_rc.height  = sn_mode->trim_height;
+
+	ret = camera_get_trim_rect(&img_rc, g_cxt->zoom_level, &img_sz);
+	if (ret) {
+		CMR_LOGE("Failed to get trimming window for %d zoom level ", g_cxt->zoom_level);
+		goto exit;
+	}
+	if (ZOOM_POST_PROCESS == g_cxt->cap_zoom_mode) {
+		if (*io_width < sn_mode->width) {
+			*io_width  = sn_mode->width;
+			*io_height = sn_mode->height;
+		}
+	} else {
+		tmp_width = (uint32_t)(g_cxt->v4l2_cxt.sc_factor * img_rc.width);
+		if (img_rc.width >= CAMERA_SAFE_SCALE_DOWN(g_cxt->capture_size.width) ||
+			g_cxt->capture_size.width <= CMR_SCALING_TH) {
+			//if the out size is smaller than the in size, try to use scaler on the fly
+			if (g_cxt->capture_size.width > tmp_width) {
+				if (tmp_width > g_cxt->v4l2_cxt.sc_capability) {
+					img_sz.width  = g_cxt->v4l2_cxt.sc_capability;
+				} else {
+					img_sz.width  = tmp_width;
+				}
+				img_sz.width = (uint32_t)(img_rc.height * g_cxt->v4l2_cxt.sc_factor);
+			} else {
+				// just use scaler on the fly
+				img_sz.width  = g_cxt->capture_size.width;
+				img_sz.height = g_cxt->capture_size.height;
+			}
+		} else {
+			//if the out size is larger than the in size
+			img_sz.width   = img_rc.width;
+			img_sz.height  = img_rc.height;
+		}
+
+		*io_width  = MAX(*io_width, img_sz.width);
+		*io_height = MAX(*io_height, img_sz.height);
+	}
+exit:
+	return ret;
 }

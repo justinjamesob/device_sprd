@@ -29,7 +29,10 @@
 #define PIXEL_1P3_MEGA            0x180000 //actually 1.5 *1024*1024
 #define PIXEL_2P0_MEGA            0x200000 //actually 2.0 *1024*1024
 #define PIXEL_3P0_MEGA            0x300000 //actually 3.0 *1024*1024
+#define PIXEL_4P0_MEGA            0x400000 //actually 3.0 *1024*1024
 #define PIXEL_5P0_MEGA            0x500000 //5.0 *1024*1024
+#define PIXEL_6P0_MEGA            0x600000 //6.0 *1024*1024
+#define PIXEL_7P0_MEGA            0x700000 //7.0 *1024*1024
 #define PIXEL_8P0_MEGA            0x800000 //8.0 *1024*1024
 #define ISP_YUV_TO_RAW_GAP        CMR_SLICE_HEIGHT
 #define BACK_CAMERA_ID            0
@@ -47,7 +50,10 @@ enum {
 	IMG_1P3_MEGA = 0,
 	IMG_2P0_MEGA,
 	IMG_3P0_MEGA,
+	IMG_4P0_MEGA,
 	IMG_5P0_MEGA,
+	IMG_6P0_MEGA,
+	IMG_7P0_MEGA,
 	IMG_8P0_MEGA,
 	IMG_SIZE_NUM
 };
@@ -79,63 +85,55 @@ static const struct cap_size_to_mem back_cam_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (4 << 20), (0 << 20)},
 	{PIXEL_2P0_MEGA, (6 << 20), (0 << 20)},
 	{PIXEL_3P0_MEGA, (10 << 20), (0 << 20)},
+	{PIXEL_4P0_MEGA, (15 << 20), (0 << 20)},
 	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)},
+	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
+	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
+	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)}
 };
 static const struct cap_size_to_mem back_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (6 << 20), (0 << 20)},
 	{PIXEL_2P0_MEGA, (7 << 20), (0 << 20)},
 	{PIXEL_3P0_MEGA, (10 << 20), (0 << 20)},
+	{PIXEL_4P0_MEGA, (15 << 20), (0 << 20)},
 	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)},
+	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
+	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
+	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)}
+
 };
 
-
-#ifdef CONFIG_FRONT_CAMERA_ROTATION
 static const struct cap_size_to_mem front_cam_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (6 << 20),  (0 << 20)},
 	{PIXEL_2P0_MEGA, (8 << 20),  (0 << 20)},
-	{PIXEL_3P0_MEGA, (11 << 20),  (0 << 20)},
+	{PIXEL_3P0_MEGA, (11 << 20), (0 << 20)},
+	{PIXEL_4P0_MEGA, (16 << 20), (8 << 20)},
 	{PIXEL_5P0_MEGA, (16 << 20), (8 << 20)},
-	{PIXEL_8P0_MEGA, (16 << 20), (16 << 20)},
+	{PIXEL_6P0_MEGA, (16 << 20), (16 << 20)},
+	{PIXEL_7P0_MEGA, (16 << 20), (16 << 20)},
+	{PIXEL_8P0_MEGA, (16 << 20), (16 << 20)}
 };
 static const struct cap_size_to_mem front_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (8 << 20),  (0 << 20)},
 	{PIXEL_2P0_MEGA, (8 << 20),  (1 << 20)},
 	{PIXEL_3P0_MEGA, (7 << 20),  (5 << 20)},
+	{PIXEL_4P0_MEGA, (16 << 20), (8 << 20)},
 	{PIXEL_5P0_MEGA, (16 << 20), (8 << 20)},
-	{PIXEL_8P0_MEGA, (24 << 20), (16 << 20)},
+	{PIXEL_6P0_MEGA, (16 << 20), (16 << 20)},
+	{PIXEL_7P0_MEGA, (16 << 20), (16 << 20)},
+	{PIXEL_8P0_MEGA, (16 << 20), (16 << 20)}
 };
-#else
-static const struct cap_size_to_mem front_cam_mem_size_tab[IMG_SIZE_NUM] = {
-	{PIXEL_1P3_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_2P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_3P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_5P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)},
-};
-static const struct cap_size_to_mem front_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
-	{PIXEL_1P3_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_2P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_3P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_5P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)},
-};
-#endif
+
 /*for ATV*/
 static const struct cap_size_to_mem mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (4 << 20),  (4 << 20)},
 	{PIXEL_2P0_MEGA, (8 << 20),  (8 << 20)},
-	{PIXEL_3P0_MEGA, (16 << 20),  (2 << 20)},
+	{PIXEL_3P0_MEGA, (16 << 20), (2 << 20)},
+	{PIXEL_4P0_MEGA, (16 << 20), (0 << 20)},
 	{PIXEL_5P0_MEGA, (16 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (16 << 20), (8 << 20)},
-};
-static const struct cap_size_to_mem raw_mem_size_tab[IMG_SIZE_NUM] = {
-	{PIXEL_1P3_MEGA, (4 << 20),  (4 << 20)},
-	{PIXEL_2P0_MEGA, (8 << 20),  (8 << 20)},
-	{PIXEL_3P0_MEGA, (16 << 20),  (2 << 20)},
-	{PIXEL_5P0_MEGA, (16 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (16 << 20), (8 << 20)},
+	{PIXEL_6P0_MEGA, (16 << 20), (8 << 20)},
+	{PIXEL_7P0_MEGA, (16 << 20), (8 << 20)},
+	{PIXEL_8P0_MEGA, (16 << 20), (8 << 20)}
 };
 
 extern int camera_get_is_noscale(void);
@@ -188,7 +186,7 @@ int camera_capture_buf_size(uint32_t     camera_id,
 		} else if(FRONT_CAMERA_ID == camera_id) {
 			mem_tab_ptr = (struct cap_size_to_mem*)&front_cam_raw_mem_size_tab[0];
 		} else {
-			mem_tab_ptr = (struct cap_size_to_mem*)&raw_mem_size_tab[0];
+			mem_tab_ptr = (struct cap_size_to_mem*)&mem_size_tab[0];
 		}
 	} else {
 		if (BACK_CAMERA_ID == camera_id) {
@@ -196,7 +194,7 @@ int camera_capture_buf_size(uint32_t     camera_id,
 		} else if(FRONT_CAMERA_ID == camera_id) {
 			mem_tab_ptr = (struct cap_size_to_mem*)&front_cam_mem_size_tab[0];
 		} else {
-			mem_tab_ptr = (struct cap_size_to_mem*)&raw_mem_size_tab[0];
+			mem_tab_ptr = (struct cap_size_to_mem*)&mem_size_tab[0];
 		}
 	}
 
@@ -370,7 +368,11 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 			yy_to_y = (uint32_t)(align16_image_size.width * align16_image_size.height);
 			tmp     = (uint32_t)((sn_trim->start_y + sn_trim->height) * sn_size->width);
 			CMR_LOGV("yy_to_y, 0x%x, tmp 0x%x", yy_to_y, tmp);
-			yy_to_y = yy_to_y - tmp;
+			if (yy_to_y > (uint32_t)(sn_size->width * sn_size->height)) {
+				yy_to_y = yy_to_y - tmp;
+			} else {
+				yy_to_y = 0;
+			}
 			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
 			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
 			tmp = (uint32_t)(sn_size->height * sn_size->width);
@@ -379,7 +381,11 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 			offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
 		} else {
 			tmp = (uint32_t)(cap_size->width * cap_size->height);
-			yy_to_y = channel_size - tmp;
+			if (channel_size > tmp) {
+				yy_to_y = channel_size - tmp;
+			} else {
+				yy_to_y = 0;
+			}
 			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
 			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
 			cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
