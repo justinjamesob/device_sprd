@@ -147,7 +147,7 @@ static int camera_cap_subthread_init(void);
 static int camera_cap_subthread_deinit(void);
 static void *camera_cap_subthread_proc(void * data);
 static void camera_capture_hdr_data(struct frm_info *data);
-static int camera_take_picture_hdr(void);
+static int camera_take_picture_hdr(int cap_cnt);
 static int camera_get_take_picture(void);
 static int camera_set_take_picture(int set_val);
 static int camera_capture_init_raw(void);
@@ -941,7 +941,7 @@ int camera_cap_post(void *data)
 			}
 		} else {
 			int tmp = g_cxt->cap_cnt;
-			ret = camera_take_picture_hdr();
+			ret = camera_take_picture_hdr(tmp);
 			g_cxt->cap_cnt = tmp;
 			if (ret) {
 				CMR_LOGE("Failed to camera_take_picture_hdr %d.", ret);
@@ -2418,7 +2418,7 @@ camera_ret_code_type camera_take_picture_raw(camera_cb_f_type    callback,
 	return ret;
 }
 
-int camera_take_picture_hdr(void)
+int camera_take_picture_hdr(int cap_cnt)
 {
 	int                      preview_format;
 	uint32_t                 skip_number = 0;
@@ -2494,7 +2494,7 @@ int camera_take_picture_hdr(void)
 	g_cxt->v4l2_cxt.v4l2_state = V4L2_PREVIEW;
 	CMR_PRINT_TIME;
 
-	if ((HDR_CAP_NUM-2) == g_cxt->cap_cnt) {
+	if ((HDR_CAP_NUM-2) == cap_cnt) {
 		camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_1);
 	} else {
 		camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_2);
