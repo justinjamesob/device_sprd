@@ -2484,17 +2484,17 @@ static uint32_t _ov8825_SetEV(uint32_t param)
 	uint32_t gain = s_ov8825_gain;
 	uint32_t ev = ext_ptr->param;
 
-	SENSOR_PRINT("SENSOR: _ov5640_SetEV param: 0x%x", ext_ptr->param);
+	SENSOR_PRINT("SENSOR: _ov8825_SetEV param: 0x%x", ext_ptr->param);
 
 	switch(ev) {
 	case SENSOR_HDR_EV_LEVE_0:
-		_calculate_hdr_exposure(s_ov8825_gain/4,s_capture_VTS,s_capture_shutter/2);
+		_calculate_hdr_exposure(s_ov8825_gain/16,s_capture_VTS,s_capture_shutter/8);
 		break;
 	case SENSOR_HDR_EV_LEVE_1:
 		_calculate_hdr_exposure(s_ov8825_gain,s_capture_VTS,s_capture_shutter);
 		break;
 	case SENSOR_HDR_EV_LEVE_2:
-		_calculate_hdr_exposure(s_ov8825_gain*3/2,s_capture_VTS,s_capture_shutter);
+		_calculate_hdr_exposure(s_ov8825_gain*8,s_capture_VTS,s_capture_shutter*3);
 		break;
 	default:
 		break;
