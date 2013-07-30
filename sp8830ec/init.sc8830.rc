@@ -49,7 +49,7 @@ on boot
     chown system root /proc/cpt/modem
     chown system root /proc/cpt/dsp
 
-    insmod /system/lib/modules/ft5306_ts.ko
+    insmod /system/lib/modules/ft53x6_ts.ko
     insmod /system/lib/modules/bcmdhd.ko
 
     chmod 666 /dev/ttyS0

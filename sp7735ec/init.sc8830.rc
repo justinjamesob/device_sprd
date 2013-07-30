@@ -54,8 +54,8 @@ on boot
     chown system root /proc/cpw/modem
     chown system root /proc/cpw/dsp
 
-    insmod /system/lib/modules/ft5306_ts.ko
-    insmod /system/lib/modules/bcmdhd.ko
+    insmod /system/lib/modules/ft53x6_ts.ko
+    insmod /system/lib/modules/inv-mpu-iio.ko
 
     chmod 666 /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto
