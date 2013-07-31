@@ -291,7 +291,8 @@ int update_ring_file(void)
 		LOGE("Unable to set alarm to %lld: %s\n", abstime, strerror(errno));
 		return 0;
 	}
-        close(fd);
+	//Can not close the fd, prevent rtc is cleared
+        //close(fd);
 	return 1;
 
 }
