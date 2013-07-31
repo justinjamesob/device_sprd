@@ -89,7 +89,7 @@ static const struct cap_size_to_mem back_cam_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
 	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
 	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)}
+	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)}
 };
 static const struct cap_size_to_mem back_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_1P3_MEGA, (6 << 20), (0 << 20)},
@@ -99,7 +99,7 @@ static const struct cap_size_to_mem back_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
 	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
 	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
-	{PIXEL_8P0_MEGA, (24 << 20), (0 << 20)}
+	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)}
 
 };
 
@@ -541,6 +541,17 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 			cap_mem->cap_yuv_rot.addr_vir.addr_u,
 			cap_mem->cap_yuv_rot.buf_size);
 	}
+
+	/* resize jpeg buffer */
+	cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->target_jpeg.addr_phy.addr_y + JPEG_EXIF_SIZE;
+	cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->target_jpeg.addr_vir.addr_y + JPEG_EXIF_SIZE;
+	cap_mem->target_jpeg.buf_size        = cap_mem->target_jpeg.buf_size - JPEG_EXIF_SIZE;
+
+	CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
+	cap_mem->target_jpeg.addr_phy.addr_y,
+	cap_mem->target_jpeg.addr_vir.addr_y,
+	cap_mem->target_jpeg.buf_size);
+
 	/*Alloc Rotation buffer End*/
 
 	cap_mem->thum_yuv.buf_size = img_frame[THUM_YUV].buf_size;
@@ -1184,6 +1195,17 @@ int camera_arrange_capture_buf2(struct cmr_cap_2_frm *cap_2_frm,
 			cap_mem->cap_yuv_rot.addr_vir.addr_u,
 			cap_mem->cap_yuv_rot.buf_size);
 	}
+
+	/* resize jpeg buffer */
+	cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->target_jpeg.addr_phy.addr_y + JPEG_EXIF_SIZE;
+	cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->target_jpeg.addr_vir.addr_y + JPEG_EXIF_SIZE;
+	cap_mem->target_jpeg.buf_size        = cap_mem->target_jpeg.buf_size - JPEG_EXIF_SIZE;
+
+	CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
+	cap_mem->target_jpeg.addr_phy.addr_y,
+	cap_mem->target_jpeg.addr_vir.addr_y,
+	cap_mem->target_jpeg.buf_size);
+
 	/*Alloc Rotation buffer End*/
 
 	cap_mem->thum_yuv.buf_size = img_frame[THUM_YUV].buf_size;
@@ -1511,7 +1533,8 @@ uint32_t get_jpeg_size(uint32_t width, uint32_t height, uint32_t thum_width, uin
 	uint32_t       size;
 	(void)thum_width; (void)thum_height;
 
-	size = CMR_JPEG_SZIE(width, height)+JPEG_EXIF_SIZE;
+	//size = CMR_JPEG_SZIE(width, height)+JPEG_EXIF_SIZE;
+	size = CMR_JPEG_SZIE(width, height);
 	return ADDR_BY_WORD(size);
 }
 uint32_t get_thum_yuv_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height)
