@@ -91,7 +91,7 @@ static void _readFile(void)
     {
         fileHandle = open(firstName, O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
 
-        if(fileHandle > 0) {
+        if(fileHandle >= 0) {
             ret = read(fileHandle, _apnv_buf, APNV_SIZE);
             close(fileHandle);
         }
@@ -101,7 +101,7 @@ static void _readFile(void)
             }
         }
         fileHandle = open(secondName, O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
-        if(fileHandle > 0) {
+        if(fileHandle >= 0) {
             ret = read(fileHandle, _apnv_buf, APNV_SIZE);
             close(fileHandle);
         }
@@ -111,6 +111,7 @@ static void _readFile(void)
             }
         }
         fileHandle  = open(firstName, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
+        if(fileHandle < 0)return;
         write(fileHandle, _apnv_buf, APNV_SIZE);
         fsync(fileHandle);
         close(fileHandle);
@@ -125,7 +126,7 @@ static void _writeFile(void)
 	_makEcc(_apnv_buf,APNV_SIZE);
 
     fileHandle  = open(secondName, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
-    if(fileHandle > 0){
+    if(fileHandle >= 0){
         if(APNV_SIZE != write(fileHandle, _apnv_buf, APNV_SIZE)) {
             APNV_PRINT("APNV:sync second handle error");
             return;
@@ -135,11 +136,16 @@ static void _writeFile(void)
     close(fileHandle);
 
     fileHandle  = open(firstName, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
-    if(fileHandle > 0){
+    if(fileHandle >= 0){
         if(APNV_SIZE != write(fileHandle, _apnv_buf, APNV_SIZE)) {
             APNV_PRINT("APNV:sync first handle error");
+            close(fileHandle);
             return;
         }
+    }
+    else{
+        APNV_PRINT("APNV:open handle error");
+        return;
     }
     fsync(fileHandle);
     close(fileHandle);
