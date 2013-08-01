@@ -59,6 +59,12 @@ enum isp_callback_cmd{
 	ISP_CALLBACK_CMD_MAX=0xffffffff
 };
 
+enum isp_video_mode{
+	ISP_VIDEO_MODE_CONTINUE=0x00,
+	ISP_VIDEO_MODE_SINGLE,
+	ISP_VIDEO_MODE_MAX
+};
+
 enum isp_focus_mode{
 	ISP_FOCUS_NONE=0x00,
 	ISP_FOCUS_TRIG,
@@ -311,6 +317,7 @@ struct isp_video_limit{
 struct isp_video_start{
 	struct isp_size size;
 	enum isp_format format;
+	enum isp_video_mode mode;
 };
 
 struct ips_in_param{

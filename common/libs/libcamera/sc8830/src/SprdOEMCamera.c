@@ -3985,6 +3985,7 @@ int camera_preview_init(int format_mode)
 		}
 		isp_param.size.h = sensor_mode->height;
 		isp_param.format = ISP_DATA_NORMAL_RAW10;
+		isp_param.mode= ISP_VIDEO_MODE_CONTINUE;
 		CMR_LOGV("isp w h, %d %d", isp_param.size.w, isp_param.size.h);
 		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[sn_work_mode].ae_info[video_mode];
 		CMR_LOGE("%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
@@ -4167,6 +4168,7 @@ int camera_capture_init(void)
 			CMR_LOGE("set ae information error.");
 		}
 		isp_video_param.format = ISP_DATA_NORMAL_RAW10;
+		isp_video_param.mode= ISP_VIDEO_MODE_SINGLE;
 		ret = isp_video_start(&isp_video_param);
 		if (CAMERA_SUCCESS == ret) {
 			g_cxt->isp_cxt.isp_state = ISP_COWORK;

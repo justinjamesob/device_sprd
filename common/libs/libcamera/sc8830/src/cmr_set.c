@@ -714,7 +714,7 @@ int camera_snapshot_start_set(void)
 		}
 	}
 	if ((CAMERA_NORMAL_MODE == cxt->cap_mode) || (CAMERA_HDR_MODE == cxt->cap_mode)) {
-		ret = Sensor_Ioctl(SENSOR_IOCTL_BEFORE_SNAPSHOT, (cxt->sn_cxt.capture_mode | (cxt->cap_mode<<CAP_MODE_BITS)));
+		ret = Sensor_Ioctl(SENSOR_IOCTL_BEFORE_SNAPSHOT, (cxt->sn_cxt.capture_mode | (cxt->sn_cxt.preview_mode<<CAP_MODE_BITS)));
 		if (ret) {
 			CMR_LOGE("Sensor can't work at this mode %d", cxt->sn_cxt.capture_mode);
 		}
@@ -1284,6 +1284,13 @@ int camera_preflash(void)
 			if (Sensor_GetFlashLevel(&flash_level)) {
 				CMR_LOGE("get flash level error.");
 			}
+
+			flash_param.mode=ISP_AWB_BYPASS;
+			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
+			if (CAMERA_SUCCESS != ret) {
+				CMR_LOGE("ISP_CTRL_ALG error.");
+			}
+
 			flash_param.mode=ISP_AE_BYPASS;
 			flash_param.flash_eb=0x01;
 			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
@@ -1343,11 +1350,18 @@ int camera_autofocus_start(void)
 			if (Sensor_GetFlashLevel(&flash_level)) {
 				CMR_LOGE("get flash level error.");
 			}
+
+			flash_param.mode=ISP_AWB_BYPASS;
+			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
+			if (CAMERA_SUCCESS != ret) {
+				CMR_LOGE("ISP_CTRL_ALG error.");
+			}
+
 			flash_param.mode=ISP_AE_BYPASS;
 			flash_param.flash_eb=0x01;
 			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
 			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
+				CMR_LOGE("ISP_AE_BYPASS error.");
 			}
 			sem_wait(&cxt->cmr_set.isp_alg_sem);
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
