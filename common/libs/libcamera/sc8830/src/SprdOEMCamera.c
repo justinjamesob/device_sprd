@@ -127,6 +127,7 @@ static int camera_init_internal(uint32_t camera_id);
 static int camera_stop_internal(void);
 static int camera_flush_msg_queue(void);
 static int camera_preview_err_handle(uint32_t evt_type);
+static int camera_capture_err_handle(uint32_t evt_type);
 static int camera_jpeg_encode_thumb(uint32_t *stream_size_ptr);
 static int camera_convert_to_thumb(void);
 static int camera_isp_proc_handle(struct ips_out_param *isp_out);
@@ -3263,7 +3264,7 @@ int camera_v4l2_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *da
 		return -CAMERA_INVALID_PARM;
 	}
 
-	if (CHN_1 == data->channel_id) {
+/*	if (CHN_1 == data->channel_id) {
 		if(CMR_IDLE == g_cxt->preview_status || CMR_ERR == g_cxt->preview_status) {
 			CMR_LOGE("Status error, preview_status = %d", g_cxt->preview_status);
 			return -CAMERA_INVALID_STATE;
@@ -3283,7 +3284,7 @@ int camera_v4l2_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *da
 			return -CAMERA_INVALID_STATE;
 		}
 	}
-
+*/
 	(void)sub_type;
 	switch (evt_type) {
 	case CMR_V4L2_TX_DONE:
@@ -3299,6 +3300,7 @@ int camera_v4l2_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *da
 
 	case CMR_V4L2_TX_ERROR:
 	case CMR_V4L2_CSI2_ERR:
+	case CMR_V4L2_TIME_OUT:
 
 		CMR_LOGV("Error type 0x%x", evt_type);
 		if (IS_PREVIEW) {
@@ -3311,6 +3313,16 @@ int camera_v4l2_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *da
 						(uint32_t)NULL);
 
 			}
+		} else if (IS_CHN_BUSY(CHN_2)){
+			ret = camera_capture_err_handle(evt_type);
+			if (ret) {
+				camera_call_cb(CAMERA_EXIT_CB_FAILED,
+							camera_get_client_data(),
+							CAMERA_FUNC_TAKE_PICTURE,
+							(uint32_t)NULL);
+			}
+		} else {
+			CMR_LOGE("don't handle error!");
 		}
 		CMR_LOGV("Errorhandle done.");
 		break;
@@ -4915,6 +4927,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 		break;
 
 	case CMR_SENSOR_ERROR:
+	case CMR_V4L2_TIME_OUT:
 		rs_mode = RESTART_HEAVY;
 		g_cxt->preview_status = RESTART;
 		CMR_LOGI("Sensor error, restart preview");
@@ -4934,6 +4947,56 @@ int camera_preview_err_handle(uint32_t evt_type)
 		CMR_LOGV("Failed to start preview %d", ret);
 	}
 
+	return ret;
+}
+
+int camera_capture_err_handle(uint32_t evt_type)
+{
+	uint32_t                 rs_mode = RESTART_MAX;
+	int                      ret = CAMERA_SUCCESS;
+
+	if (RESTART == g_cxt->recover_status) {
+		CMR_LOGE("No way to recover");
+		return CAMERA_FAILED;
+	}
+	ret = cmr_v4l2_cap_stop();
+	if (ret) {
+		CMR_LOGE("Failed to stop v4l2 capture, %d", ret);
+		return -CAMERA_FAILED;
+	}
+	CMR_PRINT_TIME;
+	ret = Sensor_StreamOff();
+	if (ret) {
+		CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+	}
+	if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
+			ret = isp_video_stop();
+			g_cxt->isp_cxt.isp_state = ISP_IDLE;
+			if (ret) {
+				CMR_LOGE("Failed to stop ISP video mode, %d", ret);
+			}
+	}
+
+	if (RECOVERING == g_cxt->recover_status) {
+		g_cxt->recover_cnt --;
+		CMR_LOGV("recover_cnt, %d", g_cxt->recover_cnt);
+		if (0 == g_cxt->recover_cnt) {
+			CMR_LOGE("restart fail.");
+			ret = -CAMERA_FAILED;
+		}
+	} else {
+		g_cxt->recover_status = RECOVERING;
+		g_cxt->recover_cnt = CAMERA_RECOVER_CNT;
+		CMR_LOGV("Need recover, recover_cnt, %d", g_cxt->recover_cnt);
+	}
+	if (CAMERA_SUCCESS == ret) {
+		ret = camera_take_picture_internal(g_cxt->cap_mode);
+		if (ret) {
+			CMR_LOGE("restart fail.");
+		}
+	}
+
+	CMR_LOGV("restart ret %d.",ret);
 	return ret;
 }
 

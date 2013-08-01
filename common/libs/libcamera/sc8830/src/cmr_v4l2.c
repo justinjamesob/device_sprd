@@ -40,6 +40,7 @@ enum
 	V4L2_FLAG_TX_ERR   = 0x02,
 	V4L2_FLAG_CSI2_ERR = 0x03,
 	V4L2_FLAG_SYS_BUSY = 0x04,
+	V4L2_FLAG_TIME_OUT = 0x10,
 	V4L2_FLAG_TX_STOP  = 0xFF
 };
 
@@ -567,6 +568,8 @@ static int cmr_v4l2_evt_id(int isr_flag)
 	case V4L2_FLAG_CSI2_ERR:
 		ret = CMR_V4L2_CSI2_ERR;
 		break;
+	case V4L2_FLAG_TIME_OUT:
+		ret = CMR_V4L2_TIME_OUT;
 	default:
 		CMR_LOGV("isr_flag 0x%x", isr_flag);
 		break;
