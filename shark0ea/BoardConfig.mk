@@ -99,7 +99,6 @@ BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
 BOARD_HOSTAPD_DRIVER        := NL80211
 BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_bcmdhd
 BOARD_WLAN_DEVICE           := bcmdhd
-HAVE_WLAN_CMCC_FEATURE      := true
 WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_STA     := "/etc/wifi/fw_bcmdhd.bin"
 WIFI_DRIVER_FW_PATH_P2P     := "/etc/wifi/fw_bcmdhd_p2p.bin"

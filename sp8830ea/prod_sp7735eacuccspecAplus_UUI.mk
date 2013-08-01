@@ -122,7 +122,6 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
-HAVE_WLAN_CU_FEATURE := true
 ifeq ($(MULTILANGUAGE_SUPPORT),true)
   PRODUCT_PACKAGES += $(MULTILANGUAGE_PRODUCT_PACKAGES)
   PRODUCT_LOCALES := zh_CN zh_TW en_US en_AU en_CA en_GB en_IE en_IN en_NZ en_SG en_ZA bn_BD in_ID id_ID ms_MY ar_EG ar_IL th_TH vi_VN es_US es_ES pt_PT pt_BR ru_RU hi_IN my_MM fr_BE fr_CA fr_CH fr_FR tl_PH ur_IN ur_PK fa_AF fa_IR tr_TR sw_KE sw_TZ ro_RO te_IN ta_IN ha_GH ha_NE ha_NG ug_CN ce_PH bo_CN bo_IN it_CH it_IT de_AT de_CH de_DE de_LI el_GR cs_CZ pa_IN gu_IN km_KH lo_LA nl_BE nl_NL pl_PL am_ET
