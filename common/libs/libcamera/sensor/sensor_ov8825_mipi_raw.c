@@ -2072,8 +2072,10 @@ LOCAL uint32_t _ov8825_PowerOn(uint32_t power_on)
 		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
 		usleep(10*1000);
 		Sensor_PowerDown(!power_down);
+		usleep(10*1000);
 		// Reset sensor
 		Sensor_Reset(reset_level);
+		usleep(20*1000);
 	} else {
 		Sensor_PowerDown(power_down);
 		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
