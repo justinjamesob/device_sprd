@@ -48,6 +48,12 @@
             android:layout_height="wrap_content"
             android:text="@string/chk_android_main" />
 
+        <CheckBox
+            android:id="@+id/chk_android_event"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/chk_android_event" />
+
     </LinearLayout>
 
 </ScrollView>

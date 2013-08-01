@@ -193,6 +193,7 @@ public class SlogProvider extends ContentProvider {
         public final static String COLUMN_MODE = "name";//"mode";
         public final static String COLUMN_GENERAL = "general";
         public final static String COLUMN_MAIN = SlogAction.MAINKEY.replace("\t", "_");
+        public final static String COLUMN_EVENT = SlogAction.EVENTKEY.replace("\t", "_");
         public final static String COLUMN_RADIO = SlogAction.RADIOKEY.replace("\t", "_");
         public final static String COLUMN_KERNEL = SlogAction.KERNELKEY.replace("\t", "_");
         public final static String COLUMN_SYSTEM = SlogAction.SYSTEMKEY.replace("\t", "_");
@@ -221,6 +222,7 @@ public class SlogProvider extends ContentProvider {
                 + Contract.COLUMN_MODE + " TEXT NOT NULL,"
                 + Contract.COLUMN_GENERAL + " TEXT NOT NULL,"
                 + Contract.COLUMN_MAIN + " INTEGER NOT NULL,"
+                + Contract.COLUMN_EVENT + " INTEGER NOT NULL,"
                 + Contract.COLUMN_RADIO + " INTEGER NOT NULL,"
                 + Contract.COLUMN_KERNEL + " INTEGER NOT NULL,"
                 + Contract.COLUMN_SYSTEM + " INTEGER NOT NULL,"

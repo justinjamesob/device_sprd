@@ -156,6 +156,7 @@
     <string name="chk_android_kernel">Record kernel log</string>
     <string name="chk_android_system">Record system log</string>
     <string name="chk_android_main">Record main log</string>
+    <string name="chk_android_event">Record event log</string>
     <string name="chk_android_radio">Record radio log</string>
 
     <string name="chk_modem_switch">Record modem log</string>
@@ -163,7 +164,7 @@
     <string name="chk_muti_modem_switch1">Record modem1 log</string>
     <string name="txv_modem_other">Misc options</string>
     <string name="chk_modem_bluetooth">Record bluetooth log</string>
-    <string name="chk_modem_tcp">Record tcp log</string>
+    <string name="chk_modem_tcp">Record cap log</string>
     <string name="chk_modem_misc">Record misc log</string>
 
     <string name="txv_alert_dump">Please input package name</string>

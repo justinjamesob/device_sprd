@@ -36,10 +36,6 @@ public class LogSettingSlogUITabHostActivity extends TabActivity {
                 .setIndicator(getText(R.string.tabtag_tabhost_tabandroid))
                 .setContent(new Intent(this, LogSettingSlogUIAndroidPage.class)));
 
-        tabHost.addTab(tabHost.newTabSpec(SlogAction.MODEMKEY)
-                .setIndicator(getText(R.string.tabtag_tabhost_tabmodem))
-                .setContent(new Intent(this, LogSettingSlogUIModemPage.class)));
-
         SlogAction.contextMainActivity = this;
         mProgressDialog = new ProgressDialog(
                 LogSettingSlogUITabHostActivity.this);

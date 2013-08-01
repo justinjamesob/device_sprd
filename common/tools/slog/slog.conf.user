@@ -9,6 +9,7 @@ var	slogsaveall	off
 #type	name	state	size	level
 stream	kernel	on	0	7
 stream	main	on	0	7
+stream	events	on	0	7
 stream	system	on	0	8
 stream	radio	on	0	0
 stream	modem	off	0	5
