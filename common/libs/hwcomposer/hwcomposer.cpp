@@ -863,7 +863,7 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
 
             context->overlay_index = (context->overlay_index + 1)%OVERLAY_BUF_NUM;
         } else {
-            ALOGI_IF(debugenable,"set_GSP_layers L%d,GSP_Proccess ret err",__LINE__);
+            ALOGE("set_GSP_layers L%d,GSP_Proccess ret err",__LINE__);
         }
 
         return ret;
@@ -1140,6 +1140,7 @@ static int hwc_set(hwc_composer_device_t *dev,
     struct hwc_context_t *ctx = (struct hwc_context_t *)dev;
     char value[PROPERTY_VALUE_MAX];
     char dumpPath[MAX_DUMP_PATH_LENGTH];
+    int ret = 0;
     property_get("debug.hwcomposer.info" , value , "0");
     if(atoi(value) == 1)
         debugenable = 1;
@@ -1219,7 +1220,7 @@ static int hwc_set(hwc_composer_device_t *dev,
 			        min = 999999;
 			    }
 			}
-            set_GSP_layers(ctx,video_layer,osd_layer);
+            ret = set_GSP_layers(ctx,video_layer,osd_layer);
 			if(debugenable){
 	            end = systemTime(CLOCK_MONOTONIC)/1000;
 	            nsecs_t interval =end-st;
@@ -1325,8 +1326,10 @@ static int hwc_set(hwc_composer_device_t *dev,
 #endif
         }
         /*************************dump end**************************************/
+        if(ret == 0) { //if gsp process ok, display it. or not display
         ALOGI_IF(debugenable,"SPRD_FB_DISPLAY_OVERLAY %d", layer_indexs);
         ioctl(ctx->fbfd, SPRD_FB_DISPLAY_OVERLAY, &display_setting);
+        }
     } else {
         if ((ctx->video_overlay_flag||ctx->osd_overlay_flag)) {
             ALOGI_IF(debugenable , "eglSwapBuffers video=%d, osd=%d", ctx->video_overlay_flag, ctx->osd_overlay_flag );
