@@ -4101,7 +4101,12 @@ int camera_capture_init(void)
 	sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.capture_mode];
 	sensor_cfg.sn_size.width  = sensor_mode->width;
 	sensor_cfg.sn_size.height = sensor_mode->height;
-	sensor_cfg.frm_num        = -1;
+	if (SENSOR_IMAGE_FORMAT_JPEG == sensor_mode->image_format) {
+		sensor_cfg.frm_num = 1;
+	} else {
+		sensor_cfg.frm_num = -1;
+	}
+
 	ret = cmr_v4l2_sn_cfg(&sensor_cfg);
 	if (ret) {
 		CMR_LOGE("Failed to set V4L2 the size of sensor");
@@ -4114,6 +4119,10 @@ int camera_capture_init(void)
 	if (ret) {
 		CMR_LOGE("Failed to camera_capture_ability, %d", ret);
 		goto exit;
+	}
+
+	if (IMG_DATA_TYPE_JPEG == v4l2_cfg.cfg.dst_img_fmt) {
+		v4l2_cfg.channel_id = CHN_0;
 	}
 
 	ret = cmr_v4l2_cap_cfg(&v4l2_cfg);
@@ -4136,8 +4145,14 @@ int camera_capture_init(void)
 		CMR_LOGE("Failed to Q capture buffer");
 		goto exit;
 	}
-	g_cxt->chn_2_status = CHN_BUSY;
-	SET_CHN_BUSY(CHN_2);
+
+	if (IMG_DATA_TYPE_JPEG == v4l2_cfg.cfg.dst_img_fmt) {
+		g_cxt->chn_0_status = CHN_BUSY;
+		SET_CHN_BUSY(CHN_0);
+	} else {
+		g_cxt->chn_2_status = CHN_BUSY;
+		SET_CHN_BUSY(CHN_2);
+	}
 
 	if (v4l2_cfg.cfg.need_isp && ISP_IDLE == g_cxt->isp_cxt.isp_state) {
 		uint32_t video_mode = g_cxt->cmr_set.video_mode;

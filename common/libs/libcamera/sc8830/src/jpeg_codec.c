@@ -583,7 +583,8 @@ static int _dec_start(uint32_t handle)
 	}
 
 	if(dec_cxt_ptr->slice_height == dec_cxt_ptr->size.height) {
-		while(1 != dec_cxt_ptr->is_finish) {
+		//while(1 != dec_cxt_ptr->is_finish) {
+		while(1 != slice_out.is_over) {
 			_dec_callback(0,0,0);
 			next_param.dst_addr_phy.addr_y = 0;
 			next_param.slice_height = JPEG_SLICE_HEIGHT;
