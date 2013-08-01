@@ -726,7 +726,8 @@ uint32_t JPEGENC_Poll_MEA_BSM_OneSlice(uint32_t time, uint32_t slice_num)
 			 }
 	}
 #else
-	ret = ioctl(jpg_fd,JPG_ACQUAIRE_MBIO_DONE,INTS_MBIO);
+	//ret = ioctl(jpg_fd,JPG_ACQUAIRE_MBIO_DONE,INTS_MBIO);
+	ret = 0;
 	SCI_TRACE_LOW("after ioctl JPG_ACQUAIRE_MBIO_DONE ret %d",ret);
 //	if(0 == ret)
 //	{
