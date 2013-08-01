@@ -1736,6 +1736,7 @@ int camera_after_set_internal(enum restart_mode re_mode)
 			CMR_LOGE("Failed to init sensor");
 			return -CAMERA_FAILED;
 		}
+		Sensor_EventReg(camera_sensor_evt_cb);
 		ret  = camera_start_preview_internal();
 		break;
 	case RESTART_MIDDLE:
@@ -3301,6 +3302,7 @@ int camera_v4l2_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *da
 	case CMR_V4L2_TX_ERROR:
 	case CMR_V4L2_CSI2_ERR:
 	case CMR_V4L2_TIME_OUT:
+	case CMR_SENSOR_ERROR:
 
 		CMR_LOGV("Error type 0x%x", evt_type);
 		if (IS_PREVIEW) {
@@ -4944,7 +4946,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 	case CMR_SENSOR_ERROR:
 	case CMR_V4L2_TIME_OUT:
 		rs_mode = RESTART_HEAVY;
-		g_cxt->preview_status = RESTART;
+	//	g_cxt->preview_status = RESTART;
 		CMR_LOGI("Sensor error, restart preview");
 		break;
 

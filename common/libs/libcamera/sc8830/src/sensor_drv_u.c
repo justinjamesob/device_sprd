@@ -33,7 +33,7 @@
 #define SENSOR_ONE_I2C	1
 #define SENSOR_ZERO_I2C	0
 #define SENSOR_16_BITS_I2C	2
-#define SENSOR_CHECK_STATUS_INTERVAL   100000
+#define SENSOR_CHECK_STATUS_INTERVAL   50000
 
 /*
 #define SENSOR_I2C_FREQ      (100*1000)
@@ -59,6 +59,9 @@ static int                      g_fd_sensor = -1;
 static cmr_evt_cb               sensor_event_cb = NULL;
 static pthread_mutex_t          cb_mutex = PTHREAD_MUTEX_INITIALIZER;
 uint32_t g_is_calibration = 0;
+LOCAL pthread_t                 s_monitor_thread = 0;
+LOCAL volatile uint32_t         s_monitor_exit = 0;
+LOCAL uint32_t                  s_stream_on = 0;
 
 LOCAL int _Sensor_SetId(SENSOR_ID_E sensor_id);
 
@@ -1414,6 +1417,11 @@ LOCAL int _Sensor_DeviceInit()
 	}
 
 	ret = _Sensor_CreateThread();
+	if (ret) {
+		SENSOR_PRINT_HIGH("Failed to create sensor thread");
+		return ret;
+	}
+	ret = _Sensor_CreateMonitorThread();
 	sensor_event_cb = NULL;
 
 	return ret;
@@ -1427,6 +1435,7 @@ LOCAL int _Sensor_DeviceDeInit()
 		g_fd_sensor = -1;
 		SENSOR_PRINT("SENSOR: _Sensor_DeviceDeInit is done, ret = %d \n", ret);
 	}
+	_Sensor_KillMonitorThread();
 	_Sensor_KillThread();
 
 	return 0;
@@ -2234,7 +2243,10 @@ int _Sensor_StreamOn(void)
 	if (PNULL != stream_on_func) {
 		err = stream_on_func(param);
 	}
-	//_Sensor_CreateMonitorThread();
+
+	if (0 == err) {
+		s_stream_on = 1;
+	}
 	sem_post(&st_on_sem);
 	return err;
 }
@@ -2289,7 +2301,7 @@ int _Sensor_StreamOff(void)
 	if (PNULL != stream_off_func) {
 		err = stream_off_func(param);
 	}
-	//_Sensor_KillMonitorThread();
+	s_stream_on = 0;
 	sem_post(&st_off_sem);
 	return err;
 }
@@ -3110,27 +3122,32 @@ LOCAL int _Sensor_AutoFocusInit(void)
 }
 
 
-#if 0
 LOCAL void* _Sensor_MonitorProc(void* data)
 {
-	uint32_t                 ret = 0, param;
+	uint32_t                 ret = 0, param = 0;
 
 	while (1) {
 		CMR_LOGV("Cycle");
 		usleep(SENSOR_CHECK_STATUS_INTERVAL);
 
-		if (s_exit_monitor_flag) {
-			s_exit_monitor_flag = 0;
+		if (s_monitor_exit) {
+			s_monitor_exit = 0;
 			CMR_LOGV("EXIT");
 			break;
 		} else {
-			ret = Sensor_Ioctl(SENSOR_IOCTL_GET_STATUS, param);
-			if (ret) {
-				CMR_LOGE("Sensor run in wrong way");
-				pthread_mutex_lock(&cb_mutex);
-				if (sensor_event_cb)
-					(*sensor_event_cb)(CMR_SENSOR_ERROR, NULL);
-				pthread_mutex_unlock(&cb_mutex);
+			if (s_stream_on) {
+				ret = Sensor_Ioctl(SENSOR_IOCTL_GET_STATUS, (uint32_t)&param);
+				if (ret) {
+					CMR_LOGE("Sensor run in wrong way");
+					pthread_mutex_lock(&cb_mutex);
+					if (sensor_event_cb)
+						(*sensor_event_cb)(CMR_SENSOR_ERROR, NULL);
+					pthread_mutex_unlock(&cb_mutex);
+				} else {
+					CMR_LOGV("NO wrong");
+				}
+			} else {
+				CMR_LOGV("Sensor no run");
 			}
 		}
 
@@ -3146,10 +3163,10 @@ LOCAL int   _Sensor_CreateMonitorThread(void)
 
 	CMR_LOGV("Create status monitor thread");
 
-	if (0 == s_sensor_monitor_thread) {
+	if (0 == s_monitor_thread) {
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		ret = pthread_create(&s_sensor_monitor_thread, &attr, _Sensor_MonitorProc, NULL);
+		ret = pthread_create(&s_monitor_thread, &attr, _Sensor_MonitorProc, NULL);
 		pthread_attr_destroy(&attr);
 	}
 
@@ -3163,16 +3180,15 @@ LOCAL int _Sensor_KillMonitorThread(void)
 
 	CMR_LOGV("To kill sensor monitor thread");
 
-	if (s_sensor_monitor_thread) {
-		s_exit_monitor_flag = 1;
-		while (1 == s_exit_monitor_flag) {
+	if (s_monitor_thread) {
+		s_monitor_exit = 1;
+		while (1 == s_monitor_exit) {
 			CMR_LOGE("Wait 10 ms");
 			usleep(10000);
 		}
-		//ret = pthread_join(s_sensor_monitor_thread, &dummy);
-		s_sensor_monitor_thread = 0;
+		ret = pthread_join(s_monitor_thread, &dummy);
+		s_monitor_thread = 0;
 	}
 
 	return ret;
 }
-#endif
