@@ -1507,7 +1507,8 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         if (low_power != out->low_power) {
             if (low_power) {
                 out->write_threshold = LONG_PERIOD_SIZE * PLAYBACK_LONG_PERIOD_COUNT;
-                out->config.avail_min = LONG_PERIOD_SIZE;
+                //out->config.avail_min = LONG_PERIOD_SIZE;
+                out->config.avail_min = (out->write_threshold * 3) / 4;
                 ALOGW("low_power out->write_threshold=%d, config.avail_min=%d, start_threshold=%d",
                         out->write_threshold,out->config.avail_min, out->config.start_threshold);
             } else {
