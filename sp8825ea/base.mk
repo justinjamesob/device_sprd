@@ -46,7 +46,7 @@ PRODUCT_PACKAGES += \
     FileExplorer \
     AppBackup \
     AudioProfile \
-    SprdNote \
+    NoteBook \
     CallFireWall \
     ValidationTools \
     libsprddm \

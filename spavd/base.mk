@@ -60,7 +60,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     AppBackup \
     AudioProfile \
-    SprdNote \
+    NoteBook \
     CallFireWall \
     libsprddm \
     vtserver	\
