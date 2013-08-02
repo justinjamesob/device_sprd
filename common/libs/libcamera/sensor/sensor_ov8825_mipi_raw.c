@@ -2215,8 +2215,6 @@ LOCAL uint32_t _ov8825_write_exposure(uint32_t param)
 	dummy_line=(param>>0x10)&0x0fff;
 	size_index=(param>>0x1c)&0x0f;
 
-	//expsure_line=595;
-
 	SENSOR_PRINT("SENSOR_ov8825: write_exposure line:%d, dummy:%d, size_index:%d", expsure_line, dummy_line, size_index);
 
 	max_frame_len=_ov8825_GetMaxFrameLine(size_index);
@@ -2268,71 +2266,48 @@ LOCAL uint32_t _ov8825_write_af(uint32_t param)
 	uint16_t reg_val = 0x0;
 
 	SENSOR_PRINT("SENSOR_ov8825: _write_af 0x%x", param);
-#if 1
+
 	value = (param&0xf)<<0x04;
 	value = value + 8 + (g_af_slewrate&0x7);
 	ret_value = Sensor_WriteReg(0x3618, value);
 	value = (param&0x3f0)>>0x04;
 	ret_value = Sensor_WriteReg(0x3619, value);
-#endif
+
 	return ret_value;
 }
 
 LOCAL uint32_t _ov8825_BeforeSnapshot(uint32_t param)
 {
 	uint8_t ret_l, ret_m, ret_h;
-	uint8_t gain_0a, gain_0b;
 	uint32_t capture_exposure, preview_maxline;
-	uint32_t capture_maxline, preview_exposure, preview_gain;
-	uint32_t prv_linetime=s_ov8825_Resolution_Trim_Tab[SENSOR_MODE_PREVIEW_ONE].line_time;
-	uint32_t cap_linetime = s_ov8825_Resolution_Trim_Tab[(param & 0xffff)].line_time;
-	int ae_ag_ctrl;
-	param = param & 0xffff;
+	uint32_t capture_maxline, preview_exposure;
+	uint32_t capture_mode = param & 0xffff;
+	uint32_t preview_mode = (param >> 0x10 ) & 0xffff;
+	uint32_t prv_linetime=s_ov8825_Resolution_Trim_Tab[preview_mode].line_time;
+	uint32_t cap_linetime = s_ov8825_Resolution_Trim_Tab[capture_mode].line_time;
 
-	SENSOR_PRINT("SENSOR_ov8825: BeforeSnapshot moe: %d",param);
-#if 1/*test*/
-    {
-		int ae_ag_ctrl;
-		//turn off AE/AG
-		ae_ag_ctrl = Sensor_ReadReg(0x3503);
-		SENSOR_PRINT("before, ae_ag_ctrl 0x%x", ae_ag_ctrl);
-		ae_ag_ctrl = ae_ag_ctrl | 0x03;
-		Sensor_WriteReg(0x3503, ae_ag_ctrl);
-		SENSOR_PRINT("after, ae_ag_ctrl 0x%x", ae_ag_ctrl);
-		s_capture_shutter = _ov8825_get_shutter();
-		s_capture_VTS = _ov8825_get_VTS();
-		_ov8825_ReadGain(param);
-		//turn on AE/AG
-		ae_ag_ctrl = Sensor_ReadReg(0x3503);
-		SENSOR_PRINT("before, ae_ag_ctrl 0x%x", ae_ag_ctrl);
-		ae_ag_ctrl = ae_ag_ctrl && 0xFC;
-		Sensor_WriteReg(0x3503, ae_ag_ctrl);
-		//return SENSOR_SUCCESS;
-	}
-#endif
-	if (SENSOR_MODE_PREVIEW_ONE >= param){
-		SENSOR_PRINT("SENSOR_ov8825: prvmode equal to capmode");
-		return SENSOR_SUCCESS;
+	SENSOR_PRINT("SENSOR_ov8825: BeforeSnapshot mode: 0x%08x",param);
+
+	if (preview_mode == capture_mode) {
+		SENSOR_PRINT("SENSOR_ov8825: prv mode equal to capmode");
+		goto CFG_INFO;
 	}
 
 	ret_h = (uint8_t) Sensor_ReadReg(0x3500);
 	ret_m = (uint8_t) Sensor_ReadReg(0x3501);
 	ret_l = (uint8_t) Sensor_ReadReg(0x3502);
 	preview_exposure = (ret_h << 12) + (ret_m << 4) + (ret_l >> 4);
-	gain_0a = (uint8_t)Sensor_ReadReg(0x350a);
-	gain_0b = (uint8_t)Sensor_ReadReg(0x350b);
-	preview_gain = ((gain_0a&0x01)+1)*((gain_0b&0x01)+1)*(((gain_0b&0x80)>>7)+1)            \
-	*(((gain_0b&0x40)>>6)+1)*(((gain_0b&0x20)>>5)+1)*(((gain_0b&0x10)>>4)+1)*((gain_0b&0x0f)+16); /*gain value *14*/
 
 	ret_h = (uint8_t) Sensor_ReadReg(0x380e);
 	ret_l = (uint8_t) Sensor_ReadReg(0x380f);
 	preview_maxline = (ret_h << 8) + ret_l;
 
-	Sensor_SetMode(param);
+	Sensor_SetMode(capture_mode);
 	Sensor_StreamOff();
+
 	if (prv_linetime == cap_linetime) {
 		SENSOR_PRINT("SENSOR_ov8825: prvline equal to capline");
-		return SENSOR_SUCCESS;
+		goto CFG_INFO;
 	}
 
 	ret_h = (uint8_t) Sensor_ReadReg(0x380e);
@@ -2360,10 +2335,11 @@ LOCAL uint32_t _ov8825_BeforeSnapshot(uint32_t param)
 	Sensor_WriteReg(0x3501, ret_m);
 	Sensor_WriteReg(0x3500, ret_h);
 
-	Sensor_WriteReg(0x350a, gain_0a);
-	Sensor_WriteReg(0x350b, gain_0b);
-
-	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_EXPOSURETIME, capture_exposure);
+	CFG_INFO:
+	s_capture_shutter = _ov8825_get_shutter();
+	s_capture_VTS = _ov8825_get_VTS();
+	_ov8825_ReadGain(capture_mode);
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_EXPOSURETIME, s_capture_shutter);
 
 	return SENSOR_SUCCESS;
 }
@@ -2377,7 +2353,7 @@ LOCAL uint32_t _ov8825_after_snapshot(uint32_t param)
 
 LOCAL uint32_t _ov8825_flash(uint32_t param)
 {
-	SENSOR_PRINT("Start:param=%d", param);
+	SENSOR_PRINT("SENSOR_ov8825: param=%d", param);
 
 	/* enable flash, disable in _ov8825_BeforeSnapshot */
 	g_flash_mode_en = param;
@@ -2400,7 +2376,7 @@ LOCAL uint32_t _ov8825_StreamOff(uint32_t param)
 	SENSOR_PRINT("SENSOR_ov8825: StreamOff");
 
 	Sensor_WriteReg(0x0100, 0x00);
-	usleep(10*1000);
+	usleep(100*1000);
 
 	return 0;
 }
@@ -2486,7 +2462,7 @@ static uint32_t _ov8825_SetEV(uint32_t param)
 	uint32_t gain = s_ov8825_gain;
 	uint32_t ev = ext_ptr->param;
 
-	SENSOR_PRINT("SENSOR: _ov8825_SetEV param: 0x%x", ext_ptr->param);
+	SENSOR_PRINT("SENSOR_ov8825: _ov8825_SetEV param: 0x%x", ext_ptr->param);
 
 	switch(ev) {
 	case SENSOR_HDR_EV_LEVE_0:
@@ -2511,11 +2487,11 @@ LOCAL uint32_t _ov8825_ExtFunc(uint32_t ctl_param)
 	SENSOR_PRINT_HIGH("0x%x", ext_ptr->cmd);
 
 	switch (ext_ptr->cmd) {
-	case SENSOR_EXT_FUNC_INIT:	
+	case SENSOR_EXT_FUNC_INIT:
 		break;
-	case SENSOR_EXT_FOCUS_START:		
+	case SENSOR_EXT_FOCUS_START:
 		break;
-	case SENSOR_EXT_EXPOSURE_START:	
+	case SENSOR_EXT_EXPOSURE_START:
 		break;
 	case SENSOR_EXT_EV:
 		rtn = _ov8825_SetEV(ctl_param);
@@ -2563,7 +2539,7 @@ LOCAL uint32_t _ov8825_ReadGain(uint32_t param)
 
 	s_ov8825_gain=(int)gain;
 
-	SENSOR_PRINT("SENSOR: _ov8825_ReadGain gain: 0x%x", s_ov8825_gain);
+	SENSOR_PRINT("SENSOR_ov8825: _ov8825_ReadGain gain: 0x%x", s_ov8825_gain);
 
 	return rtn;
 }
