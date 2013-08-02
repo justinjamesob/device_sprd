@@ -502,6 +502,7 @@ int camera_get_is_scale(void);
 void camera_isp_ae_stab_set (uint32_t is_ae_stab_eb);
 int camera_dma_copy_data(struct _dma_copy_cfg_tag dma_copy_cfg);
 camera_ret_code_type camera_zsl_rot_cap_param_reset(void);
+int camera_get_is_nonzsl(void);
 
 #ifdef __cplusplus
 }

@@ -6349,3 +6349,8 @@ int camera_capture_get_max_size(SENSOR_MODE_INFO_T *sn_mode, uint32_t *io_width,
 exit:
 	return ret;
 }
+
+int camera_get_is_nonzsl(void)
+{
+	return IS_NON_ZSL_MODE(g_cxt->cap_mode);
+}

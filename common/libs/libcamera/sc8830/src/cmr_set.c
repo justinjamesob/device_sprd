@@ -713,7 +713,8 @@ int camera_snapshot_start_set(void)
 			camera_set_flashdevice((uint32_t)FLASH_HIGH_LIGHT);
 		}
 	}
-	if ((CAMERA_NORMAL_MODE == cxt->cap_mode) || (CAMERA_HDR_MODE == cxt->cap_mode)) {
+
+	if (camera_get_is_nonzsl()) {
 		ret = Sensor_Ioctl(SENSOR_IOCTL_BEFORE_SNAPSHOT, (cxt->sn_cxt.capture_mode | (cxt->sn_cxt.preview_mode<<CAP_MODE_BITS)));
 		if (ret) {
 			CMR_LOGE("Sensor can't work at this mode %d", cxt->sn_cxt.capture_mode);
