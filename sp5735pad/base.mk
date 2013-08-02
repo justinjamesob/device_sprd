@@ -51,7 +51,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     AudioProfile \
     FileExplorer \
-    SprdNote \
+    NoteBook \
     ValidationTools \
     libsprddm \
     libvalidationtoolsjni \

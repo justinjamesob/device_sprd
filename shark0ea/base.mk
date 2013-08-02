@@ -58,7 +58,7 @@ endif
 PRODUCT_PACKAGES += \
     AppBackup \
     AudioProfile \
-    SprdNote \
+    NoteBook \
     CallFireWall \
     ValidationTools \
     libvalidationtoolsjni \
