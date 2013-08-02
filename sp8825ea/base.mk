@@ -44,7 +44,7 @@ PRODUCT_PACKAGES := \
 # own copyright packages files
 PRODUCT_PACKAGES += \
     FileExplorer \
-    AppBackup \
+    SprdAppBackup \
     AudioProfile \
     NoteBook \
     CallFireWall \
