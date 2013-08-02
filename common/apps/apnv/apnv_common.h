@@ -33,10 +33,15 @@ typedef signed int		    int32;
 #define TRUE   1;
 #define FALSE  0;
 
+//#ifdef __BIG_ENDIAN
+//#define htod16(s) ((((s)>>8)&0xff)|(((s)<<8)&0xff00))
+//#else
+#define htod16(s)  s
+//#endif
 
 #ifdef WIN32
-#define ORIG_PATH "D:\\juan.wu\\pro_nvtest\\origin.bin"
-#define BACKUP_PATH "D:\\juan.wu\\pro_nvtest\\backup.bin"
+#define ORIG_PATH "D:\\pro_nvtest\\origin.bin"
+#define BACKUP_PATH "D:\\pro_nvtest\\backup.bin"
 #else
 #define ORIG_PATH "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1"
 #define BACKUP_PATH "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo2"
@@ -44,10 +49,6 @@ typedef signed int		    int32;
 #define APNV_SIZE 0x20000
 #define PRONV_MAGIC   0x41504E56   ///* 'APNV' */"
 #define SCT_SIZE    512
-/* Status of NV directory entry */
-#define STATUS_VALID		0x0001 /* 01b */
-#define STATUS_DELETED      0x0002 /* 10b */
-#define STATUS_MASK         0x0003 /* 11b */
 
 typedef enum _NVITEM_ERROR {
     NVERR_NONE  = 0,   			/* Success */
@@ -58,44 +59,6 @@ typedef enum _NVITEM_ERROR {
     NVERR_NOT_EXIST,
     NVERR_TIMEOUT,
 }NVITEM_ERROR_E;
-
-#ifdef WIN32
-#pragma pack(1)
-#endif
-//__packed
-typedef __packed struct _NPB {
-    uint32    	magic;
-	uint16		min_id;
-	uint16		max_id;
-	uint16    	tot_scts;			/* Total sectors of NV partition */
-	uint16    	sct_size;			/* Size in bytes of a sector */
-	uint16    	dir_entry_count;	/* count of NV dir entry */
-	uint16    	dir_entry_size;		/* Size in byte of NV dir entry, = sizeof(NVDIR_ENTRY)*/
-	uint32      next_offset;	    /* Next offset to allocate for item data */
-} NPB;
-
-/* NV Directroy Entry */
-typedef __packed struct _NVDIR_ENTRY {
-	uint16 size;			/* Size in byte of data field of an item */
-	uint16 status;			/* Status of the item */
-	uint32 offset;			/* Offset of the item, measured from the beginning
-							 * of NV partition */
-} NVDIR_ENTRY;
-#ifdef WIN32
-#pragma pack()
-#endif
-
-/* NV Device control block */
-typedef struct _NV_DEVICE {
-	NPB				*npb;
-	/* size of partition unit is bytes */
-	uint32			tot_size;
-	/* Dir table parameters */
-	uint16			first_dir_sct;
-	/* Data part parameters */
-	uint32			data_offset;
-} NV_DEVICE;
-
 //-------------------------------------------------
 //				Const config: can not be changed
 //-------------------------------------------------

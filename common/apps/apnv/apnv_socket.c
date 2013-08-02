@@ -16,7 +16,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/statfs.h>
-#include "sci_types.h"
 #include <sys/select.h>
 #include <sys/time.h>
 #include <time.h>
@@ -26,7 +25,6 @@
 typedef enum NV_OPERATE_TYPE{
     PRO_NV_WRITE,
     PRO_NV_READ,
-    PRO_NV_DEL
 }NV_OPERATE_TYPE_E;
 
 typedef struct
@@ -362,64 +360,4 @@ NVITEM_ERROR_E read_productnv(uint32 id, void * buffer, uint16 size)
     }
     close(sockfd);
     return nv_res;
-
 }
-
-NVITEM_ERROR_E del_productnv(uint32 from ,uint32 to)
-{
-    PRO_NV nv_item;
-    int sockfd;
-    APNV_SOCKET_ERROR_E serr;
-    NVITEM_ERROR_E nv_res;
-
-    nv_item.type = PRO_NV_DEL;
-    nv_item.param.delParam.item_startId = from;
-    nv_item.param.delParam.item_endId = to;
-
-    sockfd = _create_socket();
-    if(sockfd < 0){
-        APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv connect failed!\n");
-        return NVERR_SYSTEM;
-    }
-    serr = _connect_socket(sockfd);
-    switch(serr)
-    {
-        case SOCKET_ERROR_NONE:
-        if(0 >=__send_socket(sockfd, &nv_item, sizeof(nv_item))) {
-            APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv send head failed!");
-            nv_res = NVERR_SYSTEM;
-            break;
-        }
-
-        nv_res = __recv_socket(sockfd, &nv_item , sizeof(nv_item));
-        if(nv_res != NVERR_NONE){
-            APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv recv head failed nv_res %d",nv_res);
-            break;
-        }
-        if(NVERR_NONE != nv_item.ope_result){
-            nv_res = nv_item.ope_result;
-            APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv ope_result = %d",nv_item.ope_result);
-            break;
-        }
-        nv_res = NVERR_NONE;
-        break;
-
-        case SOCKET_TIMEOUT:
-        APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv connect socket timeout");
-        nv_res = NVERR_TIMEOUT;
-        break;
-
-        case SOCKET_CONNECT_ERROR:
-        APNV_SOCKET_PRINT("APNV_SOCKET:del_productnv connect socket error");
-        nv_res = NVERR_SYSTEM;
-        break;
-
-        default:
-        APNV_SOCKET_PRINT("APNV_SOCKET:del_productnva error unknow");
-        nv_res = NVERR_SYSTEM;
-        break;
-    }
-    close(sockfd);
-    return  nv_res;
-}
-

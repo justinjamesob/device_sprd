@@ -10,7 +10,6 @@
 typedef enum NV_OPERATE_TYPE{
     PRO_NV_WRITE,
     PRO_NV_READ,
-    PRO_NV_DEL
 }NV_OPERATE_TYPE_E;
 
 typedef struct
@@ -198,11 +197,6 @@ int main(void)
                 _send_socket(client_sock, buffer, pro_nv.param.readParam.size);
             }
             free(buffer);
-            break;
-
-        case PRO_NV_DEL:
-            pro_nv.ope_result = PRONV_DelItem(pro_nv.param.delParam.item_startId,pro_nv.param.delParam.item_endId);
-            _send_socket(client_sock, &pro_nv, sizeof(pro_nv));
             break;
 
         default:
