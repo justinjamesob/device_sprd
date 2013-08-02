@@ -1369,6 +1369,7 @@ static uint32_t GC2035_After_Snapshot(uint32_t param)
 
 static uint32_t GC2035_BeforeSnapshot(uint32_t sensor_snapshot_mode)
 {
+	sensor_snapshot_mode &= 0xffff;
 	Sensor_SetMode(sensor_snapshot_mode);
 
 	switch (sensor_snapshot_mode) {
