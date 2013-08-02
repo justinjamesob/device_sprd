@@ -29,20 +29,20 @@ typedef enum NV_OPERATE_TYPE{
 
 typedef struct
 {
-    uint32 item_id;
-    uint16 size;
+    unsigned int item_id;
+    unsigned short size;
 }PRO_NV_READ_PARAM;
 
 typedef struct
 {
-    uint32 item_id;
-    uint16 size;
+    unsigned int item_id;
+    unsigned short size;
 }PRO_NV_WRITE_PARAM;
 
 typedef struct
 {
-    uint32 item_startId;
-    uint32 item_endId;
+    unsigned int item_startId;
+    unsigned int item_endId;
 }PRO_NV_DEL_PARAM;
 
 typedef struct _PRO_NV_{
@@ -149,7 +149,7 @@ static int __send_socket(int sockfd, void* buffer, int size)
 	return result;
 }
 
-static int32 _create_socket(void)
+static int _create_socket(void)
 {
      int sockfd;
      struct sockaddr_un address;
@@ -224,7 +224,7 @@ static APNV_SOCKET_ERROR_E _connect_socket(int sockfd)
     return serr;
 }
 
-NVITEM_ERROR_E write_productnv(uint32 id, void * buffer, uint16 size)
+NVITEM_ERROR_E write_productnv(unsigned int id, void * buffer, unsigned short size)
 {
     PRO_NV nv_item;
     int sockfd;
@@ -290,7 +290,7 @@ NVITEM_ERROR_E write_productnv(uint32 id, void * buffer, uint16 size)
     return nv_res;
 }
 
-NVITEM_ERROR_E read_productnv(uint32 id, void * buffer, uint16 size)
+NVITEM_ERROR_E read_productnv(unsigned int id, void * buffer, unsigned short size)
 {
     PRO_NV nv_item;
     int sockfd;
