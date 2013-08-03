@@ -73,7 +73,6 @@ PRODUCT_PACKAGES += \
         
 # packages files
 PRODUCT_PACKAGES += \
-	ForOPPackageTest \
 	ForOPCModuleTest
 	
 # own copyright packages files
