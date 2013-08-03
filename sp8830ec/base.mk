@@ -65,8 +65,6 @@ PRODUCT_PACKAGES += \
 #    ES_File_Explorer.apk
 
 PRODUCT_PACKAGES += \
-        apnvd\
-        libapnvsocket\
 	nvitemd \
 	charge \
 	vcharged \
