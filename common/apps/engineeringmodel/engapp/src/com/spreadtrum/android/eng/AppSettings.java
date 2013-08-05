@@ -38,6 +38,7 @@ public class AppSettings extends PreferenceActivity {
     private static final String ENABLE_USB_FACTORY_MODE = "enable_usb_factory_mode";
     private static final String ACCELEROMETER = "accelerometer_rotation";
 
+    private static final String RETRY_SMS_CONTROL="persist.sys.msms_retry_control";
     private static final String MODEM_RESET = "modem_reset";
 
     private static final String ENG_TESTMODE = "engtestmode";
@@ -51,6 +52,7 @@ public class AppSettings extends PreferenceActivity {
     private CheckBoxPreference mEnableUsbFactoryMode;
     private CheckBoxPreference mModemReset;
     private CheckBoxPreference mNotShowDialog;
+    private CheckBoxPreference mSmsRetryControl;
     private EngSqlite mEngSqlite;
 
     @Override
@@ -72,8 +74,17 @@ public class AppSettings extends PreferenceActivity {
         mEnableUsbFactoryMode = (CheckBoxPreference) findPreference(ENABLE_USB_FACTORY_MODE);
         mModemReset = (CheckBoxPreference) findPreference(MODEM_RESET);
         mNotShowDialog = (CheckBoxPreference) findPreference(NOT_SHOW_DIALOG);
+        mSmsRetryControl = (CheckBoxPreference) findPreference("msms_retry_control");
 
         String result = SystemProperties.get("persist.sys.sprd.modemreset");
+        /*Add 20130805 spreadst of 198464 add SMS retry control start*/
+        int smsControl= SystemProperties.getInt(RETRY_SMS_CONTROL,3);
+        if(smsControl ==3){
+            mSmsRetryControl.setChecked(true);
+        }else{
+            mSmsRetryControl.setChecked(false);
+        }
+        /*Add 20130805 spreadst of 198464 add SMS retry control end*/
         boolean isShowDialog = Settings.System.getInt(this.getContentResolver(),
                 Settings.System.LONG_PRESS_POWER_KEY, 0) == 1;
         if (isShowDialog) {
@@ -200,7 +211,15 @@ public class AppSettings extends PreferenceActivity {
                         ((CheckBoxPreference) preference).isChecked() ? 1 : 0);
             }
             return true;
-        } else {
+            /*Add 20130805 spreadst of 198464 add SMS retry control start*/
+        } else if ("msms_retry_control".equals(key)) {
+            if (preference instanceof CheckBoxPreference) {
+                SystemProperties.set(RETRY_SMS_CONTROL,
+                        ((CheckBoxPreference) preference).isChecked() ? "3" : "1");
+            }
+            return true;
+            /*Add 20130805 spreadst of 198464 add SMS retry control end*/
+        }else {
             return false;
         }
 
