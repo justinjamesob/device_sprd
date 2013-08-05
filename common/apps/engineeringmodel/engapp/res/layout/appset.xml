@@ -122,13 +122,21 @@
             android:targetPackage="com.spreadtrum.android.eng" />
     </Preference>
     <!-- Modify 20130320 Spreadst of 140023 remove the summary end -->
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="accelerometer_rotation"
+        android:summaryOff="Close"
+        android:summaryOn="Open"
+        android:title="Accelerometer Rotation" >
+    </CheckBoxPreference>
 
-   	<CheckBoxPreference android:key="accelerometer_rotation"
-			android:title="Accelerometer Rotation"
-			android:summaryOn="Open"
-			android:summaryOff="Close"
-			android:defaultValue="true">
-	</CheckBoxPreference>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="msms_retry_control"
+        android:summaryOff="Close"
+        android:summaryOn="Open;need restart device"
+        android:title="SMS Retry Setting" >
+    </CheckBoxPreference>
 
   <Preference android:key="RFMaxPower" android:title="RFMaxPower" android:summary="">
    	<intent android:action="android.intent.action.MAIN"
