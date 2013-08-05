@@ -1326,8 +1326,7 @@ int camera_autofocus_start(void)
 	uint32_t                 *ptr = (uint32_t*)&cxt->cmr_set.focus_zone_param[0];
 	uint32_t                 i = 0;
 	uint32_t                 zone_cnt = *ptr++;
-	uint32_t                 sn_work_mode = 0;
-	SENSOR_MODE_INFO_T       *sensor_mode;
+
 	SENSOR_EXT_FUN_PARAM_T   af_param;
 	memset(&af_param,0,sizeof(af_param));
 
@@ -1337,9 +1336,6 @@ int camera_autofocus_start(void)
 	if (camera_autofocus_need_exit()) {
 		ret = CAMERA_INVALID_STATE;
 		CMR_RTN_IF_ERR(ret);
-	}
-	if (CAMERA_FOCUS_MODE_AUTO == cxt->cmr_set.af_mode) {
-		zone_cnt = 0;
 	}
 #ifndef CONFIG_CAMERA_FLASH_CTRL
     if (CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode) {
@@ -1397,20 +1393,6 @@ int camera_autofocus_start(void)
 		if (0 == zone_cnt) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
 			af_param.param = SENSOR_EXT_FOCUS_TRIG;
-			if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-				if (camera_get_is_nonzsl()) {
-					sn_work_mode = cxt->sn_cxt.preview_mode;
-				} else {
-					sn_work_mode = cxt->sn_cxt.capture_mode;
-				}
-				sensor_mode = &cxt->sn_cxt.sensor_info->sensor_mode_info[sn_work_mode];
-				af_param.zone_cnt = 1;
-				af_param.zone[0].x = sensor_mode->trim_start_x+(sensor_mode->trim_width/2-AF_WINDOW_SIZE/2);
-				af_param.zone[0].y = sensor_mode->trim_start_y+(sensor_mode->trim_height/2-AF_WINDOW_SIZE/2);
-				af_param.zone[0].w = AF_WINDOW_SIZE;
-				af_param.zone[0].h = AF_WINDOW_SIZE;
-				CMR_LOGI("rect:%d,%d,%d,%d.",af_param.zone[0].x,af_param.zone[0].y,af_param.zone[0].w,af_param.zone[0].h);
-			}
 		} else if (1 == zone_cnt) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
 			af_param.param = SENSOR_EXT_FOCUS_ZONE;
