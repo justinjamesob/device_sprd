@@ -28,6 +28,7 @@ extern "C"
 #define INVALID_SET_BYTE                              0xFF
 #define INVALID_SET_WORD                              0xFFFFFFFF
 #define SCENE_MODE_NIGHT                              1
+#define AF_WINDOW_SIZE                                160
 
 enum cmr_focus_mode {
 	CAMERA_FOCUS_MODE_AUTO = 0,
