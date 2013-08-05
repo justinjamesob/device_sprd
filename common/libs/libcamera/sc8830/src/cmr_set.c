@@ -1319,6 +1319,35 @@ int camera_preflash(void)
 	return ret;
 }
 
+static int camera_check_autofocus_aera(SENSOR_RECT_T *rect_ptr,uint32_t rect_num)
+{
+	uint32_t                 ret = CAMERA_SUCCESS;
+	struct camera_context    *cxt = camera_get_cxt();
+	uint32_t                 sn_work_mode = 0;
+	SENSOR_MODE_INFO_T       *sensor_mode;
+	uint32_t                 i = 0;
+
+	if (camera_get_is_nonzsl()) {
+		sn_work_mode = cxt->sn_cxt.preview_mode;
+	} else {
+		sn_work_mode = cxt->sn_cxt.capture_mode;
+	}
+	sensor_mode = &cxt->sn_cxt.sensor_info->sensor_mode_info[sn_work_mode];
+
+	for ( i==0 ; i<rect_num ; i++) {
+		if ((0 == rect_ptr[i].w) || (0 == rect_ptr[i].h)
+			|| (rect_ptr->w > sensor_mode->trim_width)
+			|| (rect_ptr->h > sensor_mode->trim_height)
+			|| ((rect_ptr->x+rect_ptr->w) > (sensor_mode->trim_start_x + sensor_mode->trim_width))
+			|| ((rect_ptr->y+rect_ptr->h) > (sensor_mode->trim_start_y + sensor_mode->trim_height))) {
+			CMR_LOGE("auto focus use auto mode.");
+			ret = CAMERA_FAILED;
+			break;
+		}
+	}
+	return ret;
+}
+
 int camera_autofocus_start(void)
 {
 	int                      ret = CAMERA_SUCCESS;
@@ -1390,7 +1419,7 @@ int camera_autofocus_start(void)
 		af_param.zone_cnt = zone_cnt;
 		CMR_LOGV("SPRD OEM: camera_start_focus macro");
 	} else {
-		if (0 == zone_cnt) {
+		if ((0 == zone_cnt) || (CAMERA_FOCUS_MODE_AUTO == cxt->cmr_set.af_mode)) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
 			af_param.param = SENSOR_EXT_FOCUS_TRIG;
 		} else if (1 == zone_cnt) {
@@ -1401,6 +1430,11 @@ int camera_autofocus_start(void)
 			af_param.zone[0].y = *ptr++;
 			af_param.zone[0].w = *ptr++;
 			af_param.zone[0].h = *ptr++;
+			if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+				af_param.cmd = SENSOR_EXT_FOCUS_START;
+				af_param.param = SENSOR_EXT_FOCUS_TRIG;
+				af_param.zone_cnt = 0;
+			}
 
 		} else if (zone_cnt <= FOCUS_ZONE_CNT_MAX) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
@@ -1411,6 +1445,11 @@ int camera_autofocus_start(void)
 				af_param.zone[i].y = *ptr++;
 				af_param.zone[i].w = *ptr++;
 				af_param.zone[i].h = *ptr++;
+			}
+			if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],zone_cnt)) {
+				af_param.cmd = SENSOR_EXT_FOCUS_START;
+				af_param.param = SENSOR_EXT_FOCUS_TRIG;
+				af_param.zone_cnt = 0;
 			}
 		} else {
 			CMR_LOGE("Unsupported zone count %d", zone_cnt);
