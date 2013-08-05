@@ -439,9 +439,18 @@ status_t SprdCameraHardware::takePicture()
 
 	LOGV("ISP_TOOL:takePicture: %d E", mode);
 
-    print_time();
+	print_time();
 
-    Mutex::Autolock l(&mLock);
+	Mutex::Autolock l(&mLock);
+
+	if (SPRD_ERROR == mCameraState.capture_state) {
+		LOGE("takePicture in error status, deinit capture at first ");
+		deinitCapture();
+
+	} else if (SPRD_IDLE != mCameraState.capture_state) {
+		LOGE("take picture: action alread exist, direct return!");
+		return ALREADY_EXISTS;
+	}
 
 	if (!iSZslMode()) {
 		//stop preview first for debug
@@ -616,6 +625,8 @@ status_t SprdCameraHardware::autoFocus()
 		//return INVALID_OPERATION;
 	}
 
+	setCameraState(SPRD_FOCUS_IN_PROGRESS, STATE_FOCUS);
+
 	LOGV("mLock:autoFocus E.\n");
 	return NO_ERROR;
 }
@@ -639,8 +650,36 @@ void SprdCameraHardware::antiShakeParamSetup( )
 #endif
 }
 
+status_t SprdCameraHardware::checkSetParametersEnvironment( )
+{
+	status_t ret =  NO_ERROR;
+	/*check capture status*/
+	if (SPRD_IDLE != getCaptureState()) {
+		LOGE("camera HAL in capturing process, not allov to setParameter");
+		return PERMISSION_DENIED;
+	}
+
+	/*check preview status*/
+	if ((SPRD_IDLE != getPreviewState()) && (SPRD_PREVIEW_IN_PROGRESS != getPreviewState())) {
+		LOGE("camera HAL in preview changing process, not allov to setParameter");
+		return PERMISSION_DENIED;
+	}
+
+	return ret;
+}
+
+status_t SprdCameraHardware::checkSetParameters(const SprdCameraParameters& params)
+{
+	status_t ret =  NO_ERROR;
+	int32_t tmpSize = sizeof(SprdCameraParameters);
+	ret = memcmp(&params, &mParameters, tmpSize);
+	return ret;
+}
+
 status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 {
+	status_t ret =  NO_ERROR;
+
 	LOGV("setParameters: E params = %p", &params);
 	LOGV("mLock:setParameters S.\n");
 	Mutex::Autolock l(&mLock);
@@ -689,6 +728,17 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 #endif
 
 	LOGV("setParameters: mPreviewFormat=%d,mPictureFormat=%d.",mPreviewFormat,mPictureFormat);
+
+	if (0 == checkSetParameters(params)) {
+		LOGV("same parameters with system, directly return!");
+		return NO_ERROR;
+	}
+
+	ret = checkSetParametersEnvironment();
+	if (NO_ERROR != ret) {
+		LOGV("setParameters, invalid status , directly return!");
+		return NO_ERROR;
+	}
 
 	// FIXME: will this make a deep copy/do the right thing? String8 i
 	// should handle it
@@ -875,6 +925,7 @@ const char* SprdCameraHardware::getCameraStateStr(
             STATE_STR(SPRD_IDLE),
             STATE_STR(SPRD_ERROR),
             STATE_STR(SPRD_PREVIEW_IN_PROGRESS),
+            STATE_STR(SPRD_FOCUS_IN_PROGRESS),
             STATE_STR(SPRD_WAITING_RAW),
             STATE_STR(SPRD_WAITING_JPEG),
             STATE_STR(SPRD_INTERNAL_PREVIEW_STOPPING),
@@ -946,6 +997,7 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 		mCameraState.camera_state = SPRD_INIT;
 		mCameraState.preview_state = SPRD_IDLE;
 		mCameraState.capture_state = SPRD_IDLE;
+		mCameraState.focus_state = SPRD_IDLE;
 		break;
 
 	case SPRD_IDLE:
@@ -961,6 +1013,9 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 		case STATE_CAPTURE:
 			mCameraState.capture_state = SPRD_IDLE;
 			break;
+
+		case STATE_FOCUS:
+			mCameraState.focus_state = SPRD_IDLE;
 		}
 		break;
 
@@ -980,6 +1035,10 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 
 		case STATE_CAPTURE:
 			mCameraState.capture_state = SPRD_ERROR;
+			break;
+
+		case STATE_FOCUS:
+			mCameraState.focus_state = SPRD_ERROR;
 			break;
 		}
 		break;
@@ -1014,13 +1073,21 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 		mCameraState.capture_state = SPRD_INTERNAL_CAPTURE_STOPPING;
 		break;
 
+	//focus state
+	case SPRD_FOCUS_IN_PROGRESS:
+		mCameraState.focus_state = SPRD_FOCUS_IN_PROGRESS;
+		break;
+
 	default:
 		LOGD("setCameraState: error");
 		break;
 	}
 
-	LOGV("setCameraState:camera state = %s, preview state = %s, capture state = %s", getCameraStateStr(mCameraState.camera_state),
-				getCameraStateStr(mCameraState.preview_state), getCameraStateStr(mCameraState.capture_state));
+	LOGV("setCameraState:camera state = %s, preview state = %s, capture state = %s focus state = %s",
+				getCameraStateStr(mCameraState.camera_state),
+				getCameraStateStr(mCameraState.preview_state),
+				getCameraStateStr(mCameraState.capture_state),
+				getCameraStateStr(mCameraState.focus_state));
 }
 
 SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getCameraState()
@@ -1039,6 +1106,12 @@ SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getCaptureState()
 {
 	LOGV("getCaptureState: %s", getCameraStateStr(mCameraState.capture_state));
 	return mCameraState.capture_state;
+}
+
+SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getFocusState()
+{
+	LOGV("getFocusState: %s", getCameraStateStr(mCameraState.focus_state));
+	return mCameraState.focus_state;
 }
 
 bool SprdCameraHardware::isCameraInit()
@@ -1772,14 +1845,14 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 
 void SprdCameraHardware::stopPreviewInternal()
 {
-    nsecs_t start_timestamp = systemTime();
-    nsecs_t end_timestamp;
+	nsecs_t start_timestamp = systemTime();
+	nsecs_t end_timestamp;
 	LOGV("stopPreviewInternal E");
 
-    if (!isPreviewing()) {
+	if (!isPreviewing()) {
 		LOGE("Preview not in progress!");
 		return;
-    }
+	}
 
 	setCameraState(SPRD_INTERNAL_PREVIEW_STOPPING, STATE_PREVIEW);
 
@@ -1792,10 +1865,15 @@ void SprdCameraHardware::stopPreviewInternal()
 
 	WaitForPreviewStop();
 	deinitPreview();
+
+	if (isCapturing()) {
+		WaitForCaptureDone();
+	}
 	deinitCapture();
-    end_timestamp = systemTime();
-    LOGE("Stop Preview Time:%lld(ms).",(end_timestamp - start_timestamp)/1000000);
-    LOGV("stopPreviewInternal: X Preview has stopped.");
+
+	end_timestamp = systemTime();
+	LOGE("Stop Preview Time:%lld(ms).",(end_timestamp - start_timestamp)/1000000);
+	LOGV("stopPreviewInternal: X Preview has stopped.");
 }
 
 takepicture_mode SprdCameraHardware::getCaptureMode()
@@ -2770,7 +2848,7 @@ SprdCameraHardware::transitionState(SprdCameraHardware::Sprd_camera_state from,
 	volatile SprdCameraHardware::Sprd_camera_state *which_ptr = NULL;
 	LOGV("transitionState: owner = %d, lock = %d", owner, lock);
 
-	//if (lock) mStateLock.lock();
+	if (lock) mStateLock.lock();
 
 	switch (owner) {
 	case STATE_CAMERA:
@@ -2804,7 +2882,7 @@ SprdCameraHardware::transitionState(SprdCameraHardware::Sprd_camera_state from,
 		}
 	}
 
-	//if (lock) mStateLock.unlock();
+	if (lock) mStateLock.unlock();
 
 	return to;
 }
@@ -3021,42 +3099,44 @@ void SprdCameraHardware::HandleFocus(camera_cb_type cb,
 	LOGV("HandleFocus in: cb = %d, parm4 = 0x%x, state = %s",
 				cb, parm4, getCameraStateStr(getPreviewState()));
 
-    if (NULL == mNotify_cb) {
+	if (NULL == mNotify_cb) {
 		LOGE("HandleFocus: mNotify_cb is NULL");
-        return;
-    }
+		setCameraState(SPRD_IDLE, STATE_FOCUS);
+		return;
+	}
 
-    switch (cb) {
-    case CAMERA_RSP_CB_SUCCESS:
+	switch (cb) {
+	case CAMERA_RSP_CB_SUCCESS:
 		LOGV("camera cb: autofocus has started.");
-        break;
+		break;
 
-    case CAMERA_EXIT_CB_DONE:
-        LOGV("camera cb: autofocus succeeded.");
-        LOGV("camera cb: autofocus mNotify_cb start.");
-	if (mMsgEnabled & CAMERA_MSG_FOCUS)
-		mNotify_cb(CAMERA_MSG_FOCUS, 1, 0, mUser);
-	else
-		LOGE("camera cb: mNotify_cb is null.");
+	case CAMERA_EXIT_CB_DONE:
+		LOGV("camera cb: autofocus succeeded.");
+		LOGV("camera cb: autofocus mNotify_cb start.");
+		if (mMsgEnabled & CAMERA_MSG_FOCUS)
+			mNotify_cb(CAMERA_MSG_FOCUS, 1, 0, mUser);
+		else
+			LOGE("camera cb: mNotify_cb is null.");
 
-	LOGV("camera cb: autofocus mNotify_cb ok.");
-	break;
-    case CAMERA_EXIT_CB_ABORT:
-	LOGE("camera cb: autofocus aborted");
-	break;
+		LOGV("camera cb: autofocus mNotify_cb ok.");
+		break;
+	case CAMERA_EXIT_CB_ABORT:
+		LOGE("camera cb: autofocus aborted");
+		break;
 
-    case CAMERA_EXIT_CB_FAILED:
-        LOGE("camera cb: autofocus failed");
-        if (mMsgEnabled & CAMERA_MSG_FOCUS)
-            mNotify_cb(CAMERA_MSG_FOCUS, 0, 0, mUser);
-	break;
+	case CAMERA_EXIT_CB_FAILED:
+		LOGE("camera cb: autofocus failed");
+		if (mMsgEnabled & CAMERA_MSG_FOCUS)
+		mNotify_cb(CAMERA_MSG_FOCUS, 0, 0, mUser);
+		break;
 
-    default:
-        LOGE("camera cb: unknown cb %d for CAMERA_FUNC_START_FOCUS!", cb);
-        if (mMsgEnabled & CAMERA_MSG_FOCUS)
-            mNotify_cb(CAMERA_MSG_FOCUS, 0, 0, mUser);
-	break;
-    }
+	default:
+		LOGE("camera cb: unknown cb %d for CAMERA_FUNC_START_FOCUS!", cb);
+		if (mMsgEnabled & CAMERA_MSG_FOCUS)
+			mNotify_cb(CAMERA_MSG_FOCUS, 0, 0, mUser);
+		break;
+	}
+	setCameraState(SPRD_IDLE, STATE_FOCUS);
 
 	LOGV("HandleFocus out, state = %s", getCameraStateStr(getCaptureState()));
 }

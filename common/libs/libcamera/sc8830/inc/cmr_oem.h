@@ -66,10 +66,16 @@ extern "C"
 #define CMR_EVT_CAP_START_CAP                        (CMR_EVT_CAP_BASE + 3)
 #define CMR_EVT_CAP_RAW_TX_DONE                      (CMR_EVT_CAP_BASE + 4)
 
+#define CMR_EVT_CB_BASE                              (CMR_EVT_OEM_BASE + 0x800)
+#define CMR_EVT_CB_INIT                              (CMR_EVT_CAP_BASE + 0)
+#define CMR_EVT_CB_EXIT                              (CMR_EVT_CAP_BASE + 1)
+#define CMR_EVT_CB_HANDLE                            (CMR_EVT_CAP_BASE + 2)
+
 #define CAMERA_OEM_MSG_QUEUE_SIZE                    50
 #define CAMERA_AF_MSG_QUEUE_SIZE                     5
 #define CAMERA_PREV_MSG_QUEUE_SIZE                   20
 #define CAMERA_CAP_MSG_QUEUE_SIZE                    20
+#define CAMERA_CB_MSG_QUEUE_SIZE                     40
 #define CAMERA_PREV_ID_BASE                          0x1000
 #define CAMERA_CAP0_ID_BASE                          0x2000
 #define CAMERA_CAP1_ID_BASE                          0x4000
@@ -385,6 +391,12 @@ struct camera_context {
 	uint32_t                 cap_phys_addr;
 	uint32_t                 *cap_virt_addr;
 	uint32_t                 cap_mem_szie;
+
+	/*callback thread*/
+	pthread_t                cb_thread;
+	uint32_t                 cb_msg_que_handle;
+	uint32_t                 cb_inited;
+	sem_t                    cb_sync_sem;
 
 	/*for setting*/
 	struct camera_settings   cmr_set;

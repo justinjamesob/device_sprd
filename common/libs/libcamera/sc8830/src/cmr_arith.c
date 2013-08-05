@@ -80,6 +80,7 @@ void *arithmetic_fd_thread_proc(void *data)
 	unsigned char       *p_format = (unsigned char*)IMAGE_FORMAT;
 	camera_frame_type   frame_type;
 	int                 fd_exit_flag = 0;
+	camera_cb_info      cb_info;
 	struct camera_context  *cxt = camera_get_cxt();
 
 	while (1) {
@@ -133,10 +134,21 @@ void *arithmetic_fd_thread_proc(void *data)
 					face_rect_ptr++;
 				}
 				if (cxt->arithmetic_cxt.fd_flag) {
+#if CB_LIGHT_SYNC
 					camera_call_cb(CAMERA_EVT_CB_FD,
 								camera_get_client_data(),
 								CAMERA_FUNC_START_PREVIEW,
 								(uint32_t)&frame_type);
+#else
+					memset(&cb_info, 0, sizeof(camera_cb_info));
+					cb_info.cb_type = CAMERA_EVT_CB_FD;
+					cb_info.cb_func = CAMERA_FUNC_START_PREVIEW;
+					cb_info.cb_data = (void *)(&frame_type);
+					cb_info.cb_data_length = sizeof(camera_frame_type);
+					cb_info.refer_data = face_rect_ptr;
+					cb_info.refer_data_length = sizeof(morpho_FaceRect);
+					camera_callback_start(&cb_info);
+#endif
 				}
 			}
 			s_arith_cxt->fd_busy = 0;

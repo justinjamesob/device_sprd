@@ -26,9 +26,10 @@ extern "C"
 #include "../../arithmetic/sc8825/inc/HDR2.h"
 #include "sprd_dma_copy_k.h"
 
-#define FACE_DETECT_NUM		5
-#define FACE_SMILE_LIMIT	10
+#define FACE_DETECT_NUM     5
+#define FACE_SMILE_LIMIT    10
 #define HDR_CAP_NUM         3
+#define CB_LIGHT_SYNC       1
 
 typedef enum {
 	CAMERA_NORMAL_MODE = 0,
@@ -292,6 +293,15 @@ typedef void (*camera_cb_f_type)(camera_cb_type cb,
 				camera_func_type func,
 				int32_t parm4);
 
+typedef struct{
+	camera_func_type       cb_func;
+	camera_cb_type         cb_type;
+	void                 * cb_data;
+	uint32_t               cb_data_length;
+	void                 * refer_data;
+	uint32_t               refer_data_length;
+}camera_cb_info;
+
 typedef struct {
 	int32_t                  quality;
 	camera_encode_type       format;
@@ -491,6 +501,7 @@ void camera_call_cb(camera_cb_type cb,
                  const void *client_data,
                  camera_func_type func,
                  int32_t parm4);
+void camera_callback_start(camera_cb_info *cb_info);
 void *camera_get_client_data(void);
 int camera_set_fd_mem(uint32_t phy_addr, uint32_t vir_addr, uint32_t mem_size);
 int camera_set_change_size(uint32_t cap_width,uint32_t cap_height,uint32_t preview_width,uint32_t preview_height);
