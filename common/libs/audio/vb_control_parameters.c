@@ -420,10 +420,12 @@ static int SetVoice_gain_by_devices(struct tiny_audio_device *adev, pga_gain_nv_
     if((pga_gain_nv->devices & AUDIO_DEVICE_OUT_SPEAKER) && ((pga_gain_nv->devices & AUDIO_DEVICE_OUT_WIRED_HEADSET) || (pga_gain_nv->devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE))){
         audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_l,"voice-headphone-spk-l");
         audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_r,"voice-headphone-spk-r");
+        mixer_ctl_set_value(adev->private_ctl.internal_pa, 0, pga_gain_nv->pa_config);
     }else{
         if(pga_gain_nv->devices & AUDIO_DEVICE_OUT_SPEAKER){
             audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_l,"voice-speaker-l");
             audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_r,"voice-speaker-r");
+            mixer_ctl_set_value(adev->private_ctl.internal_pa, 0, pga_gain_nv->pa_config);
         }
         if((pga_gain_nv->devices & AUDIO_DEVICE_OUT_WIRED_HEADSET) || (pga_gain_nv->devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE)){
             audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_l,"voice-headphone-l");
