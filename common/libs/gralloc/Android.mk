@@ -64,6 +64,9 @@ endif
 ifeq ($(strip $(USE_UI_OVERLAY)),true)
         LOCAL_CFLAGS += -DUSE_UI_OVERLAY
 endif
+ifeq ($(strip $(FB_FORMAT_SWITCH)),true)
+        LOCAL_CFLAGS += -DFB_FORMAT_SWITCH
+endif
 
 ifneq ($(strip $(TARGET_BUILD_VARIANT)), user)
         LOCAL_CFLAGS += -DDUMP_FB

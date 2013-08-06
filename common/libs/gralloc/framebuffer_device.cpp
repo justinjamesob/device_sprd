@@ -158,6 +158,15 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 #ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
 		gralloc_mali_vsync_report(MALI_VSYNC_EVENT_BEGIN_WAIT);
 #endif
+
+#ifdef FB_FORMAT_SWITCH
+		if(dev->format==HAL_PIXEL_FORMAT_RGB_565){
+			m->info.bits_per_pixel = 16;
+		}
+		else{
+			m->info.bits_per_pixel = 32;
+		}
+#endif
 		if (ioctl(m->framebuffer->fd, FBIOPUT_VSCREENINFO, &m->info) == -1) 
 		{
 			AERR( "FBIOPUT_VSCREENINFO failed for fd: %d", m->framebuffer->fd );
