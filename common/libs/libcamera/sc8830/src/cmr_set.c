@@ -541,8 +541,14 @@ int camera_set_video_mode(uint32_t mode, uint32_t *skip_mode, uint32_t *skip_num
 {
 	struct camera_context    *cxt = camera_get_cxt();
 	int                      ret = CAMERA_SUCCESS;
+	uint32_t                 isp_param = 0;
 
 	CMR_LOGI("preview mode %d", mode);
+	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
+		isp_param = cxt->cmr_set.frame_rate;
+		CMR_LOGI("frame rate:%d.",isp_param);
+		ret = isp_ioctl(ISP_CTRL_VIDEO_MODE, (void *)&isp_param);
+	}
 	*skip_mode = IMG_SKIP_SW;
 	*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 	ret = Sensor_Ioctl(SENSOR_IOCTL_VIDEO_MODE, mode);
@@ -1211,7 +1217,7 @@ int camera_set_ctrl(camera_parm_type id,
 
 			ret = camera_get_video_mode(parm,&video_mode);
 			CMR_RTN_IF_ERR(ret);
-
+            cxt->cmr_set.frame_rate = parm;
 			if (video_mode != cxt->cmr_set.video_mode) {
 				CMR_LOGV("cxt->preview_status = %d \n", cxt->preview_status);
 				if (CMR_PREVIEW == cxt->preview_status) {
