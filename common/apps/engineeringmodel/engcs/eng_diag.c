@@ -1307,7 +1307,7 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 				break;
 			case GET_ARM_VOLUME_DATA_FROM_FLASH:
 				audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//(AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
-				if ((AUDIO_TOTAL_T *)( -1 )!= audio_ptr ) {
+				if (((AUDIO_TOTAL_T *)( -1 )!= audio_ptr) && ((AUDIO_TOTAL_T *)( 0 )!= audio_ptr) ) {
 					//audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
 					//munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
 					audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
