@@ -131,6 +131,7 @@ static int SetAudio_gain_4eng(struct audio_pga *pga, pga_gain_nv_t *pga_gain_nv,
         audio_pga_apply(pga,pga_gain_nv->adc_pga_gain_l,"capture-l");
         audio_pga_apply(pga,pga_gain_nv->adc_pga_gain_r,"capture-r");
     }
+    mixer_close(mixer);
     ALOGW("%s, set cp mode(0x%x) ",__func__,lmode);
     return 0;
 }
