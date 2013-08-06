@@ -401,12 +401,16 @@ static int verify_video_layer(struct hwc_context_t *context, hwc_layer_t * l)
         return 0;
     }
 #else
-    if(4*src_width < dest_width || src_width > 16*dest_width ||
-            4*src_height < dest_height || src_height > 16*dest_height) { //gsp support [1/16-4] scaling
-        ALOGI_IF(debugenable,"verify_video(),dcam support 1/4-4 scaling! L%d",__LINE__);
+    int gsp_scaling_up_limit = 4;
+#ifdef GSP_SCALING_UP_TWICE
+    gsp_scaling_up_limit = 16;
+#endif
+    if(gsp_scaling_up_limit*src_width < dest_width || src_width > 16*dest_width ||
+            gsp_scaling_up_limit*src_height < dest_height || src_height > 16*dest_height) { //gsp support [1/16-4] scaling
+        ALOGI_IF(debugenable,"verify_video(),gsp support [1/16-16] scaling! L%d",__LINE__);
         return 0;
     }
-	//added for Bug 181381
+    //added for Bug 181381
     if(((src_width < dest_width) && (src_height > dest_height))
             || ((src_width > dest_width) && (src_height < dest_height))) { //gsp support [1/16-4] scaling
         ALOGI_IF(debugenable,"verify_video(),gsp not support one direction scaling down while the other scaling up! L%d",__LINE__);
@@ -820,10 +824,80 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
 
         ALOGI_IF(debugenable,"set_GSP_layers L%d,Ld [p%d]",__LINE__,gsp_cfg_info.layer_des_info.pitch);
         if(context->gsp_dev) {
-            ret = context->gsp_dev->GSP_Proccess(&gsp_cfg_info);
-        }
-        //ret = GSP_Proccess(&gsp_cfg_info);
+#ifdef GSP_SCALING_UP_TWICE
+            if((((gsp_cfg_info.layer0_info.rot_angle & 0x1) == 0) &&
+                    (((gsp_cfg_info.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w)
+                     ||((gsp_cfg_info.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h)))
+                    ||(((gsp_cfg_info.layer0_info.rot_angle & 0x1) == 1) &&
+                       (((gsp_cfg_info.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h)
+                        || ((gsp_cfg_info.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w)))) {
+                GSP_CONFIG_INFO_T gsp_cfg_info_phase1 = gsp_cfg_info;
+                GSP_LAYER_DST_DATA_FMT_E phase1_des_format = GSP_DST_FMT_YUV420_2P;//GSP_DST_FMT_YUV422_2P; //GSP_DST_FMT_ARGB888
 
+                /*phase1*/
+                gsp_cfg_info_phase1.layer_des_info.img_format = phase1_des_format;
+                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y = (context->overlay_phy_addr + context->overlay_buf_size*OVERLAY_BUF_NUM);
+                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_v =
+                    gsp_cfg_info_phase1.layer_des_info.src_addr.addr_uv = gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y + context->fb_width*context->fb_height;
+
+                gsp_cfg_info_phase1.layer0_info.des_rect.st_x = 0;
+                gsp_cfg_info_phase1.layer0_info.des_rect.st_y = 0;
+                if((gsp_cfg_info.layer0_info.rot_angle & 0x1) == 0) {
+                    if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w) {
+                        gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = (gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe;
+                    }
+                    if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h) {
+                        gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = (gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe;
+                    }
+                } else {
+                    if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h) {
+                        gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = (gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe;
+                    }
+                    if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w) {
+                        gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = (gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe;
+                    }
+                }
+                gsp_cfg_info_phase1.layer_des_info.pitch = gsp_cfg_info_phase1.layer0_info.des_rect.rect_w;
+                gsp_cfg_info_phase1.layer0_info.rot_angle = GSP_ROT_ANGLE_0;
+                gsp_cfg_info_phase1.layer1_info.layer_en = 0;//disable Layer1
+
+                ALOGI_IF(debugenable,"scaling twice phase 1,set_GSP_layers L%d,src_addr_y:0x%08x,des_addr_y:0x%08x",__LINE__,
+                         gsp_cfg_info_phase1.layer0_info.src_addr.addr_y,
+                         gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y);
+
+                ret = context->gsp_dev->GSP_Proccess(&gsp_cfg_info_phase1);
+                if(0 == ret) {
+                    ALOGI_IF(debugenable,"scaling twice phase 1,set_GSP_layers L%d,GSP_Proccess ret 0",__LINE__);
+                } else {
+                    debugenable = 1;
+                    ALOGE("scaling twice phase 1,set_GSP_layers L%d,GSP_Proccess ret err!! debugenable = 1;",__LINE__);
+                    return ret;
+                }
+
+                /*phase2*/
+                gsp_cfg_info.layer0_info.img_format = (GSP_LAYER_SRC_DATA_FMT_E)phase1_des_format;
+                gsp_cfg_info.layer0_info.clip_rect = gsp_cfg_info_phase1.layer0_info.des_rect;
+                gsp_cfg_info.layer0_info.pitch = gsp_cfg_info_phase1.layer_des_info.pitch;
+                gsp_cfg_info.layer0_info.src_addr = gsp_cfg_info_phase1.layer_des_info.src_addr;
+                gsp_cfg_info.layer0_info.endian_mode = gsp_cfg_info_phase1.layer_des_info.endian_mode;
+
+                ALOGI_IF(debugenable,"scaling twice phase 2,set_GSP_layers L%d,src_addr_y:0x%08x,des_addr_y:0x%08x",__LINE__,
+                         gsp_cfg_info.layer0_info.src_addr.addr_y,
+                         gsp_cfg_info.layer_des_info.src_addr.addr_y);
+                ret = context->gsp_dev->GSP_Proccess(&gsp_cfg_info);
+                if(0 == ret) {
+                    ALOGI_IF(debugenable,"scaling twice phase 2,set_GSP_layers L%d,GSP_Proccess ret 0",__LINE__);
+                } else {
+                    debugenable = 1;
+                    ALOGE("scaling twice phase 2,set_GSP_layers L%d,GSP_Proccess ret err!! debugenable = 1;",__LINE__);
+                }
+            } else {
+                ret = context->gsp_dev->GSP_Proccess(&gsp_cfg_info);
+            }
+#else
+            ret = context->gsp_dev->GSP_Proccess(&gsp_cfg_info);
+#endif
+        }
 
         if(0 == ret) {
             ALOGI_IF(debugenable,"set_GSP_layers L%d,GSP_Proccess ret 0",__LINE__);
@@ -857,13 +931,15 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
                      (uint32_t)ov_setting.buffer);
 
             if (ioctl(context->fbfd, SPRD_FB_SET_OVERLAY, &ov_setting) == -1) {
-                ALOGE("fail video SPRD_FB_SET_OVERLAY");//
+                debugenable = 1;
+                ALOGE("ioctl SPRD_FB_SET_OVERLAY failed, call again!! debugenable = 1; ");//
                 ioctl(context->fbfd, SPRD_FB_SET_OVERLAY, &ov_setting);//Fix ME later
             }
 
             context->overlay_index = (context->overlay_index + 1)%OVERLAY_BUF_NUM;
         } else {
-            ALOGE("set_GSP_layers L%d,GSP_Proccess ret err",__LINE__);
+            debugenable = 1;
+            ALOGE("set_GSP_layers L%d,GSP_Proccess ret err!! debugenable = 1;",__LINE__);
         }
 
         return ret;
@@ -1521,7 +1597,11 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
             dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*3/2);//YUV420
 #endif
 #endif
+#ifdef GSP_SCALING_UP_TWICE
+            dev->ion_heap = new MemoryHeapIon(SPRD_ION_DEV, dev->overlay_buf_size*(OVERLAY_BUF_NUM+1/2), MemoryHeapBase::NO_CACHING, (1 << ION_HEAP_CARVEOUT_ID1));
+#else
             dev->ion_heap = new MemoryHeapIon(SPRD_ION_DEV, dev->overlay_buf_size*OVERLAY_BUF_NUM, MemoryHeapBase::NO_CACHING, (1 << ION_HEAP_CARVEOUT_ID1));
+#endif
             int fd = dev->ion_heap->getHeapID();
             if (fd >= 0) {
                 int ret,phy_addr, buffer_size;
