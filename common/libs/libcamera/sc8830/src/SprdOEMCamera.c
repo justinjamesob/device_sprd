@@ -4008,8 +4008,9 @@ int camera_preview_init(int format_mode)
 	g_cxt->chn_1_status = CHN_BUSY;
 
 	if (v4l2_cfg.cfg.need_isp) {
-		uint32_t video_mode = g_cxt->cmr_set.video_mode;
+		uint32_t video_mode = 0;
 		struct isp_trim_size wb_trim;
+		video_mode = g_cxt->cmr_set.video_mode;
 		isp_param.size.w = sensor_mode->width;
 		if (v4l2_cfg.cfg.need_binning) {
 			isp_param.size.w = (isp_param.size.w >> 1);
@@ -4019,8 +4020,8 @@ int camera_preview_init(int format_mode)
 		isp_param.mode= ISP_VIDEO_MODE_CONTINUE;
 		CMR_LOGV("isp w h, %d %d", isp_param.size.w, isp_param.size.h);
 		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[sn_work_mode].ae_info[video_mode];
-		CMR_LOGE("%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
-			     sensor_aec_info->line_time,sensor_aec_info->gain);
+		CMR_LOGE("%d,%d,%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
+			     sensor_aec_info->line_time,sensor_aec_info->gain,sn_work_mode,video_mode);
 		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
 		if (CAMERA_SUCCESS != ret) {
 			CMR_LOGE("set ae information error.");

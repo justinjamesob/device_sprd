@@ -972,7 +972,11 @@ void SprdCameraHardware::setCameraPreviewMode()
 	} else {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
 	}*/
-	SET_PARM(CAMERA_PARM_PREVIEW_MODE, mParameters.getPreviewFameRate());
+	if (isRecordingMode()) {
+		SET_PARM(CAMERA_PARM_PREVIEW_MODE, mParameters.getPreviewFameRate());
+	} else {
+		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
+	}
 }
 
 bool SprdCameraHardware::isRecordingMode()

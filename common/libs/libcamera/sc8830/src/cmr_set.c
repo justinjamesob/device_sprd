@@ -37,7 +37,7 @@ static int camera_set_night(uint32_t night_mode, uint32_t *skip_mode, uint32_t *
 static int camera_set_flicker(uint32_t flicker_mode, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_set_iso(uint32_t iso, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_set_flash(uint32_t flash_mode, uint32_t *skip_mode, uint32_t *skip_num);
-static int camera_set_video_mode(uint32_t mode, uint32_t *skip_mode, uint32_t *skip_num);
+static int camera_set_video_mode(uint32_t mode, uint32_t frame_rate, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_get_video_mode(uint32_t frame_rate, uint32_t *video_mode);
 
 
@@ -537,7 +537,7 @@ int camera_set_flash(uint32_t flash_mode, uint32_t *skip_mode, uint32_t *skip_nu
 	return ret;
 }
 
-int camera_set_video_mode(uint32_t mode, uint32_t *skip_mode, uint32_t *skip_num)
+int camera_set_video_mode(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode, uint32_t *skip_num)
 {
 	struct camera_context    *cxt = camera_get_cxt();
 	int                      ret = CAMERA_SUCCESS;
@@ -545,13 +545,18 @@ int camera_set_video_mode(uint32_t mode, uint32_t *skip_mode, uint32_t *skip_num
 
 	CMR_LOGI("preview mode %d", mode);
 	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-		isp_param = cxt->cmr_set.frame_rate;
+		isp_param = frame_rate;
 		CMR_LOGI("frame rate:%d.",isp_param);
 		ret = isp_ioctl(ISP_CTRL_VIDEO_MODE, (void *)&isp_param);
+		camera_param_to_isp(ISP_CTRL_ISO, 5, &isp_param);
+		ret = isp_ioctl(ISP_CTRL_ISO, (void *)&isp_param);
 	}
-	*skip_mode = IMG_SKIP_SW;
-	*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
-	ret = Sensor_Ioctl(SENSOR_IOCTL_VIDEO_MODE, mode);
+	if ((cxt->cmr_set.video_mode != mode) || (cxt->cmr_set.sensor_mode != cxt->sn_cxt.preview_mode)) {
+		*skip_mode = IMG_SKIP_SW;
+		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
+		ret = Sensor_Ioctl(SENSOR_IOCTL_VIDEO_MODE, mode);
+		cxt->cmr_set.sensor_mode = cxt->sn_cxt.preview_mode;
+	}
 
 	return ret;
 }
@@ -679,7 +684,9 @@ int camera_preview_start_set(void)
 	}
 
 	if (INVALID_SET_WORD != set->video_mode) {
-		ret = camera_set_video_mode(set->video_mode, &skip, &skip_num);
+		ret = camera_get_video_mode(set->frame_rate,&set->video_mode);
+		CMR_RTN_IF_ERR(ret);
+		ret = camera_set_video_mode(set->video_mode, set->frame_rate, &skip, &skip_num);
 		CMR_RTN_IF_ERR(ret);
 	}
 
@@ -1217,24 +1224,23 @@ int camera_set_ctrl(camera_parm_type id,
 
 			ret = camera_get_video_mode(parm,&video_mode);
 			CMR_RTN_IF_ERR(ret);
-            cxt->cmr_set.frame_rate = parm;
-			if (video_mode != cxt->cmr_set.video_mode) {
-				CMR_LOGV("cxt->preview_status = %d \n", cxt->preview_status);
-				if (CMR_PREVIEW == cxt->preview_status) {
+	        cxt->cmr_set.frame_rate = parm;
 
-					if (before_set) {
-						ret = (*before_set)(RESTART_LIGHTLY);
-						CMR_RTN_IF_ERR(ret);
-					}
-					ret = camera_set_video_mode(video_mode, &skip_mode, &skip_number);
+			CMR_LOGV("cxt->preview_status = %d \n", cxt->preview_status);
+			if (CMR_PREVIEW == cxt->preview_status) {
+
+				if (before_set) {
+					ret = (*before_set)(RESTART_LIGHTLY);
 					CMR_RTN_IF_ERR(ret);
-					if (after_set) {
-						ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
-						CMR_RTN_IF_ERR(ret);
-					}
 				}
-				cxt->cmr_set.video_mode = video_mode;
+				ret = camera_set_video_mode(video_mode, cxt->cmr_set.frame_rate, &skip_mode, &skip_number);
+				CMR_RTN_IF_ERR(ret);
+				if (after_set) {
+					ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
+					CMR_RTN_IF_ERR(ret);
+				}
 			}
+			cxt->cmr_set.video_mode = video_mode;
 		}
 		break;
 
@@ -1646,13 +1652,9 @@ int camera_get_video_mode(uint32_t frame_rate, uint32_t *video_mode)
 		return CAMERA_FAILED;
 	}
 	*video_mode = 0;
-	ret = Sensor_GetMode((uint32_t *)(&sensor_mode));
-	if (ret) {
-		CMR_LOGE("get sensor mode fail.");
-		return CAMERA_FAILED;
-	}
-
+	sensor_mode = cxt->sn_cxt.preview_mode;
 	sensor_ae_info = (SENSOR_AE_INFO_T*)&cxt->sn_cxt.sensor_info->sensor_video_info[sensor_mode];
+	CMR_LOGE("%d.",sensor_mode);
 	for (i=0 ; i<SENSOR_VIDEO_MODE_MAX ; i++) {
 		if (frame_rate <= sensor_ae_info[i].max_frate) {
 			*video_mode = i;

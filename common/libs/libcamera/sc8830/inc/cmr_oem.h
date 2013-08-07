@@ -248,6 +248,7 @@ struct camera_settings {
 	uint32_t                 luma_adapt;
 	uint32_t                 video_mode;
 	uint32_t                 frame_rate;
+	uint32_t                 sensor_mode;
 	uint32_t                 auto_exposure_mode;
 	/*all the above value will be set as 0xFFFFFFFF after inited*/
 	uint32_t                 set_end;
