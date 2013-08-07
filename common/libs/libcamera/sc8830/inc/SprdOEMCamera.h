@@ -242,6 +242,7 @@ typedef enum {
 	CAMERA_EVT_CB_SNAPSHOT_DONE,/*  Snapshot updated               */
 	CAMERA_EVT_CB_SNAPSHOT_JPEG_DONE,
 	CAMERA_EVT_CB_FD,
+	CAMERA_EVT_CB_FLUSH,
 	CAMERA_CB_MAX
 } camera_cb_type;
 

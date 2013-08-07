@@ -948,6 +948,10 @@ int camera_cap_post(void *data)
 			}
 		} else {
 			int tmp = g_cxt->cap_cnt;
+			camera_call_cb(CAMERA_EVT_CB_FLUSH,
+				camera_get_client_data(),
+				CAMERA_FUNC_TAKE_PICTURE,
+				0);
 			ret = camera_take_picture_hdr(tmp);
 			g_cxt->cap_cnt = tmp;
 			if (ret) {
@@ -5186,6 +5190,10 @@ int camera_v4l2_capture_handle(struct frm_info *data)
 			if(0 != arithmetic_hdr(data_addr,g_cxt->cap_orig_size.width,g_cxt->cap_orig_size.height)) {
 				CMR_LOGE("hdr error.");
 			}
+			camera_call_cb(CAMERA_EVT_CB_FLUSH,
+				camera_get_client_data(),
+				CAMERA_FUNC_TAKE_PICTURE,
+				0);
 			arithmetic_hdr_deinit();
 	} else if (CAMERA_TOOL_RAW_MODE == g_cxt->cap_mode) {
 		CMR_LOGV("raw capture done: cap_original_fmt %d, cap_zoom_mode %d, rot %d",

@@ -2970,6 +2970,10 @@ void SprdCameraHardware::HandleTakePicture(camera_cb_type cb,
 	encode_location = getCameraLocation(&pt);
 
 	switch (cb) {
+	case CAMERA_EVT_CB_FLUSH:
+		LOGV("capture:flush.");
+		flush_buffer(CAMERA_FLUSH_RAW_HEAP_ALL, 0,(void*)0,(void*)0,0);
+		break;
 	case CAMERA_RSP_CB_SUCCESS:
 		LOGV("HandleTakePicture: CAMERA_RSP_CB_SUCCESS");
 		transitionState(SPRD_INTERNAL_RAW_REQUESTED,
