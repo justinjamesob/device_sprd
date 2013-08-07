@@ -1486,6 +1486,12 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->blc.offset[0].gr=0x0f;
 	sensor_ptr->blc.offset[0].gb=0x0f;
 	sensor_ptr->blc.offset[0].b=0x0f;
+
+	sensor_ptr->blc.offset[1].r=0x0f;
+	sensor_ptr->blc.offset[1].gr=0x0f;
+	sensor_ptr->blc.offset[1].gb=0x0f;
+	sensor_ptr->blc.offset[1].b=0x0f;
+
 	//nlc
 	sensor_ptr->nlc.r_node[0]=0;
 	sensor_ptr->nlc.r_node[1]=16;
@@ -1789,6 +1795,14 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->awb.win[19].x=305;
 	sensor_ptr->awb.win[19].yt=109;
 	sensor_ptr->awb.win[19].yb=90;
+
+	sensor_ptr->awb.gain_convert[0].r=0x100;
+	sensor_ptr->awb.gain_convert[0].g=0x100;
+	sensor_ptr->awb.gain_convert[0].b=0x100;
+
+	sensor_ptr->awb.gain_convert[1].r=0x100;
+	sensor_ptr->awb.gain_convert[1].g=0x100;
+	sensor_ptr->awb.gain_convert[1].b=0x100;
 
 	//bpc
 	sensor_ptr->bpc.flat_thr=80;
