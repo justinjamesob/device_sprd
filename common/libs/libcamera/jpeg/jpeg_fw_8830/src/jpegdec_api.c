@@ -220,7 +220,8 @@ LOCAL JPEG_RET_E JPEGDEC_start_decode(JPEGDEC_PARAMS_T *jpegdec_params)
 	SCI_TRACE_LOW("enter [JPEG_HWDecStart]   ");
 	/*if(jpegdec_params->height > SLICE_HEIGHT){*/
 	if(jpegdec_params->set_slice_height != 0){
-		ret_value = JPEG_HWDecStart(slice_height,  &jpeg_dec_out_param);
+	//	ret_value = JPEG_HWDecStart(slice_height,  &jpeg_dec_out_param);
+	ret_value = JPEG_HWDecStart( jpegdec_params->height,  &jpeg_dec_out_param);
 	}
 	else{
 		ret_value = JPEG_HWDecStart(jpegdec_params->height,&jpeg_dec_out_param);

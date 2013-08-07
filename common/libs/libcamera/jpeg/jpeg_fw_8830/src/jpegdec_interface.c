@@ -366,7 +366,7 @@ PUBLIC JPEG_RET_E JPEG_HWDecStartMCUSynchro(uint32 num_of_rows, JPEG_DEC_OUTPUT_
 #endif
 
 	//polling bsm status
-	JPG_READ_REG_POLL(JPG_BSM_REG_BASE+BSM_STS0_OFFSET, ((uint32)1<<31), ((uint32)1<<31), TIME_OUT_CLK, "BSM_DEBUG: polling bsm status");
+	JPG_READ_REG_POLL(JPG_BSM_REG_BASE+BSM_STS0_OFFSET, ((uint32)1<<31), ((uint32)0<<31), TIME_OUT_CLK, "BSM_DEBUG: polling bsm status");
 	
 	//JPEG_PRINT("[JPEG_HWDecStartMCUSynchro] slice_mcu_num =d, remained_mcu_num =d", slice_mcu_num, remained_mcu_num);
 

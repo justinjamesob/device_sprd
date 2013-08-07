@@ -269,7 +269,9 @@ PUBLIC JPEG_RET_E START_HW_DECODE(JPEG_CODEC_T *jpeg_fw_codec, uint32 num_of_row
 	}
 	
 	//VSP_CFG1
-	cmd =(((!jpeg_fw_codec->uv_interleaved)<<27)) |(jpeg_fw_codec->input_mcu_info<<24) | ((global_mcu_num_y & 0x3ff) << 12) | (jpeg_fw_codec->mcu_num_x & 0x3ff);
+	jpeg_fw_codec->uv_interleaved = 1;
+	cmd = JPG_READ_REG(JPG_GLB_REG_BASE+MB_CFG_OFFSET,"MB_CFG_OFFSET");
+	cmd |=(((!jpeg_fw_codec->uv_interleaved)<<27)) |(jpeg_fw_codec->input_mcu_info<<24) | ((global_mcu_num_y & 0x3ff) << 12) | (jpeg_fw_codec->mcu_num_x & 0x3ff);
 	JPG_WRITE_REG(JPG_GLB_REG_BASE+MB_CFG_OFFSET, cmd, "MB_CFG: input mcu info, slice mcu number x and y");	
 
 	//BSM Module cfg
@@ -286,8 +288,9 @@ if((SWITCH_MODE == jpeg_fw_codec->work_mode) || (jpeg_fw_codec->is_first_slice &
 #endif
 
 	//polling bsm status
-	JPG_READ_REG_POLL(JPG_BSM_REG_BASE+BSM_STS0_OFFSET, V_BIT_31, 0, TIME_OUT_CLK, "BSM_DEBUG: polling bsm status");
-
+	ret = JPG_READ_REG_POLL(JPG_BSM_REG_BASE+BSM_STS0_OFFSET, V_BIT_31, V_BIT_31, TIME_OUT_CLK, "BSM_DEBUG: polling bsm status");
+    cmd = JPG_READ_REG(JPG_BSM_REG_BASE+BSM_STS0_OFFSET,"MB_CFG_OFFSET");
+    SCI_TRACE_LOW("%s,%d BSM_STS0_OFFSET %x ret %d",__FUNCTION__,__LINE__,cmd,ret);
 #if _CMODEL_ && !defined(_LIB) //for rtl simulation.
 	bytes_need_flush = head_byte_len%4; 
 #endif
@@ -318,9 +321,9 @@ if((SWITCH_MODE == jpeg_fw_codec->work_mode) || (jpeg_fw_codec->is_first_slice &
 
 #if 1
 {
-	uint32 i;
-
-	for ( i = 0; i < head_byte_len; i++)
+	int32 i;
+       int32 unalign_bytes = head_byte_len&0x03;SCI_TRACE_LOW("unalign_bytes %d",unalign_bytes);
+	for ( i = 0; i < unalign_bytes; i++)
 	{
 		JPG_READ_REG_POLL (JPG_BSM_REG_BASE+BSM_STS0_OFFSET, V_BIT_3, V_BIT_3, TIME_OUT_CLK,  "polling bsm fifo depth >= 8 words for PVOP MB header");
 		JPG_WRITE_REG(JPG_BSM_REG_BASE+BSM_CFG2_OFFSET, (8 << 24) | (1<<0), "BSM_CFG2: configure flush n bits");
@@ -341,7 +344,7 @@ if((SWITCH_MODE == jpeg_fw_codec->work_mode) || (jpeg_fw_codec->is_first_slice &
 	//MBIO
 	cmd = ((jpeg_fw_codec->mbio_bfr1_valid<<1)|(jpeg_fw_codec->mbio_bfr0_valid));
 	JPG_WRITE_REG(JPG_MBIO_REG_BASE+BUF_STS_OFFSET, cmd, "BUF_STS_OFFSET: set which mbio buffer is valid now.");
-	JPG_WRITE_REG(JPG_MBIO_REG_BASE+MCU_NUM_OFFSET, total_slice_mcu_num & 0xffff, "MCU_NUM_OFFSET: configure the total mcu number");
+	JPG_WRITE_REG(JPG_MBIO_REG_BASE+MCU_NUM_OFFSET, total_slice_mcu_num & 0xfffff, "MCU_NUM_OFFSET: configure the total mcu number");
 	JPG_WRITE_REG(JPG_MBIO_REG_BASE+CTRL_OFFSET, 1, "CTRL_OFFSET: SW configuration is completed, start!");
 
 

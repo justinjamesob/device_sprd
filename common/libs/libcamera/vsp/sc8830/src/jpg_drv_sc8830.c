@@ -132,7 +132,7 @@ PUBLIC void close_jpg_iram (void)
 	cmd = (cmd & ~0x4) ;
 	JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, cmd, "DCAM_CFG: allow hardware to access the vsp buffer");
 	
-	JPG_READ_REG_POLL (JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, 0, 0, TIME_OUT_CLK, "DCAM_CFG: polling dcam clock status");
+	JPG_READ_REG_POLL (JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, 1,1, TIME_OUT_CLK, "DCAM_CFG: polling dcam clock status");
 }
 
 /**

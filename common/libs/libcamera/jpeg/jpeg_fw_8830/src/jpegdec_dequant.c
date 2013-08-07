@@ -109,6 +109,7 @@ PUBLIC JPEG_RET_E JPEGFW_AdjustQuantTbl_Dec()
 
 		if(time_out_flag != 0)
 		{
+			SCI_TRACE_LOW("time_out_flag %s,%d",__FUNCTION__,__LINE__);
 			return JPEG_FAILED;
 		}
 
@@ -141,10 +142,12 @@ PUBLIC JPEG_RET_E JPEGFW_AdjustQuantTbl_Dec()
         	cmd = JPG_READ_REG(JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, "DCAM_CFG: allow hardware to access the vsp buffer");
 	        cmd = (cmd & ~0x4) ;
 	        JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, cmd, "DCAM_CFG: allow hardware to access the vsp buffer");
-	        time_out_flag = JPG_READ_REG_POLL (JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, 0, 0, TIME_OUT_CLK, "DCAM_CFG: polling dcam clock status");
+	        time_out_flag = JPG_READ_REG_POLL (JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, 1, 1, TIME_OUT_CLK, "DCAM_CFG: polling dcam clock status");
 
 		if(time_out_flag != 0)
 		{
+			time_out_flag = JPG_READ_REG (JPG_GLB_REG_BASE+GLB_CTRL_OFFSET, "DCAM_CFG: allow hardware to access the vsp buffer");
+			SCI_TRACE_LOW("time_out_flag %s,%d %x",__FUNCTION__,__LINE__,time_out_flag);
 			return JPEG_FAILED;
 		}
 	}else

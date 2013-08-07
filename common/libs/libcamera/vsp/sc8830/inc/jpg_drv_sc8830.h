@@ -148,7 +148,11 @@ PUBLIC __inline int32 jpg_read_reg_poll(uint32 reg_addr, uint32 msk,uint32 exp_v
 	return 0;
 }
 
-#define JPG_WRITE_REG(reg_addr, value, pstring) jpg_write_register(reg_addr, value)
+#define JPG_WRITE_REG(reg_addr, value, pstring) do{jpg_write_register(reg_addr, value);\
+	if(value !=jpg_read_register(reg_addr))SCI_TRACE_LOW("err %s,%d %x",__FUNCTION__,__LINE__,jpg_read_register(reg_addr));\
+	else {\
+		}\
+		}while(0)
 #define JPG_READ_REG(reg_addr, pstring)		jpg_read_register(reg_addr)
 #define JPG_READ_REG_POLL(reg_addr, msk, exp_value, time, pstring) jpg_read_reg_poll(reg_addr, msk, exp_value, time)
 

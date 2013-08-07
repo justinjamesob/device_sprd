@@ -95,7 +95,7 @@ PUBLIC void JpegDec_HwTopRegCfg(void)
 
         cmd = (jpeg_fw_codec->c_width & 0x1fff);
         JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_PITCH_OFFSET, cmd, "configure jpeg pitch, pixel unit");
-
+        cmd =  (1<<3)| (1<<2)|(1<<0);
         //Clear INT
         JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_INT_CLR_OFFSET, cmd, "GLB_INT_CLR_OFFSET: clear related INT bit");
 
@@ -172,6 +172,11 @@ PUBLIC void JpegDec_HwTopRegCfg(void)
 	//decoded bitstream addr0 and addr1
 	JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_FRM_ADDR4_OFFSET, (uint32)(jpeg_fw_codec->stream_0), "Decoded bit stream buffer0 ");
 	JPG_WRITE_REG(JPG_GLB_REG_BASE+GLB_FRM_ADDR5_OFFSET, (uint32)(jpeg_fw_codec->stream_1), "Decoded bit stream buffer1 ");//modified by leon @2012.09.27
+
+	JPEG_TRACE("jpeg_fw_codec->YUV_Info_0.y_data_ptr 0x%x YUV_Info_0.u_data_ptr 0x%x",
+		jpeg_fw_codec->YUV_Info_0.y_data_ptr,
+		jpeg_fw_codec->YUV_Info_0.u_data_ptr);
+	JPEG_TRACE("jpeg_fw_codec->stream_0 0x%x ",jpeg_fw_codec->stream_0);
 #endif//_CMODEL_
 
 //	close_vsp_iram();
@@ -187,9 +192,9 @@ PUBLIC void JpegDec_HwTopRegCfg(void)
 //	VSP_WRITE_REG(VSP_DCAM_REG_BASE+DCAM_VSP_TIME_OUT_OFF, cmd, "DCAM_VSP_TIME_OUT: disable hardware timer out");
 
 //set the interval of mcu decoding
-	cmd = (jpeg_fw_codec->YUV_Info_0.v_data_ptr == NULL)?1:0;//1    //1: uv_interleaved, two plane, 0: three plane
-	cmd = (cmd<<8)|0xff;
-	JPG_WRITE_REG(JPG_GLB_REG_BASE+BUS_GAP_OFFSET, cmd, "configure AHB register: BURST_GAP, and frame_mode");
+//	cmd = (jpeg_fw_codec->YUV_Info_0.v_data_ptr == NULL)?1:0;//1    //1: uv_interleaved, two plane, 0: three plane
+//	cmd = (cmd<<8)|0xff;
+//	JPG_WRITE_REG(JPG_GLB_REG_BASE+BUS_GAP_OFFSET, cmd, "configure AHB register: BURST_GAP, and frame_mode");
         JPG_WRITE_REG(JPG_GLB_REG_BASE+BUS_GAP_OFFSET, 0, "BUS_GAP: 0");
 
 	return;
@@ -212,7 +217,8 @@ PUBLIC void JpegDec_HwSubModuleCfg(uint32 header_length)
 
 	///1. enable de-stuffing
 	///2. reconfigure current address of source bit stream buffer0, word align(the unit is word)
-	JPG_WRITE_REG(JPG_BSM_REG_BASE+BSM_CFG1_OFFSET, (uint32)1<<31, "BSM_CFG1: bitstream offset address"); /*lint !e569*/
+	cmd = header_length>>2;
+	JPG_WRITE_REG(JPG_BSM_REG_BASE+BSM_CFG1_OFFSET, ((uint32)1<<31)|cmd, "BSM_CFG1: bitstream offset address"); /*lint !e569*/
 	cmd = ((jpeg_fw_codec->pingpang_buf_len+3) >> 2);
 	JPG_WRITE_REG(JPG_BSM_REG_BASE+BSM_CFG0_OFFSET, cmd, "BSM_CFG0: buffer0 for read, and the buffer size");
 
@@ -220,7 +226,7 @@ PUBLIC void JpegDec_HwSubModuleCfg(uint32 header_length)
 	head_byte_len = header_length;
 #endif
 	//VLD Module cfg
-	cmd = ((jpeg_fw_codec->mcu_num_y * jpeg_fw_codec->mcu_num_x)  & 0x3ffff );
+	cmd = ((jpeg_fw_codec->mcu_num_y * jpeg_fw_codec->mcu_num_x)  & 0xfffff );
 	JPG_WRITE_REG(JPG_VLD_REG_BASE+JPEG_TOTAL_MCU_OFFSET, cmd, "VLD_TOTAL_MCU: total mcu number.");
 
 	//DCT Module cfg
