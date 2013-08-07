@@ -24,7 +24,6 @@ extern "C"
 #include "cmr_common.h"
 
 #define JPEG_EXIF_SIZE	(64*1024)
-#define CMR_ISP_YUV422  0
 
 typedef int (*alloc_mem_ptr)(void* handle, unsigned int size, unsigned int *addr_phy, unsigned int *addr_vir);
 typedef int (*free_mem_ptr)(void* handle);
