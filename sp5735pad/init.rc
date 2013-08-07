@@ -330,7 +330,7 @@ on charger
     class_start charger
 
 on alarm
-    insmod /system/lib/modules/ft53x6_ts.ko
+    insmod /system/lib/modules/focaltech_ts.ko
     class_start core
     start media
     exec /bin/poweroff_alarm

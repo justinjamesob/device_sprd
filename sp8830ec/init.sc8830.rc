@@ -53,7 +53,7 @@ on boot
     chown system root /proc/cpt/modem
     chown system root /proc/cpt/dsp
 
-    insmod /system/lib/modules/ft53x6_ts.ko
+    insmod /system/lib/modules/focaltech_ts.ko
 
     chmod 666 /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto

@@ -54,7 +54,7 @@ on boot
     chown system root /proc/cpt/modem
     chown system root /proc/cpt/dsp
 
-    insmod /system/lib/modules/ft53x6_ts.ko
+    insmod /system/lib/modules/focaltech_ts.ko
     insmod /system/lib/modules/inv-mpu-iio.ko
     insmod /system/lib/modules/bcmdhd.ko
 
