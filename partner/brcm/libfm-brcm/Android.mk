@@ -66,8 +66,9 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
 	  FmDaemon.cpp
 
-LOCAL_CFLAGS:= \
-	 -DFM_UDP_SERVER
+ifneq ($(TARGET_BUILD_VARIANT),user)
+LOCAL_CFLAGS:=    -DFM_UDP_SERVER
+endif
 
 LOCAL_C_INCLUDES:=\
         $(call include-path-for, bluedroid ) \
