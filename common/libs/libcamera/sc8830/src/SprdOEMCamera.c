@@ -68,6 +68,57 @@ struct camera_context        *g_cxt = &cmr_cxt;
 #define IS_NON_ZSL_MODE(x)   ((CAMERA_ZSL_MODE != x) && (CAMERA_ZSL_CONTINUE_SHOT_MODE != x))
 #define IS_NO_MALLOC_MEM   ((CAMERA_HDR_MODE == g_cxt->cap_mode) && ((1 == g_cxt->cap_cnt)||(2 == g_cxt->cap_cnt)))
 
+
+//camera_takepic_step timestamp
+enum CAMERA_TAKEPIC_STEP {
+		CMR_STEP_TAKE_PIC = 0,
+		CMR_STEP_CAP_S,
+		CMR_STEP_CAP_E,
+		CMR_STEP_ISP_PP_S,
+		CMR_STEP_ISP_PP_E,
+		CMR_STEP_JPG_DEC_S,
+		CMR_STEP_JPG_DEC_E,
+		CMR_STEP_SC_S,
+		CMR_STEP_SC_E,
+		CMR_STEP_JPG_ENC_S,
+		CMR_STEP_JPG_ENC_E,
+		CMR_STEP_THUM_ENC_S,
+		CMR_STEP_THUM_ENC_E,
+		CMR_STEP_WR_EXIF_S,
+		CMR_STEP_WR_EXIF_E,
+		CMR_STEP_CALL_BACK,
+		CMR_STEP_MAX
+};
+
+struct CAMERA_TAKEPIC_STAT {
+		char              step_name[20];
+		nsecs_t          timestamp;
+		uint32_t         valid;
+};
+struct CAMERA_TAKEPIC_STAT cap_stp[CMR_STEP_MAX] ={
+		{"takepicture",           0, 0},
+		{"capture start",        0, 0},
+		{"capture end",          0, 0},
+		{"isp pp start",           0, 0},
+		{"isp pp end",             0, 0},
+		{"jpeg dec start",        0, 0},
+		{"jpeg dec end",         0, 0},
+		{"scaling start",          0, 0},
+		{"scaling end",           0,  0},
+		{"jpeg enc start",       0,  0},
+		{"jpeg enc end",         0,  0},
+		{"thumb enc start",     0,  0},
+		{"thumb enc end",       0,  0},
+		{"write exif start",       0,  0},
+		{"write exif end",         0,  0},
+		{"call back",               0,  0},
+};
+
+#define TAKE_PICTURE_STEP(a)  do {                                                  \
+		cap_stp[a].timestamp = systemTime(CLOCK_MONOTONIC); \
+		cap_stp[a].valid = 1;                                                 \
+	} while (0)
+
 static void camera_sensor_evt_cb(int evt, void* data);
 static int  camera_isp_evt_cb(int evt, void* data);
 static void camera_jpeg_evt_cb(int evt, void* data);
@@ -158,6 +209,7 @@ static int camera_cb_thread_init(void);
 static int camera_cb_thread_deinit(void);
 static void *camera_cb_thread_proc(void *data);
 static void camera_callback_handle(camera_cb_type cb, camera_func_type func, int32_t cb_param);
+static void camera_capture_step_statisic(void);
 
 camera_ret_code_type camera_encode_picture(camera_frame_type *frame,
 					camera_handle_type *handle,
@@ -2394,6 +2446,7 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 	CMR_MSG_INIT(message);
 	int                      ret = CAMERA_SUCCESS;
 
+	TAKE_PICTURE_STEP(CMR_STEP_TAKE_PIC);
 	CMR_LOGI("start");
 	if (IS_ZSL_MODE(cap_mode)) {
 		camera_snapshot_start_set();
@@ -3498,7 +3551,9 @@ int camera_jpeg_encode_handle(JPEG_ENC_CB_PARAM_T *data)
 		CMR_PRINT_TIME;
 		TAKE_PIC_CANCEL;
 		if (1 == g_cxt->thum_ready) {
+			TAKE_PICTURE_STEP(CMR_STEP_THUM_ENC_S);
 			ret = camera_jpeg_encode_thumb(&thumb_size);
+			TAKE_PICTURE_STEP(CMR_STEP_THUM_ENC_E);
 			if (ret) {
 				CMR_LOGE("Failed to enc thumbnail, %d", ret);
 				thumb_size = 0;
@@ -5227,6 +5282,7 @@ int camera_v4l2_capture_handle(struct frm_info *data)
 #endif
 
 	CMR_LOGV("Call done");
+	TAKE_PICTURE_STEP(CMR_STEP_CAP_E);
 
 	if ((IS_ZSL_MODE(g_cxt->cap_mode)) &&
 		(TAKE_PICTURE_NEEDED == camera_get_take_picture())) {
@@ -5431,6 +5487,9 @@ int camera_jpeg_encode_done(uint32_t thumb_stream_size)
 
 	CMR_LOGV("index %d, bitstream size %d", g_cxt->jpeg_cxt.index, jpg_frm->addr_vir.addr_u);
 	/*camera_set_position(NULL,0,0);*/
+	TAKE_PICTURE_STEP(CMR_STEP_JPG_ENC_E);
+	TAKE_PICTURE_STEP(CMR_STEP_WR_EXIF_S);
+
 	exif_ptr = camera_get_exif(g_cxt);
 	bzero(&encoder_param, sizeof(JPEGENC_CBrtnType));
 	encoder_param.header_size = 0;
@@ -5455,6 +5514,7 @@ int camera_jpeg_encode_done(uint32_t thumb_stream_size)
 	}
 
 	ret = jpeg_enc_add_eixf(&wexif_param,&wexif_output);
+	TAKE_PICTURE_STEP(CMR_STEP_WR_EXIF_E);
 	g_cxt->jpeg_cxt.jpeg_state = JPEG_IDLE;
 	TAKE_PIC_CANCEL;
 	if (0 == ret) {
@@ -5469,6 +5529,10 @@ int camera_jpeg_encode_done(uint32_t thumb_stream_size)
 
 		encoder_type.buffer = (uint8_t *)wexif_output.output_buf_virt_addr;
 		encoder_param.size  = wexif_output.output_buf_size;
+
+		TAKE_PICTURE_STEP(CMR_STEP_CALL_BACK);
+		camera_capture_step_statisic();
+
 		camera_call_cb(CAMERA_EXIT_CB_DONE,
 				camera_get_client_data(),
 				CAMERA_FUNC_ENCODE_PICTURE,
@@ -5498,6 +5562,8 @@ int camera_start_jpeg_encode(struct frm_info *data)
 	struct jpeg_enc_out_param    out_parm;
 
 	TAKE_PIC_CANCEL;
+
+	TAKE_PICTURE_STEP(CMR_STEP_JPG_ENC_S);
 
 	if (NULL == data || JPEG_ENCODE == g_cxt->jpeg_cxt.jpeg_state) {
 		CMR_LOGV("wrong parameter 0x%x or status %d",
@@ -5608,6 +5674,7 @@ int camera_start_scale(struct frm_info *data)
 	struct scaler_context    *cxt = &g_cxt->scaler_cxt;
 
 	TAKE_PIC_CANCEL;
+	TAKE_PICTURE_STEP(CMR_STEP_SC_S);
 
 	data->channel_id = CHN_2;
 	frm_id = data->frame_id - CAMERA_CAP0_ID_BASE;
@@ -5742,7 +5809,7 @@ int camera_scale_done(struct frm_info *data)
 	camera_save_to_file(0, IMG_DATA_TYPE_YUV420, g_cxt->capture_size.width, g_cxt->capture_size.height,
 		&g_cxt->cap_mem[frm_id].target_yuv.addr_vir);
 #endif
-
+	TAKE_PICTURE_STEP(CMR_STEP_SC_E);
 	CMR_PRINT_TIME;
 	if (ret) {
 		CMR_LOGV("Failed to deinit scaler, %d", ret);
@@ -6629,4 +6696,28 @@ exit:
 int camera_get_is_nonzsl(void)
 {
 	return IS_NON_ZSL_MODE(g_cxt->cap_mode);
+}
+
+void camera_capture_step_statisic(void)
+{
+	int i = 0, time_delta = 0;
+
+	ALOGE("*********************Take picture statistic*******Start******************");
+
+	for (i = 0; i < CMR_STEP_MAX; i++) {
+		if (i == 0) {
+			ALOGE("%20s, %10d",
+				cap_stp[i].step_name,
+				0);
+			continue;
+		}
+
+		if (1 == cap_stp[i].valid) {
+			time_delta = (int)((cap_stp[i].timestamp - cap_stp[CMR_STEP_TAKE_PIC].timestamp)/1000000);
+			ALOGE("%20s, %10d",
+				cap_stp[i].step_name,
+				time_delta);
+		}
+	}
+	ALOGE("*********************Take picture statistic********End*******************");
 }
