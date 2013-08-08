@@ -473,6 +473,13 @@ int i2s_pin_mux_sel(struct tiny_audio_device *adev, int type)
         return 0;
     }
 
+    if(modem->i2s_bt.fd < 0) {
+	modem->i2s_bt.fd = open(modem->i2s_bt.ctl_path,O_RDWR | O_SYNC);
+    }
+
+    if(modem->i2s_extspk.fd < 0) {
+	modem->i2s_extspk.fd = open(modem->i2s_extspk.ctl_path,O_RDWR | O_SYNC);
+    }
     ALOGW("i2s_pin_mux_sel in bt fd is %d, extspk fd is %d,type is %d,str is %s",modem->i2s_bt.fd,modem->i2s_extspk.fd,type,ctl_str);
 
     if(type != 2) {
