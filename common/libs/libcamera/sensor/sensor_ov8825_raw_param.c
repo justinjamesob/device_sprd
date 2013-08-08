@@ -1829,7 +1829,11 @@ static struct sensor_raw_fix_info s_ov8825_fix_info={
 			},
 		},
 	},
-}
+},
+{
+	PNULL,
+	0,
+},
 };
 
 static struct sensor_version_info s_ov8825_version_info={

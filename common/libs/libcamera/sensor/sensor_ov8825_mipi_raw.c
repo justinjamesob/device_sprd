@@ -51,8 +51,8 @@ LOCAL int _ov8825_get_shutter(void);
 LOCAL uint32_t _ov8825_com_Identify_otp(void* param_ptr);
 
 LOCAL const struct raw_param_info_tab s_ov8825_raw_param_tab[]={
-	{OV8825_RAW_PARAM_COM, &s_ov8825_mipi_raw_info, _ov8825_com_Identify_otp, NULL},
-	{RAW_INFO_END_ID, NULL, NULL}
+	{OV8825_RAW_PARAM_COM, &s_ov8825_mipi_raw_info, _ov8825_com_Identify_otp, PNULL},
+	{RAW_INFO_END_ID, PNULL, PNULL, PNULL}
 };
 
 struct sensor_raw_info* s_ov8825_mipi_raw_info_ptr=NULL;
@@ -1185,17 +1185,17 @@ LOCAL SENSOR_REG_TAB_INFO_T s_ov8825_resolution_Tab_RAW[] = {
 };
 
 LOCAL SENSOR_TRIM_T s_ov8825_Resolution_Trim_Tab[] = {
-	{0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
 
 	{0, 0, 1920, 1080, 178, 90, 1868},
 	{0, 0, 3264, 2448, 168, 82, 2480},
 
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0}
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0}
 };
 #ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 
@@ -1357,6 +1357,7 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov8825_ioctl_func_tab = {
 	PNULL, //get_status
 	_ov8825_StreamOn,
 	_ov8825_StreamOff,
+	PNULL,
 };
 
 
@@ -1622,7 +1623,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->ae.target_zone=8;
 	sensor_ptr->ae.quick_mode=1;
 	sensor_ptr->ae.smart=0;
-	sensor_ptr->ae.smart_rotio=256;
+	sensor_ptr->ae.smart_rotio=255;
 	sensor_ptr->ae.ev[0]=0xd0;
 	sensor_ptr->ae.ev[1]=0xe0;
 	sensor_ptr->ae.ev[2]=0xf0;
@@ -2103,7 +2104,7 @@ LOCAL uint32_t _ov8825_PowerOn(uint32_t power_on)
 LOCAL uint32_t _ov8825_cfg_otp(uint32_t  param)
 {
 	uint32_t rtn=SENSOR_SUCCESS;
-	struct raw_param_info_tab* tab_ptr=s_ov8825_raw_param_tab;
+	struct raw_param_info_tab* tab_ptr = (struct raw_param_info_tab*)s_ov8825_raw_param_tab;
 	uint32_t module_id=g_module_id;
 
 	SENSOR_PRINT("SENSOR_OV8825: _ov8825_cfg_otp");
@@ -2135,7 +2136,7 @@ LOCAL uint32_t _ov8825_com_Identify_otp(void* param_ptr)
 LOCAL uint32_t _ov8825_GetRawInof(void)
 {
 	uint32_t rtn=SENSOR_SUCCESS;
-	struct raw_param_info_tab* tab_ptr=s_ov8825_raw_param_tab;
+	struct raw_param_info_tab* tab_ptr = (struct raw_param_info_tab*)s_ov8825_raw_param_tab;
 	uint32_t param_id;
 	uint32_t i=0x00;
 
@@ -2219,7 +2220,7 @@ LOCAL uint32_t _ov8825_write_exposure(uint32_t param)
 	uint16_t size_index=0x00;
 	uint16_t frame_len=0x00;
 	uint16_t frame_len_cur=0x00;
-	uint32_t max_frame_len=0x00;
+	uint16_t max_frame_len=0x00;
 	uint16_t value=0x00;
 	uint16_t value0=0x00;
 	uint16_t value1=0x00;

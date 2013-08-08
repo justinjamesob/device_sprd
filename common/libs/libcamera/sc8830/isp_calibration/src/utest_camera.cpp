@@ -1137,7 +1137,8 @@ int main(int argc, char **argv)
 					UTEST_PREVIEW_WIDTH,/*cmr_cxt_ptr->capture_width,*/
 					UTEST_PREVIEW_HEIGHT,/*cmr_cxt_ptr->capture_height,*/
 					NULL,
-					NULL);
+					NULL,
+					0);
 
 	if (utest_dcam_preview()) {
 		rtn = -1;

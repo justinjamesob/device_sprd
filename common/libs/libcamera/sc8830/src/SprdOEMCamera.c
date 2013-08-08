@@ -1611,7 +1611,8 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 					uint16_t display_width,
 					uint16_t display_height,
 					camera_cb_f_type callback,
-					void *client_data)
+					void *client_data,
+					uint32_t can_resize)
 {
 	int                      ret = CAMERA_SUCCESS;
 
@@ -1628,8 +1629,13 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 		g_cxt->display_size.height = display_height;
 		ret = camera_preview_sensor_mode();
 
-		g_cxt->picture_size.width  = CAMERA_ALIGNED_16(picture_width);
-		g_cxt->picture_size.height = CAMERA_ALIGNED_16(picture_height);
+		if (can_resize) {
+			g_cxt->picture_size.width  = CAMERA_ALIGNED_16(picture_width);
+			g_cxt->picture_size.height = CAMERA_ALIGNED_16(picture_height);
+		} else {
+			g_cxt->picture_size.width  = picture_width;
+			g_cxt->picture_size.height = picture_height;
+		}
 		CMR_LOGV("picture after ALIGNED_16 is %d %d",
 			g_cxt->picture_size.width,
 			g_cxt->picture_size.height);
@@ -5340,13 +5346,22 @@ int camera_start_isp_process(struct frm_info *data)
 	ips_in.src_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].cap_raw.addr_phy.addr_y;
 	ips_in.src_frame.img_size.w = g_cxt->cap_mem[frm_id].cap_raw.size.width;
 	ips_in.src_frame.img_size.h = g_cxt->cap_mem[frm_id].cap_raw.size.height;
-	ips_in.dst_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].cap_yuv.addr_phy.addr_y;
-	g_cxt->isp_cxt.cur_dst.addr_y = g_cxt->cap_mem[frm_id].cap_yuv.addr_vir.addr_y;
 	ips_in.dst_frame.img_fmt = ISP_DATA_YVU420_2FRAME;
-	ips_in.dst_frame.img_addr_phy.chn1 = g_cxt->cap_mem[frm_id].cap_yuv.addr_phy.addr_u;
-	g_cxt->isp_cxt.cur_dst.addr_u = g_cxt->cap_mem[frm_id].cap_yuv.addr_vir.addr_u;
-	ips_in.dst_frame.img_size.w = g_cxt->cap_mem[frm_id].cap_yuv.size.width;
-	ips_in.dst_frame.img_size.h = g_cxt->cap_mem[frm_id].cap_yuv.size.height;
+	if (NO_SCALING) {
+		ips_in.dst_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].target_yuv.addr_phy.addr_y;
+		g_cxt->isp_cxt.cur_dst.addr_y = g_cxt->cap_mem[frm_id].target_yuv.addr_vir.addr_y;
+		ips_in.dst_frame.img_addr_phy.chn1 = g_cxt->cap_mem[frm_id].target_yuv.addr_phy.addr_u;
+		g_cxt->isp_cxt.cur_dst.addr_u = g_cxt->cap_mem[frm_id].target_yuv.addr_vir.addr_u;
+		ips_in.dst_frame.img_size.w = g_cxt->cap_mem[frm_id].target_yuv.size.width;
+		ips_in.dst_frame.img_size.h = g_cxt->cap_mem[frm_id].target_yuv.size.height;
+	} else {
+		ips_in.dst_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].cap_yuv.addr_phy.addr_y;
+		g_cxt->isp_cxt.cur_dst.addr_y = g_cxt->cap_mem[frm_id].cap_yuv.addr_vir.addr_y;
+		ips_in.dst_frame.img_addr_phy.chn1 = g_cxt->cap_mem[frm_id].cap_yuv.addr_phy.addr_u;
+		g_cxt->isp_cxt.cur_dst.addr_u = g_cxt->cap_mem[frm_id].cap_yuv.addr_vir.addr_u;
+		ips_in.dst_frame.img_size.w = g_cxt->cap_mem[frm_id].cap_yuv.size.width;
+		ips_in.dst_frame.img_size.h = g_cxt->cap_mem[frm_id].cap_yuv.size.height;
+	}
 	ips_in.src_avail_height = g_cxt->cap_mem[frm_id].cap_raw.size.height;
 
 	ips_in.src_slice_height = ips_in.src_avail_height;
@@ -5373,7 +5388,7 @@ int camera_start_isp_process(struct frm_info *data)
 	if (0 == ret) {
 		CMR_LOGV("ISP post-process started");
 		g_cxt->isp_cxt.isp_state = ISP_POST_PROCESS;
-		g_cxt->isp_cxt.proc_status.slice_height_in = CMR_SLICE_HEIGHT;
+		g_cxt->isp_cxt.proc_status.slice_height_in = ips_in.dst_slice_height;
 		g_cxt->isp_cxt.proc_status.slice_height_out = 0;
 		g_cxt->isp_cxt.is_first_slice = 1;
 		memcpy((void*)&g_cxt->isp_cxt.proc_status.frame_info,
