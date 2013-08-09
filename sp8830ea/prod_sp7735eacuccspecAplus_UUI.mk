@@ -72,7 +72,7 @@ PRODUCT_PACKAGES := \
 
 # prebuild files
 PRODUCT_PACKAGES += \
-	moffice_5.3.3_1033_cn00353_multidex_135897.apk \
+	wps.apk \
 	weibopro_10035_0001_0.9.0noshortcut_Android-0506.apk \
 	SogouInput_31143_android_oem_zhanxun_20130509.apk \
 	SohuNewsClient_v3.3_factory_zhanxun_6230.apk \
