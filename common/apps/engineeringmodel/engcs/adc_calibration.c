@@ -12,6 +12,11 @@
 
 #define CONFIG_AP_ADC_CALIBRATION
 #ifdef CONFIG_AP_ADC_CALIBRATION
+
+#define PRECISION_1MV       (1<<24)
+#define PRECISION_10MV      (0)
+#define MAX_VOLTAGE         (0xFFFFFF)
+
 static	int	vbus_charger_disconnect = 0;
 void	disconnect_vbus_charger(void)
 {
@@ -349,8 +354,16 @@ static unsigned int ap_get_voltage(MSG_AP_ADC_CNF *pMsgADC)
         voltage >>= 4;
 
 	para = (int *)(Msg +1);
-        *para = (voltage/10);
-	pMsgADC->msg_head.len = 12;
+//        *para = (voltage/10);
+        if (voltage > MAX_VOLTAGE)
+        {
+            *para = (PRECISION_10MV | ((voltage/10) & MAX_VOLTAGE));
+        }
+        else
+        {
+            *para = (PRECISION_1MV | (voltage & MAX_VOLTAGE));
+        }
+        pMsgADC->msg_head.len = 12;
 
         return voltage;
 }
