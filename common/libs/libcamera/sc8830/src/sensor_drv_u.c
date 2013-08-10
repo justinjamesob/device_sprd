@@ -2675,6 +2675,32 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 	case SENSOR_EXIF_CTRL_APERTUREVALUE:
 		break;
 	case SENSOR_EXIF_CTRL_BRIGHTNESSVALUE:
+		{
+			sensor_exif_info_ptr->valid.BrightnessValue = 1;
+			switch (param) {
+			case 0:
+			case 1:
+			case 2:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 1;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 1;
+				break;
+			case 3:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 0;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 0;
+				break;
+			case 4:
+			case 5:
+			case 6:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 2;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 2;
+				break;
+			default:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 0xff;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 0xff;
+				break;
+			}
+			break;
+		}
 		break;
 	case SENSOR_EXIF_CTRL_EXPOSUREBIASVALUE:
 		break;
