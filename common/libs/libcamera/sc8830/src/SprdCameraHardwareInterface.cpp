@@ -958,9 +958,9 @@ bool SprdCameraHardware::setCameraDimensions()
 	}
 
 	if (0 != camera_set_dimensions(mRawWidth, mRawHeight, mPreviewWidth,
- 								mPreviewHeight, NULL, NULL)) {
- 		return false;
- 	}
+								mPreviewHeight, NULL, NULL, mCaptureMode != CAMERA_RAW_MODE)) {
+		return false;
+	}
 
 	return true;
 }
@@ -1709,7 +1709,8 @@ bool SprdCameraHardware::initCapture(bool initJpegHeap)
                          mPreviewWidth,
                          mPreviewHeight,
                          NULL,
-                         NULL);
+                         NULL,
+                         mCaptureMode != CAMERA_RAW_MODE);
 
 	if (camera_capture_max_img_size(&local_width, &local_height))
 		return false;

@@ -459,7 +459,7 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain *= prc_00;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
 		rtn_param_ptr->chn_00[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_01.max_stat << shf_bit) / (in_param_ptr->chn_01.stat_ptr[x]+1);
@@ -467,7 +467,7 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain *= prc_01;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
 		rtn_param_ptr->chn_01[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_10.max_stat << shf_bit) / (in_param_ptr->chn_10.stat_ptr[x]+1);
@@ -475,7 +475,7 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain *= prc_10;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
 		rtn_param_ptr->chn_10[x] = tmp_val;
 
 		map_gain = (in_param_ptr->chn_11.max_stat << shf_bit) / (in_param_ptr->chn_11.stat_ptr[x]+1);
@@ -483,7 +483,7 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain *= prc_11;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
 		rtn_param_ptr->chn_11[x] = tmp_val;
 	}
 

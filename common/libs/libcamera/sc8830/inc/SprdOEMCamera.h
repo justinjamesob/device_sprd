@@ -411,7 +411,8 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 					uint16_t display_width,
 					uint16_t display_height,
 					camera_cb_f_type callback,
-					void *client_data);
+					void *client_data,
+					uint32_t can_resize);
 
 camera_ret_code_type camera_set_encode_properties(camera_encode_properties_type *encode_properties);
 

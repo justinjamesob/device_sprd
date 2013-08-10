@@ -214,22 +214,8 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/sensor_cfg.c \
 	sc8830/src/sensor_drv_u.c \
 	sc8830/src/cmr_arith.c \
-	sensor/sensor_ov5640_raw.c  \
-	sensor/sensor_ov5640.c  \
-	sensor/sensor_ov2640.c  \
-	sensor/sensor_ov2655.c  \
-	sensor/sensor_ov7675.c  \
-	sensor/sensor_gc0309.c  \
-	sensor/sensor_s5k5ccgx.c \
-	sensor/sensor_s5k4e1ga_mipi_raw.c \
-	sensor/sensor_s5k5ccgx_mipi.c \
-	sensor/sensor_ov5640_mipi.c  \
-	sensor/sensor_ov5640_mipi_raw.c \
-	sensor/sensor_ov5647_mipi_raw.c \
-	sensor/sensor_ov5648_mipi_raw.c \
 	sensor/sensor_ov8825_mipi_raw.c \
-	sensor/sensor_ov8830_mipi_raw.c \
-	sensor/sensor_hi351_mipi.c \
+	sensor/sensor_ov5640_mipi.c \
 	sensor/sensor_gc2035.c \
 	vsp/sc8830/src/jpg_drv_sc8830.c \
 	jpeg/jpeg_fw_8830/src/jpegcodec_bufmgr.c \
