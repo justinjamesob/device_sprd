@@ -188,6 +188,9 @@ static int  ReadParas_SwitchCtrl(int fd_pipe,  switch_ctrl_t *paras_ptr);
 static int  ReadParas_Mute(int fd_pipe,  set_mute_t *paras_ptr);
 
 void *vbc_ctrl_thread_routine(void *args);
+void *vbc_ctrl_voip_thread_routine(void *arg);
+
+extern int i2s_pin_mux_sel(struct tiny_audio_device *adev, int type);
 
 extern int i2s_pin_mux_sel(struct tiny_audio_device *adev, int type);
 
@@ -199,6 +202,7 @@ static int  ReadParas_Head(int fd_pipe,  parameters_head_t *head_ptr)
     int ret = 0;
     if (fd_pipe > 0 && head_ptr != NULL) {
         ret = read(fd_pipe, head_ptr, sizeof(parameters_head_t));
+        
         if(ret != sizeof(parameters_head_t))
             ret = -1;
     }
@@ -1023,6 +1027,237 @@ int vbc_ctrl_close()
     //pthread_cancel (s_vbc_ctrl_thread);    
     return (0);
 }
+
+int vbc_ctrl_voip_open(struct voip_res *res)
+{
+    int rc;
+
+    if(!res) {
+        return -1;
+    }
+   if(!res->enable){
+        ALOGD("voip is not enable");
+    }
+
+    rc = pthread_create((pthread_t *)&(res->thread_id), NULL,
+            vbc_ctrl_voip_thread_routine, (void *)res);
+    if (rc) {
+        ALOGE("error,voip pthread_create failed, rc=%d", rc);
+        return -1;
+    }
+
+    return 0;
+} 
+
+
+void *vbc_ctrl_voip_thread_routine(void *arg)
+{
+    int ret = 0;
+    vbc_ctrl_thread_para_t     para_res = {0};
+   vbc_ctrl_thread_para_t	*para = &para_res;
+    struct voip_res * res = (struct voip_res *)arg;
+   struct tiny_audio_device *adev;
+    parameters_head_t read_common_head;
+   parameters_head_t write_common_head;
+
+    pthread_attr_t attr;
+    struct sched_param m_param;
+    int newprio=39;
+    
+    pthread_attr_init(&attr);
+    pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
+    pthread_attr_setschedpolicy(&attr,SCHED_FIFO);
+    pthread_attr_getschedparam(&attr,&m_param);
+    m_param.sched_priority=newprio;
+    pthread_attr_setschedparam(&attr,&m_param);
+
+    para->cp_type = res->cp_type;
+    para->vbchannel_id = res->channel_id;
+    para->adev = res->adev;
+    para->vbpipe_fd = -1;
+
+    memcpy(para->vbpipe, res->pipe_name,strlen(res->pipe_name)+1); 
+
+    adev = (struct tiny_audio_device *)(para->adev);
+
+   memset(&read_common_head, 0, sizeof(parameters_head_t));
+    memset(&write_common_head, 0, sizeof(parameters_head_t));
+    
+    memcpy(&write_common_head.tag[0], VBC_CMD_TAG, 3);
+    write_common_head.cmd_type = VBC_CMD_NONE;
+    write_common_head.paras_size = 0;
+    MY_TRACE("voip:vbc_ctrl_thread_routine in pipe_name:%s.", para->vbpipe);
+    
+RESTART:
+    if (para->is_exit) goto VOIP_EXIT;
+    /* open vbpipe to build connection.*/
+    if (para->vbpipe_fd == -1) {
+        para->vbpipe_fd = open(para->vbpipe, O_RDWR);//open("/dev/vbpipe6", O_RDWR);
+        if (para->vbpipe_fd < 0) {
+            MY_TRACE("VBC_CMD_HAL_RESTART release vbc_lock, pipe_name:%s.", para->vbpipe);
+            sleep(1);
+            goto RESTART;
+        } else {
+            ALOGD("voip:vbpipe_name(%s) vbpipe_fd(%d) open successfully.", para->vbpipe, para->vbpipe_fd);
+        }
+    }
+
+    /* loop to read parameters from vbpipe.*/
+    while(!para->is_exit)
+    {
+        ALOGD("voip:%s, looping now...", para->vbpipe);
+        /* read parameters common head of the packet.*/
+        ret = ReadParas_Head(para->vbpipe_fd, &read_common_head);
+        if(ret < 0) {
+            ALOGE("voip:Error, %s read head failed(%s), need to read again ",__func__,strerror(errno));
+           continue;
+        }
+
+		ALOGD("voip: get cmd ok");
+
+       if (memcmp(&read_common_head.tag[0], VBC_CMD_TAG, 3)) {
+            ALOGE("voip:error read_common_head.tag is %d",read_common_head.tag[0]);
+            continue;
+        }
+
+       ALOGD("voip: Get CMD(%d) from cp(pipe:%s, pipe_fd:%d,paras_size:%d devices:0x%x mode:%d",
+            read_common_head.cmd_type, para->vbpipe, para->vbpipe_fd, read_common_head.paras_size,adev->devices,adev->mode);
+
+        pthread_mutex_lock(&adev->vbc_lock);
+
+        switch (read_common_head.cmd_type)
+        {
+            case VBC_CMD_HAL_OPEN:
+            {
+                MY_TRACE("voip:VBC_CMD_HAL_OPEN IN.");
+                
+				SetParas_OpenHal_Incall(adev,para->vbpipe_fd); 
+
+               // SetParas_OpenHal_Incall(para->vbpipe_fd);   //get sim card number
+		adev->cp_type = para->cp_type;
+#if 0
+	        if(adev->devices & (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ALL_SCO)) {
+		    if(adev->cp_type == CP_TG)
+			i2s_pin_mux_sel(adev,1);
+		    else if(adev->cp_type == CP_W)
+			i2s_pin_mux_sel(adev,0);
+		}
+#endif
+                MY_TRACE("voip:VBC_CMD_HAL_OPEN OUT, cur_vbpipe_id:%d, vbpipe_name:%s.", adev->cur_vbpipe_fd, para->vbpipe);
+            }
+            break;
+            case VBC_CMD_HAL_CLOSE:
+            {
+                MY_TRACE("voip:VBC_CMD_HAL_CLOSE IN.");
+               
+                write_common_head.cmd_type = VBC_CMD_RSP_CLOSE;
+                ret = WriteParas_Head(para->vbpipe_fd, &write_common_head);
+                if(ret < 0){
+                    ALOGE("voip:VBC_CMD_HAL_CLOSE: write1 cmd VBC_CMD_RSP_CLOSE ret(%d) error(%s).",ret,strerror(errno));
+                }
+                mixer_ctl_set_value(adev->private_ctl.vbc_switch, 0, VBC_ARM_CHANNELID);  //switch vbc to arm
+           
+                //i2s_pin_mux_sel(adev,2);
+
+                ALOGW("voip:END CALL,close pcm device & switch to arm...");
+
+                ret = ReadParas_Head(para->vbpipe_fd,&write_common_head);
+                if(ret < 0){
+                   ALOGE("voip:VBC_CMD_HAL_CLOSE: read ret(%d) error(%s).",ret,strerror(errno));
+                }
+                ret = Write_Rsp2cp(para->vbpipe_fd,VBC_CMD_HAL_CLOSE);
+                if(ret < 0){
+                    ALOGE("voip:VBC_CMD_HAL_CLOSE: write2 cmd VBC_CMD_RSP_CLOSE error(%d).",ret);
+                }
+                MY_TRACE("voip:VBC_CMD_HAL_CLOSE OUT.");
+            }
+            break;
+            case VBC_CMD_SET_MODE:
+            {
+                MY_TRACE("voip:VBC_CMD_SET_MODE IN.");
+               
+                if(adev->devices&(AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ALL_SCO)) {
+		#if 0
+                   if(adev->cp_type == CP_TG)
+                       i2s_pin_mux_sel(adev,1);
+                   else if(adev->cp_type == CP_W)
+                       i2s_pin_mux_sel(adev,0);
+		#endif
+                }
+
+               if(para->vbpipe_fd!=-1)
+               {
+                   ret = SetParas_Route_Incall(para->vbpipe_fd,adev);
+                   if(ret < 0){
+                       MY_TRACE("voip:VBC_CMD_SET_MODE SetParas_Route_Incall error. pipe:%s, s_is_exit:%d ",
+                        para->vbpipe, para->is_exit);
+                       para->is_exit = 1;
+                   }
+               }
+
+                MY_TRACE("voip:VBC_CMD_SET_MODE OUT.");
+            }
+            break;
+            case VBC_CMD_SET_GAIN:
+            {
+                MY_TRACE("voip:VBC_CMD_SET_GAIN IN.");
+    
+               if(para->vbpipe_fd!=-1)
+               {
+                   ret = SetParas_Volume_Incall(para->vbpipe_fd,adev);
+                   if(ret < 0){
+                       MY_TRACE("VBC_CMD_SET_GAIN SetParas_Route_Incall error. pipe:%s, s_is_exit:%d ",
+                               para->vbpipe, para->is_exit);
+                       para->is_exit = 1;
+                  }
+               }
+                
+                MY_TRACE("voip:VBC_CMD_SET_GAIN OUT.");
+            }
+           break;
+           case VBC_CMD_SWITCH_CTRL:
+            {
+                MY_TRACE("voip:VBC_CMD_SWITCH_CTRL IN.");
+                ret = SetParas_Switch_Incall(para->vbpipe_fd,para->vbchannel_id,adev);
+                if(ret < 0){
+                    MY_TRACE("voip:VBC_CMD_SWITCH_CTRL SetParas_Switch_Incall error.s_is_exit:%d ",para->is_exit);
+                    para->is_exit = 1;
+               }
+                MY_TRACE("voip:VBC_CMD_SWITCH_CTRL OUT.");
+            }
+            break;
+            case VBC_CMD_SET_MUTE:
+            {
+                MY_TRACE("voip:VBC_CMD_SET_MUTE IN.");
+
+                MY_TRACE("voip:VBC_CMD_SET_MUTE OUT.");
+            }
+            break;
+            case VBC_CMD_DEVICE_CTRL:
+            {
+                MY_TRACE("voip:VBC_CMD_DEVICE_CTRL IN.");
+                ret = SetParas_DeviceCtrl_Incall(para->vbpipe_fd,adev);
+                if(ret < 0){
+                    MY_TRACE("voip:VBC_CMD_DEVICE_CTRL SetParas_DeviceCtrl_Incall error.s_is_exit:%d ",para->is_exit);
+                    para->is_exit = 1;
+                }
+                MY_TRACE("voip:VBC_CMD_DEVICE_CTRL OUT.");
+            }
+            break;
+            default:
+                ALOGE("voip:Error: %s wrong cmd_type(%d)",__func__,read_common_head.cmd_type);
+            break;
+        }
+    	pthread_mutex_unlock(&adev->vbc_lock);
+        MY_TRACE("voip:VBC_CMD_HAL_get_cmd release vbc_lock.");
+   }
+
+VOIP_EXIT:
+    ALOGE("voip:vbc_ctrl_thread exit, pipe:%s!!!", para->vbpipe);
+    return 0;
+}
+
+
 
 static int is_voip( struct tiny_audio_device *adev)
 {

@@ -17,9 +17,14 @@
 #ifndef VBC_CONTROL_PARAMETERS_H
 #define VBC_CONTROL_PARAMETERS_H
 
+#include "pthread.h"
+
+
 #define BUF_SIZE 1024
 
 #define VBC_PIPE_NAME_MAX_LEN 16
+#define VOIP_PIPE_NAME_MAX     VBC_PIPE_NAME_MAX_LEN
+
 
 #define I2S_CTL_PATH_MAX      16
 #define I2S_CTL_INDEX_MAX     3
@@ -52,6 +57,19 @@ typedef struct
     cp_type_t cp_type;
 }vbc_ctrl_pipe_para_t;
 
+
+struct voip_res
+{
+    cp_type_t cp_type;
+    int8_t  pipe_name[VOIP_PIPE_NAME_MAX];
+    int  channel_id;
+    int enable;
+   void *adev;
+    pthread_t thread_id;
+};
+
+
+
 typedef struct
 {
     int fd;
@@ -65,6 +83,7 @@ typedef struct{
     vbc_ctrl_pipe_para_t *vbc_ctrl_pipe_info;
     i2s_ctl_t i2s_bt;
     i2s_ctl_t i2s_extspk;
+    struct voip_res  voip_res;
 }audio_modem_t;
 
 /*audio mode structure,we can expand  for more fields if necessary*/
