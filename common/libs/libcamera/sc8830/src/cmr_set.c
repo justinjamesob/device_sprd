@@ -312,6 +312,7 @@ int camera_set_brightness(uint32_t brightness, uint32_t *skip_mode, uint32_t *sk
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_BRIGHTNESS, brightness);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_BRIGHTNESSVALUE, brightness);
 
 	return ret;
 }
@@ -328,12 +329,12 @@ int camera_set_contrast(uint32_t contrast, uint32_t *skip_mode, uint32_t *skip_n
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		camera_param_to_isp(ISP_CTRL_CONTRAST, contrast, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_CONTRAST, (void *)&isp_param);
-		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_CONTRAST, contrast);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_CONTRAST, contrast);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_CONTRAST, contrast);
 
 	return ret;
 }
@@ -355,6 +356,7 @@ int camera_set_saturation(uint32_t saturation, uint32_t *skip_mode, uint32_t *sk
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_SATURATION, saturation);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_SATURATION, saturation);
 
 	CMR_LOGI ("skip_mode=%d, skip_num=%d", *skip_mode, *skip_num);
 
@@ -378,6 +380,7 @@ int camera_set_sharpness(uint32_t sharpness, uint32_t *skip_mode, uint32_t *skip
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_SHARPNESS, sharpness);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_SHARPNESS, sharpness);
 
 	return ret;
 }
@@ -436,13 +439,13 @@ int camera_set_wb(uint32_t wb_mode, uint32_t *skip_mode, uint32_t *skip_num)
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		camera_param_to_isp(ISP_CTRL_AWB_MODE, wb_mode, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_AWB_MODE, (void *)&isp_param);
-		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_LIGHTSOURCE, wb_mode);
-		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_WHITEBALANCE, wb_mode);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_SET_WB_MODE, wb_mode);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_LIGHTSOURCE, wb_mode);
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_WHITEBALANCE, wb_mode);
 
 	return ret;
 }
@@ -459,12 +462,12 @@ int camera_set_scene(uint32_t scene_mode, uint32_t *skip_mode, uint32_t *skip_nu
 		*skip_num  = 0;
 		camera_param_to_isp(ISP_CTRL_AE_MODE, scene_mode, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_AE_MODE,(void *)&isp_param);
-		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_SCENECAPTURETYPE,scene_mode);
 	} else {
 		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_PREVIEWMODE, scene_mode);
 	}
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_SCENECAPTURETYPE,scene_mode);
 
 	return ret;
 }
