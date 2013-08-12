@@ -2081,19 +2081,17 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 
 	_Sensor_save_sensor_type();
 
-#if 0
-	if (SENSOR_SUCCESS == ret_val) {
-
-		//SENSOR_PRINT("hait_test: g_is_calibration: %d\n", g_is_calibration);
-		ret_val = _sensor_cali_load_param(cali_file_dir, s_sensor_info_ptr, sensor_id);
-		if (ret_val) {
-			SENSOR_PRINT("load cali data fail!! rtn:%d",ret_val);
-			return ret_val;
+	if (SENSOR_IMAGE_FORMAT_RAW == s_sensor_info_ptr->image_format) {
+		if (SENSOR_SUCCESS == ret_val) {
+			//SENSOR_PRINT("hait_test: g_is_calibration: %d\n", g_is_calibration);
+			ret_val = _sensor_cali_load_param(cali_file_dir, s_sensor_info_ptr, sensor_id);
+			if (ret_val) {
+				SENSOR_PRINT("load cali data fail!! rtn:%d",ret_val);
+				return ret_val;
+			}
 		}
-
 	}
 
-#endif
 
 	*sensor_num_ptr = sensor_num;
 
@@ -2392,12 +2390,11 @@ ERR_SENSOR_E Sensor_Close(void)
 {
 	SENSOR_PRINT("SENSOR: Sensor_close");
 
-#if 0
-	if (0 == g_is_calibration) {
-
-		_sensor_calil_lnc_param_recover(s_sensor_info_ptr);
+	if (SENSOR_IMAGE_FORMAT_RAW == s_sensor_info_ptr->image_format) {
+		if (0 == g_is_calibration) {
+			_sensor_calil_lnc_param_recover(s_sensor_info_ptr);
+		}
 	}
-#endif
 
 	if (1 == g_is_register_sensor) {
 		if (1 == g_is_main_sensor) {
