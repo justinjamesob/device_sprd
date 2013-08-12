@@ -1170,11 +1170,6 @@ void *camera_cap_thread_proc(void *data)
 			} else {
 				CMR_LOGV("cap raw: frame id=%x \n", data->frame_id);
 			}
-			ret = camera_cap_post(data);
-			if (CAMERA_EXIT == ret) {
-				CMR_LOGI("normal exit.");
-				break;
-			}
 
 			ret = camera_v4l2_capture_handle(data);
 			if (ret) {
@@ -1183,6 +1178,11 @@ void *camera_cap_thread_proc(void *data)
 				cb_info.cb_type = CAMERA_EXIT_CB_FAILED;
 				cb_info.cb_func = CAMERA_FUNC_TAKE_PICTURE;
 				camera_callback_start(&cb_info);
+			}
+			ret = camera_cap_post(data);
+			if (CAMERA_EXIT == ret) {
+				CMR_LOGI("normal exit.");
+				break;
 			}
 			CMR_PRINT_TIME;
 		}
@@ -3761,6 +3761,7 @@ int camera_jpeg_decode_handle(JPEG_DEC_CB_PARAM_T *data)
 		} else {
 			CMR_LOGI("don't need stop jpeg.");
 		}
+		TAKE_PICTURE_STEP(CMR_STEP_JPG_DEC_E);
 		g_cxt->jpeg_cxt.jpeg_state = JPEG_IDLE;
 		g_cxt->cap_original_fmt = IMG_DATA_TYPE_YUV420;
 		ret = camera_capture_yuv_process(&g_cxt->jpeg_cxt.proc_status.frame_info);
@@ -5600,6 +5601,7 @@ int camera_start_jpeg_decode(struct frm_info *data)
 		CMR_LOGE("Wrong Frame id, 0x%x", data->frame_id);
 		return -CAMERA_INVALID_PARM;
 	}
+	TAKE_PICTURE_STEP(CMR_STEP_JPG_DEC_S);
 	frm = &g_cxt->cap_mem[frm_id].target_jpeg;
 	dec_in.stream_buf_phy       = frm->addr_phy.addr_y;
 	dec_in.stream_buf_vir       = frm->addr_vir.addr_y;

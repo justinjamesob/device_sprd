@@ -1247,7 +1247,7 @@ SENSOR_INFO_T g_ov5640_mipi_yuv_info = {
 	SENSOR_AVDD_1800MV,	// iovdd
 	SENSOR_AVDD_1500MV,	// dvdd
 	3,			// skip frame num before preview
-	3,			// skip frame num before capture
+	1,			// skip frame num before capture
 	0,			// deci frame num during preview
 	0,			// deci frame num during video preview
 
