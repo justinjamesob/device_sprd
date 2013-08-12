@@ -1317,7 +1317,9 @@ int camera_preflash(void)
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
 			flash_param.mode=ISP_ALG_FAST;
 			flash_param.flash_eb=0x01;
-			flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;
+			/*flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;*/
+			/*because hardware issue high equal to low, so use hight div high */
+			flash_param.flash_ratio=flash_level.high_light*256/flash_level.high_light;
 			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
 			if (CAMERA_SUCCESS != ret) {
 				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
@@ -1412,7 +1414,9 @@ int camera_autofocus_start(void)
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
 			flash_param.mode=ISP_ALG_FAST;
 			flash_param.flash_eb=0x01;
-			flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;
+			/*flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;*/
+			/*because hardware issue high equal to low, so use hight div high */
+			flash_param.flash_ratio=flash_level.high_light*256/flash_level.high_light;
 			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
 			if (CAMERA_SUCCESS != ret) {
 				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
