@@ -261,6 +261,7 @@ void SprdCameraHardware::release()
     }
 
     if (isPreviewing()) {
+		camera_set_stop_preview_mode(1);
 		stopPreviewInternal();
     }
 
@@ -316,7 +317,7 @@ void SprdCameraHardware::stopPreview()
 {
 	LOGV("stopPreview: E");
 	Mutex::Autolock l(&mLock);
-
+    camera_set_stop_preview_mode(0);
 	stopPreviewInternal();
 	setRecordingMode(false);
 	LOGV("stopPreview: X");
@@ -354,6 +355,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
     if (isPreviewing()){
         LOGI("stop preview (window change)");
+		camera_set_stop_preview_mode(0);
         stopPreviewInternal();
     }
 
@@ -456,6 +458,7 @@ status_t SprdCameraHardware::takePicture()
 		//stop preview first for debug
 	    if (isPreviewing()) {
 			LOGV("call stopPreviewInternal in takePicture().");
+			camera_set_stop_preview_mode(0);
 			stopPreviewInternal();
 	    }
 	    LOGV("ok to stopPreviewInternal in takePicture. preview state = %d", getPreviewState());
@@ -520,6 +523,7 @@ status_t SprdCameraHardware::startRecording()
 	if (isPreviewing()) {
 		if (camera_is_need_stop_preview()) {
 			LOGV("wxz call stopPreviewInternal in startRecording().");
+			camera_set_stop_preview_mode(1);
 			setCameraState(SPRD_INTERNAL_PREVIEW_STOPPING, STATE_PREVIEW);
 			if(CAMERA_SUCCESS != camera_stop_preview()){
 				setCameraState(SPRD_ERROR, STATE_PREVIEW);
@@ -543,6 +547,7 @@ void SprdCameraHardware::stopRecording()
 {
 	LOGV("stopRecording: E");
 	Mutex::Autolock l(&mLock);
+	camera_set_stop_preview_mode(0);
 	stopPreviewInternal();
 	mRecordingFirstFrameTime = 0;
 	LOGV("stopRecording: X");
@@ -768,6 +773,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 
 	if (camera_set_change_size(mRawWidth, mRawHeight, mPreviewWidth, mPreviewHeight)) {
 		mPreviewStartFlag = 2;
+		camera_set_stop_preview_mode(1);
 		stopPreviewInternal();
 		if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 			return UNKNOWN_ERROR;
@@ -779,6 +785,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		LOGI("mode change:stop preview.");
 		if (isPreviewing()) {
 			mPreviewStartFlag = 2;
+			camera_set_stop_preview_mode(0);
 			stopPreviewInternal();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 				return UNKNOWN_ERROR;
@@ -790,6 +797,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		LOGI("mode change:stop preview.");
 		if (isPreviewing()) {
 			mPreviewStartFlag = 2;
+			camera_set_stop_preview_mode(0);
 			stopPreviewInternal();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 				return UNKNOWN_ERROR;

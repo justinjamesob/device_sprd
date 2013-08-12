@@ -59,6 +59,12 @@ enum cmr_v4l2_rtn {
 	CMR_V4L2_RET_RESTART,
 	CMR_V4L2_RET_MAX,
 };
+
+enum if_status {
+	IF_OPEN = 0,
+	IF_CLOSE
+};
+
 	
 struct img_frm_cap {
 	struct img_rect                     src_img_rect;
@@ -103,6 +109,7 @@ int cmr_v4l2_init(void);
 int cmr_v4l2_deinit(void);
 void cmr_v4l2_evt_reg(cmr_evt_cb  v4l2_event_cb);
 int cmr_v4l2_if_cfg(struct sensor_if *sn_if);
+int cmr_v4l2_if_decfg(struct sensor_if *sn_if);
 int cmr_v4l2_sn_cfg(struct sn_cfg *config);
 int cmr_v4l2_cap_cfg(struct cap_cfg *config);
 int cmr_v4l2_buff_cfg(struct buffer_cfg *buf_cfg);
@@ -113,7 +120,6 @@ int cmr_v4l2_cap_pause(uint32_t channel_id, uint32_t reconfig_flag);
 int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index);
 int cmr_v4l2_scale_capability(uint32_t *width, uint32_t *sc_factor);
 int cmr_v4l2_get_cap_time(uint32_t *sec, uint32_t *usec);
-
 #ifdef __cplusplus
 }
 #endif

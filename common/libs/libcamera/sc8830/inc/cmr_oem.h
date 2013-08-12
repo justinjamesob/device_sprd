@@ -186,6 +186,7 @@ struct sensor_context {
 	uint32_t                 setting_length;
 	uint32_t                 preview_mode;
 	uint32_t                 capture_mode;
+	uint32_t                 previous_sensor_mode;
 };
 
 
@@ -322,6 +323,7 @@ struct camera_context {
 	uint32_t                 prev_msg_que_handle;
 	uint32_t                 prev_inited;
 	sem_t                    prev_sync_sem;
+	uint32_t                 stop_preview_mode;
 	/* capture thread */
 	pthread_t                cap_thread;
 	pthread_t                cap_sub_thread;
@@ -366,6 +368,7 @@ struct camera_context {
 	uint32_t                 total_cap_num;
 	uint32_t                 total_capture_num;
 	uint32_t                 cap_cnt;
+	uint32_t                 cap_cnt_for_err;
 	uint32_t                 cap_process_id;
 	uint32_t                 total_cap_ch_num;
 	uint32_t                 cap_ch_cnt;

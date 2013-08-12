@@ -182,6 +182,8 @@ timing_param[7]       mipi.lane_num
 timing_param[7]       width
 timing_param[8]       height
 
+timint_param[14]      IF status
+
 */
 int cmr_v4l2_if_cfg(struct sensor_if *sn_if)
 {
@@ -192,6 +194,7 @@ int cmr_v4l2_if_cfg(struct sensor_if *sn_if)
 	CMR_CHECK_FD;
 
 	timing_param[CMR_TIMING_LEN-1] = sn_if->if_type;
+	timing_param[CMR_TIMING_LEN-2] = IF_OPEN;
 	timing_param[0] = sn_if->img_fmt;
 	timing_param[1] = sn_if->img_ptn;
 	timing_param[3] = sn_if->frm_deci;
@@ -214,11 +217,36 @@ int cmr_v4l2_if_cfg(struct sensor_if *sn_if)
 
 	ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
 
-	CMR_LOGV("Set dv timing, ret %d, if type %d, mode %d, deci %d",
+	CMR_LOGV("Set dv timing, ret %d, if type %d, mode %d, deci %d, status %d",
 		ret,
 		timing_param[CMR_TIMING_LEN-1],
 		timing_param[0],
-		timing_param[3]);
+		timing_param[3],
+		timing_param[CMR_TIMING_LEN-2]);
+
+	return ret;
+}
+
+int cmr_v4l2_if_decfg(struct sensor_if *sn_if)
+{
+	int                      ret = 0;
+	struct v4l2_control      ctrl;
+	uint32_t                 timing_param[CMR_TIMING_LEN];
+
+	CMR_CHECK_FD;
+
+	timing_param[CMR_TIMING_LEN-1] = sn_if->if_type;
+	timing_param[CMR_TIMING_LEN-2] = IF_CLOSE;
+
+	ctrl.id = V4L2_CID_USER_CLASS;
+	ctrl.value = (int32_t)&timing_param[0];
+
+	ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
+
+	CMR_LOGV("Set dv timing, ret %d, if type %d, status %d.",
+		ret,
+		timing_param[CMR_TIMING_LEN-1],
+		timing_param[CMR_TIMING_LEN-2]);
 
 	return ret;
 }
@@ -650,8 +678,6 @@ static void* cmr_v4l2_thread_proc(void* data)
 					frame.channel_id = CHN_2;
 				} else if (V4L2_BUF_TYPE_VIDEO_OUTPUT == buf.type) {
 					frame.channel_id = CHN_0;
-				} else {
-					continue;
 				}
 
 				CMR_LOGV("TX got one frame! buf_type 0x%x, id 0x%x, evt_id 0x%x", buf.type, buf.index, evt_id);

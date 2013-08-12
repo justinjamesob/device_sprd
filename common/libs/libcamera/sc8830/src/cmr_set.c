@@ -547,15 +547,16 @@ int camera_set_video_mode(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode
 	uint32_t                 isp_param = 0;
 
 	CMR_LOGI("preview mode %d", mode);
+	*skip_mode = IMG_SKIP_SW;
 	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
 		isp_param = frame_rate;
+		*skip_num  = 0;
 		CMR_LOGI("frame rate:%d.",isp_param);
 		ret = isp_ioctl(ISP_CTRL_VIDEO_MODE, (void *)&isp_param);
 		camera_param_to_isp(ISP_CTRL_ISO, 5, &isp_param);
 		ret = isp_ioctl(ISP_CTRL_ISO, (void *)&isp_param);
 	}
 	if ((cxt->cmr_set.video_mode != mode) || (cxt->cmr_set.sensor_mode != cxt->sn_cxt.preview_mode)) {
-		*skip_mode = IMG_SKIP_SW;
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_VIDEO_MODE, mode);
 		cxt->cmr_set.sensor_mode = cxt->sn_cxt.preview_mode;
@@ -640,7 +641,8 @@ int camera_preview_start_set(void)
 		goto exit;
 	}
 
-	ret = Sensor_StreamOff();//wait for set mode done
+	/*ret = Sensor_StreamOff();//wait for set mode done*/
+	ret = Sensor_SetMode_WaitDone();
 	if (ret) {
 		CMR_LOGE("Fail to switch off the sensor stream");
 		goto exit;
@@ -736,7 +738,20 @@ int camera_snapshot_start_set(void)
 			CMR_LOGE("Sensor can't work at this mode %d", cxt->sn_cxt.capture_mode);
 		}
 		if (CAMERA_HDR_MODE == cxt->cap_mode) {
-			ret = camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_0);
+			switch (cxt->cap_cnt) {
+			case 0:
+				ret = camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_0);
+				break;
+			case 1:
+				ret = camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_1);
+				break;
+			case 2:
+				ret = camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_2);
+				break;
+			default:
+				ret = camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_0);
+				break;
+			}
 		}
 	}
 	return ret;
@@ -758,6 +773,7 @@ int camera_snapshot_stop_set(void)
 		}
 		if (CAMERA_HDR_MODE == cxt->cap_mode) {
 			camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_1);
+			cxt->cap_cnt_for_err = 0;
 		}
 	}
 	return ret;

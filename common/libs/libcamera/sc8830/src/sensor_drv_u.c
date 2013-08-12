@@ -104,6 +104,7 @@ LOCAL sem_t                       sensor_sync_sem;
 LOCAL sem_t                       st_on_sem;
 LOCAL sem_t                       st_off_sem;
 LOCAL sem_t                       st_af_sem;
+LOCAL sem_t                       st_setmode_sem;
 LOCAL volatile uint32_t           s_exit_flag = 0;
 #if 0
 LOCAL pthread_t                   s_sensor_monitor_thread = 0;
@@ -141,7 +142,8 @@ enum {
 	SENSOR_EVT_STREAM_ON,
 	SENSOR_EVT_STREAM_OFF,
 	SENSOR_EVT_AF_INIT,
-	SENSOR_EVT_DEINIT
+	SENSOR_EVT_DEINIT,
+	SENSOR_EVT_SET_MODE_DONE
 };
 
 
@@ -2219,6 +2221,20 @@ int Sensor_SetMode(uint32_t mode)
 	return ret;
 }
 
+int Sensor_SetMode_WaitDone(void)
+{
+	int                      ret = 0;
+	CMR_MSG_INIT(message);
+
+	message.msg_type = SENSOR_EVT_SET_MODE_DONE;
+	ret = cmr_msg_post(s_queue_handle, &message);
+	if (ret) {
+		CMR_LOGE("Fail to send message");
+	}
+	sem_wait(&st_setmode_sem);
+	return ret;
+}
+
 int Sensor_GetMode(uint32_t *mode)
 {
 	if (SENSOR_FALSE == Sensor_IsInit()) {
@@ -2355,8 +2371,8 @@ uint32_t Sensor_Ioctl(uint32_t cmd, uint32_t arg)
 		ret_value = func_ptr(arg);
 		//ImgSensor_PutMutex();
 	} else {
-		SENSOR_PRINT
-		    ("SENSOR: Sensor_Ioctl -> the ioctl function has not register err!\n");
+/*		SENSOR_PRINT
+		    ("SENSOR: Sensor_Ioctl -> the ioctl function has not register err!\n");*/
 	}
 	return ret_value;
 }
@@ -2978,6 +2994,7 @@ LOCAL int   _Sensor_CreateThread(void)
 	sem_init(&st_off_sem, 0, 0);
 	sem_init(&st_af_sem, 0, 0);
 	sem_init(&sensor_sync_sem, 0, 0);
+	sem_init(&st_setmode_sem, 0, 0);
 	s_exit_flag = 0;
 	ret = cmr_msg_queue_create(SENSOR_MSG_QUEUE_SIZE, &s_queue_handle);
 	if (ret) {
@@ -3027,6 +3044,7 @@ LOCAL int _Sensor_KillThread(void)
 	s_sensor_thread = 0;
 	sem_destroy(&st_on_sem);
 	sem_destroy(&st_off_sem);
+	sem_destroy(&st_setmode_sem);
 	sem_destroy(&st_af_sem);
 	sem_destroy(&sensor_sync_sem);
 
@@ -3087,6 +3105,9 @@ LOCAL void* _Sensor_ThreadProc(void* data)
 			ret = _Sensor_AutoFocusInit();
 			sem_post(&st_af_sem);
 			/*CMR_LOGV("SENSOR_EVT_AF_INIT, Done");*/
+			break;
+		case SENSOR_EVT_SET_MODE_DONE:
+			sem_post(&st_setmode_sem);
 			break;
 		default:
 			CMR_LOGE("Unsupported MSG");
@@ -3157,7 +3178,7 @@ LOCAL void* _Sensor_MonitorProc(void* data)
 	uint32_t                 ret = 0, param = 0;
 
 	while (1) {
-		CMR_LOGV("Cycle");
+/*		CMR_LOGV("Cycle");*/
 		usleep(SENSOR_CHECK_STATUS_INTERVAL);
 
 		if (s_monitor_exit) {
@@ -3173,9 +3194,9 @@ LOCAL void* _Sensor_MonitorProc(void* data)
 					if (sensor_event_cb)
 						(*sensor_event_cb)(CMR_SENSOR_ERROR, NULL);
 					pthread_mutex_unlock(&cb_mutex);
-				} else {
+				}/* else {
 					CMR_LOGV("NO wrong");
-				}
+				}*/
 			} else {
 				CMR_LOGV("Sensor no run");
 			}

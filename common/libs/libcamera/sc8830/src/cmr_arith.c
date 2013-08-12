@@ -290,6 +290,10 @@ int arithmetic_hdr_init(uint32_t pic_width, uint32_t pic_height)
 	uint32_t size = pic_width * pic_height * 3/2;
 
 	CMR_LOGI("test log.");
+	if (s_hdr_cxt->addr[0]) {
+		CMR_LOGI("no need to init");
+		return ret;
+	}
 	pthread_mutex_lock(&s_arith_cxt->hdr_lock);
 
 	s_hdr_cxt->addr[0] = (uint8_t*)malloc(size);

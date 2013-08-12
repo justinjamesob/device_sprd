@@ -776,6 +776,7 @@ int Sensor_AutoFocusInit(void);
 int Sensor_WriteI2C(uint16_t slave_addr, uint8_t *cmd, uint16_t cmd_length);
 int Sensor_GetMode(uint32_t *mode);
 int Sensor_GetFlashLevel(SENSOR_FLASH_LEVEL_T *level);
+int Sensor_SetMode_WaitDone();
 
 #ifdef	 __cplusplus
 }
