@@ -106,9 +106,6 @@ int get_modem_images_info_bak(void)
     struct image_info *info = download_image_info;
     int max_item = sizeof(download_image_info)/sizeof(download_image_info[0]);
 
-    if(info == NULL)
-        return 0;
-
     if(max_item == 0)
         return 0;
 
