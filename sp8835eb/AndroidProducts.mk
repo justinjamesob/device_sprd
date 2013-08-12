@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 The Android Open Source Project
+# Copyright (C) 2011 The Android Open-Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,13 @@
 #
 
 
-add_lunch_combo sp7735ebcuccspecAplus_UUI-userdebug
-add_lunch_combo sp8735ebplus_UUI-userdebug
-add_lunch_combo sp8830ebcmccspecAplus_UUI-userdebug
-add_lunch_combo sp8830ebbase-userdebug
+
+PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp8835ebcmccspecAplus_UUI.mk
+PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp8835ebbase.mk
+				      
+
+
+
+
 
 

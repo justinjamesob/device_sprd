@@ -1,0 +1,21 @@
+<!-- SPRD audio params configuration file,include cp,mocor,pcm config -->
+<audio device="sc8830-audio">
+<!-- the profile -->
+<modem num="2">
+	<cp name="t" pipe="/dev/spipe_td6" vbchannel="1" />
+	<cp name="w" pipe="/dev/spipe_w6" vbchannel="0" />
+</modem>
+
+
+<i2s_for_btcall ctl_path="/d/efuse/iis-0" index="0" switch="1" />
+<i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
+
+<audiomode num="4">
+	<item name="Headset" index="0" />
+	<item name="Headfree" index="1" />
+	<item name="Handset" index="2" />
+	<item name="Handsfree" index="3" />
+</audiomode>
+</audio>
+
+
