@@ -548,6 +548,7 @@ int camera_set_video_mode(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode
 
 	CMR_LOGI("preview mode %d", mode);
 	*skip_mode = IMG_SKIP_SW;
+	*skip_num  = 0;
 	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
 		isp_param = frame_rate;
 		*skip_num  = 0;
