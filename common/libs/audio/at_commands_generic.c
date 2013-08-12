@@ -102,7 +102,9 @@ static int at_cmd_route(struct tiny_audio_device *adev)
 {
     char r_buf[32];
     const char *at_cmd = NULL;
-    if (adev->mode != AUDIO_MODE_IN_CALL) {
+    //if (adev->mode != AUDIO_MODE_IN_CALL) 
+    if ((adev->mode != AUDIO_MODE_IN_CALL)&&(!((AUDIO_MODE_IN_COMMUNICATION == adev->mode)&&adev->voip_state)))
+    {
         ALOGE("Error: NOT mode_in_call, current mode(%d)", adev->mode);
         return -1;
     }
