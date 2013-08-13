@@ -415,21 +415,25 @@ public class DmServiceCU extends Service {
         mIsDebugMode = sharedPreferences.getBoolean(ITEM_DEBUG_MODE, false);
         Log.d("SmsReg", "mIsDebugMode = " + mIsDebugMode);
         
+        mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "sprd");
+    	mModel = sharedPreferences.getString(ITEM_MODEL, "sp7710ga");
+        mSoftVer = SystemProperties.get("ro.build.display.id","JZ055K");
+        
         if (mIsDebugMode) {
             // init manufacture
             //mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "sprd");
-            mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "MTK");
-            //mModel = sharedPreferences.getString(ITEM_MODEL, "sp7710ga");
-            mModel = sharedPreferences.getString(ITEM_MODEL, "6573");
-            mSoftVer = sharedPreferences.getString(ITEM_SOFTVER, "EZXBASE_N_00.39.A4I");
+        	//mModel = sharedPreferences.getString(ITEM_MODEL, "sp7710ga");
+            //mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "MTK");            
+            //mModel = sharedPreferences.getString(ITEM_MODEL, "6573");
+            //mSoftVer = sharedPreferences.getString(ITEM_SOFTVER, "EZXBASE_N_00.39.A4I");
 
             for (int i= 0; i<mPhoneCnt;i++)
             mImeiStr[i] = sharedPreferences.getString(ITEM_IMEI, mTelephonyManager[i].getDeviceId());
         } else {
-            mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "MTK");
-            mModel = sharedPreferences.getString(ITEM_MODEL, "6573");
-            mSoftVer = SystemProperties.get("ro.hisense.software.version",
-                    "EZXBASE_N_00.39.A4I");
+            //mManufactory = sharedPreferences.getString(ITEM_MANUFACTORY, "MTK");
+            //mModel = sharedPreferences.getString(ITEM_MODEL, "6573");
+            //mSoftVer = SystemProperties.get("ro.hisense.software.version",
+                    //"EZXBASE_N_00.39.A4I");
              for (int i= 0; i<mPhoneCnt;i++)
             mImeiStr[i] = mTelephonyManager[i].getDeviceId();
         }
