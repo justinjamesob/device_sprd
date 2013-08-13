@@ -23,6 +23,11 @@
 #define OV5648_MIN_FRAME_LEN_PRV  0x484
 #define OV5648_MIN_FRAME_LEN_CAP  0x7B6
 
+#define OV5648_RAW_PARAM_COM  0x0000
+static uint32_t g_module_id = 0;
+
+static uint32_t s_ov5648_gain = 0;
+
 LOCAL uint32_t _ov5648_GetResolutionTrimTab(uint32_t param);
 LOCAL uint32_t _ov5648_PowerOn(uint32_t power_on);
 LOCAL uint32_t _ov5648_Identify(uint32_t param);
@@ -38,7 +43,12 @@ LOCAL uint32_t _ov5648_SetEV(uint32_t param);
 LOCAL uint32_t _ov5648_ExtFunc(uint32_t ctl_param);
 LOCAL uint32_t _dw9174_SRCInit(uint32_t mode);
 
-static uint32_t s_ov5648_gain = 0;
+LOCAL uint32_t _ov5648_com_Identify_otp(void* param_ptr);
+
+LOCAL const struct raw_param_info_tab s_ov5648_raw_param_tab[]={
+	{OV5648_RAW_PARAM_COM, &s_ov5648_mipi_raw_info, _ov5648_com_Identify_otp, PNULL},
+	{RAW_INFO_END_ID, PNULL, PNULL, PNULL}
+};
 
 LOCAL const SENSOR_REG_T ov5648_com_mipi_raw[] = {
 	{0x0100, 0x00},
@@ -286,23 +296,100 @@ LOCAL SENSOR_REG_TAB_INFO_T s_ov5648_resolution_Tab_RAW[] = {
 };
 
 LOCAL SENSOR_TRIM_T s_ov5648_Resolution_Trim_Tab[] = {
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 1296, 972, 345, 560},//sysclk*10
-	{0, 0, 2592, 1944, 337, 560},//sysclk*10
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0}
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 1296, 972, 345, 560, 948},//sysclk*10
+	{0, 0, 2592, 1944, 337, 560, 1974},//sysclk*10
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0}
 };
 
-static struct sensor_raw_info s_ov5648_mipi_raw_info={
-	&s_ov5648_version_info,
-	&s_ov5648_tune_info,
-	&s_ov5648_fix_info,
-	&s_ov5648_cali_info,
+#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
+LOCAL const SENSOR_REG_T s_ov5648_1296X972_video_tab[SENSOR_VIDEO_MODE_MAX][1] = {
+	/*video mode 0: ?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 1:?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 2:?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 3:?fps*/
+	{
+		{0xffff, 0xff}
+	}
 };
+LOCAL const SENSOR_REG_T s_ov5648_2592X1944_video_tab[SENSOR_VIDEO_MODE_MAX][1] = {
+	/*video mode 0: ?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 1:?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 2:?fps*/
+	{
+		{0xffff, 0xff}
+	},
+	/* video mode 3:?fps*/
+	{
+		{0xffff, 0xff}
+	}
+};
+
+LOCAL SENSOR_VIDEO_INFO_T s_ov5648_video_info[] = {
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{30, 30, 345, 90}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},(SENSOR_REG_T**)s_ov5648_1296X972_video_tab},
+	{{{15, 15, 337, 64}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},(SENSOR_REG_T**)s_ov5648_2592X1944_video_tab},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
+	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL}
+};
+
+LOCAL uint32_t _ov5648_set_video_mode(uint32_t param)
+{
+	SENSOR_REG_T_PTR sensor_reg_ptr;
+	uint16_t         i = 0x00;
+	uint32_t         mode;
+
+	if (param >= SENSOR_VIDEO_MODE_MAX)
+		return 0;
+
+	if (SENSOR_SUCCESS != Sensor_GetMode(&mode)) {
+		SENSOR_PRINT("fail.");
+		return SENSOR_FAIL;
+	}
+
+	if (PNULL == s_ov5648_video_info[mode].setting_ptr) {
+		SENSOR_PRINT("fail.");
+		return SENSOR_FAIL;
+	}
+
+	sensor_reg_ptr = (SENSOR_REG_T_PTR)&s_ov5648_video_info[mode].setting_ptr[param];
+	if (PNULL == sensor_reg_ptr) {
+		SENSOR_PRINT("fail.");
+		return SENSOR_FAIL;
+	}
+
+	for (i=0x00; (0xffff!=sensor_reg_ptr[i].reg_addr)||(0xff!=sensor_reg_ptr[i].reg_value); i++) {
+		Sensor_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
+	}
+
+	SENSOR_PRINT("0x%02x", param);
+	return 0;
+}
+#endif
 
 struct sensor_raw_info* s_ov5648_mipi_raw_info_ptr=&s_ov5648_mipi_raw_info;
 
@@ -351,12 +438,17 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov5648_ioctl_func_tab = {
 	PNULL, //_ov5648_GetExifInfo,
 	_ov5648_ExtFunc,
 	PNULL, //_ov5648_set_anti_flicker,
-	PNULL, //_ov5648_set_video_mode,
+#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
+	_ov5648_set_video_mode,
+#else
+	PNULL,  //_ov5648_set_video_mode,
+#endif
 	PNULL, //pick_jpeg_stream
 	PNULL,  //meter_mode
 	PNULL, //get_status
 	_ov5648_StreamOn,
 	_ov5648_StreamOff,
+	PNULL,
 };
 
 
@@ -412,7 +504,7 @@ SENSOR_INFO_T g_ov5648_mipi_raw_info = {
 
 	s_ov5648_resolution_Tab_RAW,	// point to resolution table information structure
 	&s_ov5648_ioctl_func_tab,	// point to ioctl function table
-	&s_ov5648_mipi_raw_info,		// information and table about Rawrgb sensor
+	&s_ov5648_mipi_raw_info_ptr,		// information and table about Rawrgb sensor
 	NULL,			//&g_ov5648_ext_info,                // extend information about sensor
 	SENSOR_AVDD_1800MV,	// iovdd
 	SENSOR_AVDD_1500MV,	// dvdd
@@ -428,7 +520,7 @@ SENSOR_INFO_T g_ov5648_mipi_raw_info = {
 	0,
 #ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CSI2, 2, 10, 0},
-	PNULL,
+	s_ov5648_video_info,
 	3,			// skip frame num while change setting
 #else
 	{SENSOR_INTERFACE_TYPE_CSI2, 2, 10, 0}
@@ -446,14 +538,14 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	struct sensor_raw_info* raw_sensor_ptr=Sensor_GetContext();
 	struct sensor_raw_tune_info* sensor_ptr=raw_sensor_ptr->tune_ptr;
 
-	raw_sensor_ptr->version_info->version_id=0x00000000;
+	raw_sensor_ptr->version_info->version_id=0x00010000;
 	raw_sensor_ptr->version_info->srtuct_size=sizeof(struct sensor_raw_info);
 
 	//bypass
-	sensor_ptr->version_id=0x00000000;
+	sensor_ptr->version_id=0x00010000;
 	sensor_ptr->blc_bypass=0x00;
 	sensor_ptr->nlc_bypass=0x01;
-	sensor_ptr->lnc_bypass=0x00;
+	sensor_ptr->lnc_bypass=0x01;
 	sensor_ptr->ae_bypass=0x00;
 	sensor_ptr->awb_bypass=0x00;
 	sensor_ptr->bpc_bypass=0x00;
@@ -482,6 +574,10 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->blc.offset[0].gr=0x0f;
 	sensor_ptr->blc.offset[0].gb=0x0f;
 	sensor_ptr->blc.offset[0].b=0x0f;
+	sensor_ptr->blc.offset[1].r=0x0f;
+	sensor_ptr->blc.offset[1].gr=0x0f;
+	sensor_ptr->blc.offset[1].gb=0x0f;
+	sensor_ptr->blc.offset[1].b=0x0f;
 	//nlc
 	sensor_ptr->nlc.r_node[0]=0;
 	sensor_ptr->nlc.r_node[1]=16;
@@ -608,7 +704,7 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->ae.normal_fix_fps=0;
 	sensor_ptr->ae.night_fix_fps=0;
 	sensor_ptr->ae.video_fps=30;
-	sensor_ptr->ae.target_lum=60;
+	sensor_ptr->ae.target_lum=120;
 	sensor_ptr->ae.target_zone=8;
 	sensor_ptr->ae.quick_mode=1;
 	sensor_ptr->ae.smart=0;
@@ -768,6 +864,13 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->awb.win[17].yb=76;
 	sensor_ptr->awb.win[18].yb=77;
 	sensor_ptr->awb.win[19].yb=92;
+
+	sensor_ptr->awb.gain_convert[0].r=0x100;
+	sensor_ptr->awb.gain_convert[0].g=0x100;
+	sensor_ptr->awb.gain_convert[0].b=0x100;
+	sensor_ptr->awb.gain_convert[1].r=0x100;
+	sensor_ptr->awb.gain_convert[1].g=0x100;
+	sensor_ptr->awb.gain_convert[1].b=0x100;
 
 	//bpc
 	sensor_ptr->bpc.flat_thr=80;
@@ -1014,7 +1117,6 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	return rtn;
 }
 
-
 LOCAL uint32_t _ov5648_GetResolutionTrimTab(uint32_t param)
 {
 	SENSOR_PRINT("0x%x", (uint32_t)s_ov5648_Resolution_Trim_Tab);
@@ -1039,8 +1141,10 @@ LOCAL uint32_t _ov5648_PowerOn(uint32_t power_on)
 		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
 		usleep(10*1000);
 		Sensor_PowerDown(!power_down);
+		usleep(10*1000);
 		// Reset sensor
 		Sensor_Reset(reset_level);
+		usleep(20*1000);
 	} else {
 		Sensor_PowerDown(power_down);
 		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
@@ -1049,6 +1153,72 @@ LOCAL uint32_t _ov5648_PowerOn(uint32_t power_on)
 	}
 	SENSOR_PRINT("SENSOR_OV5648: _ov5648_Power_On(1:on, 0:off): %d", power_on);
 	return SENSOR_SUCCESS;
+}
+
+LOCAL uint32_t _ov5648_cfg_otp(uint32_t  param)
+{
+	uint32_t rtn=SENSOR_SUCCESS;
+	struct raw_param_info_tab* tab_ptr= (struct raw_param_info_tab* )s_ov5648_raw_param_tab;
+	uint32_t module_id=g_module_id;
+
+	SENSOR_PRINT("SENSOR_OV5648: _ov5648_cfg_otp");
+
+	if(PNULL!=tab_ptr[module_id].cfg_otp){
+		tab_ptr[module_id].cfg_otp(0);
+		}
+
+	return rtn;
+}
+
+LOCAL uint32_t _ov5648_com_Identify_otp(void* param_ptr)
+{
+	uint32_t rtn=SENSOR_FAIL;
+	uint32_t param_id;
+
+	SENSOR_PRINT("SENSOR_OV5648: _ov5648_com_Identify_otp");
+
+	/*read param id from sensor omap*/
+	param_id=OV5648_RAW_PARAM_COM;
+
+	if(OV5648_RAW_PARAM_COM==param_id){
+		rtn=SENSOR_SUCCESS;
+	}
+
+	return rtn;
+}
+
+LOCAL uint32_t _ov5648_GetRawInof(void)
+{
+	uint32_t rtn=SENSOR_SUCCESS;
+	struct raw_param_info_tab* tab_ptr = (struct raw_param_info_tab*)s_ov5648_raw_param_tab;
+	uint32_t param_id;
+	uint32_t i=0x00;
+
+	/*read param id from sensor omap*/
+	param_id=OV5648_RAW_PARAM_COM;
+
+	for(i=0x00; ; i++)
+	{
+		g_module_id = i;
+		if(RAW_INFO_END_ID==tab_ptr[i].param_id){
+			if(NULL==s_ov5648_mipi_raw_info_ptr){
+				SENSOR_PRINT("SENSOR_OV5648: ov5647_GetRawInof no param error");
+				rtn=SENSOR_FAIL;
+			}
+			SENSOR_PRINT("SENSOR_OV5648: ov5648_GetRawInof end");
+			break;
+		}
+		else if(PNULL!=tab_ptr[i].identify_otp){
+			if(SENSOR_SUCCESS==tab_ptr[i].identify_otp(0))
+			{
+				s_ov5648_mipi_raw_info_ptr = tab_ptr[i].info_ptr;
+				SENSOR_PRINT("SENSOR_OV5648: ov5648_GetRawInof success");
+				break;
+			}
+		}
+	}
+
+	return rtn;
 }
 
 LOCAL uint32_t _ov5648_Identify(uint32_t param)
@@ -1070,6 +1240,7 @@ LOCAL uint32_t _ov5648_Identify(uint32_t param)
 		ver_value = Sensor_ReadReg(ov5648_VER_ADDR);
 		SENSOR_PRINT("SENSOR_OV5648: Identify: PID = %x, VER = %x", pid_value, ver_value);
 		if (ov5648_VER_VALUE == ver_value) {
+			ret_value=_ov5648_GetRawInof();
 			Sensor_InitRawTuneInfo();
 			ret_value = SENSOR_SUCCESS;
 			SENSOR_PRINT("SENSOR_OV5648: this is ov5648 sensor !");
@@ -1265,10 +1436,11 @@ LOCAL uint32_t _ov5648_PreBeforeSnapshot(uint32_t param)
 	}
 	
 	while(gain >= 0x20){
+		if(capture_exposure * 2 > capture_maxline)
+			break;
 		capture_exposure = capture_exposure * 2;
 		gain=gain / 2;
-		if(capture_exposure > capture_maxline*2)
-			break;
+
 	}
 	
 	gain=gain * 320/300;
