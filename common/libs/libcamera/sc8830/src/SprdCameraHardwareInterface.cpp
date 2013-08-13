@@ -1792,6 +1792,19 @@ void SprdCameraHardware::restoreFreq()
 
 }
 
+void SprdCameraHardware::set_ddr_freq(const char* freq_in_khz)
+{
+	const char* const set_freq = "/sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_freq";
+	FILE* fp = fopen(set_freq, "wb");
+	if (fp != NULL) {
+		fprintf(fp, "%s", freq_in_khz);
+		ALOGE("set ddr freq to %skhz", freq_in_khz);
+		fclose(fp);
+	} else {
+		ALOGE("Failed to open %s", set_freq);
+	}
+}
+
 status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 {
 	takepicture_mode mode = getCaptureMode();
@@ -1832,11 +1845,12 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 		return UNKNOWN_ERROR;
 	}
 	if (iSZslMode()) {
-	    if (!initCapture(mData_cb != NULL)) {
+		set_ddr_freq("400000");
+		if (!initCapture(mData_cb != NULL)) {
 			deinitCapture();
 			LOGE("initCapture failed. Not taking picture.");
 			return UNKNOWN_ERROR;
-	    }
+		}
 	}
 
 	setCameraState(SPRD_INTERNAL_PREVIEW_REQUESTED, STATE_PREVIEW);
@@ -1883,6 +1897,10 @@ void SprdCameraHardware::stopPreviewInternal()
 		WaitForCaptureDone();
 	}
 	deinitCapture();
+
+	if (iSZslMode()) {
+		set_ddr_freq("0");
+	}
 
 	end_timestamp = systemTime();
 	LOGE("Stop Preview Time:%lld(ms).",(end_timestamp - start_timestamp)/1000000);

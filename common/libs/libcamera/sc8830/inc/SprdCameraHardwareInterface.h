@@ -260,6 +260,7 @@ private:
 	void                            setCameraPreviewMode();
 	void                            changeEmcFreq(char flag);
 	void                            setPreviewFreq();
+	void                            set_ddr_freq(const char* freq_in_khz);
 	void                            restoreFreq();
 	bool                            displayOneFrame(uint32_t width, 
 							uint32_t height,

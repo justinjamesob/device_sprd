@@ -185,7 +185,7 @@ static int camera_isp_proc_handle(struct ips_out_param *isp_out);
 static int camera_af_init(void);
 static int camera_af_deinit(void);
 static int camera_uv422_to_uv420(uint32_t dst, uint32_t src, uint32_t width, uint32_t height);
-static int camera_cancel_capture(void);
+static int camera_set_cancel_capture(int set_val);
 static int camera_prev_thread_init(void);
 static int camera_prev_thread_deinit(void);
 static void *camera_prev_thread_proc(void *data);
@@ -2359,9 +2359,7 @@ int camera_capture_init_internal(takepicture_mode cap_mode)
 	}
 
 	g_cxt->cap_mode = cap_mode;
-	pthread_mutex_lock(&g_cxt->cancel_mutex);
-	g_cxt->cap_canceled = 0;
-	pthread_mutex_unlock(&g_cxt->cancel_mutex);
+	camera_set_cancel_capture(0);
 	ret = camera_capture_init();
 	if (ret) {
 		CMR_LOGE("Failed to init capture mode.");
@@ -2401,9 +2399,7 @@ int camera_take_picture_internal(takepicture_mode cap_mode)
 	uint32_t                 sensor_mode = 0;
 
 	g_cxt->cap_mode = cap_mode;
-	pthread_mutex_lock(&g_cxt->cancel_mutex);
-	g_cxt->cap_canceled = 0;
-	pthread_mutex_unlock(&g_cxt->cancel_mutex);
+	camera_set_cancel_capture(0);
 
 	if(0 != g_cxt->sn_cxt.sn_if.if_type) {
 		/* if mipi, set to half word for capture raw */
@@ -2517,9 +2513,7 @@ int camera_take_picture_internal_raw(takepicture_mode cap_mode)
 	}
 
 	g_cxt->cap_mode = cap_mode;
-	pthread_mutex_lock(&g_cxt->cancel_mutex);
-	g_cxt->cap_canceled = 0;
-	pthread_mutex_unlock(&g_cxt->cancel_mutex);
+	camera_set_cancel_capture(0);
 
 	if ((0 != g_cxt->sn_cxt.sn_if.if_type) && (CAMERA_TOOL_RAW_MODE == cap_mode)) {
 		/* if mipi, set to half word for capture raw */
@@ -2571,20 +2565,13 @@ int camera_set_take_picture(int set_val)
 {
 	CMR_LOGV("in");
 	pthread_mutex_lock(&g_cxt->take_mutex);
-	CMR_LOGV("got take mutex");
 	g_cxt->is_take_picture = set_val;
 	g_cxt->hdr_cnt = 0;
 	pthread_mutex_unlock(&g_cxt->take_mutex);
 	if (TAKE_PICTURE_NEEDED == set_val) {
-		pthread_mutex_lock(&g_cxt->cancel_mutex);
-		CMR_LOGV("got cancel mutex");
-		g_cxt->cap_canceled = 0;
-		pthread_mutex_unlock(&g_cxt->cancel_mutex);
+		camera_set_cancel_capture(0);
 	} else {
-		pthread_mutex_lock(&g_cxt->cancel_mutex);
-		CMR_LOGV("got cancel mutex");
-		g_cxt->cap_canceled = 1;
-		pthread_mutex_unlock(&g_cxt->cancel_mutex);
+		camera_set_cancel_capture(1);
 	}
 	CMR_LOGV("out");
 
@@ -3480,13 +3467,13 @@ int camera_internal_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info
 		if (IS_ZSL_MODE(g_cxt->cap_mode)) {
 			if (IS_CHN_IDLE(CHN_2)) {
 				SET_CHN_BUSY(CHN_2);
-				ret = cmr_v4l2_cap_resume(CHN_2,
-				0,
-				g_cxt->v4l2_cxt.chn_frm_deci[CHN_2]);
 				if ((g_cxt->cap_cnt == g_cxt->total_capture_num) ||
 					(CAMERA_HDR_MODE == g_cxt->cap_mode)) {
-					g_cxt->is_take_picture = TAKE_PICTURE_NO;
+					camera_set_take_picture(0);
 				}
+				ret = cmr_v4l2_cap_resume(CHN_2,
+					0,
+					g_cxt->v4l2_cxt.chn_frm_deci[CHN_2]);
 				if (ret) {
 					SET_CHN_IDLE(CHN_2);
 					CMR_LOGE("error.");
@@ -6513,12 +6500,12 @@ int camera_set_change_size(uint32_t cap_width,uint32_t cap_height,uint32_t previ
 	return ret;
 }
 
-int camera_cancel_capture(void)
+int camera_set_cancel_capture(int set_val)
 {
 	int        ret = CAMERA_SUCCESS;
 
 	pthread_mutex_lock(&g_cxt->cancel_mutex);
-	g_cxt->cap_canceled = 1;
+	g_cxt->cap_canceled = set_val;
 	pthread_mutex_unlock(&g_cxt->cancel_mutex);
 
 	CMR_LOGV("cap_canceled %d", g_cxt->cap_canceled);
