@@ -14,7 +14,7 @@
 #include "cutils/properties.h"
 
 #define ENG_CARDLOG_PROPERTY	"persist.sys.cardlog"
-#define DATA_BUF_SIZE (4096 * 4)
+#define DATA_BUF_SIZE (4096 * 64)
 static char log_data[DATA_BUF_SIZE];
 static int vser_fd = 0;
 
@@ -155,7 +155,10 @@ void *eng_vlog_thread(void *x)
         // printf dump memory len 
         dump_mem_len_print(r_cnt, &dumpmemlen);
 
-        //		ENG_LOG("peter:eng_vlog read %d\n", r_cnt);
+        if(r_cnt > 8192) {
+            ENG_LOG("eng_vlog: read from modem %d\n", r_cnt);
+        }
+
         w_cnt = 0;
         if(((r_cnt % 64 )==0) && r_cnt){
             if(param->califlag  && param->connect_type == CONNECT_USB){
@@ -178,7 +181,10 @@ write_fail:		ENG_LOG("eng_vlog no log data write:%d ,%s\n", w_cnt, strerror(errn
                 vser_fd = ser_fd;
                 ENG_LOG("eng_vlog reopen usb serial:%d\n", ser_fd);
         }
-        //		ENG_LOG("eng_vlog read %d, write %d\n", r_cnt, w_cnt);
+
+        if(w_cnt > 8192) {
+            ENG_LOG("eng_vlog: read %d, write %d\n", r_cnt, w_cnt);
+        }
     }
 out:
     close(pipe_fd);
