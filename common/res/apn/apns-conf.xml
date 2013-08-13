@@ -17036,7 +17036,7 @@
         mcc="621"
         mnc="60"
         apn="etisalat"
-        proxy="10.70.170.5"
+        proxy="10.71.170.5"
         port="8080"
         user=""
         password=""
