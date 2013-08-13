@@ -126,7 +126,7 @@ char *get_ring_file(void)
 		ring_length = 1;
 
 	if (file_path != NULL && stat(file_path, &s) != 0) {
-		LOGE("%s cannot find '%s'\n", file_path);
+		LOGE("%s cannot find '%s'\n", file_path,strerror(errno));
 		file_path = NULL;
 	}
 
