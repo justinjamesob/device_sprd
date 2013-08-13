@@ -7,7 +7,10 @@ import com.spreadtrum.android.eng.R;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -34,6 +37,17 @@ public class SlogUISnapService extends Service {
                 getText(R.string.notification_snapsvc_statusbarprompt),
                 0);
 
+        setNotification();
+        registerReceiver(mLocalChangeReceiver,
+                new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
+    }
+    private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            Log.d("SlogUISnapService", "language is change....");
+            setNotification();
+        }
+    };
+    private void setNotification() {
         // The PendingIntent to launch our activity if the user selects this
         // notification
         PendingIntent contentIntent = PendingIntent.getActivity(
