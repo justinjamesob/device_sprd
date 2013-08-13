@@ -2579,6 +2579,7 @@ int camera_take_picture_internal_raw(takepicture_mode cap_mode)
 {
 	uint32_t                 skip_number = 0;
 	int                      ret = CAMERA_SUCCESS;
+	uint32_t                 sensor_mode = 0;
 
 	if (CMR_IDLE != g_cxt->capture_raw_status) {
 		CMR_LOGV("capture_raw_status=%d is not idle, no need to take capture \n", 
@@ -2593,18 +2594,37 @@ int camera_take_picture_internal_raw(takepicture_mode cap_mode)
 		/* if mipi, set to half word for capture raw */
 		g_cxt->sn_cxt.sn_if.if_spec.mipi.is_loose = 1;
 	}
-	ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
+	ret = Sensor_GetMode(&sensor_mode);
 	if (ret) {
-		CMR_LOGE("the sensor interface is unsupported by V4L2");
+		CMR_LOGE("Fail to switch on the sensor stream");
 		return -CAMERA_FAILED;
+	} else {
+		if (sensor_mode != g_cxt->sn_cxt.capture_mode) {
+			ret = Sensor_StreamOff();
+			if (ret) {
+				CMR_LOGE("Fail to switch off the sensor stream");
+				return -CAMERA_FAILED;
+			}
+			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+			if (ret) {
+				CMR_LOGE("the senso interface is unsupported by V4L2");
+				return -CAMERA_FAILED;
+			}
+			CMR_LOGV("Sensor workmode %d", g_cxt->sn_cxt.capture_mode);
+			ret = Sensor_SetMode(g_cxt->sn_cxt.capture_mode);
+			if (ret) {
+				CMR_LOGE("Sensor can't work at this mode %d", g_cxt->sn_cxt.capture_mode);
+				return -CAMERA_FAILED;
+			}
+			ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
+			if (ret) {
+				CMR_LOGE("the sensor interface is unsupported by V4L2");
+				return -CAMERA_FAILED;
+			}
+		}
 	}
 
-	CMR_LOGV("Sensor workmode %d", g_cxt->sn_cxt.capture_mode);
-	ret = Sensor_SetMode(g_cxt->sn_cxt.capture_mode);
-	if (ret) {
-		CMR_LOGE("Sensor can't work at this mode %d", g_cxt->sn_cxt.capture_mode);
-		return -CAMERA_FAILED;
-	}
+
 
 	ret = camera_capture_init_raw();
 	if (ret) {
