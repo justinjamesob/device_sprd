@@ -6,6 +6,7 @@
 	<cp name="w" pipe="/dev/spipe_w6" vbchannel="0" />
 </modem>
 
+<voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="1" />
 
 <i2s_for_btcall ctl_path="/d/efuse/iis-0" index="0" switch="1" />
 <i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
