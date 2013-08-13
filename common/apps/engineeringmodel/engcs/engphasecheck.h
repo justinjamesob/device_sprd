@@ -12,6 +12,7 @@ extern "C" {
 #define SP09_MAX_STATION_NUM		   	    (15)
 #define SP09_MAX_STATION_NAME_LEN		    (10)
 #define SP09_SPPH_MAGIC_NUMBER             (0X53503039)    // "SP09"
+#define SP05_SPPH_MAGIC_NUMBER             (0X53503035)    // "SP05"
 #define SP09_MAX_LAST_DESCRIPTION_LEN      (32)
 
 
