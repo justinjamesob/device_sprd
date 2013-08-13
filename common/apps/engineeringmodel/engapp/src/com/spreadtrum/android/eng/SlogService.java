@@ -8,7 +8,10 @@ import com.spreadtrum.android.eng.R;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -40,8 +43,16 @@ public class SlogService extends Service {
             // Running on an older platform.
             mStartForeground = mStopForeground = null;
         }
+        registerReceiver(mLocalChangeReceiver,
+                new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
     }
 
+    private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            Log.d("SlogService", "language is change....");
+            setNotification();
+        }
+    };
     @Override
     public void onStart(Intent intent, int startId) {
 
@@ -49,6 +60,9 @@ public class SlogService extends Service {
         notification = new Notification(android.R.drawable.ic_dialog_alert,
                 getText(R.string.notification_slogsvc_statusbarprompt), 0);
 
+        setNotification();
+    }
+    private void setNotification() {
         // The PendingIntent to launch our activity if the user selects this
         // notification
 
