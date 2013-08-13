@@ -2348,8 +2348,9 @@ uint32_t Sensor_Ioctl(uint32_t cmd, uint32_t arg)
 	uint32_t temp;
 	uint32_t ret_value = SENSOR_SUCCESS;
 
-	SENSOR_PRINT("SENSOR: Sensor_Ioctl -> cmd = %d, arg = %d.\n", cmd, arg);
-
+	if (SENSOR_IOCTL_GET_STATUS != cmd) {
+		SENSOR_PRINT("SENSOR: Sensor_Ioctl -> cmd = %d, arg = %d.\n", cmd, arg);
+	}
 	if (!Sensor_IsInit()) {
 		SENSOR_PRINT("SENSOR: Sensor_Ioctl -> sensor has not init.\n");
 		return SENSOR_OP_STATUS_ERR;
@@ -3194,9 +3195,9 @@ LOCAL void* _Sensor_MonitorProc(void* data)
 				}/* else {
 					CMR_LOGV("NO wrong");
 				}*/
-			} else {
+			}/* else {
 				CMR_LOGV("Sensor no run");
-			}
+			}*/
 		}
 
 	}

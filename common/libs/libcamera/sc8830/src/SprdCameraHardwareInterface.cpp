@@ -785,7 +785,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		LOGI("mode change:stop preview.");
 		if (isPreviewing()) {
 			mPreviewStartFlag = 2;
-			camera_set_stop_preview_mode(0);
+			camera_set_stop_preview_mode(1);
 			stopPreviewInternal();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 				return UNKNOWN_ERROR;

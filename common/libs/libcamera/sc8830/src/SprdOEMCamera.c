@@ -210,6 +210,7 @@ static int camera_cb_thread_deinit(void);
 static void *camera_cb_thread_proc(void *data);
 static void camera_callback_handle(camera_cb_type cb, camera_func_type func, int32_t cb_param);
 static void camera_capture_step_statisic(void);
+static int camera_capture_init_continue(void);
 
 camera_ret_code_type camera_encode_picture(camera_frame_type *frame,
 					camera_handle_type *handle,
@@ -363,6 +364,10 @@ int camera_v4l2_deinit(void)
 	if (0 == ctrl->v4l2_inited) {
 		CMR_LOGI("V4L2 has been de-intialized");
 		goto exit;
+	}
+	ret = Sensor_StreamOff();
+	if (ret) {
+		CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
 	}
 	ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 	if (ret) {
@@ -944,9 +949,64 @@ int camera_cap_subthread_deinit(void)
 	return ret ;
 }
 
+int camera_take_continue_picture(int cap_cnt)
+{
+	int                      preview_format;
+	uint32_t                 skip_number = 0;
+	int                      ret = CAMERA_SUCCESS;
+	struct buffer_cfg        buffer_info;
+
+	CMR_LOGI("start.");
+	if(0 != g_cxt->sn_cxt.sn_if.if_type) {
+		/* if mipi, set to half word for capture raw */
+		g_cxt->sn_cxt.sn_if.if_spec.mipi.is_loose = 1;
+	}
+
+	ret = camera_capture_init_continue();
+	if (ret) {
+		CMR_LOGE("Failed to init raw capture mode.");
+		return -CAMERA_FAILED;
+	}
+
+	if (V4L2_SENSOR_FORMAT_RAWRGB != g_cxt->sn_cxt.sn_if.img_fmt) {
+		g_cxt->skip_mode      = IMG_SKIP_HW;
+	}
+
+	if (IMG_SKIP_HW == g_cxt->skip_mode) {
+		skip_number = g_cxt->sn_cxt.sensor_info->capture_skip_num;
+	}
+
+	CMR_PRINT_TIME;
+	skip_number = 1;
+	ret = cmr_v4l2_cap_start(skip_number);
+	if (ret) {
+		CMR_LOGE("Fail to start V4L2 Capture");
+		return -CAMERA_FAILED;
+	}
+	g_cxt->v4l2_cxt.v4l2_state = V4L2_PREVIEW;
+	CMR_PRINT_TIME;
+
+	g_cxt->capture_raw_status = CMR_CAPTURE;
+	return ret;
+}
+
+int camera_cap_continue(void)
+{
+	int ret = CAMERA_SUCCESS;
+
+	if (CAMERA_NORMAL_CONTINUE_SHOT_MODE == g_cxt->cap_mode) {
+		ret = camera_take_continue_picture(0);
+	}
+	if (CAMERA_ZSL_CONTINUE_SHOT_MODE == g_cxt->cap_mode) {
+		g_cxt->chn_2_status = CHN_BUSY;
+	}
+	return ret;
+}
+
 int camera_cap_post(void *data)
 {
 	int ret = CAMERA_SUCCESS;
+	CMR_MSG_INIT(message);
 
 	g_cxt->cap_cnt++;
 	g_cxt->cap_cnt_for_err = g_cxt->cap_cnt;
@@ -964,14 +1024,14 @@ int camera_cap_post(void *data)
 		ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 		if (ret) {
 			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+			ret = Sensor_StreamOff();
+			if (ret) {
+				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+			}
 			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 			if (ret) {
 				CMR_LOGE("Failed to stop IF , %d", ret);
 				return -CAMERA_FAILED;
-			}
-			ret = Sensor_StreamOff();
-			if (ret) {
-				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
 			}
 		}
 
@@ -999,16 +1059,16 @@ int camera_cap_post(void *data)
 		CMR_PRINT_TIME;
 	/*	ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 		if (ret) {
+			ret = Sensor_StreamOff();
+			if (ret) {
+				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+			}
 			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 			if (ret) {
 				CMR_LOGE("Failed to stop IF , %d", ret);
 				return -CAMERA_FAILED;
 			}
 			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-			ret = Sensor_StreamOff();
-			if (ret) {
-				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
-			}
 		}*/
 
 		if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
@@ -1023,15 +1083,15 @@ int camera_cap_post(void *data)
 		if (HDR_CAP_NUM == g_cxt->cap_cnt) {
 			ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 			if (ret) {
-				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-				if (ret) {
-					CMR_LOGE("Failed to stop IF , %d", ret);
-					return -CAMERA_FAILED;
-				}
 				g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 				ret = Sensor_StreamOff();
 				if (ret) {
 					CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+				}
+				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+				if (ret) {
+					CMR_LOGE("Failed to stop IF , %d", ret);
+					return -CAMERA_FAILED;
 				}
 			}
 			ret = camera_snapshot_stop_set();
@@ -1056,25 +1116,24 @@ int camera_cap_post(void *data)
 			}
 		}
 	} else if (CAMERA_NORMAL_CONTINUE_SHOT_MODE == g_cxt->cap_mode) {
+		ret = cmr_v4l2_cap_stop();
+		if (ret) {
+			CMR_LOGE("Failed to stop v4l2 capture, %d", ret);
+			return -CAMERA_FAILED;
+		}
 		if (g_cxt->cap_cnt == g_cxt->total_capture_num) {
-			ret = cmr_v4l2_cap_stop();
-			if (ret) {
-				CMR_LOGE("Failed to stop v4l2 capture, %d", ret);
-				return -CAMERA_FAILED;
-			}
-
 			CMR_PRINT_TIME;
 			ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 			if (ret) {
-				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-				if (ret) {
-					CMR_LOGE("Failed to stop IF , %d", ret);
-					return -CAMERA_FAILED;
-				}
 				g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 				ret = Sensor_StreamOff();
 				if (ret) {
 					CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+				}
+				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+				if (ret) {
+					CMR_LOGE("Failed to stop IF , %d", ret);
+					return -CAMERA_FAILED;
 				}
 			}
 			CMR_PRINT_TIME;
@@ -1083,6 +1142,14 @@ int camera_cap_post(void *data)
 				CMR_LOGE("Failed to exit snapshot %d", ret);
 				return -CAMERA_FAILED;
 			}
+		}
+	}else if (CAMERA_ZSL_CONTINUE_SHOT_MODE == g_cxt->cap_mode) {
+		g_cxt->chn_2_status = CHN_IDLE;
+		if ((TAKE_PICTURE_NEEDED == camera_get_take_picture()) && IS_CHN_BUSY(CHN_2)) {
+			message.msg_type = CMR_EVT_BEFORE_CAPTURE;
+			message.alloc_flag = 0;
+			ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
+			CMR_LOGI("send post.");
 		}
 	}
 	return ret;
@@ -1154,6 +1221,11 @@ void *camera_cap_thread_proc(void *data)
 				if ((g_cxt->cap_cnt == g_cxt->total_capture_num)||(CAMERA_HDR_MODE == g_cxt->cap_mode)) {
 					camera_snapshot_stop_set();
 					ret = camera_set_take_picture(TAKE_PICTURE_NO);
+					if (CAMERA_ZSL_CONTINUE_SHOT_MODE == g_cxt->cap_mode) {
+						g_cxt->chn_2_status = CHN_BUSY;
+					}
+				} else {
+					camera_cap_continue();
 				}
 			}
 			CMR_PRINT_TIME;
@@ -2007,16 +2079,17 @@ int camera_start_preview_internal(void)
 			CMR_LOGE("Failed to switch on the sensor stream");
 			return -CAMERA_FAILED;
 		} else {
-			if (sensor_mode != g_cxt->sn_cxt.previous_sensor_mode) {
-				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-				if (ret) {
-					CMR_LOGE("Failed to close sensor interface");
-				}
+			if (sensor_mode != g_cxt->sn_cxt.preview_mode) {
 				ret = Sensor_StreamOff();
 				if (ret) {
 					CMR_LOGE("Failed to switch off the sensor stream");
 					return -CAMERA_FAILED;
 				}
+				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+				if (ret) {
+					CMR_LOGE("Failed to close sensor interface");
+				}
+
 				ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 				if (ret) {
 					CMR_LOGE("the sensor interface is unsupported by V4L2");
@@ -2145,6 +2218,11 @@ int camera_stop_capture_raw_internal(void)
 		if (ret) {
 			CMR_LOGE("Failed to stop V4L2 capture, %d", ret);
 		}
+		g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+		ret = Sensor_StreamOff();
+		if (ret) {
+			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+		}
 		ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 		if (ret) {
 			CMR_LOGE("Failed to stop IF , %d", ret);
@@ -2152,12 +2230,6 @@ int camera_stop_capture_raw_internal(void)
 		}
 
 		CMR_PRINT_TIME;
-		g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-		ret = Sensor_StreamOff();
-		if (ret) {
-			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
-		}
-
 	}
 
 	pthread_mutex_unlock(&g_cxt->take_raw_mutex);
@@ -2221,15 +2293,15 @@ int camera_stop_preview_internal(void)
     if (0 == g_cxt->stop_preview_mode) {
 		ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 		if (ret) {
-			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-			if (ret) {
-				CMR_LOGE("Failed to stop IF , %d", ret);
-				return -CAMERA_FAILED;
-			}
 			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 			ret = Sensor_StreamOff();
 			if (ret) {
 				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+			}
+			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+			if (ret) {
+				CMR_LOGE("Failed to stop IF , %d", ret);
+				return -CAMERA_FAILED;
 			}
 			CMR_LOGE("get sensor mode fail.");
 		} else {
@@ -2237,14 +2309,14 @@ int camera_stop_preview_internal(void)
 		}
     } else {
         g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+		ret = Sensor_StreamOff();
+		if (ret) {
+			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+		}
 		ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 		if (ret) {
 			CMR_LOGE("Failed to stop IF , %d", ret);
 			return -CAMERA_FAILED;
-		}
-		ret = Sensor_StreamOff();
-		if (ret) {
-			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
 		}
 	}
 	pthread_mutex_unlock(&g_cxt->prev_mutex);
@@ -2405,6 +2477,7 @@ int camera_take_picture_internal(takepicture_mode cap_mode)
 		/* if mipi, set to half word for capture raw */
 		g_cxt->sn_cxt.sn_if.if_spec.mipi.is_loose = 1;
 	}
+    CMR_LOGI("previous_sensor_mode is %d.",g_cxt->sn_cxt.previous_sensor_mode);
 	if (g_cxt->sn_cxt.previous_sensor_mode == SENSOR_MODE_MAX) {
 		ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 		if (ret) {
@@ -2417,17 +2490,18 @@ int camera_take_picture_internal(takepicture_mode cap_mode)
 			CMR_LOGE("Fail to switch on the sensor stream");
 			return -CAMERA_FAILED;
 		} else {
-			if (sensor_mode != g_cxt->sn_cxt.previous_sensor_mode) {
-				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-				if (ret) {
-					CMR_LOGE("the senso interface is unsupported by V4L2");
-					return -CAMERA_FAILED;
-				}
+			if (sensor_mode != g_cxt->sn_cxt.capture_mode) {
 				ret = Sensor_StreamOff();
 				if (ret) {
 					CMR_LOGE("Fail to switch off the sensor stream");
 					return -CAMERA_FAILED;
 				}
+				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+				if (ret) {
+					CMR_LOGE("the senso interface is unsupported by V4L2");
+					return -CAMERA_FAILED;
+				}
+
 				ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 				if (ret) {
 					CMR_LOGE("the sensor interface is unsupported by V4L2");
@@ -3140,6 +3214,14 @@ void camera_v4l2_evt_cb(int evt, void* data)
 		ret = cmr_v4l2_free_frame(info->channel_id, info->frame_id);
 		CMR_LOGE("Wrong status, %d", g_cxt->v4l2_cxt.v4l2_state);
 		return;
+	}
+	if (CMR_V4L2_TX_DONE == evt) {
+		if ((CHN_BUSY != g_cxt->chn_2_status) &&
+			(CHN_2 == info->channel_id)) {
+			ret = cmr_v4l2_free_frame(info->channel_id, info->frame_id);
+			CMR_LOGE("discard, %d", g_cxt->chn_2_status);
+			return;
+		}
 	}
 
 	message.data = malloc(sizeof(struct frm_info));
@@ -4387,10 +4469,103 @@ int camera_capture_init(void)
 	} else {
 		g_cxt->thum_from = THUM_FROM_SCALER;
 	}
+
 	if (RECOVERING != g_cxt->recover_status) {
 		g_cxt->cap_cnt = 0;
 	} else {
 		g_cxt->cap_cnt = g_cxt->cap_cnt_for_err;
+	}
+
+	ret = camera_alloc_capture_buf(&buffer_info, g_cxt->total_cap_num, v4l2_cfg.channel_id);
+	if (ret) {
+		CMR_LOGE("Failed to alloc capture buffer");
+		goto exit;
+	}
+
+	ret = cmr_v4l2_buff_cfg(&buffer_info);
+	if (ret) {
+		CMR_LOGE("Failed to Q capture buffer");
+		goto exit;
+	}
+
+	if (IMG_DATA_TYPE_JPEG == v4l2_cfg.cfg.dst_img_fmt) {
+		g_cxt->chn_0_status = CHN_BUSY;
+		SET_CHN_BUSY(CHN_0);
+	} else {
+		g_cxt->chn_2_status = CHN_BUSY;
+		SET_CHN_BUSY(CHN_2);
+	}
+
+	if (v4l2_cfg.cfg.need_isp && ISP_IDLE == g_cxt->isp_cxt.isp_state) {
+		uint32_t video_mode = g_cxt->cmr_set.video_mode;
+		CMR_LOGI("start ISP.");
+		isp_video_param.size.w = sensor_mode->width;
+		isp_video_param.size.h = sensor_mode->height;
+/*		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[g_cxt->sn_cxt.capture_mode].ae_info[video_mode];
+		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
+		if (CAMERA_SUCCESS != ret) {
+			CMR_LOGE("set ae information error.");
+		}*/
+		isp_video_param.format = ISP_DATA_NORMAL_RAW10;
+		isp_video_param.mode= ISP_VIDEO_MODE_SINGLE;
+		ret = isp_video_start(&isp_video_param);
+		if (CAMERA_SUCCESS == ret) {
+			g_cxt->isp_cxt.isp_state = ISP_COWORK;
+		}
+	}
+    g_cxt->recover_status = NO_RECOVERY;
+exit:
+	return ret;
+}
+
+int camera_capture_init_continue(void)
+{
+	struct img_size          capture_size;
+	int                      ret = CAMERA_SUCCESS;
+	struct cap_cfg           v4l2_cfg;
+	SENSOR_MODE_INFO_T       *sensor_mode;
+	struct buffer_cfg        buffer_info;
+	struct isp_video_start   isp_video_param;
+	SENSOR_AE_INFO_T         *sensor_aec_info;
+	struct sn_cfg            sensor_cfg;
+
+	CMR_LOGV("capture size, %d %d, cap_rot %d",
+		g_cxt->capture_size.width,
+		g_cxt->capture_size.height,
+		g_cxt->cap_rot);
+
+	g_cxt->thum_ready = 0;
+	CMR_LOGI("test log:%d.",g_cxt->sn_cxt.capture_mode);
+	sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.capture_mode];
+	sensor_cfg.sn_size.width  = sensor_mode->width;
+	sensor_cfg.sn_size.height = sensor_mode->height;
+	if (IS_NON_ZSL_MODE(g_cxt->cap_mode)) {
+		sensor_cfg.frm_num = 1;
+		ret = cmr_v4l2_sn_cfg(&sensor_cfg);
+		if (ret) {
+			CMR_LOGE("Failed to set V4L2 the size of sensor");
+			return -CAMERA_FAILED;
+		}
+	}
+
+	bzero(&v4l2_cfg, sizeof(struct cap_cfg));
+	v4l2_cfg.channel_id = CHN_2;
+	ret = camera_capture_ability(sensor_mode, &v4l2_cfg.cfg, &g_cxt->capture_size);
+	if (ret) {
+		CMR_LOGE("Failed to camera_capture_ability, %d", ret);
+		goto exit;
+	}
+
+	if (IMG_DATA_TYPE_JPEG == v4l2_cfg.cfg.dst_img_fmt) {
+		v4l2_cfg.channel_id = CHN_0;
+	}
+
+	ret = cmr_v4l2_cap_cfg(&v4l2_cfg);
+	if (ret) {
+		CMR_LOGE("Can't support this capture configuration");
+		goto exit;
+	} else {
+		g_cxt->thum_from = THUM_FROM_SCALER;
 	}
 
 	ret = camera_alloc_capture_buf(&buffer_info, g_cxt->total_cap_num, v4l2_cfg.channel_id);
@@ -5263,6 +5438,11 @@ int camera_capture_err_handle(uint32_t evt_type)
 		CMR_LOGE("Failed to stop v4l2 capture, %d", ret);
 		return -CAMERA_FAILED;
 	}
+	g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+	ret = Sensor_StreamOff();
+	if (ret) {
+		CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+	}
 	ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 	if (ret) {
 		CMR_LOGE("Failed to stop IF , %d", ret);
@@ -5270,11 +5450,7 @@ int camera_capture_err_handle(uint32_t evt_type)
 	}
 
 	CMR_PRINT_TIME;
-	g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-	ret = Sensor_StreamOff();
-	if (ret) {
-		CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
-	}
+
 	if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
 			ret = isp_video_stop();
 			g_cxt->isp_cxt.isp_state = ISP_IDLE;
