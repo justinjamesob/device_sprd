@@ -1,7 +1,7 @@
 
 LOCAL_PATH:= device/sprd/common/res/boot
 
-ifneq ($(filter sp8830ea sp8830eb , $(TARGET_BOARD)),)
+ifneq ($(filter sp8830ea sp8830eb sp8835eb , $(TARGET_BOARD)),)
 PRODUCT_COPY_FILES += \
         $(LOCAL_PATH)/bootanimation_8830.zip:system/media/bootanimation.zip \
         $(LOCAL_PATH)/bootsound.mp3:system/media/bootsound.mp3 \
