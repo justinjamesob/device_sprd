@@ -37,6 +37,7 @@
 #define ISP_YUV_TO_RAW_GAP        CMR_SLICE_HEIGHT
 #define BACK_CAMERA_ID            0
 #define FRONT_CAMERA_ID           1
+#define JPEG_SMALL_SIZE           (300 * 1024)
 #define ADDR_BY_WORD(a)           (((a) + 3 ) & (~3))
 #define CMR_NO_MEM(a, b)                                                                  \
 	do {                                                                              \
@@ -1528,9 +1529,15 @@ uint32_t get_jpeg_size(uint32_t width, uint32_t height, uint32_t thum_width, uin
 	uint32_t       size;
 	(void)thum_width; (void)thum_height;
 
-	size = CMR_JPEG_SZIE(width, height);//+JPEG_EXIF_SIZE;
+	if ((width * height) < JPEG_SMALL_SIZE) {
+		size = CMR_JPEG_SZIE(width, height) + JPEG_EXIF_SIZE;
+	} else {
+		size = CMR_JPEG_SZIE(width, height);
+	}
+
 	return ADDR_BY_WORD(size);
 }
+
 uint32_t get_thum_yuv_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height)
 {
 	(void)width; (void)height;
