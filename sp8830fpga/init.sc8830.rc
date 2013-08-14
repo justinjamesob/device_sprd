@@ -27,6 +27,10 @@ on post-fs-data
     # Set indication (checked by vold) that we have finished this action
     setprop vold.post_fs_data_done 1
 
+on init
+    mkdir /dev/pipe 0755 system system
+    pipe 666 /dev/pipe/mmi.audio.ctrl
+
 on boot
     chown system system /sys/class/backlight/sprd_backlight/brightness
 

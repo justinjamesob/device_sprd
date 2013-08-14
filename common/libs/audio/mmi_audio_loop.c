@@ -96,6 +96,9 @@ void *mmi_audio_loop_thread(void *args)
 
 	ALOGE("peter: open /dev/pipe/mmi.audio.ctrl in\n");
     mmi_audio_ctrl = open("/dev/pipe/mmi.audio.ctrl", O_RDWR);
+    if(mmi_audio_ctrl < 0){
+        ALOGE("%s, open pipe error!! ",__func__);
+    }
     max_fd = mmi_audio_ctrl;
     memset(r_buf, 0, sizeof r_buf);
     
