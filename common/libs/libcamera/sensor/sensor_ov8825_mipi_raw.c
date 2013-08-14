@@ -2318,7 +2318,7 @@ LOCAL uint32_t _ov8825_BeforeSnapshot(uint32_t param)
 	preview_maxline = (ret_h << 8) + ret_l;
 
 	Sensor_SetMode(capture_mode);
-	Sensor_StreamOff();
+	Sensor_SetMode_WaitDone();
 
 	if (prv_linetime == cap_linetime) {
 		SENSOR_PRINT("SENSOR_ov8825: prvline equal to capline");

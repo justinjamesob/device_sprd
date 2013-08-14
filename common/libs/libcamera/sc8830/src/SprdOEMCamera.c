@@ -2726,6 +2726,7 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 		}
 	} else {
 		if ((TAKE_PICTURE_NEEDED == camera_get_take_picture()) && IS_CHN_BUSY(CHN_2)) {
+			g_cxt->chn_2_status = CHN_BUSY;
 			message.msg_type = CMR_EVT_BEFORE_CAPTURE;
 			message.alloc_flag = 0;
 			ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
