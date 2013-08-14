@@ -295,12 +295,16 @@ struct camera_context {
 	uint32_t                 chn_2_status;
 	uint32_t                 recover_status;
 	uint32_t                 recover_cnt;
+	pthread_mutex_t          recover_mutex;
+
 	pthread_mutex_t          cb_mutex;
 	camera_cb_f_type         camera_cb;
 	pthread_mutex_t          data_mutex;
 	void*                    client_data;
 	uint32_t                 af_inited;
 	pthread_mutex_t          af_cb_mutex;
+	uint32_t                 af_busy;
+
 	camera_cb_f_type         camera_af_cb;
 	uint32_t                 zoom_level;
 	uint32_t                 skip_mode;
@@ -368,6 +372,7 @@ struct camera_context {
 	uint32_t                 total_cap_num;
 	uint32_t                 total_capture_num;
 	uint32_t                 cap_cnt;
+	uint32_t                 last_cap_cnt;
 	uint32_t                 cap_cnt_for_err;
 	uint32_t                 cap_process_id;
 	uint32_t                 total_cap_ch_num;

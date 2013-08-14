@@ -1401,11 +1401,11 @@ int camera_autofocus_start(void)
 		CMR_RTN_IF_ERR(ret);
 	}
 #ifndef CONFIG_CAMERA_FLASH_CTRL
-    if (CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode) {
+	if (CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode) {
 		uint32_t skip_mode = 0;;
 		uint32_t skip_number = 0;
 		ret = camera_set_flash(cxt->cmr_set.flash_mode, &skip_mode, &skip_number);
-    }
+	}
 
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
@@ -1494,6 +1494,7 @@ int camera_autofocus_start(void)
 	}
 
 	if (CAMERA_SUCCESS == ret) {
+		cxt->af_busy = 1;
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
 			struct isp_af_win isp_af_param;
 
@@ -1522,6 +1523,7 @@ int camera_autofocus_start(void)
 		} else {
 			ret = Sensor_Ioctl(SENSOR_IOCTL_FOCUS, (uint32_t) & af_param);
 		}
+		cxt->af_busy = 0;
 	}
 /*#ifndef CONFIG_CAMERA_FLASH_CTRL
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
@@ -1539,6 +1541,31 @@ int camera_autofocus_start(void)
 	}
 
 exit:
+	return ret;
+}
+
+int camera_autofocus_quit(void)
+{
+	int                      ret = CAMERA_SUCCESS;
+	struct camera_context    *cxt = camera_get_cxt();
+
+	if (!(cxt->af_busy)) {
+		CMR_LOGV("autofocus is IDLE direct return!");
+		return ret;
+	}
+
+	CMR_LOGV("set autofocus quit!");
+	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
+		struct isp_af_win isp_af_param;
+		memset(&isp_af_param, 0, sizeof(struct isp_af_win));
+		ret = isp_ioctl(ISP_CTRL_AF_STOP, &isp_af_param);
+	} else {
+		SENSOR_EXT_FUN_PARAM_T   af_param;
+		memset(&af_param,0,sizeof(af_param));
+		af_param.cmd = SENSOR_EXT_FOCUS_QUIT;
+		ret = Sensor_Ioctl(SENSOR_IOCTL_FOCUS, (uint32_t) &af_param);
+	}
+
 	return ret;
 }
 
