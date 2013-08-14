@@ -17,6 +17,7 @@
 #include <linux/cdev.h>     /* character device definitions */
 #include <linux/mm.h>       /* memory manager definitions */
 #include <linux/mali/mali_utgard_ioctl.h>
+#include <linux/uaccess.h>
 #include "mali_kernel_common.h"
 #include "mali_session.h"
 #include "mali_kernel_core.h"
@@ -63,17 +64,18 @@ module_param(gpuinfo_transition_latency, int, S_IRUSR | S_IRGRP | S_IROTH); /* r
 MODULE_PARM_DESC(gpuinfo_transition_latency, "GPU transition latency");
 
 int scaling_min_freq=0;
-module_param(scaling_min_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* rw-rw-r-- */
+module_param(scaling_min_freq, int, S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP | S_IROTH); /* rw-rw-r-- */
 MODULE_PARM_DESC(scaling_min_freq, "GPU scaling_min_freq");
 
 int scaling_max_freq=0;
-module_param(scaling_max_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* rw-rw-r-- */
+module_param(scaling_max_freq, int, S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP | S_IROTH); /* rw-rw-r-- */
 MODULE_PARM_DESC(scaling_max_freq, "GPU scaling_max_freq");
 
-unsigned int scaling_cur_freq=0;
-module_param(scaling_cur_freq, uint, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
+int scaling_cur_freq=0;
+module_param(scaling_cur_freq, int, S_IRUSR | S_IRGRP | S_IROTH); /* r-r-r-- */
 MODULE_PARM_DESC(scaling_cur_freq, "GPU scaling_cur_freq");
 
+int gpu_level=0;
 /* By default the module uses any available major, but it's possible to set it at load time to a specific number */
 int mali_major = 0;
 module_param(mali_major, int, S_IRUGO); /* r--r--r-- */
@@ -358,6 +360,7 @@ static int mali_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, 
 #endif
 {
 	int err;
+	int level=0;
 	struct mali_session_data *session_data;
 
 #ifndef HAVE_UNLOCKED_IOCTL
@@ -396,6 +399,14 @@ static int mali_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, 
 
 		case MALI_IOC_GET_USER_SETTINGS:
 			err = get_user_settings_wrapper(session_data, (_mali_uk_get_user_settings_s __user *)arg);
+			break;
+
+		case MALI_IOC_SET_GPU_LEVEL:
+			err=get_user(level,(int __user *)arg);;
+			if((0==err)&&(level>gpu_level))
+			{
+				gpu_level=level;
+			}
 			break;
 
 #if MALI_TIMELINE_PROFILING_ENABLED

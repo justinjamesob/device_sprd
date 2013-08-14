@@ -68,6 +68,7 @@ typedef enum
     _MALI_UK_POST_NOTIFICATION,           /**< _mali_ukk_post_notification() */
 	_MALI_UK_GET_USER_SETTING,       /**< _mali_ukk_get_user_setting() *//**< [out] */
 	_MALI_UK_GET_USER_SETTINGS,       /**< _mali_ukk_get_user_settings() *//**< [out] */
+	_MALI_UK_SET_GPU_LEVEL,           /*set gpu level to control frequency */
 
 	/** Memory functions */
 
