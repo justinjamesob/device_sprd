@@ -215,7 +215,7 @@ public class AppSettings extends PreferenceActivity {
         } else if ("msms_retry_control".equals(key)) {
             if (preference instanceof CheckBoxPreference) {
                 SystemProperties.set(RETRY_SMS_CONTROL,
-                        ((CheckBoxPreference) preference).isChecked() ? "3" : "1");
+                        ((CheckBoxPreference) preference).isChecked() ? "3" : "0");
             }
             return true;
             /*Add 20130805 spreadst of 198464 add SMS retry control end*/
