@@ -557,12 +557,15 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
                                 }
                                 String fileName = edtDump.getText().toString();
                                 java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("[0-9a-zA-Z]*");
-                                if (pattern.matcher(fileName).matches() && !"".equals(fileName)) {
+                                if ((pattern.matcher(fileName).matches() && !"".equals(fileName)) 
+                                        && fileName.length() <= 40) {
                                     SlogAction.dump(edtDump.getText()
                                         .toString());
                                 } else {
                                     Toast.makeText(LogSettingSlogUICommonControl.this
-                                                , getText(R.string.toast_dump_filename_error)
+                                                , fileName.length() > 40 ?
+                                                getText(R.string.toast_dump_input_limited)
+                                                : getText(R.string.toast_dump_filename_error)
                                                 , Toast.LENGTH_LONG)
                                             .show();
                                 }
