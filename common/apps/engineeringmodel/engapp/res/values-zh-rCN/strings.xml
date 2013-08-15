@@ -71,6 +71,7 @@
     <string name="toast_service_slog_end_failed">Slog服务停止失败</string>
     <string name="toast_freespace_nand">手机剩余空间:</string>
     <string name="toast_freespace_sdcard">SD卡剩余空间</string>
+    <string name="toast_dump_input_limited">名称过长，请控制在40字以内</string>
     <string name="low_free_space_title">请及时清理或导出Log</string>
     <string name="low_free_space_message">存储Log的空用空间正在减小，为避免丢失已保存Log，请及时导出或清理Log</string>
     <string name="slog_dump_ok">完成</string>

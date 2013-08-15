@@ -55,6 +55,7 @@
     <string name="tabtag_tabhost_tabandroid">Android Log</string>
     <string name="tabtag_tabhost_tabmodem">Modem and Misc</string>
     <string name="toast_receiver_failed">啓動Slog服務失敗</string>
+    <string name="toast_dump_input_limited">輸入名稱冗餘，限制在40字內</string>
     <string name="notification_slogsvc_title">Slog正在進行</string>
     <string name="notification_slogsvc_prompt">點擊這裏進入Slog設置</string>
     <string name="notification_slogsvc_statusbarprompt">正在開啓Slog服務</string>

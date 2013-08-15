@@ -199,6 +199,7 @@
     <string name="toast_snap_success">Screenshot successfully</string>
     <string name="toast_snap_failed">Failed to screenshot</string>
     <string name="toast_snap_prompt">Pull the statusbar, you\'ll find screenshot service, press it to snap the screen.</string>
+    <string name="toast_dump_input_limited">Please input tgz name below 40</string>
 
     <string name="toast_service_snap_start_failed">Failed to start snap service.</string>
     <string name="toast_service_snap_end_failed">Failed to stop snap service.</string>
