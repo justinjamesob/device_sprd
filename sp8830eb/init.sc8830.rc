@@ -49,7 +49,7 @@ on boot
     chmod 660 /proc/cpt/dsp
     chmod 660 /proc/cpw/wdtirq
     chmod 660 /proc/cpw/stop
-    chmod 660 /proc/cpwt/start
+    chmod 660 /proc/cpw/start
     chmod 660 /proc/cpw/modem
     chmod 660 /proc/cpw/dsp
     chown system root /proc/cpt/wdtirq
