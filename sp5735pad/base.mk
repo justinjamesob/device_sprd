@@ -45,7 +45,8 @@ PRODUCT_PACKAGES += \
 	wpa_supplicant.conf \
 	calibration_init \
 	nvm_daemon \
-	modemd
+	modemd\
+	engpc
 
 # own copyright packages files
 PRODUCT_PACKAGES += \

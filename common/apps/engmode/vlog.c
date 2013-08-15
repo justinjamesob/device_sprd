@@ -1,0 +1,134 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <time.h>
+#include <signal.h>
+#include <sys/ioctl.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <termios.h>
+#include "engopt.h"
+#include "cutils/properties.h"
+#include "eng_pcclient.h"
+#include "vlog.h"
+#include "eng_util.h"
+
+#define DATA_BUF_SIZE (4096 * 4)
+#define MAX_OPEN_TIMES  10
+
+static char log_data[DATA_BUF_SIZE];
+static int s_ser_fd = 0;
+static int s_connect_type = 0;
+
+int get_ser_fd(void)
+{
+    return s_ser_fd;
+}
+
+int restart_gser(void)
+{
+    struct termios ser_settings;
+
+    if(s_ser_fd > 0) {
+        ENG_LOG("%s: eng_vlog close usb serial:%d\n", __FUNCTION__, s_ser_fd);
+        close(s_ser_fd);
+    }
+
+    s_ser_fd = eng_open_dev(s_connect_ser_path[s_connect_type], O_WRONLY);
+    if(s_ser_fd < 0) {
+        ENG_LOG("%s: eng_vlog cannot open general serial\n", __FUNCTION__);
+        return -1;
+    }
+
+    ENG_LOG("%s: eng_vlog reopen usb serial:%d\n", __FUNCTION__, s_ser_fd);
+    return 0;
+}
+
+void *eng_vlog_thread(void *x)
+{
+    int ser_fd, sipc_fd;
+    int r_cnt, w_cnt, offset;
+    int retry_num = 0;
+    struct eng_param * param = (struct eng_param *)x;
+
+    ENG_LOG("eng_vlog thread start\n");
+
+    if(param == NULL) {
+        ENG_LOG("eng_vlog invalid input\n");
+        return NULL;
+    }
+
+    /*open usb/uart*/
+    ENG_LOG("eng_vlog open serial...\n");
+    s_connect_type = param->connect_type;
+    ser_fd = eng_open_dev(s_connect_ser_path[s_connect_type], O_WRONLY);
+    if(ser_fd < 0) {
+        ENG_LOG("eng_vlog open serial failed, error: %s\n", strerror(errno));
+        return NULL;
+    }
+
+    s_ser_fd = ser_fd;
+
+    /*open vbpipe/spipe*/
+    ENG_LOG("eng_vlog open SIPC channel...\n");
+    do{
+        sipc_fd = open(s_cp_pipe[param->cp_type], O_RDONLY);
+        if(sipc_fd < 0) {
+            ENG_LOG("eng_vlog cannot open %s, error: %s\n", s_cp_pipe[param->cp_type], strerror(errno));
+            sleep(5);
+        }
+
+        if((++retry_num) > MAX_OPEN_TIMES) {
+            ENG_LOG("eng_vlog SIPC open times exceed the max times, vlog thread stopped.\n");
+            return NULL;
+        }
+    }while(sipc_fd < 0);
+
+    ENG_LOG("eng_vlog put log data from SIPC to serial\n");
+    while(1) {
+        memset(log_data, 0, sizeof(log_data));
+        r_cnt = read(sipc_fd, log_data, DATA_BUF_SIZE);
+        if (r_cnt <= 0) {
+            ENG_LOG("eng_vlog read no log data : r_cnt=%d, %s\n",  r_cnt, strerror(errno));
+            continue;
+        }
+
+        offset = 0; //reset the offset
+
+        do {
+            w_cnt = write(ser_fd, log_data + offset, r_cnt);
+            if (w_cnt < 0) {
+                ENG_LOG("eng_vlog no log data write:%d ,%s\n", w_cnt, strerror(errno));
+
+                // FIX ME: retry to open
+                retry_num = 0; //reset the try number.
+                while (-1 == restart_gser()) {
+                    ENG_LOG("eng_vlog open gser port failed\n");
+                    sleep(1);
+                    retry_num ++;
+                    if(retry_num > MAX_OPEN_TIMES) {
+                        ENG_LOG("eng_vlog: vlog thread stop for gser error !\n");
+                        return 0;
+                    }
+                }
+
+                ser_fd = s_ser_fd;
+            } else {
+                r_cnt -= w_cnt;
+                offset += w_cnt;
+                ENG_LOG("eng_vlog: r_cnt: %d, w_cnt: %d, offset: %d\n", r_cnt, w_cnt, offset);
+            }
+        } while(r_cnt > 0);
+    }
+
+out:
+    ENG_LOG("eng_vlog thread end\n");
+    close(sipc_fd);
+    close(ser_fd);
+
+    return 0;
+}

@@ -31,7 +31,8 @@ PRODUCT_PACKAGES := \
 	CalendarProvider \
 	calibration_init \
 	nvm_daemon \
-	modemd
+	modemd\
+	engpc
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
 PRODUCT_PACKAGES := \
