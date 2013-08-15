@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
 	} else {
 		path = W_NOTIFY_DEV;
 	}
-	fd = open(TD_NOTIFY_DEV, O_RDWR);
+	fd = open(path/*TD_NOTIFY_DEV*/, O_RDWR);
 	if (fd < 0) {
 		REF_LOGE("RefNotify open %s failed, error: %s", path, strerror(errno));
 		exit(EXIT_FAILURE);
