@@ -4140,6 +4140,10 @@ void *camera_af_thread_proc(void *data)
 			CMR_PRINT_TIME;
 			if (CMR_IDLE == g_cxt->preview_status) {
 				CMR_LOGI("preview already stoped.");
+				camera_call_af_cb(CAMERA_EXIT_CB_FAILED,
+					message.data,
+					CAMERA_FUNC_START_FOCUS,
+					0);
 				break;
 			}
 			pthread_mutex_lock(&g_cxt->af_cb_mutex);
