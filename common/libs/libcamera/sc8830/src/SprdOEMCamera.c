@@ -1007,6 +1007,7 @@ int camera_cap_post(void *data)
 {
 	int ret = CAMERA_SUCCESS;
 	CMR_MSG_INIT(message);
+	int tmp = 0;
 
 	g_cxt->cap_cnt++;
 	g_cxt->cap_cnt_for_err = g_cxt->cap_cnt;
@@ -1100,7 +1101,7 @@ int camera_cap_post(void *data)
 				return -CAMERA_FAILED;
 			}
 		} else {
-			int tmp = g_cxt->cap_cnt;
+			tmp = g_cxt->cap_cnt;
 			camera_call_cb(CAMERA_EVT_CB_FLUSH,
 				camera_get_client_data(),
 				CAMERA_FUNC_TAKE_PICTURE,
@@ -1384,6 +1385,7 @@ int camera_local_init(void)
 	pthread_mutex_init(&g_cxt->data_mutex, NULL);
 	pthread_mutex_init(&g_cxt->prev_mutex, NULL);
 	pthread_mutex_init(&g_cxt->take_mutex, NULL);
+	pthread_mutex_init(&g_cxt->recover_mutex, NULL);
 	pthread_mutex_init(&g_cxt->af_cb_mutex, NULL);
 	pthread_mutex_init(&g_cxt->cancel_mutex, NULL);
 	pthread_mutex_init(&g_cxt->take_raw_mutex, NULL);
@@ -1403,6 +1405,7 @@ int camera_local_deinit(void)
 
 	pthread_mutex_destroy (&g_cxt->cancel_mutex);
 	pthread_mutex_destroy (&g_cxt->af_cb_mutex);
+	pthread_mutex_destroy(&g_cxt->recover_mutex);
 	pthread_mutex_destroy(&g_cxt->take_mutex);
 	pthread_mutex_destroy (&g_cxt->prev_mutex);
 	pthread_mutex_destroy (&g_cxt->data_mutex);
@@ -2123,6 +2126,7 @@ int camera_start_preview_internal(void)
 	if (IMG_SKIP_HW == g_cxt->skip_mode) {
 		skip_number = g_cxt->skip_num;
 	}
+
 	ret = cmr_v4l2_cap_start(skip_number);
 	if (ret) {
 		CMR_LOGE("Fail to start V4L2 Capture");
@@ -2255,6 +2259,7 @@ int camera_stop_preview_internal(void)
 
 	g_cxt->preview_status = CMR_IDLE;
 	if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
+		camera_autofocus_quit();
 		pthread_mutex_lock(&g_cxt->af_cb_mutex);
 		pthread_mutex_unlock(&g_cxt->af_cb_mutex);
 	}
@@ -2678,6 +2683,7 @@ int camera_set_take_picture_cap_mode(takepicture_mode cap_mode)
 	g_cxt->cap_mode = cap_mode;/*CAMERA_NORMAL_MODE;*/
 	g_cxt->hdr_cnt = 0;
 	g_cxt->cap_cnt = 0;
+	g_cxt->cap_cnt_for_err = 0;
 	pthread_mutex_unlock(&g_cxt->take_mutex);
 	CMR_LOGE("cap mode is %d.",cap_mode);
 	return CAMERA_SUCCESS;
@@ -2703,13 +2709,17 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 
 	TAKE_PICTURE_STEP(CMR_STEP_TAKE_PIC);
 	CMR_LOGI("start");
-	if (IS_ZSL_MODE(cap_mode)) {
-		camera_snapshot_start_set();
-	}
+
+	pthread_mutex_lock(&g_cxt->recover_mutex);
 	camera_set_client_data(client_data);
 	camera_set_hal_cb(callback);
 	camera_set_take_picture_cap_mode(cap_mode);
-	ret = camera_set_take_picture(TAKE_PICTURE_NEEDED);
+	camera_set_take_picture(TAKE_PICTURE_NEEDED);
+	pthread_mutex_unlock(&g_cxt->recover_mutex);
+
+	if (IS_ZSL_MODE(cap_mode)) {
+		camera_snapshot_start_set();
+	}
 
 	if (IS_NON_ZSL_MODE(cap_mode)) {
 		message.msg_type = CMR_EVT_START;
@@ -2933,6 +2943,7 @@ int camera_af_init(void)
 		ret = pthread_create(&g_cxt->af_thread, &attr, camera_af_thread_proc, NULL);
 		sem_wait(&g_cxt->af_sync_sem);
 		g_cxt->af_inited = 1;
+		g_cxt->af_busy = 0;
 		message.msg_type = CMR_EVT_AF_INIT;
 		message.data     = 0;
 		ret = cmr_msg_post(g_cxt->af_msg_que_handle, &message);
@@ -4140,10 +4151,12 @@ void *camera_af_thread_proc(void *data)
 			pthread_mutex_lock(&g_cxt->af_cb_mutex);
 			ret = camera_autofocus_start();
 			pthread_mutex_unlock(&g_cxt->af_cb_mutex);
+/*
 			if (CMR_IDLE == g_cxt->preview_status) {
 				CMR_LOGI("preview already stoped.");
 				break;
 			}
+*/
 			if (CAMERA_INVALID_STATE == ret) {
 				camera_call_af_cb(CAMERA_EXIT_CB_ABORT,
 					message.data,
@@ -5377,11 +5390,12 @@ int camera_v4l2_preview_handle(struct frm_info *data)
 		CMR_LOGV("Need rotate");
 		ret = camera_start_rotate(data);
 	}
-
+	pthread_mutex_lock(&g_cxt->recover_mutex);
 	if (g_cxt->recover_status) {
 		CMR_LOGV("Reset the recover status");
 		g_cxt->recover_status = NO_RECOVERY;
 	}
+	pthread_mutex_unlock(&g_cxt->recover_mutex);
 	return ret;
 }
 
@@ -5394,6 +5408,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 		CMR_LOGE("No way to recover");
 		return CAMERA_FAILED;
 	}
+	pthread_mutex_lock(&g_cxt->recover_mutex);
 
 	switch (evt_type) {
 
@@ -5435,6 +5450,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 	ret = camera_before_set_internal(rs_mode);
 	if (ret) {
 		CMR_LOGV("Failed to stop preview %d", ret);
+		pthread_mutex_unlock(&g_cxt->recover_mutex);
 		return CAMERA_FAILED;
 	}
 	ret = camera_after_set_internal(rs_mode);
@@ -5442,6 +5458,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 		CMR_LOGV("Failed to start preview %d", ret);
 	}
 
+	pthread_mutex_unlock(&g_cxt->recover_mutex);
 	return ret;
 }
 
@@ -5454,9 +5471,12 @@ int camera_capture_err_handle(uint32_t evt_type)
 		CMR_LOGE("No way to recover");
 		return CAMERA_FAILED;
 	}
+
+	pthread_mutex_lock(&g_cxt->recover_mutex);
 	ret = cmr_v4l2_cap_stop();
 	if (ret) {
 		CMR_LOGE("Failed to stop v4l2 capture, %d", ret);
+		pthread_mutex_unlock(&g_cxt->recover_mutex);
 		return -CAMERA_FAILED;
 	}
 	g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
@@ -5467,6 +5487,7 @@ int camera_capture_err_handle(uint32_t evt_type)
 	ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 	if (ret) {
 		CMR_LOGE("Failed to stop IF , %d", ret);
+		pthread_mutex_unlock(&g_cxt->recover_mutex);
 		return -CAMERA_FAILED;
 	}
 
@@ -5500,6 +5521,7 @@ int camera_capture_err_handle(uint32_t evt_type)
 	}
 
 	CMR_LOGV("restart ret %d.",ret);
+	pthread_mutex_unlock(&g_cxt->recover_mutex);
 	return ret;
 }
 
@@ -5898,7 +5920,9 @@ int camera_jpeg_encode_done(uint32_t thumb_stream_size)
 	TAKE_PIC_CANCEL;
 	if (0 == ret) {
 		camera_wait_takepic_callback(g_cxt);
-		CMR_LOGV("take pic done.");
+		CMR_LOGV("take pic done. cap cnt %d, total_cnt %d, cap_mode %d", g_cxt->cap_cnt,
+			g_cxt->total_capture_num,
+			g_cxt->cap_mode);
 		encoder_param.need_free = 0;
 		if ((g_cxt->cap_cnt == g_cxt->total_capture_num) ||
 			(CAMERA_NORMAL_MODE == g_cxt->cap_mode) ||

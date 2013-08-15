@@ -80,6 +80,7 @@ int camera_ae_enable(uint32_t param);
 int camera_isp_alg_done(void *data);
 int camera_isp_af_stat(void* data);
 int camera_isp_ae_stab(void* data);
+int camera_autofocus_quit(void);
 #ifdef __cplusplus
 }
 #endif
