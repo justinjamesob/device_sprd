@@ -26,7 +26,9 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/cmr_set.c \
 	sc8830/src/cmr_mem.c \
 	sc8830/src/cmr_msg.c \
-	sc8830/src/cmr_cvt.c \
+	sc8830/src/cmr_scale.c \
+	sc8830/src/cmr_rotate.c \
+	sc8830/src/cmr_copy.c \
 	sc8830/src/cmr_v4l2.c \
 	sc8830/src/jpeg_codec.c \
 	sc8830/src/dc_cfg.c \
