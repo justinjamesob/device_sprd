@@ -1528,7 +1528,7 @@ static ssize_t out_write_sco(struct tiny_stream_out *out, const void* buffer,
         size_t bytes)
 {
     void *buf;
-    void *buffer1 = NULL;
+    //void *buffer1 = NULL;
     int ret;
     size_t frame_size = 0;
     size_t in_frames = 0;
@@ -1558,19 +1558,16 @@ static ssize_t out_write_sco(struct tiny_stream_out *out, const void* buffer,
 		for( i = 0;i<out_frames*frame_size/4;i++)
 		{ *((int16_t *)buf+i)= 1;
 		}
-#else
-		//memset(buf,0x1,out_frames*frame_size/2);
 #endif
-		buffer1 = buf;
-		BLUE_TRACE("voip:out_write_sco final data, %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", *((int16_t*)buffer1+0),*((int16_t*)buffer1+1),*((int16_t*)buffer1+2),*((int16_t*)buffer1+3), *((int16_t*)buffer1+4),*((int16_t*)buffer1+4),*((int16_t*)buffer1+5),*((int16_t*)buffer1+6), *((int16_t*)buffer1+7),*((int16_t*)buffer1+8),*((int16_t*)buffer1+9),*((int16_t*)buffer1+10), *((int16_t*)buffer1+11),*((int16_t*)buffer1+12),*((int16_t*)buffer1+13),*((int16_t*)buffer1+14), *((int16_t*)buffer1+15),*((int16_t*)buffer1+16),*((int16_t*)buffer1+17),*((int16_t*)buffer1+18));
+		//buffer1 = buf;
+		//BLUE_TRACE("voip:out_write_sco final data, %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", *((int16_t*)buffer1+0),*((int16_t*)buffer1+1),*((int16_t*)buffer1+2),*((int16_t*)buffer1+3), *((int16_t*)buffer1+4),*((int16_t*)buffer1+4),*((int16_t*)buffer1+5),*((int16_t*)buffer1+6), *((int16_t*)buffer1+7),*((int16_t*)buffer1+8),*((int16_t*)buffer1+9),*((int16_t*)buffer1+10), *((int16_t*)buffer1+11),*((int16_t*)buffer1+12),*((int16_t*)buffer1+13),*((int16_t*)buffer1+14), *((int16_t*)buffer1+15),*((int16_t*)buffer1+16),*((int16_t*)buffer1+17),*((int16_t*)buffer1+18));
         ret = pcm_mmap_write(out->pcm_sco, (void *)buf, out_frames*frame_size/2);
-        //out_dump_doing(out->out_dump_fd, (void *)buf, out_frames * frame_size);
         //usleep(10000);//add by wz
     }
     else
         usleep(out_frames*1000*1000/out->config.rate);
 
-    BLUE_TRACE("voip:out_write_sco out bytes is %d,frame_size %d, in_frames %d, out_frames %d,out->pcm_sco %x", bytes, frame_size,in_frames, out_frames,out->pcm_sco);
+    //BLUE_TRACE("voip:out_write_sco out bytes is %d,frame_size %d, in_frames %d, out_frames %d,out->pcm_sco %x", bytes, frame_size,in_frames, out_frames,out->pcm_sco);
     return 0;
 }
 
@@ -1592,7 +1589,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
      * on the output stream mutex - e.g. executing select_mode() while holding the hw device
      * mutex
      */
-    ALOGD("into out_write: start: out->is_sco is %d, voip_state is %d",out->is_sco,adev->voip_state); 
+    
     pthread_mutex_lock(&adev->lock);
     pthread_mutex_lock(&out->lock);
 #ifndef _VOICE_CALL_VIA_LINEIN
@@ -1618,7 +1615,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         }
         else{
             if(out->is_sco){
-            ALOGD("voip:out_write: end: out->is_sco is %d, voip_state is %d",out->is_sco,adev->voip_state);
+
                 do_output_standby(out);
                 out->is_sco=false;
             }
@@ -1648,7 +1645,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
     pthread_mutex_unlock(&adev->lock);
     if(out->is_sco){
         BLUE_TRACE("sco playback out_write call_start(%d) call_connected(%d) ...in....",adev->call_start,adev->call_connected);
-		ALOGD("wz voip:into out_write_sco: start: out->is_sco is %d, voip_state is %d",out->is_sco,adev->voip_state);
+		
         ret=out_write_sco(out,buffer,bytes);/////////////////////////voip
     }
     else if (adev->call_connected) {      
@@ -2304,8 +2301,7 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
                 in->config.period_size *
                 audio_stream_frame_size(&in->stream.common));
        buffer1 = (void*)in->buffer;         
-       BLUE_TRACE("voip:in_read get_next_buffer:after pcm_read, %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", *((int16_t*)buffer1+0),*((int16_t*)buffer1+1),*((int16_t*)buffer1+2),*((int16_t*)buffer1+3), *((int16_t*)buffer1+4),*((int16_t*)buffer1+4),*((int16_t*)buffer1+5),*((int16_t*)buffer1+6), *((int16_t*)buffer1+7),*((int16_t*)buffer1+8),*((int16_t*)buffer1+9),*((int16_t*)buffer1+10), *((int16_t*)buffer1+11),*((int16_t*)buffer1+12),*((int16_t*)buffer1+13),*((int16_t*)buffer1+14), *((int16_t*)buffer1+15),*((int16_t*)buffer1+16),*((int16_t*)buffer1+17),*((int16_t*)buffer1+18));
-      // BLUE_TRACE("in voip6:after read from kernel buffer=%d", sizeof((void*)in->buffer));
+    
                 
 #else
 	    in->read_status = 0;
@@ -2357,10 +2353,10 @@ static void release_buffer(struct resampler_buffer_provider *buffer_provider,
 static ssize_t read_frames(struct tiny_stream_in *in, void *buffer, ssize_t frames)
 {
     ssize_t frames_wr = 0;
-    BLUE_TRACE("in voip3:read_frames, frames=%d", frames);
+    //BLUE_TRACE("in voip3:read_frames, frames=%d", frames);
     while (frames_wr < frames) {
         size_t frames_rd = frames - frames_wr;
-        BLUE_TRACE("in voip4:frames_wr=%d, frames=%d, frames_rd=%d", frames_wr, frames, frames_rd);
+        //BLUE_TRACE("in voip4:frames_wr=%d, frames=%d, frames_rd=%d", frames_wr, frames, frames_rd);
         if (in->resampler != NULL) {
             in->resampler->resample_from_provider(in->resampler,
                     (int16_t *)((char *)buffer +
@@ -2508,7 +2504,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         {
             if(!in->is_sco ) {       
                 //ALOGE(": in_read sco start  and do standby");
-                ALOGD("voip:in_read: start: in->is_sco is %d, voip_state is %d",in->is_sco,adev->voip_state);
+
                 do_input_standby(in);
 
 				adev->voip_state |= VOIP_CAPTURE_STREAM;
@@ -2520,7 +2516,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         else{
             if(in->is_sco){      
                 //ALOGE(": in_read sco stop  and do standby");
-                ALOGD("voip:in_read: end: in->is_sco is %d, voip_state is %d",in->is_sco,adev->voip_state);
+                
                 do_input_standby( in);
                 in->is_sco=false;
             }
@@ -2528,7 +2524,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
 
         if((in->is_sco && ((!(adev->voip_state & VOIP_PLAYBACK_STREAM)) ||(!(adev->voip_state & VOIP_CAPTURE_STREAM))))
         ||((!in->is_sco) && adev->voip_state)){
-		ALOGE("voip: in_read: fill_empty data and sleep,in->is_sco is %d,voip_state is %d",in->is_sco,adev->voip_state);
+		
         usleep(100000);
         memset(buffer,0,bytes);
         pthread_mutex_unlock(&in->lock);
@@ -2541,7 +2537,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         if (ret == 0)
             in->standby = 0;
 
-        ALOGE(": start input_stream ret is %d, in->is_sco is %d",ret,in->is_sco);
+
     }
     pthread_mutex_unlock(&adev->lock);
 
@@ -2565,7 +2561,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         ret = process_frames(in, buffer, frames_rq);
     else if (in->resampler != NULL)
     	{
-    		ALOGD("wz voip:in_read into read_frames: start: in->is_sco is %d, voip_state is %d",in->is_sco,adev->voip_state); 
+    		
         	ret = read_frames(in, buffer, frames_rq);/////////////get_next_buffer
         }
     else {
@@ -2589,12 +2585,12 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         memset(buffer, 0, bytes);
         
     BLUE_TRACE("voip:in_read final OK, bytes=%d", bytes);
-  	BLUE_TRACE("voip:in_read final OK, %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", *((int16_t*)buffer+0),*((int16_t*)buffer+1),*((int16_t*)buffer+2),*((int16_t*)buffer+3), *((int16_t*)buffer+4),*((int16_t*)buffer+4),*((int16_t*)buffer+5),*((int16_t*)buffer+6), *((int16_t*)buffer+7),*((int16_t*)buffer+8),*((int16_t*)buffer+9),*((int16_t*)buffer+10), *((int16_t*)buffer+11),*((int16_t*)buffer+12),*((int16_t*)buffer+13),*((int16_t*)buffer+14), *((int16_t*)buffer+15),*((int16_t*)buffer+16),*((int16_t*)buffer+17),*((int16_t*)buffer+18));
+
     
 exit:
     if (ret < 0) {
         if(in->pcm) {
-            ALOGW("(voip wz:)in_read,warning: ret=%d, (%s)", ret, pcm_get_error(in->pcm));
+            ALOGW("in_read,warning: ret=%d, (%s)", ret, pcm_get_error(in->pcm));
         }
         do_input_standby(in);
     }
