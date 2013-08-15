@@ -460,7 +460,11 @@ struct config_element sprd_front_camera_hardware_config[] = {
 	{"smile-snap-mode","0"},
 	{"hdr-supported","false"},
 	{"hdr","0"},
+#if	defined(CONFIG_CAMERA_ZSL_CAPTURE)
 	{"zsl-supported","true"},
+#else
+	{"zsl-supported","false"},
+#endif
 	{"zsl","0"},
 	{"capture-mode", "1"},
 	{"slow-motion-supported","false"},
@@ -474,21 +478,38 @@ struct config_element sprd_front_camera_hardware_config[] = {
 struct config_element sprd_back_camera_hardware_config[] = {
 	{"whitebalance-values", "auto,incandescent,fluorescent,daylight,cloudy-daylight"},
 	{"whitebalance", "auto"},
-#if defined(CONFIG_CAMERA_SUPPORT_5M)
+#if defined(CONFIG_CAMERA_SUPPORT_8M)
 	{"picture-size-values", "3264x2448,2592x1944,2048x1536,1600x1200,1280x960,640x480"},
+	{"video-picture-size-values", "2592x1944,2592x1944,2592x1944,2592x1944,2592x1944"},
+#elif defined(CONFIG_CAMERA_SUPPORT_5M)
+	{"picture-size-values", "2592x1944,2048x1536,1600x1200,1280x960,640x480"},
+	{"video-picture-size-values", "2048x1536,2048x1536,2048x1536,2048x1536,2048x1536"},
 #elif defined(CONFIG_CAMERA_SUPPORT_3M)
 	{"picture-size-values", "2048x1536,1600x1200,1280x960,640x480"},
+	{"video-picture-size-values", "1600x1200,1600x1200,1600x1200,1600x1200,1600x1200"},
 #elif defined(CONFIG_CAMERA_SUPPORT_2M)
 	{"picture-size-values", "1600x1200,1280x960,640x480"},
+	{"video-picture-size-values", "1280x960,1280x960,1280x960,1280x960,1280x960"},
 #else
 	{"picture-size-values", "3264x2448,2592x1944,2048x1536,1600x1200,1280x960,640x480"},
+	{"video-picture-size-values", "2592x1944,2592x1944,2592x1944,2592x1944,2592x1944"},
 #endif
 	{"picture-size", "640x480"},
 	{"preview-size-values", "1280x960,352x288,176x144"},
 	{"preview-size", "1280x960"},
+#if defined(CONFIG_CAMERA_VIDEO_SIZE_SUPPORT_1080P)
 	{"video-size-values", "1920x1080,1280x720,720x480,352x288,176x144"},
 	{"video-size", "1920x1080"},
-	{"video-picture-size-values", "2592x1944,2592x1944,2592x1944,2592x1944,2592x1944"},
+#elif defined(CONFIG_CAMERA_VIDEO_SIZE_SUPPORT_720P)
+	{"video-size-values",  "1280x720,720x480,352x288,176x144"},
+	{"video-size", "1280x720"},
+#elif defined(CONFIG_CAMERA_VIDEO_SIZE_SUPPORT_D1)
+	{"video-size-values",  "720x480,352x288,176x144"},
+	{"video-size", "720x480"},
+#else
+	{"video-size-values",  "720x480,352x288,176x144"},
+	{"video-size", "720x480"},
+#endif
 	{"preferred-preview-size-for-video", "352x288"},
 	{"video-frame-format-values", "yuv420sp,yuv420p"},
 	{"video-frame-format", "yuv420sp"},
@@ -558,7 +579,11 @@ struct config_element sprd_back_camera_hardware_config[] = {
 	{"smile-snap-mode","0"},
 	{"hdr-supported","true"},
 	{"hdr","0"},
+#if	defined(CONFIG_CAMERA_ZSL_CAPTURE)
 	{"zsl-supported","true"},
+#else
+	{"zsl-supported","false"},
+#endif
 	{"zsl","0"},
 	{"capture-mode", "1"},
 	{"slow-motion-supported","true"},
