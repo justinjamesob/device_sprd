@@ -82,6 +82,7 @@ static pthread_mutex_t    status_mutex = PTHREAD_MUTEX_INITIALIZER;
 static uint32_t           is_on = 0;
 static pthread_t          v4l2_thread;
 static uint32_t           chn_status[CHN_MAX];
+static int                chn_frm_num[CHN_MAX];
 
 static int      cmr_v4l2_create_thread(void);
 static int      cmr_v4l2_kill_thread(void);
@@ -293,7 +294,7 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 	if (NULL == config)
 		return -1;
 
-	CMR_LOGV("channel_id %d", config->channel_id);
+	CMR_LOGV("channel_id %d, frm_num %d.", config->channel_id, config->frm_num);
 	cfg_id = config->channel_id;
 	stream_parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	stream_parm.parm.capture.capability = PATH_FRM_DECI;
@@ -305,11 +306,14 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 
 	if (CHN_1 == cfg_id) {
 		buf_type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		chn_frm_num[1] = config->frm_num;
 	} else  if (CHN_2 == cfg_id) {
 		buf_type  = V4L2_BUF_TYPE_PRIVATE;
+		chn_frm_num[2] = config->frm_num;
 	} else {
 		/* CHN_0 */
 		buf_type  = V4L2_BUF_TYPE_VIDEO_OUTPUT;
+		chn_frm_num[0] = config->frm_num;
 	}
 
 	/* firstly, set the crop rectangle PATH1 module, this should be called before VIDIOC_TRY_FMT called */
@@ -466,14 +470,23 @@ parameters for v4l2_ext_controls
  reserved[1],    deci_factor;
  struct v4l2_ext_control *controls;
 */
-int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci_factor)
+int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci_factor, int frm_num)
 {
 	int                      ret = 0;
 	struct v4l2_streamparm   stream_parm;
 	
 	CMR_CHECK_FD;
 
-	CMR_LOGV("channel_id %d", channel_id);
+	CMR_LOGV("channel_id %d, frm_num %d", channel_id,frm_num);
+
+	if (CHN_1 == channel_id) {
+		chn_frm_num[1] = frm_num;
+	} else  if (CHN_2 == channel_id) {
+		chn_frm_num[2] = frm_num;
+	} else {
+		/* CHN_0 */
+		chn_frm_num[0] = frm_num;
+	}
 
 	stream_parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	stream_parm.parm.capture.capability = PATH_RESUME;
@@ -644,6 +657,7 @@ static void* cmr_v4l2_thread_proc(void* data)
 	int                      evt_id;
 	struct frm_info          frame;
 	uint32_t                 on_flag = 0;
+	int                      frm_num = -1;
 
 	if (-1 == fd) {
 		CMR_LOGE("V4L2 device not opened");
@@ -674,12 +688,31 @@ static void* cmr_v4l2_thread_proc(void* data)
 				}
 				if (V4L2_BUF_TYPE_VIDEO_CAPTURE == buf.type) {
 					frame.channel_id = CHN_1;
+					frm_num = chn_frm_num[CHN_1];
 				} else if (V4L2_BUF_TYPE_PRIVATE == buf.type) {
 					frame.channel_id = CHN_2;
+					frm_num = chn_frm_num[CHN_2];
 				} else if (V4L2_BUF_TYPE_VIDEO_OUTPUT == buf.type) {
 					frame.channel_id = CHN_0;
+					frm_num = chn_frm_num[CHN_0];
 				}
 
+				frame.free = 0;
+				if (CMR_V4L2_TX_DONE == evt_id) {
+					if (frm_num == 0) {
+						frame.free = 1;
+					} else if (-1 != frm_num) {
+						frm_num--;
+					}
+				}
+
+				if (CHN_1 == frame.channel_id) {
+					chn_frm_num[CHN_1] = frm_num;
+				} else if (CHN_2 == frame.channel_id) {
+					chn_frm_num[CHN_2] = frm_num;
+				} else if (CHN_0 == frame.channel_id) {
+					chn_frm_num[CHN_0] = frm_num;
+				}
 				CMR_LOGV("TX got one frame! buf_type 0x%x, id 0x%x, evt_id 0x%x", buf.type, buf.index, evt_id);
 				frame.height   = buf.reserved;
 				frame.frame_id = buf.index;

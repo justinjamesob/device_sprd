@@ -83,6 +83,7 @@ struct sn_cfg {
 struct cap_cfg {
 	uint32_t                            channel_id;
 	uint32_t                            chn_deci_factor;
+	uint32_t                            frm_num;
 	struct img_frm_cap                  cfg;
 };
 
@@ -104,6 +105,7 @@ struct frm_info {
 	uint32_t                            usec;
 	struct img_data_end                 data_endian;
 	uint32_t                            length;
+	uint32_t                            free;
 };
 int cmr_v4l2_init(void);
 int cmr_v4l2_deinit(void);
@@ -115,7 +117,7 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config);
 int cmr_v4l2_buff_cfg(struct buffer_cfg *buf_cfg);
 int cmr_v4l2_cap_start(uint32_t skip_num);
 int cmr_v4l2_cap_stop(void);
-int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci_factor);
+int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci_factor, int frm_num);
 int cmr_v4l2_cap_pause(uint32_t channel_id, uint32_t reconfig_flag);
 int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index);
 int cmr_v4l2_scale_capability(uint32_t *width, uint32_t *sc_factor);
