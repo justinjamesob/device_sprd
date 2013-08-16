@@ -81,7 +81,7 @@ static const struct cap_size_to_mem back_cam_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_2P0_MEGA, (7 << 20), (0 << 20)},
 	{PIXEL_3P0_MEGA, (10 << 20), (0 << 20)},
 	{PIXEL_4P0_MEGA, (15 << 20), (0 << 20)},
-	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
+	{PIXEL_5P0_MEGA, (16 << 20), (0 << 20)},
 	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
 	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
 	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)}
@@ -91,7 +91,7 @@ static const struct cap_size_to_mem back_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_2P0_MEGA, (7 << 20), (0 << 20)},
 	{PIXEL_3P0_MEGA, (10 << 20), (0 << 20)},
 	{PIXEL_4P0_MEGA, (15 << 20), (0 << 20)},
-	{PIXEL_5P0_MEGA, (15 << 20), (0 << 20)},
+	{PIXEL_5P0_MEGA, (16 << 20), (0 << 20)},
 	{PIXEL_6P0_MEGA, (18 << 20), (0 << 20)},
 	{PIXEL_7P0_MEGA, (20 << 20), (0 << 20)},
 	{PIXEL_8P0_MEGA, (20 << 20), (0 << 20)}
@@ -139,6 +139,74 @@ static uint32_t get_thum_jpeg_size(uint32_t width, uint32_t height, uint32_t thu
 static uint32_t get_jpg_tmp_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height);
 static uint32_t get_scaler_tmp_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height);
 static uint32_t get_isp_tmp_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height);
+
+static int arrange_raw_buf(struct cmr_cap_2_frm *cap_2_frm,
+							struct img_size *sn_size,
+							struct img_rect *sn_trim,
+							struct img_size *image_size,
+							uint32_t orig_fmt,
+							struct img_size *cap_size,
+							struct img_size *thum_size,
+							struct cmr_cap_mem *capture_mem,
+							uint32_t need_rot,
+							uint32_t *io_major_res,
+							uint32_t *io_major_end,
+							uint32_t *io_channel_size);
+
+static int arrange_jpeg_buf(struct cmr_cap_2_frm *cap_2_frm,
+							struct img_size *sn_size,
+							struct img_rect *sn_trim,
+							struct img_size *image_size,
+							uint32_t orig_fmt,
+							struct img_size *cap_size,
+							struct img_size *thum_size,
+							struct cmr_cap_mem *capture_mem,
+							uint32_t need_rot,
+							uint32_t *io_major_res,
+							uint32_t *io_major_end,
+							uint32_t *io_channel_size);
+
+static int arrange_yuv_buf(struct cmr_cap_2_frm *cap_2_frm,
+							struct img_size *sn_size,
+							struct img_rect *sn_trim,
+							struct img_size *image_size,
+							uint32_t orig_fmt,
+							struct img_size *cap_size,
+							struct img_size *thum_size,
+							struct cmr_cap_mem *capture_mem,
+							uint32_t need_rot,
+							uint32_t *io_major_res,
+							uint32_t *io_major_end,
+							uint32_t *io_channel_size);
+
+static int arrange_misc_buf(struct cmr_cap_2_frm *cap_2_frm,
+							struct img_size *sn_size,
+							struct img_rect *sn_trim,
+							struct img_size *image_size,
+							uint32_t orig_fmt,
+							struct img_size *cap_size,
+							struct img_size *thum_size,
+							struct cmr_cap_mem *capture_mem,
+							uint32_t need_rot,
+							uint32_t *io_major_res,
+							uint32_t *io_major_end,
+							uint32_t *io_channel_size);
+
+static int arrange_rot_buf(struct cmr_cap_2_frm *cap_2_frm,
+							struct img_size *sn_size,
+							struct img_rect *sn_trim,
+							struct img_size *image_size,
+							uint32_t orig_fmt,
+							struct img_size *cap_size,
+							struct img_size *thum_size,
+							struct cmr_cap_mem *capture_mem,
+							uint32_t need_rot,
+							uint32_t *io_major_res,
+							uint32_t *io_major_end,
+							uint32_t *io_channel_size);
+
+
+
 
 static const cmr_get_size get_size[BUF_TYPE_NUM] = {
 	get_jpeg_size,
@@ -221,15 +289,10 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 {
 	uint32_t       channel_size;
 	uint32_t       size_pixel;
-	uint32_t       major_res;
-	uint32_t       minor_res;
-	uint32_t       major_end = 0, minor_end = 0;
-	uint32_t       i, yuv_raw_size = 0, img_cnt = 0;
-	uint32_t       offset = 0, offset_1;
-	uint32_t       y_to_raw = 0, yy_to_y = 0, tmp = 0, raw_size = 0;
-	uint32_t       uv_size = 0, useless_raw = 0;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       i = 0;
+	int32_t        ret = -1;
 	struct cmr_cap_mem *cap_mem = &capture_mem[0];
-	struct img_frm img_frame[BUF_TYPE_NUM];
 	struct img_size align16_image_size, align16_cap_size;
 
 	if (NULL == cap_2_frm ||
@@ -256,17 +319,11 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 	channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
 	size_pixel = channel_size;
 	major_res = cap_2_frm->major_frm.buf_size;
-	minor_res = cap_2_frm->minor_frm.buf_size;
 
 	CMR_LOGV("Major frame, 0x%x 0x%x, 0x%x",
 		cap_2_frm->major_frm.addr_phy.addr_y,
 		cap_2_frm->major_frm.addr_vir.addr_y,
 		cap_2_frm->major_frm.buf_size);
-
-	CMR_LOGV("Minor frame, 0x%x 0x%x, 0x%x",
-		cap_2_frm->minor_frm.addr_phy.addr_y,
-		cap_2_frm->minor_frm.addr_vir.addr_y,
-		cap_2_frm->minor_frm.buf_size);
 
 	CMR_LOGV("channel_size, 0x%x, image_cnt %d, rot %d, orig_fmt %d",
 		channel_size,
@@ -274,138 +331,73 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 		need_rot,
 		orig_fmt);
 
-	size_pixel = (size_pixel << 1);
+	CMR_LOGV("sn_size %d %d, image_size %d %d, cap_size %d %d",
+		sn_size->width, sn_size->height,
+		image_size->width, image_size->height,
+		cap_size->width, cap_size->height);
 
-	memset((void*)capture_mem, 0, sizeof(struct cmr_cap_mem));
+	/* get target_jpeg buffer size first, will be used later */
+	memset((void*)cap_mem, 0, sizeof(struct cmr_cap_mem));
 	cap_mem->target_jpeg.buf_size = get_jpeg_size(align16_image_size.width,
 					align16_image_size.height,
 					thum_size->width,
 					thum_size->height);
 
 	if (IMG_DATA_TYPE_RAW == orig_fmt) {
-		channel_size = (uint32_t)(sn_size->width * sn_size->height);
-		raw_size = (uint32_t)(channel_size * RAWRGB_BIT_WIDTH / 8);
-		y_to_raw = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
-		uv_size = (channel_size >> 1);
-		if (align16_image_size.width != sn_size->width ||
-			align16_image_size.height != sn_size->height) {
-			yy_to_y = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
-			uv_size = uv_size + (yy_to_y >> 1);
-			tmp = (sn_size->height - align16_image_size.height) >> 1;
-			CMR_LOGV("Need scaling down, Recovered height, %d", tmp);
-			useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
-		} else if (sn_trim && sn_trim->start_y) {
-			tmp = sn_size->height - sn_trim->height - sn_trim->start_y;
-			CMR_LOGV("Recovered height, %d", tmp);
-			yy_to_y = (uint32_t)(tmp * sn_size->width);
-			uv_size = uv_size + (yy_to_y >> 1);
-			useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
+		ret = arrange_raw_buf(cap_2_frm,
+						sn_size,
+						sn_trim,
+						image_size,
+						orig_fmt,
+						cap_size,
+						thum_size,
+						cap_mem,
+						need_rot,
+						&major_res,
+						&major_end,
+						&channel_size);
+		if (ret) {
+			CMR_LOGE("raw fmt arrange failed!");
+			return -1;
 		}
-		cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-		cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-		cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-		cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-		cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-		cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-		cap_mem->cap_raw.buf_size        = raw_size;
-		CMR_LOGI("y_to_raw 0x%x, yy_to_y 0x%x, raw size 0x%x useless_raw 0x%x",
-			y_to_raw, yy_to_y, raw_size, useless_raw);
-
-		yuv_raw_size = raw_size + y_to_raw + yy_to_y + (channel_size >> 1);
-		offset = raw_size + y_to_raw + yy_to_y - useless_raw;// the end of RawRGB
-		CMR_NO_MEM(offset, major_res);
-		major_end += offset;
-		major_res -= offset;
-
-		if (!need_rot) {
-			CMR_NO_MEM(capture_mem->target_jpeg.buf_size, major_res);
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += cap_mem->target_jpeg.buf_size;
-			major_res -= cap_mem->target_jpeg.buf_size;
-		}
-
-		if (uv_size < major_res) {
-			//if Y and UV can be located at Major frame
-			cap_mem->target_yuv.addr_phy.addr_u = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_yuv.addr_vir.addr_u = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += uv_size;
-			major_res -= uv_size;
-		} else {
-			CMR_NO_MEM(uv_size, minor_res);
-			cap_mem->target_yuv.addr_phy.addr_u = cap_2_frm->minor_frm.addr_phy.addr_y;
-			cap_mem->target_yuv.addr_vir.addr_u = cap_2_frm->minor_frm.addr_vir.addr_y;
-			minor_end += uv_size;
-			minor_res -= uv_size;
-		}
-		cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-		cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
-
-		cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-		cap_mem->cap_yuv.size.width      = sn_size->width;
-		cap_mem->cap_yuv.size.height     = sn_size->height;
-		cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-
 	} else {
-		channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-		cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-		cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-		cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-		cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
 		if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-			offset = channel_size << 1;
-			yy_to_y = (uint32_t)(align16_image_size.width * align16_image_size.height);
-			tmp     = (uint32_t)((sn_trim->start_y + sn_trim->height) * sn_size->width);
-			CMR_LOGV("yy_to_y, 0x%x, tmp 0x%x", yy_to_y, tmp);
-			if (yy_to_y > (uint32_t)(sn_size->width * sn_size->height)) {
-				yy_to_y = yy_to_y - tmp;
-			} else {
-				yy_to_y = 0;
+			ret = arrange_jpeg_buf(cap_2_frm,
+								sn_size,
+								sn_trim,
+								image_size,
+								orig_fmt,
+								cap_size,
+								thum_size,
+								cap_mem,
+								need_rot,
+								&major_res,
+								&major_end,
+								&channel_size);
+			if (ret) {
+				CMR_LOGE("jpeg fmt arrange failed!");
+				return -1;
 			}
-			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-			tmp = (uint32_t)(sn_size->height * sn_size->width);
-			cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-			cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-			offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
 		} else {
-			offset = (channel_size * 3) >> 1;
-			tmp = (uint32_t)(cap_size->width * cap_size->height);
-			if (channel_size > tmp) {
-				yy_to_y = channel_size - tmp;
-			} else {
-				yy_to_y = 0;
+			ret = arrange_yuv_buf(cap_2_frm,
+							sn_size,
+							sn_trim,
+							image_size,
+							orig_fmt,
+							cap_size,
+							thum_size,
+							cap_mem,
+							need_rot,
+							&major_res,
+							&major_end,
+							&channel_size);
+			if (ret) {
+				CMR_LOGE("jpeg fmt arrange failed!");
+				return -1;
 			}
-			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-			cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-			cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
 		}
-		CMR_NO_MEM(offset, major_res);
-		yuv_raw_size = offset;
-		major_end = offset;
-		major_res = major_res - major_end;
-
-		if (!need_rot) {
-			CMR_NO_MEM(cap_mem->target_jpeg.buf_size, major_res);
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += cap_mem->target_jpeg.buf_size;
-			major_res -= cap_mem->target_jpeg.buf_size;
-		}
-
-		/* Get the capture Y buffer, same to RawRGB buffer */
-		cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-		cap_mem->cap_yuv.size.width      = align16_cap_size.width;
-		cap_mem->cap_yuv.size.height     = align16_cap_size.height;
-		cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-
 	}
 
-	/* Get the capture UV buffer */
-	cap_mem->cap_raw.size.width      = sn_size->width;
-	cap_mem->cap_raw.size.height     = sn_size->height;
-	cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
 	CMR_LOGI("cap_raw, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
 		cap_mem->cap_raw.addr_phy.addr_y,
 		cap_mem->cap_raw.addr_phy.addr_u,
@@ -413,12 +405,6 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 		cap_mem->cap_raw.addr_vir.addr_u,
 		cap_mem->cap_raw.buf_size);
 
-
-	/* Get the Target Y/UV buffer */
-	cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-	cap_mem->target_yuv.size.width   = align16_image_size.width;
-	cap_mem->target_yuv.size.height  = align16_image_size.height;
-	cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
 	CMR_LOGI("target_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
 		cap_mem->target_yuv.addr_phy.addr_y,
 		cap_mem->target_yuv.addr_phy.addr_u,
@@ -433,106 +419,48 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 		cap_mem->cap_yuv.addr_vir.addr_u,
 		cap_mem->cap_yuv.buf_size);
 
-	CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-		cap_mem->target_jpeg.addr_phy.addr_y,
-		cap_mem->target_jpeg.addr_vir.addr_y,
-		cap_mem->target_jpeg.buf_size);
-	/* re-calculate the currend end of major buffer */
-
-	CMR_LOGV("Now to alloc misc buffers");
-	for(i = THUM_YUV; i < BUF_TYPE_NUM; i++) {
-		/* calculate the address of target_jpeg, start */
-		size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
-		if (major_res >= size_pixel) {
-			img_frame[i].buf_size = size_pixel;
-			img_frame[i].addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			img_frame[i].addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
-			img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
-			/* re-calculate the currend end of major buffer */
-			major_res -= size_pixel;
-			major_end += size_pixel;
-		} else {
-			break;
-		}
-	}
-
-	if (i != BUF_TYPE_NUM) {
-		CMR_LOGV("No more memory reseved in Major buffer, to alloc misc buffers from Minor buffer");
-		/* Not all the misc buffer have been alloc-ed yet, get memory from minor_frm */
-		for (; i < BUF_TYPE_NUM; i++) {
-			/* calculate the address of target_jpeg, start */
-			size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
-			if (minor_res >= size_pixel) {
-				img_frame[i].buf_size = size_pixel;
-				img_frame[i].addr_phy.addr_y = cap_2_frm->minor_frm.addr_phy.addr_y + minor_end;
-				img_frame[i].addr_vir.addr_y = cap_2_frm->minor_frm.addr_vir.addr_y + minor_end;;
-				img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
-				img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
-				/* re-calculate the currend end of major buffer */
-				minor_res -= size_pixel;
-				minor_end += size_pixel;
-			} else {
-				break;
-			}
-
-		}
-	}
-
-	if (i != BUF_TYPE_NUM) {
-		CMR_LOGE("Failed to alloc all the buffers used in capture");
+	/* arrange misc buffers */
+	ret = arrange_misc_buf(cap_2_frm,
+					sn_size,
+					sn_trim,
+					image_size,
+					orig_fmt,
+					cap_size,
+					thum_size,
+					cap_mem,
+					need_rot,
+					&major_res,
+					&major_end,
+					&channel_size);
+	if (ret) {
+		CMR_LOGE("misc buf arrange failed!");
 		return -1;
 	}
 
-	CMR_LOGV("major_end, major_res, minor_end, minor_res: 0x%x 0x%x 0x%x 0x%x",
-		major_end, major_res, minor_end, minor_res);
+	CMR_LOGV("major_end, major_res: 0x%x 0x%x ", major_end, major_res);
 
-	/*Alloc Rotation buffer if necessary, Start*/
+	/* arrange rot buf */
 	if (need_rot) {
-		size_pixel = (channel_size * 3) >> 1;
-		CMR_LOGV("Rot channel size 0x%x, buf size 0x%X", channel_size, size_pixel);
-		if (major_res > size_pixel) {
-			CMR_LOGV("Rot buffer located at Major frame");
-			tmp = 1;
-			offset = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			offset_1 = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_res -= size_pixel;
-			major_end += size_pixel;
-		} else if (minor_res > size_pixel) {
-			CMR_LOGV("Rot buffer located at Minor frame");
-			tmp = 1;
-			offset = cap_2_frm->minor_frm.addr_phy.addr_y + minor_end;
-			offset_1 = cap_2_frm->minor_frm.addr_vir.addr_y + minor_end;
-			minor_res -= size_pixel;
-			minor_end += size_pixel;
-		} else {
-			CMR_LOGV("No Rot buffer");
-			tmp = 0;
+		ret = arrange_rot_buf(cap_2_frm,
+						sn_size,
+						sn_trim,
+						image_size,
+						orig_fmt,
+						cap_size,
+						thum_size,
+						cap_mem,
+						need_rot,
+						&major_res,
+						&major_end,
+						&channel_size
+						);
+		if (ret) {
+			CMR_LOGE("rot buf arrange failed!");
+			return -1;
 		}
-
-		if (tmp) {
-			cap_mem->cap_yuv_rot.addr_phy.addr_y = offset;
-			cap_mem->cap_yuv_rot.addr_vir.addr_y = offset_1;
-			cap_mem->cap_yuv_rot.addr_phy.addr_u = offset + channel_size;
-			cap_mem->cap_yuv_rot.addr_vir.addr_u = offset_1 + channel_size;
-			cap_mem->cap_yuv_rot.size.width      = align16_image_size.height;
-			cap_mem->cap_yuv_rot.size.height     = align16_image_size.width;
-			cap_mem->cap_yuv_rot.buf_size        = size_pixel;
-			cap_mem->cap_yuv_rot.fmt             = IMG_DATA_TYPE_YUV420;
-
-			//mem reuse when rot
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->cap_yuv_rot.addr_phy.addr_y;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->cap_yuv_rot.addr_vir.addr_y;
-		}
-		CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			cap_mem->cap_yuv_rot.addr_phy.addr_y,
-			cap_mem->cap_yuv_rot.addr_phy.addr_u,
-			cap_mem->cap_yuv_rot.addr_vir.addr_y,
-			cap_mem->cap_yuv_rot.addr_vir.addr_u,
-			cap_mem->cap_yuv_rot.buf_size);
 	}
 
-	/* resize jpeg buffer */
+	/* resize target jpeg buffer */
 	cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->target_jpeg.addr_phy.addr_y + JPEG_EXIF_SIZE;
 	cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->target_jpeg.addr_vir.addr_y + JPEG_EXIF_SIZE;
 	cap_mem->target_jpeg.buf_size        = cap_mem->target_jpeg.buf_size - JPEG_EXIF_SIZE;
@@ -542,865 +470,6 @@ int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 	cap_mem->target_jpeg.addr_vir.addr_y,
 	cap_mem->target_jpeg.buf_size);
 
-	/*Alloc Rotation buffer End*/
-
-	cap_mem->thum_yuv.buf_size = img_frame[THUM_YUV].buf_size;
-	cap_mem->thum_yuv.addr_phy.addr_y = img_frame[THUM_YUV].addr_phy.addr_y;
-	cap_mem->thum_yuv.addr_vir.addr_y = img_frame[THUM_YUV].addr_vir.addr_y;
-	cap_mem->thum_yuv.addr_phy.addr_u = img_frame[THUM_YUV].addr_phy.addr_u;
-	cap_mem->thum_yuv.addr_vir.addr_u = img_frame[THUM_YUV].addr_vir.addr_u;
-	cap_mem->thum_yuv.size.width      = thum_size->width;
-	cap_mem->thum_yuv.size.height     = thum_size->height;
-	CMR_LOGI("thum_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-		img_frame[THUM_YUV].addr_phy.addr_y,
-		img_frame[THUM_YUV].addr_phy.addr_u,
-		img_frame[THUM_YUV].addr_vir.addr_y,
-		img_frame[THUM_YUV].addr_vir.addr_u,
-		img_frame[THUM_YUV].buf_size);
-
-	cap_mem->thum_jpeg.buf_size = img_frame[THUM_JPEG].buf_size;
-	cap_mem->thum_jpeg.addr_phy.addr_y = img_frame[THUM_JPEG].addr_phy.addr_y;
-	cap_mem->thum_jpeg.addr_vir.addr_y = img_frame[THUM_JPEG].addr_vir.addr_y;
-	CMR_LOGI("thum_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-		img_frame[THUM_JPEG].addr_phy.addr_y,
-		img_frame[THUM_JPEG].addr_vir.addr_y,
-		img_frame[THUM_JPEG].buf_size);
-
-	cap_mem->jpeg_tmp.buf_size = cap_mem->cap_yuv.buf_size;
-	cap_mem->jpeg_tmp.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_u;
-	cap_mem->jpeg_tmp.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_u;
-	CMR_LOGI("jpeg_tmp, phy 0x%x, vir 0x%x, size 0x%x",
-		cap_mem->jpeg_tmp.addr_phy.addr_y,
-		cap_mem->jpeg_tmp.addr_vir.addr_y,
-		cap_mem->jpeg_tmp.buf_size);
-
-
-	img_cnt ++;
-	cap_mem ++;
-#if 0
-	/*Alloc other image buffer include RAW and CAP YUV , Start*/
-	if (img_cnt < image_cnt) {
-		while (major_res >= yuv_raw_size) {
-			if (IMG_DATA_TYPE_RAW == orig_fmt) {
-				uv_size = channel_size >> 1;
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-				cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-				cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-				cap_mem->cap_raw.buf_size        = raw_size;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_raw.addr_phy.addr_y + raw_size;
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_raw.addr_vir.addr_y + raw_size;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_u - (uv_size >> 1);
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_u - (uv_size >> 1);
-				cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-				cap_mem->cap_yuv.size.width      = sn_size->width;
-				cap_mem->cap_yuv.size.height     = sn_size->height;
-				cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-				cap_mem->cap_raw.size.width      = sn_size->width;
-				cap_mem->cap_raw.size.height     = sn_size->height;
-				cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
-
-			} else {
-				channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-				offset = (channel_size * 3) >> 1;
-				if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-					cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-					tmp = (uint32_t)(sn_size->height * sn_size->width);
-					cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-					cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-					offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
-				} else {
-					cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-					cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
-				}
-				cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-				cap_mem->cap_yuv.size.width      = align16_cap_size.width;
-				cap_mem->cap_yuv.size.height     = align16_cap_size.height;
-				cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-			}
-
-			cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-			cap_mem->target_yuv.size.width   = align16_image_size.width;
-			cap_mem->target_yuv.size.height  = align16_image_size.height;
-			cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
-
-			img_cnt++;
-			if (img_cnt >= image_cnt) {
-				break;
-			}
-			cap_mem ++;
-			major_res -= yuv_raw_size;
-			major_end += yuv_raw_size;
-		}
-	}
-
-	if (img_cnt < image_cnt) {
-		while (minor_res >= yuv_raw_size) {
-			if (IMG_DATA_TYPE_RAW == orig_fmt) {
-				uv_size = channel_size >> 1;
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->minor_frm.addr_phy.addr_y + minor_end;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->minor_frm.addr_vir.addr_y + minor_end;
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-				cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-				cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-				cap_mem->cap_raw.buf_size        = raw_size;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_raw.addr_phy.addr_y + raw_size;
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_raw.addr_vir.addr_y + raw_size;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_u - (uv_size >> 1);
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_u - (uv_size >> 1);
-				cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-				cap_mem->cap_yuv.size.width      = sn_size->width;
-				cap_mem->cap_yuv.size.height     = sn_size->height;
-				cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-				cap_mem->cap_raw.size.width      = sn_size->width;
-				cap_mem->cap_raw.size.height     = sn_size->height;
-				cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
-
-			} else {
-				channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->minor_frm.addr_phy.addr_y + minor_end;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->minor_frm.addr_vir.addr_y + minor_end;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-				offset = (channel_size * 3) >> 1;
-				if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-					cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-					tmp = (uint32_t)(sn_size->height * sn_size->width);
-					cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-					cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-					offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
-				} else {
-					cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-					cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
-				}
-				cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-				cap_mem->cap_yuv.size.width      = align16_cap_size.width;
-				cap_mem->cap_yuv.size.height     = align16_cap_size.height;
-				cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-			}
-
-			cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-			cap_mem->target_yuv.size.width   = align16_image_size.width;
-			cap_mem->target_yuv.size.height  = align16_image_size.height;
-			cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
-
-			img_cnt++;
-			if (img_cnt >= image_cnt) {
-				break;
-			}
-			cap_mem ++;
-			minor_res -= yuv_raw_size;
-			minor_end += yuv_raw_size;
-		}
-	}
-
-	if (img_cnt < image_cnt) {
-		CMR_LOGE("Not enough memory, %d", img_cnt);
-		return -1;
-	}
-#endif
-
-	for (i = 1; i < image_cnt; i++) {
-		memcpy((void*)&capture_mem[i].target_jpeg,
-			(void*)&capture_mem[0].target_jpeg,
-			sizeof(struct img_frm));
-
-		memcpy((void*)&capture_mem[i].thum_yuv,
-			(void*)&capture_mem[0].thum_yuv,
-			sizeof(struct img_frm));
-		memcpy((void*)&capture_mem[i].thum_jpeg,
-			(void*)&capture_mem[0].thum_jpeg,
-			sizeof(struct img_frm));
-		memcpy((void*)&capture_mem[i].jpeg_tmp,
-			(void*)&capture_mem[0].jpeg_tmp,
-			sizeof(struct img_frm));
-		memcpy((void*)&capture_mem[i].scale_tmp,
-			(void*)&capture_mem[0].scale_tmp,
-			sizeof(struct img_frm));
-		memcpy((void*)&capture_mem[i].cap_yuv_rot,
-			(void*)&capture_mem[0].cap_yuv_rot,
-			sizeof(struct img_frm));
-		memcpy((void*)&capture_mem[i].isp_tmp,
-			(void*)&capture_mem[0].isp_tmp,
-			sizeof(struct img_frm));
-
-		CMR_LOGI("Image ID %d", i);
-		CMR_LOGI("cap_raw, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			capture_mem[i].cap_raw.addr_phy.addr_y,
-			capture_mem[i].cap_raw.addr_phy.addr_u,
-			capture_mem[i].cap_raw.addr_vir.addr_y,
-			capture_mem[i].cap_raw.addr_vir.addr_u,
-			capture_mem[i].cap_raw.buf_size);
-
-		CMR_LOGI("target_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			capture_mem[i].target_yuv.addr_phy.addr_y,
-			capture_mem[i].target_yuv.addr_phy.addr_u,
-			capture_mem[i].target_yuv.addr_vir.addr_y,
-			capture_mem[i].target_yuv.addr_vir.addr_u,
-			capture_mem[i].target_yuv.buf_size);
-
-		CMR_LOGI("cap_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			capture_mem[i].cap_yuv.addr_phy.addr_y,
-			capture_mem[i].cap_yuv.addr_phy.addr_u,
-			capture_mem[i].cap_yuv.addr_vir.addr_y,
-			capture_mem[i].cap_yuv.addr_vir.addr_u,
-			capture_mem[i].cap_yuv.buf_size);	
-
-		CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-			capture_mem[i].target_jpeg.addr_phy.addr_y,
-			capture_mem[i].target_jpeg.addr_vir.addr_y,
-			capture_mem[i].target_jpeg.buf_size);
-
-		CMR_LOGI("thum_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			capture_mem[i].thum_yuv.addr_phy.addr_y,
-			capture_mem[i].thum_yuv.addr_phy.addr_u,
-			capture_mem[i].thum_yuv.addr_vir.addr_y,
-			capture_mem[i].thum_yuv.addr_vir.addr_u,
-			capture_mem[i].thum_yuv.buf_size);
-
-		CMR_LOGI("thum_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-			capture_mem[i].thum_jpeg.addr_phy.addr_y,
-			capture_mem[i].thum_jpeg.addr_vir.addr_y,
-			capture_mem[i].thum_jpeg.buf_size);
-		CMR_LOGI("scale_tmp, phy 0x%x, vir 0x%x, size 0x%x",
-			capture_mem[i].scale_tmp.addr_phy.addr_y,
-			capture_mem[i].scale_tmp.addr_vir.addr_y,
-			capture_mem[i].scale_tmp.buf_size);
-
-	}
-
-	if (need_rot) {
-		if (camera_get_is_noscale()) {
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv_rot,
-					(void*)&capture_mem[0].cap_yuv_rot,
-					sizeof(struct img_frm));
-				CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_u,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_u,
-					capture_mem[i].cap_yuv_rot.buf_size);
-			}
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].target_yuv,
-					(void*)&capture_mem[0].target_yuv,
-					sizeof(struct img_frm));
-			}
-		} else {
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv_rot,
-					(void*)&capture_mem[0].cap_yuv_rot,
-					sizeof(struct img_frm));
-				CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_u,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_u,
-					capture_mem[i].cap_yuv_rot.buf_size);
-			}
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv,
-					(void*)&capture_mem[0].cap_yuv,
-					sizeof(struct img_frm));
-			}
-		}
-	}
-
-	/*Alloc other image buffer include RAW and CAP YUV , End*/
-
-	return 0;
-}
-
-int camera_arrange_capture_buf2(struct cmr_cap_2_frm *cap_2_frm,
-						struct img_size *sn_size,
-						struct img_rect *sn_trim,
-						struct img_size *image_size,
-						uint32_t orig_fmt,
-						struct img_size *cap_size,
-						struct img_size *thum_size,
-						struct cmr_cap_mem *capture_mem,
-						uint32_t need_rot,
-						uint32_t image_cnt)
-{
-	uint32_t       channel_size;
-	uint32_t       size_pixel;
-	uint32_t       major_res;
-	uint32_t       minor_res;
-	uint32_t       major_end = 0, minor_end = 0;
-	uint32_t       i, yuv_raw_size = 0, img_cnt = 0;
-	uint32_t       offset = 0, offset_1;
-	uint32_t       y_to_raw = 0, yy_to_y = 0, tmp = 0, raw_size = 0;
-	uint32_t       uv_size = 0, useless_raw = 0;
-	struct cmr_cap_mem *cap_mem = &capture_mem[0];
-	struct img_frm img_frame[BUF_TYPE_NUM];
-	struct img_size align16_image_size, align16_cap_size;
-
-	if (NULL == cap_2_frm ||
-		NULL == image_size ||
-		NULL == thum_size ||
-		NULL == capture_mem ||
-		NULL == sn_size ||
-		NULL == sn_trim) {
-		CMR_LOGE("Parameter error 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x",
-			(uint32_t)cap_2_frm,
-			(uint32_t)image_size,
-			(uint32_t)thum_size,
-			(uint32_t)capture_mem,
-			(uint32_t)sn_size,
-			(uint32_t)sn_trim);
-		return -1;
-	}
-
-	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
-	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
-	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
-	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
-
-	channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-	size_pixel = channel_size;
-	major_res = cap_2_frm->major_frm.buf_size;
-	minor_res = cap_2_frm->minor_frm.buf_size;
-
-	CMR_LOGV("Major frame, 0x%x 0x%x, 0x%x",
-		cap_2_frm->major_frm.addr_phy.addr_y,
-		cap_2_frm->major_frm.addr_vir.addr_y,
-		cap_2_frm->major_frm.buf_size);
-
-	CMR_LOGV("Minor frame, 0x%x 0x%x, 0x%x",
-		cap_2_frm->minor_frm.addr_phy.addr_y,
-		cap_2_frm->minor_frm.addr_vir.addr_y,
-		cap_2_frm->minor_frm.buf_size);
-
-	CMR_LOGV("channel_size, 0x%x, image_cnt %d, rot %d, orig_fmt %d",
-		channel_size,
-		image_cnt,
-		need_rot,
-		orig_fmt);
-
-
-	size_pixel = (size_pixel << 1);
-
-	memset((void*)capture_mem, 0, sizeof(struct cmr_cap_mem));
-	cap_mem->target_jpeg.buf_size = get_jpeg_size(align16_image_size.width,
-					align16_image_size.height,
-					thum_size->width,
-					thum_size->height);
-
-	if (IMG_DATA_TYPE_RAW == orig_fmt) {
-		channel_size = (uint32_t)(sn_size->width * sn_size->height);
-		raw_size = (uint32_t)(channel_size * RAWRGB_BIT_WIDTH / 8);
-		y_to_raw = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
-		uv_size = (channel_size >> 1);
-		if (align16_image_size.width != sn_size->width ||
-			align16_image_size.height != sn_size->height) {
-			yy_to_y = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
-			uv_size = uv_size + (yy_to_y >> 1);
-			tmp = (sn_size->height - align16_image_size.height) >> 1;
-			CMR_LOGV("Need scaling down, Recovered height, %d", tmp);
-			useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
-		} else if (sn_trim && sn_trim->start_y) {
-			tmp = sn_size->height - sn_trim->height - sn_trim->start_y;
-			CMR_LOGV("Recovered height, %d", tmp);
-			yy_to_y = (uint32_t)(tmp * sn_size->width);
-			uv_size = uv_size + (yy_to_y >> 1);
-			useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
-		}
-		cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-		cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-		cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-		cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-		cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-		cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-		cap_mem->cap_raw.buf_size        = raw_size;
-		CMR_LOGI("y_to_raw 0x%x, yy_to_y 0x%x, raw size 0x%x useless_raw 0x%x",
-			y_to_raw, yy_to_y, raw_size, useless_raw);
-
-		yuv_raw_size = raw_size + y_to_raw + yy_to_y + (channel_size >> 1);
-		offset = raw_size + y_to_raw + yy_to_y - useless_raw;// the end of RawRGB
-		CMR_NO_MEM(offset, major_res);
-		major_end += offset;
-		major_res -= offset;
-
-		if (!need_rot) {
-			CMR_NO_MEM(capture_mem->target_jpeg.buf_size, major_res);
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += cap_mem->target_jpeg.buf_size;
-			major_res -= cap_mem->target_jpeg.buf_size;
-		}
-
-		if (uv_size < major_res) {
-			//if Y and UV can be located at Major frame
-			cap_mem->target_yuv.addr_phy.addr_u = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_yuv.addr_vir.addr_u = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += uv_size;
-			major_res -= uv_size;
-		} else {
-			unsigned int addr_phy, addr_vir;
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, uv_size, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-			cap_mem->target_yuv.addr_phy.addr_u = addr_phy;
-			cap_mem->target_yuv.addr_vir.addr_u = addr_vir;
-			minor_end += uv_size;
-		}
-		cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-		cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
-
-		cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-		cap_mem->cap_yuv.size.width      = sn_size->width;
-		cap_mem->cap_yuv.size.height     = sn_size->height;
-		cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-
-	} else {
-
-		if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-			channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-			cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-			cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-			cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-			cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-			offset = channel_size << 1;
-			yy_to_y = (uint32_t)(align16_image_size.width * align16_image_size.height);
-			tmp     = (uint32_t)((sn_trim->start_y + sn_trim->height) * sn_size->width);
-			CMR_LOGV("yy_to_y, 0x%x, tmp 0x%x", yy_to_y, tmp);
-			yy_to_y = yy_to_y - tmp;
-			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-			tmp = (uint32_t)(sn_size->height * sn_size->width);
-			cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-			cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-			offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
-		} else {
-			channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-			tmp = (uint32_t)(cap_size->width * cap_size->height);
-			if (channel_size > tmp) {
-				//need scaling up
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_u - tmp;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_u - tmp;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + ((channel_size - tmp) >> 1);
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + ((channel_size - tmp) >> 1);
-				yy_to_y = channel_size - tmp;
-			} else {
-				//means scaling down
-				offset = (tmp * 3) >> 1;
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-				memcpy((void*)&cap_mem->target_yuv, (void*)&cap_mem->cap_yuv, sizeof(struct img_frm));
-				channel_size = tmp;
-				yy_to_y = 0;
-			}
-			offset = (channel_size * 3) >> 1;
-		}
-		CMR_NO_MEM(offset, major_res);
-		yuv_raw_size = offset;
-		major_end = offset;
-		major_res = major_res - major_end;
-
-		if (!need_rot) {
-			CMR_NO_MEM(cap_mem->target_jpeg.buf_size, major_res);
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_end += cap_mem->target_jpeg.buf_size;
-			major_res -= cap_mem->target_jpeg.buf_size;
-		}
-
-		/* Get the capture Y buffer, same to RawRGB buffer */
-		cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-		cap_mem->cap_yuv.size.width      = align16_cap_size.width;
-		cap_mem->cap_yuv.size.height     = align16_cap_size.height;
-		cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-
-	}
-
-	/* Get the capture UV buffer */
-	cap_mem->cap_raw.size.width      = sn_size->width;
-	cap_mem->cap_raw.size.height     = sn_size->height;
-	cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
-	CMR_LOGI("cap_raw, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-		cap_mem->cap_raw.addr_phy.addr_y,
-		cap_mem->cap_raw.addr_phy.addr_u,
-		cap_mem->cap_raw.addr_vir.addr_y,
-		cap_mem->cap_raw.addr_vir.addr_u,
-		cap_mem->cap_raw.buf_size);
-
-
-	/* Get the Target Y/UV buffer */
-	cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-	cap_mem->target_yuv.size.width   = align16_image_size.width;
-	cap_mem->target_yuv.size.height  = align16_image_size.height;
-	cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
-	CMR_LOGI("target_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-		cap_mem->target_yuv.addr_phy.addr_y,
-		cap_mem->target_yuv.addr_phy.addr_u,
-		cap_mem->target_yuv.addr_vir.addr_y,
-		cap_mem->target_yuv.addr_vir.addr_u,
-		cap_mem->target_yuv.buf_size);
-
-	CMR_LOGI("cap_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-		cap_mem->cap_yuv.addr_phy.addr_y,
-		cap_mem->cap_yuv.addr_phy.addr_u,
-		cap_mem->cap_yuv.addr_vir.addr_y,
-		cap_mem->cap_yuv.addr_vir.addr_u,
-		cap_mem->cap_yuv.buf_size);
-
-	CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-		cap_mem->target_jpeg.addr_phy.addr_y,
-		cap_mem->target_jpeg.addr_vir.addr_y,
-		cap_mem->target_jpeg.buf_size);
-	/* re-calculate the currend end of major buffer */
-
-	CMR_LOGV("Now to alloc misc buffers");
-	for(i = THUM_YUV; i < BUF_TYPE_NUM; i++) {
-		/* calculate the address of target_jpeg, start */
-		size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
-		if (major_res >= size_pixel) {
-			img_frame[i].buf_size = size_pixel;
-			img_frame[i].addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			img_frame[i].addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
-			img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
-			/* re-calculate the currend end of major buffer */
-			major_res -= size_pixel;
-			major_end += size_pixel;
-		} else {
-			break;
-		}
-	}
-
-	if (i != BUF_TYPE_NUM) {
-		CMR_LOGV("No more memory reseved in Major buffer, to alloc misc buffers from Minor buffer");
-		/* Not all the misc buffer have been alloc-ed yet, get memory from minor_frm */
-		for (; i < BUF_TYPE_NUM; i++) {
-			unsigned int addr_phy, addr_vir;
-			/* calculate the address of target_jpeg, start */
-			size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, size_pixel, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-
-			img_frame[i].buf_size = size_pixel;
-			img_frame[i].addr_phy.addr_y = addr_phy;
-			img_frame[i].addr_vir.addr_y = addr_vir;
-			img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
-			img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
-			/* re-calculate the currend end of major buffer */
-			minor_end += size_pixel;
-		}
-	}
-
-	if (i != BUF_TYPE_NUM) {
-		CMR_LOGE("Failed to alloc all the buffers used in capture");
-		return -1;
-	}
-
-	CMR_LOGV("major_end, major_res, minor_end, minor_res: 0x%x 0x%x 0x%x 0x%x",
-		major_end, major_res, minor_end, minor_res);
-
-	/*Alloc Rotation buffer if necessary, Start*/
-	if (need_rot) {
-		size_pixel = (channel_size * 3) >> 1;
-		CMR_LOGV("Rot channel size 0x%x, buf size 0x%X", channel_size, size_pixel);
-		if (major_res > size_pixel) {
-			CMR_LOGV("Rot buffer located at Major frame");
-			tmp = 1;
-			offset = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-			offset_1 = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-			major_res -= size_pixel;
-			major_end += size_pixel;
-
-			cap_mem->cap_yuv_rot.addr_phy.addr_y = offset;
-			cap_mem->cap_yuv_rot.addr_vir.addr_y = offset_1;
-			cap_mem->cap_yuv_rot.addr_phy.addr_u = offset + channel_size;
-			cap_mem->cap_yuv_rot.addr_vir.addr_u = offset_1 + channel_size;
-			cap_mem->cap_yuv_rot.size.width      = align16_image_size.height;
-			cap_mem->cap_yuv_rot.size.height     = align16_image_size.width;
-			cap_mem->cap_yuv_rot.buf_size        = size_pixel;
-			cap_mem->cap_yuv_rot.fmt             = IMG_DATA_TYPE_YUV420;
-
-			//mem reuse when rot
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->cap_yuv_rot.addr_phy.addr_y;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->cap_yuv_rot.addr_vir.addr_y;
-		} else  {
-			unsigned int addr_phy, addr_vir;
-			CMR_LOGV("Rot buffer need alloc");
-			tmp = 1;
-
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-			cap_mem->cap_yuv_rot.addr_phy.addr_y = addr_phy;
-			cap_mem->cap_yuv_rot.addr_vir.addr_y = addr_vir;
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size>>1, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-			cap_mem->cap_yuv_rot.addr_phy.addr_u = addr_phy;
-			cap_mem->cap_yuv_rot.addr_vir.addr_u = addr_vir;
-			cap_mem->cap_yuv_rot.size.width      = align16_image_size.height;
-			cap_mem->cap_yuv_rot.size.height     = align16_image_size.width;
-			cap_mem->cap_yuv_rot.buf_size        = size_pixel;
-			cap_mem->cap_yuv_rot.fmt             = IMG_DATA_TYPE_YUV420;
-
-			minor_end += size_pixel;
-
-			//mem reuse when rot
-			cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->cap_yuv_rot.addr_phy.addr_y;
-			cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->cap_yuv_rot.addr_vir.addr_y;
-		}
-		CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-			cap_mem->cap_yuv_rot.addr_phy.addr_y,
-			cap_mem->cap_yuv_rot.addr_phy.addr_u,
-			cap_mem->cap_yuv_rot.addr_vir.addr_y,
-			cap_mem->cap_yuv_rot.addr_vir.addr_u,
-			cap_mem->cap_yuv_rot.buf_size);
-	}
-
-	/* resize jpeg buffer */
-	cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->target_jpeg.addr_phy.addr_y + JPEG_EXIF_SIZE;
-	cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->target_jpeg.addr_vir.addr_y + JPEG_EXIF_SIZE;
-	cap_mem->target_jpeg.buf_size        = cap_mem->target_jpeg.buf_size - JPEG_EXIF_SIZE;
-
-	CMR_LOGI("target_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-	cap_mem->target_jpeg.addr_phy.addr_y,
-	cap_mem->target_jpeg.addr_vir.addr_y,
-	cap_mem->target_jpeg.buf_size);
-
-	/*Alloc Rotation buffer End*/
-
-	cap_mem->thum_yuv.buf_size = img_frame[THUM_YUV].buf_size;
-	cap_mem->thum_yuv.addr_phy.addr_y = img_frame[THUM_YUV].addr_phy.addr_y;
-	cap_mem->thum_yuv.addr_vir.addr_y = img_frame[THUM_YUV].addr_vir.addr_y;
-	cap_mem->thum_yuv.addr_phy.addr_u = img_frame[THUM_YUV].addr_phy.addr_u;
-	cap_mem->thum_yuv.addr_vir.addr_u = img_frame[THUM_YUV].addr_vir.addr_u;
-	cap_mem->thum_yuv.size.width      = thum_size->width;
-	cap_mem->thum_yuv.size.height     = thum_size->height;
-	CMR_LOGI("thum_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-		img_frame[THUM_YUV].addr_phy.addr_y,
-		img_frame[THUM_YUV].addr_phy.addr_u,
-		img_frame[THUM_YUV].addr_vir.addr_y,
-		img_frame[THUM_YUV].addr_vir.addr_u,
-		img_frame[THUM_YUV].buf_size);
-
-	cap_mem->thum_jpeg.buf_size = img_frame[THUM_JPEG].buf_size;
-	cap_mem->thum_jpeg.addr_phy.addr_y = img_frame[THUM_JPEG].addr_phy.addr_y;
-	cap_mem->thum_jpeg.addr_vir.addr_y = img_frame[THUM_JPEG].addr_vir.addr_y;
-	CMR_LOGI("thum_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
-		img_frame[THUM_JPEG].addr_phy.addr_y,
-		img_frame[THUM_JPEG].addr_vir.addr_y,
-		img_frame[THUM_JPEG].buf_size);
-
-	cap_mem->jpeg_tmp.buf_size = cap_mem->cap_yuv.buf_size;
-	cap_mem->jpeg_tmp.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_u;
-	cap_mem->jpeg_tmp.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_u;
-	CMR_LOGI("jpeg_tmp, phy 0x%x, vir 0x%x, size 0x%x",
-		cap_mem->jpeg_tmp.addr_phy.addr_y,
-		cap_mem->jpeg_tmp.addr_vir.addr_y,
-		cap_mem->jpeg_tmp.buf_size);
-
-	img_cnt ++;
-	cap_mem ++;
-#if 0
-	/*Alloc other image buffer include RAW and CAP YUV , Start*/
-	if (img_cnt < image_cnt) {
-		while (major_res >= yuv_raw_size) {
-			if (IMG_DATA_TYPE_RAW == orig_fmt) {
-				uv_size = channel_size >> 1;
-				cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-				cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-				cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-				cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-				cap_mem->cap_raw.buf_size        = raw_size;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_raw.addr_phy.addr_y + raw_size;
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_raw.addr_vir.addr_y + raw_size;
-				cap_mem->target_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_u - (uv_size >> 1);
-				cap_mem->target_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_u - (uv_size >> 1);
-				cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-				cap_mem->cap_yuv.size.width      = sn_size->width;
-				cap_mem->cap_yuv.size.height     = sn_size->height;
-				cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-				cap_mem->cap_raw.size.width      = sn_size->width;
-				cap_mem->cap_raw.size.height     = sn_size->height;
-				cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
-
-			} else {
-				if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-					channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-					cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-					cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-					cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-					cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-					offset = channel_size << 1;
-					yy_to_y = (uint32_t)(align16_image_size.width * align16_image_size.height);
-					tmp 	= (uint32_t)((sn_trim->start_y + sn_trim->height) * sn_size->width);
-					CMR_LOGV("yy_to_y, 0x%x, tmp 0x%x", yy_to_y, tmp);
-					yy_to_y = yy_to_y - tmp;
-					cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-					cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-					tmp = (uint32_t)(sn_size->height * sn_size->width);
-					cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-					cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-					offset	= offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
-				} else {
-					channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-					CMR_LOGV("YUV sensor, channel %d, %d, 0x%x",
-						align16_image_size.width,
-						align16_image_size.height,
-						channel_size);
-					tmp = (uint32_t)(cap_size->width * cap_size->height);
-
-					CMR_LOGV("YUV sensor, tmp %d, %d, 0x%x",
-						cap_size->width,
-						cap_size->height,
-						tmp);
-					if (channel_size > tmp) {
-						//need scaling up
-						cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-						cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-						cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
-						cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
-						cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_u - tmp;
-						cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_u - tmp;
-						cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + ((channel_size - tmp) >> 1);
-						cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + ((channel_size - tmp) >> 1);
-					} else {
-						//means scaling down
-						offset = (tmp * 3) >> 1;
-						cap_mem->cap_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
-						cap_mem->cap_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
-						cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-						cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-						memcpy((void*)&cap_mem->target_yuv, (void*)&cap_mem->cap_yuv, sizeof(struct img_frm));
-						channel_size = tmp;
-					}
-					offset = (channel_size * 3) >> 1;
-				}
-			}
-
-			cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-			cap_mem->target_yuv.size.width   = align16_image_size.width;
-			cap_mem->target_yuv.size.height  = align16_image_size.height;
-			cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
-
-			img_cnt++;
-			if (img_cnt >= image_cnt) {
-				break;
-			}
-			cap_mem ++;
-			major_res -= yuv_raw_size;
-			major_end += yuv_raw_size;
-		}
-	}
-
-	while (img_cnt < image_cnt) {
-		if (IMG_DATA_TYPE_RAW == orig_fmt) {
-			unsigned int addr_phy, addr_vir;
-			uv_size = channel_size >> 1;
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, uv_size, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-
-			cap_mem->target_yuv.addr_phy.addr_y = addr_phy;
-			cap_mem->target_yuv.addr_vir.addr_y = addr_vir;
-			cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-			cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-			cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
-			cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
-			cap_mem->cap_raw.buf_size        = raw_size;
-			cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_raw.addr_phy.addr_y + raw_size;
-			cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_raw.addr_vir.addr_y + raw_size;
-			cap_mem->target_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_u - (uv_size >> 1);
-			cap_mem->target_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_u - (uv_size >> 1);
-			cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-			cap_mem->cap_yuv.size.width      = sn_size->width;
-			cap_mem->cap_yuv.size.height     = sn_size->height;
-			cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-			cap_mem->cap_raw.size.width      = sn_size->width;
-			cap_mem->cap_raw.size.height     = sn_size->height;
-			cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
-
-		} else {
-			unsigned int addr_phy, addr_vir;
-			channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
-
-			offset = (channel_size * 3) >> 1;
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-			cap_mem->target_yuv.addr_phy.addr_y = addr_phy;
-			cap_mem->target_yuv.addr_vir.addr_y = addr_vir;
-			if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size>>1, &addr_phy, &addr_vir) != 0) {
-				CMR_LOGE("Failed to alloc the buffer used in capture");
-				return -1;
-			}
-			cap_mem->target_yuv.addr_phy.addr_u = addr_phy;
-			cap_mem->target_yuv.addr_vir.addr_u = addr_vir;
-
-			if (IMG_DATA_TYPE_JPEG == orig_fmt) {
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-				tmp = (uint32_t)(sn_size->height * sn_size->width);
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
-				offset  = offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
-			} else {
-				cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
-				cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
-				cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
-			}
-			cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
-			cap_mem->cap_yuv.size.width      = align16_cap_size.width;
-			cap_mem->cap_yuv.size.height     = align16_cap_size.height;
-			cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
-		}
-
-		cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
-		cap_mem->target_yuv.size.width   = align16_image_size.width;
-		cap_mem->target_yuv.size.height  = align16_image_size.height;
-		cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
-
-		img_cnt++;
-		if (img_cnt >= image_cnt) {
-			break;
-		}
-		cap_mem ++;
-		minor_end += yuv_raw_size;
-	}
-
-	if (img_cnt < image_cnt) {
-		CMR_LOGE("Not enough memory, %d", img_cnt);
-		return -1;
-	}
-
-#endif
 
 	for (i = 1; i < image_cnt; i++) {
 		memcpy((void*)&capture_mem[i].cap_raw,
@@ -1421,18 +490,23 @@ int camera_arrange_capture_buf2(struct cmr_cap_2_frm *cap_2_frm,
 		memcpy((void*)&capture_mem[i].thum_yuv,
 			(void*)&capture_mem[0].thum_yuv,
 			sizeof(struct img_frm));
+
 		memcpy((void*)&capture_mem[i].thum_jpeg,
 			(void*)&capture_mem[0].thum_jpeg,
 			sizeof(struct img_frm));
+
 		memcpy((void*)&capture_mem[i].jpeg_tmp,
 			(void*)&capture_mem[0].jpeg_tmp,
 			sizeof(struct img_frm));
+
 		memcpy((void*)&capture_mem[i].scale_tmp,
 			(void*)&capture_mem[0].scale_tmp,
 			sizeof(struct img_frm));
+
 		memcpy((void*)&capture_mem[i].cap_yuv_rot,
 			(void*)&capture_mem[0].cap_yuv_rot,
 			sizeof(struct img_frm));
+
 		memcpy((void*)&capture_mem[i].isp_tmp,
 			(void*)&capture_mem[0].isp_tmp,
 			sizeof(struct img_frm));
@@ -1475,54 +549,525 @@ int camera_arrange_capture_buf2(struct cmr_cap_2_frm *cap_2_frm,
 			capture_mem[i].thum_jpeg.addr_phy.addr_y,
 			capture_mem[i].thum_jpeg.addr_vir.addr_y,
 			capture_mem[i].thum_jpeg.buf_size);
+
 		CMR_LOGI("scale_tmp, phy 0x%x, vir 0x%x, size 0x%x",
 			capture_mem[i].scale_tmp.addr_phy.addr_y,
 			capture_mem[i].scale_tmp.addr_vir.addr_y,
 			capture_mem[i].scale_tmp.buf_size);
-
 	}
-
-	if (need_rot) {
-		if (camera_get_is_noscale()) {
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv_rot,
-					(void*)&capture_mem[0].cap_yuv_rot,
-					sizeof(struct img_frm));
-				CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_u,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_u,
-					capture_mem[i].cap_yuv_rot.buf_size);
-			}
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].target_yuv,
-					(void*)&capture_mem[0].target_yuv,
-					sizeof(struct img_frm));
-			}
-		} else {
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv_rot,
-					(void*)&capture_mem[0].cap_yuv_rot,
-					sizeof(struct img_frm));
-				CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_phy.addr_u,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_y,
-					capture_mem[i].cap_yuv_rot.addr_vir.addr_u,
-					capture_mem[i].cap_yuv_rot.buf_size);
-			}
-			for (i = 1; i < image_cnt; i++) {
-				memcpy((void*)&capture_mem[i].cap_yuv,
-					(void*)&capture_mem[0].cap_yuv,
-					sizeof(struct img_frm));
-			}
-		}
-	}
-	/*Alloc other image buffer include RAW and CAP YUV , End*/
 
 	return 0;
 }
+
+int arrange_raw_buf(struct cmr_cap_2_frm *cap_2_frm,
+					struct img_size *sn_size,
+					struct img_rect *sn_trim,
+					struct img_size *image_size,
+					uint32_t orig_fmt,
+					struct img_size *cap_size,
+					struct img_size *thum_size,
+					struct cmr_cap_mem *capture_mem,
+					uint32_t need_rot,
+					uint32_t *io_major_res,
+					uint32_t *io_major_end,
+					uint32_t *io_channel_size)
+{
+	uint32_t       channel_size;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       offset = 0;
+	uint32_t       y_to_raw = 0, yy_to_y = 0, tmp = 0, raw_size = 0;
+	uint32_t       uv_size = 0, useless_raw = 0;
+	struct cmr_cap_mem *cap_mem = capture_mem; //&capture_mem[0];
+	struct img_size align16_image_size, align16_cap_size;
+
+	if (IMG_DATA_TYPE_RAW != orig_fmt ||
+		NULL == io_major_res ||
+		NULL == io_major_end ||
+		NULL == io_channel_size) {
+		return -1;
+	}
+	CMR_LOGV("raw fmt buf arrange");
+
+	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
+	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
+	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
+	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
+
+	major_res    = *io_major_res;
+	major_end    = *io_major_end;
+	channel_size = *io_channel_size;
+
+	channel_size = (uint32_t)(sn_size->width * sn_size->height);
+	raw_size = (uint32_t)(channel_size * RAWRGB_BIT_WIDTH / 8);
+	y_to_raw = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
+	uv_size = (channel_size >> 1);
+	if (align16_image_size.width != sn_size->width ||
+		align16_image_size.height != sn_size->height) {
+		yy_to_y = (uint32_t)(ISP_YUV_TO_RAW_GAP * sn_size->width);
+		uv_size = uv_size + (yy_to_y >> 1);
+		tmp = (sn_size->height - align16_image_size.height) >> 1;
+		CMR_LOGV("Need scaling down, Recovered height, %d", tmp);
+		useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
+	} else if (sn_trim && sn_trim->start_y) {
+		tmp = sn_size->height - sn_trim->height - sn_trim->start_y;
+		CMR_LOGV("Recovered height, %d", tmp);
+		yy_to_y = (uint32_t)(tmp * sn_size->width);
+		uv_size = uv_size + (yy_to_y >> 1);
+		useless_raw = (uint32_t)(yy_to_y * RAWRGB_BIT_WIDTH / 8);
+	}
+	cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
+	cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
+	cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
+	cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
+	cap_mem->cap_raw.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_y + y_to_raw;
+	cap_mem->cap_raw.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_y + y_to_raw;
+	cap_mem->cap_raw.buf_size        = raw_size;
+	CMR_LOGI("y_to_raw 0x%x, yy_to_y 0x%x, raw size 0x%x useless_raw 0x%x",
+		y_to_raw, yy_to_y, raw_size, useless_raw);
+
+	offset = raw_size + y_to_raw + yy_to_y - useless_raw;// the end of RawRGB
+	CMR_NO_MEM(offset, major_res);
+	major_end += offset;
+	major_res -= offset;
+
+	if (!need_rot) {
+		CMR_NO_MEM(cap_mem->target_jpeg.buf_size, major_res);
+		cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+		cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+		major_end += cap_mem->target_jpeg.buf_size;
+		major_res -= cap_mem->target_jpeg.buf_size;
+	}
+
+	/* start get UV buffer */
+	if (uv_size < major_res) {
+		cap_mem->target_yuv.addr_phy.addr_u = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+		cap_mem->target_yuv.addr_vir.addr_u = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+		major_end += uv_size;
+		major_res -= uv_size;
+	} else {
+		unsigned int addr_phy, addr_vir;
+		if (cap_2_frm->alloc_mem(cap_2_frm->handle, uv_size, &addr_phy, &addr_vir) != 0) {
+			CMR_LOGE("Failed to alloc the buffer used in capture");
+			return -1;
+		}
+		cap_mem->target_yuv.addr_phy.addr_u = addr_phy;
+		cap_mem->target_yuv.addr_vir.addr_u = addr_vir;
+	}
+	cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + (yy_to_y >> 1);
+	cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + (yy_to_y >> 1);
+	/* end get UV buffer */
+
+	cap_mem->cap_yuv.buf_size        = (channel_size * 3) >> 1;
+	cap_mem->cap_yuv.size.width      = sn_size->width;
+	cap_mem->cap_yuv.size.height     = sn_size->height;
+	cap_mem->cap_yuv.fmt             = IMG_DATA_TYPE_YUV420;
+
+	cap_mem->cap_raw.size.width      = sn_size->width;
+	cap_mem->cap_raw.size.height     = sn_size->height;
+	cap_mem->cap_raw.fmt             = IMG_DATA_TYPE_RAW;
+
+	cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
+	cap_mem->target_yuv.size.width   = align16_image_size.width;
+	cap_mem->target_yuv.size.height  = align16_image_size.height;
+	cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
+
+	/* update io param */
+	*io_major_res    = major_res;
+	*io_major_end    = major_end;
+	*io_channel_size = channel_size;
+
+	return 0;
+}
+
+int arrange_jpeg_buf(struct cmr_cap_2_frm *cap_2_frm,
+					 struct img_size *sn_size,
+					 struct img_rect *sn_trim,
+					 struct img_size *image_size,
+					 uint32_t orig_fmt,
+					 struct img_size *cap_size,
+					 struct img_size *thum_size,
+					 struct cmr_cap_mem *capture_mem,
+					 uint32_t need_rot,
+					 uint32_t *io_major_res,
+					 uint32_t *io_major_end,
+					 uint32_t *io_channel_size)
+{
+	uint32_t       channel_size;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       offset = 0;
+	uint32_t       yy_to_y = 0, tmp = 0;
+	struct cmr_cap_mem *cap_mem = capture_mem; //&capture_mem[0];
+	struct img_size align16_image_size, align16_cap_size;
+
+	if (IMG_DATA_TYPE_JPEG != orig_fmt ||
+		NULL == io_major_res ||
+		NULL == io_major_end ||
+		NULL == io_channel_size) {
+		return -1;
+	}
+	CMR_LOGV("jpeg fmt buf arrange");
+
+	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
+	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
+	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
+	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
+
+	major_res    = *io_major_res;
+	major_end    = *io_major_end;
+	channel_size = *io_channel_size;
+
+	channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
+	cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
+	cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
+	cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
+	cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
+	offset = channel_size << 1;
+	yy_to_y = (uint32_t)(align16_image_size.width * align16_image_size.height);
+	tmp 	= (uint32_t)((sn_trim->start_y + sn_trim->height) * sn_size->width);
+	CMR_LOGV("yy_to_y, 0x%x, tmp 0x%x", yy_to_y, tmp);
+	yy_to_y = yy_to_y - tmp;
+	cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_y + yy_to_y;
+	cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_y + yy_to_y;
+	tmp = (uint32_t)(sn_size->height * sn_size->width);
+	cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
+	cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
+	offset	= offset + (uint32_t)((sn_size->height - sn_trim->start_y - sn_trim->height) * sn_size->width);;
+
+	CMR_NO_MEM(offset, major_res);
+	major_end = offset;
+	major_res = major_res - major_end;
+
+	if (!need_rot) {
+		CMR_NO_MEM(cap_mem->target_jpeg.buf_size, major_res);
+		cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+		cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+		major_end += cap_mem->target_jpeg.buf_size;
+		major_res -= cap_mem->target_jpeg.buf_size;
+	}
+
+	cap_mem->cap_yuv.buf_size		 = (channel_size * 3) >> 1;
+	cap_mem->cap_yuv.size.width 	 = align16_cap_size.width;
+	cap_mem->cap_yuv.size.height	 = align16_cap_size.height;
+	cap_mem->cap_yuv.fmt			 = IMG_DATA_TYPE_YUV420;
+
+	cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
+	cap_mem->target_yuv.size.width   = align16_image_size.width;
+	cap_mem->target_yuv.size.height  = align16_image_size.height;
+	cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
+
+	/* update io param */
+	*io_major_res    = major_res;
+	*io_major_end    = major_end;
+	*io_channel_size = channel_size;
+
+	return 0;
+}
+
+int arrange_yuv_buf(struct cmr_cap_2_frm *cap_2_frm,
+					struct img_size *sn_size,
+					struct img_rect *sn_trim,
+					struct img_size *image_size,
+					uint32_t orig_fmt,
+					struct img_size *cap_size,
+					struct img_size *thum_size,
+					struct cmr_cap_mem *capture_mem,
+					uint32_t need_rot,
+					uint32_t *io_major_res,
+					uint32_t *io_major_end,
+					uint32_t *io_channel_size)
+{
+	uint32_t       channel_size;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       offset = 0;
+	uint32_t       yy_to_y = 0, tmp = 0;
+	struct cmr_cap_mem *cap_mem = capture_mem; //&capture_mem[0];
+	struct img_size align16_image_size, align16_cap_size;
+
+	if (IMG_DATA_TYPE_JPEG == orig_fmt ||
+		IMG_DATA_TYPE_RAW == orig_fmt ||
+		NULL == io_major_res ||
+		NULL == io_major_end ||
+		NULL == io_channel_size) {
+		return -1;
+	}
+	CMR_LOGV("yuv fmt buf arrange");
+
+	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
+	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
+	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
+	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
+
+	major_res    = *io_major_res;
+	major_end    = *io_major_end;
+	channel_size = *io_channel_size;
+
+	channel_size = (uint32_t)(align16_image_size.width * align16_image_size.height);
+	tmp = (uint32_t)(cap_size->width * cap_size->height);
+	if (channel_size > tmp) {
+		//need scaling up
+		cap_mem->target_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
+		cap_mem->target_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
+		cap_mem->target_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_y + channel_size;
+		cap_mem->target_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_y + channel_size;
+		cap_mem->cap_yuv.addr_phy.addr_y = cap_mem->target_yuv.addr_phy.addr_u - tmp;
+		cap_mem->cap_yuv.addr_vir.addr_y = cap_mem->target_yuv.addr_vir.addr_u - tmp;
+		cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->target_yuv.addr_phy.addr_u + ((channel_size - tmp) >> 1);
+		cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->target_yuv.addr_vir.addr_u + ((channel_size - tmp) >> 1);
+		yy_to_y = channel_size - tmp;
+	} else {
+		//means scaling down
+		offset = (tmp * 3) >> 1;
+		cap_mem->cap_yuv.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y;
+		cap_mem->cap_yuv.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y;
+		cap_mem->cap_yuv.addr_phy.addr_u = cap_mem->cap_yuv.addr_phy.addr_y + tmp;
+		cap_mem->cap_yuv.addr_vir.addr_u = cap_mem->cap_yuv.addr_vir.addr_y + tmp;
+		memcpy((void*)&cap_mem->target_yuv, (void*)&cap_mem->cap_yuv, sizeof(struct img_frm));
+		channel_size = tmp;
+		yy_to_y = 0;
+	}
+	offset = (channel_size * 3) >> 1;
+
+	CMR_NO_MEM(offset, major_res);
+	major_end = offset;
+	major_res = major_res - major_end;
+
+	if (!need_rot) {
+		CMR_NO_MEM(cap_mem->target_jpeg.buf_size, major_res);
+		cap_mem->target_jpeg.addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+		cap_mem->target_jpeg.addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+		major_end += cap_mem->target_jpeg.buf_size;
+		major_res -= cap_mem->target_jpeg.buf_size;
+	}
+
+	cap_mem->cap_yuv.buf_size		 = (channel_size * 3) >> 1;
+	cap_mem->cap_yuv.size.width 	 = align16_cap_size.width;
+	cap_mem->cap_yuv.size.height	 = align16_cap_size.height;
+	cap_mem->cap_yuv.fmt			 = IMG_DATA_TYPE_YUV420;
+
+	cap_mem->target_yuv.buf_size     = (channel_size * 3) >> 1;
+	cap_mem->target_yuv.size.width   = align16_image_size.width;
+	cap_mem->target_yuv.size.height  = align16_image_size.height;
+	cap_mem->target_yuv.fmt          = IMG_DATA_TYPE_YUV420;
+
+	/* update io param */
+	*io_major_res    = major_res;
+	*io_major_end    = major_end;
+	*io_channel_size = channel_size;
+
+	return 0;
+}
+
+int arrange_misc_buf(struct cmr_cap_2_frm *cap_2_frm,
+					 struct img_size *sn_size,
+					 struct img_rect *sn_trim,
+					 struct img_size *image_size,
+					 uint32_t orig_fmt,
+					 struct img_size *cap_size,
+					 struct img_size *thum_size,
+					 struct cmr_cap_mem *capture_mem,
+					 uint32_t need_rot,
+					 uint32_t *io_major_res,
+					 uint32_t *io_major_end,
+					 uint32_t *io_channel_size)
+{
+	uint32_t       size_pixel;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       i = 0;
+	struct cmr_cap_mem *cap_mem = capture_mem; //&capture_mem[0];
+	struct img_frm img_frame[BUF_TYPE_NUM];
+	struct img_size align16_image_size, align16_cap_size;
+
+	if (NULL == io_major_res ||
+		NULL == io_major_end ||
+		NULL == io_channel_size) {
+		return -1;
+	}
+
+	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
+	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
+	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
+	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
+
+	major_res    = *io_major_res;
+	major_end    = *io_major_end;
+
+	CMR_LOGV("Now to alloc misc buffers");
+	for(i = THUM_YUV; i < BUF_TYPE_NUM; i++) {
+		/* calculate the address of target_jpeg, start */
+		size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
+		if (major_res >= size_pixel) {
+			img_frame[i].buf_size = size_pixel;
+			img_frame[i].addr_phy.addr_y = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+			img_frame[i].addr_vir.addr_y = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+			img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
+			img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
+			/* re-calculate the currend end of major buffer */
+			major_res -= size_pixel;
+			major_end += size_pixel;
+		} else {
+			break;
+		}
+	}
+
+	if (i != BUF_TYPE_NUM) {
+		CMR_LOGV("No more memory reseved in Major buffer, to alloc misc buffers from Minor buffer");
+		/* Not all the misc buffer have been alloc-ed yet, get memory from minor_frm */
+		for (; i < BUF_TYPE_NUM; i++) {
+			unsigned int addr_phy, addr_vir;
+			/* calculate the address of target_jpeg, start */
+			size_pixel = get_size[i](align16_image_size.width, align16_image_size.height, thum_size->width, thum_size->height);
+			if (cap_2_frm->alloc_mem(cap_2_frm->handle, size_pixel, &addr_phy, &addr_vir) != 0) {
+				CMR_LOGE("Failed to alloc the buffer used in capture");
+				return -1;
+			}
+
+			img_frame[i].buf_size = size_pixel;
+			img_frame[i].addr_phy.addr_y = addr_phy;
+			img_frame[i].addr_vir.addr_y = addr_vir;
+			img_frame[i].addr_phy.addr_u = img_frame[i].addr_phy.addr_y + size_pixel * 2 / 3;
+			img_frame[i].addr_vir.addr_u = img_frame[i].addr_vir.addr_y + size_pixel * 2 / 3;
+		}
+	}
+
+	if (i != BUF_TYPE_NUM) {
+		CMR_LOGE("Failed to alloc all the buffers used in capture");
+		return -1;
+	}
+
+	cap_mem->thum_yuv.buf_size = img_frame[THUM_YUV].buf_size;
+	cap_mem->thum_yuv.addr_phy.addr_y = img_frame[THUM_YUV].addr_phy.addr_y;
+	cap_mem->thum_yuv.addr_vir.addr_y = img_frame[THUM_YUV].addr_vir.addr_y;
+	cap_mem->thum_yuv.addr_phy.addr_u = img_frame[THUM_YUV].addr_phy.addr_u;
+	cap_mem->thum_yuv.addr_vir.addr_u = img_frame[THUM_YUV].addr_vir.addr_u;
+	cap_mem->thum_yuv.size.width      = thum_size->width;
+	cap_mem->thum_yuv.size.height     = thum_size->height;
+	CMR_LOGI("thum_yuv, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
+		img_frame[THUM_YUV].addr_phy.addr_y,
+		img_frame[THUM_YUV].addr_phy.addr_u,
+		img_frame[THUM_YUV].addr_vir.addr_y,
+		img_frame[THUM_YUV].addr_vir.addr_u,
+		img_frame[THUM_YUV].buf_size);
+
+	cap_mem->thum_jpeg.buf_size = img_frame[THUM_JPEG].buf_size;
+	cap_mem->thum_jpeg.addr_phy.addr_y = img_frame[THUM_JPEG].addr_phy.addr_y;
+	cap_mem->thum_jpeg.addr_vir.addr_y = img_frame[THUM_JPEG].addr_vir.addr_y;
+	CMR_LOGI("thum_jpeg, phy 0x%x, vir 0x%x, size 0x%x",
+		img_frame[THUM_JPEG].addr_phy.addr_y,
+		img_frame[THUM_JPEG].addr_vir.addr_y,
+		img_frame[THUM_JPEG].buf_size);
+
+	/* mem reuse, jpeg_tmp/uv */
+	cap_mem->jpeg_tmp.buf_size = cap_mem->cap_yuv.buf_size;
+	cap_mem->jpeg_tmp.addr_phy.addr_y = cap_mem->cap_yuv.addr_phy.addr_u;
+	cap_mem->jpeg_tmp.addr_vir.addr_y = cap_mem->cap_yuv.addr_vir.addr_u;
+	CMR_LOGI("jpeg_tmp, phy 0x%x, vir 0x%x, size 0x%x",
+		cap_mem->jpeg_tmp.addr_phy.addr_y,
+		cap_mem->jpeg_tmp.addr_vir.addr_y,
+		cap_mem->jpeg_tmp.buf_size);
+
+	/* update io param */
+	*io_major_res    = major_res;
+	*io_major_end    = major_end;
+
+	return 0;
+}
+
+int arrange_rot_buf(struct cmr_cap_2_frm *cap_2_frm,
+					struct img_size *sn_size,
+					struct img_rect *sn_trim,
+					struct img_size *image_size,
+					uint32_t orig_fmt,
+					struct img_size *cap_size,
+					struct img_size *thum_size,
+					struct cmr_cap_mem *capture_mem,
+					uint32_t need_rot,
+					uint32_t *io_major_res,
+					uint32_t *io_major_end,
+					uint32_t *io_channel_size)
+{
+	uint32_t       channel_size;
+	uint32_t       size_pixel;
+	uint32_t       major_res = 0, major_end = 0;
+	uint32_t       offset = 0, offset_1;
+	struct cmr_cap_mem *cap_mem = capture_mem; //&capture_mem[0];
+	struct img_size align16_image_size, align16_cap_size;
+
+	align16_image_size.width  = CAMERA_ALIGNED_16(image_size->width);
+	align16_image_size.height = CAMERA_ALIGNED_16(image_size->height);
+	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
+	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
+
+	major_res    = *io_major_res;
+	major_end    = *io_major_end;
+	channel_size = *io_channel_size;
+
+	if (NULL == io_major_res ||
+		NULL == io_major_end ||
+		NULL == io_channel_size) {
+		return -1;
+	}
+
+	if (!need_rot) {
+		return -1;
+	}
+	CMR_LOGV("rotation buf arrange");
+
+	size_pixel = (channel_size * 3) >> 1;
+	CMR_LOGV("Rot channel size 0x%x, buf size 0x%X", channel_size, size_pixel);
+	if (major_res > size_pixel) {
+		CMR_LOGV("Rot buffer located at Major frame");
+		offset = cap_2_frm->major_frm.addr_phy.addr_y + major_end;
+		offset_1 = cap_2_frm->major_frm.addr_vir.addr_y + major_end;
+		major_res -= size_pixel;
+		major_end += size_pixel;
+
+		cap_mem->cap_yuv_rot.addr_phy.addr_y = offset;
+		cap_mem->cap_yuv_rot.addr_vir.addr_y = offset_1;
+		cap_mem->cap_yuv_rot.addr_phy.addr_u = offset + channel_size;
+		cap_mem->cap_yuv_rot.addr_vir.addr_u = offset_1 + channel_size;
+
+	} else	{
+		unsigned int addr_phy, addr_vir;
+		CMR_LOGV("Rot buffer need alloc");
+
+		if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size, &addr_phy, &addr_vir) != 0) {
+			CMR_LOGE("Failed to alloc the buffer used in capture");
+			return -1;
+		}
+		cap_mem->cap_yuv_rot.addr_phy.addr_y = addr_phy;
+		cap_mem->cap_yuv_rot.addr_vir.addr_y = addr_vir;
+		if (cap_2_frm->alloc_mem(cap_2_frm->handle, channel_size>>1, &addr_phy, &addr_vir) != 0) {
+			CMR_LOGE("Failed to alloc the buffer used in capture");
+			return -1;
+		}
+		cap_mem->cap_yuv_rot.addr_phy.addr_u = addr_phy;
+		cap_mem->cap_yuv_rot.addr_vir.addr_u = addr_vir;
+	}
+
+	cap_mem->cap_yuv_rot.size.width 	 = align16_image_size.height;
+	cap_mem->cap_yuv_rot.size.height	 = align16_image_size.width;
+	cap_mem->cap_yuv_rot.buf_size		 = size_pixel;
+	cap_mem->cap_yuv_rot.fmt			 = IMG_DATA_TYPE_YUV420;
+
+	/* mem reuse when rot */
+	cap_mem->target_jpeg.addr_phy.addr_y = cap_mem->cap_yuv_rot.addr_phy.addr_y;
+	cap_mem->target_jpeg.addr_vir.addr_y = cap_mem->cap_yuv_rot.addr_vir.addr_y;
+
+	CMR_LOGI("cap_yuv_rot, phy 0x%x 0x%x, vir 0x%x 0x%x, size 0x%x",
+		cap_mem->cap_yuv_rot.addr_phy.addr_y,
+		cap_mem->cap_yuv_rot.addr_phy.addr_u,
+		cap_mem->cap_yuv_rot.addr_vir.addr_y,
+		cap_mem->cap_yuv_rot.addr_vir.addr_u,
+		cap_mem->cap_yuv_rot.buf_size);
+
+	/* update io param */
+	*io_major_res    = major_res;
+	*io_major_end    = major_end;
+	*io_channel_size = channel_size;
+
+	return 0;
+}
+
 
 uint32_t get_jpeg_size(uint32_t width, uint32_t height, uint32_t thum_width, uint32_t thum_height)
 {
