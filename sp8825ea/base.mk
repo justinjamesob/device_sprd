@@ -39,7 +39,12 @@ PRODUCT_PACKAGES := \
 	rawdatad \
 	nvm_daemon \
 	modemd\
-	audio.a2dp.default
+	audio.a2dp.default\
+	libnfc \
+	libnfc_jni \
+	Nfc \
+	Tag \
+	nfc.default
 
 # own copyright packages files
 PRODUCT_PACKAGES += \
@@ -135,6 +140,8 @@ PRODUCT_COPY_FILES := \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
 	frameworks/native/data/etc/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml \
+	frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+	external/libnfc-nxp/libpn544_fw.so:system/vendor/firmware/libpn544_fw.so\
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_uart.xml:/system/etc/gpsconfig.xml \

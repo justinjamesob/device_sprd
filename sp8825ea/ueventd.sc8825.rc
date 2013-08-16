@@ -16,6 +16,7 @@
 /dev/lis3dh_acc         0660     system      system
 /dev/akm8975_dev        0660     system      system
 /dev/ts0710mux*         0660     radio       system
+/dev/pn544              0660     nfc         nfc
 
 /dev/mdtv*              0600     system  system
 /dev/mxdspidev          0666     system  system
