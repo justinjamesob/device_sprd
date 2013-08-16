@@ -16,6 +16,7 @@
 #include "eng_sqlite.h"
 
 #define VLOG_PRI  -20
+#define USB_CONFIG_PROPERTY  "mass_storage,adb,vser,gser"
 
 // current run mode: TD or W
 int g_run_mode = ENG_RUN_TYPE_TD;
@@ -102,10 +103,11 @@ void eng_check_factorymode_fornand(void)
         if(fd > 0)
             close(fd);
 
-        property_set("sys.usb.config","mass_storage,adb,vser,gser");
-        property_set("persist.sys.usb.config","mass_storage,adb,vser,gser");
+        if(strncmp(config_property, USB_CONFIG_PROPERTY, strlen(USB_CONFIG_PROPERTY))){
+            property_set("sys.usb.config", USB_CONFIG_PROPERTY);
+            property_set("persist.sys.usb.config", USB_CONFIG_PROPERTY);
+        }
     } else if (status == 0) {
-
         remove(ENG_FACOTRYMODE_FILE);
     } else {
         remove(ENG_FACOTRYMODE_FILE);

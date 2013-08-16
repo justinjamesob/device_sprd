@@ -17,12 +17,36 @@
 #include "vlog.h"
 #include "eng_util.h"
 
-#define DATA_BUF_SIZE (4096 * 4)
+#define DATA_BUF_SIZE (4096 * 64)
 #define MAX_OPEN_TIMES  10
 
+extern int g_ass_start;
 static char log_data[DATA_BUF_SIZE];
 static int s_ser_fd = 0;
 static int s_connect_type = 0;
+
+static void dump_mem_len_print(int r_cnt, int* dumplen)
+{
+    unsigned int head, len, tail;
+
+    if (r_cnt == 12) {
+        head = (log_data[3] << 24)|(log_data[2] << 16)|(log_data[1] << 8)|log_data[0];
+        len  = (log_data[7] << 24)|(log_data[6] << 16)|(log_data[5] << 8)|log_data[4];
+        tail = (log_data[11] << 24)|(log_data[10] << 16)|(log_data[9] << 8)|log_data[8];
+
+        ENG_LOG("eng_vlog: get 12 bytes, let's check if dump finished.\n");
+
+        if(tail == (len^head)) {
+            ENG_LOG("eng_vlog: cp dump memory len: %d, ap dump memory len: %d\n", len, *dumplen);
+            *dumplen  = 0;
+            g_ass_start = 0;
+        }
+    }
+
+    if (g_ass_start) {
+        *dumplen += r_cnt;
+    }
+}
 
 int get_ser_fd(void)
 {
@@ -53,6 +77,7 @@ void *eng_vlog_thread(void *x)
     int ser_fd, sipc_fd;
     int r_cnt, w_cnt, offset;
     int retry_num = 0;
+    int dumpmemlen = 0;
     struct eng_param * param = (struct eng_param *)x;
 
     ENG_LOG("eng_vlog thread start\n");
@@ -96,6 +121,9 @@ void *eng_vlog_thread(void *x)
             ENG_LOG("eng_vlog read no log data : r_cnt=%d, %s\n",  r_cnt, strerror(errno));
             continue;
         }
+
+        // printf dump memory len
+        dump_mem_len_print(r_cnt, &dumpmemlen);
 
         offset = 0; //reset the offset
 

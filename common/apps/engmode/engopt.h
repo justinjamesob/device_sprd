@@ -92,6 +92,11 @@ extern "C" {
         CONNECT_PIPE,
     }eng_connect_type;
 
+    typedef enum{
+        ENG_DIAG_RECV_TO_AP,
+        ENG_DIAG_RECV_TO_CP,
+    }eng_diag_state;
+
     struct eng_param{
         int califlag;
         int engtest;
