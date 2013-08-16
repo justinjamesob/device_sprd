@@ -68,6 +68,7 @@ struct camera_context        *g_cxt = &cmr_cxt;
 #define IS_NON_ZSL_MODE(x)   ((CAMERA_ZSL_MODE != x) && (CAMERA_ZSL_CONTINUE_SHOT_MODE != x))
 #define IS_NO_MALLOC_MEM   ((CAMERA_HDR_MODE == g_cxt->cap_mode) && ((1 == g_cxt->cap_cnt)||(2 == g_cxt->cap_cnt)))
 #define IS_WAIT_FOR_NORMAL_CONTINUE(x,y)  (((x) == CAMERA_NORMAL_CONTINUE_SHOT_MODE)&&((y) != g_cxt->total_capture_num))
+#define USE_SENSOR_OFF_ON_FOR_HDR    1
 
 //camera_takepic_step timestamp
 enum CAMERA_TAKEPIC_STEP {
@@ -1059,8 +1060,10 @@ int camera_cap_post(void *data)
 		}
 
 		CMR_PRINT_TIME;
-	/*	ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
+#if !USE_SENSOR_OFF_ON_FOR_HDR
+		ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 		if (ret) {
+#endif
 			ret = Sensor_StreamOff();
 			if (ret) {
 				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
@@ -1071,7 +1074,9 @@ int camera_cap_post(void *data)
 				return -CAMERA_FAILED;
 			}
 			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-		}*/
+#if !USE_SENSOR_OFF_ON_FOR_HDR
+		}
+#endif
 
 		if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
 			ret = isp_video_stop();
@@ -1083,8 +1088,10 @@ int camera_cap_post(void *data)
 		CMR_PRINT_TIME;
 		camera_capture_hdr_data((struct frm_info *)data);
 		if (HDR_CAP_NUM == g_cxt->cap_cnt) {
+#if !USE_SENSOR_OFF_ON_FOR_HDR
 			ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 			if (ret) {
+#endif
 				g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 				ret = Sensor_StreamOff();
 				if (ret) {
@@ -1095,7 +1102,9 @@ int camera_cap_post(void *data)
 					CMR_LOGE("Failed to stop IF , %d", ret);
 					return -CAMERA_FAILED;
 				}
+#if !USE_SENSOR_OFF_ON_FOR_HDR
 			}
+#endif
 			ret = camera_snapshot_stop_set();
 			if (ret) {
 				CMR_LOGE("Failed to exit snapshot %d", ret);
@@ -2791,51 +2800,18 @@ int camera_take_picture_hdr(int cap_cnt)
 	struct buffer_cfg        buffer_info;
 
 	CMR_LOGI("start.");
-	#if 0
-	g_cxt->cap_ch_cnt = 0;
-	ret = camera_alloc_capture_buf0(&buffer_info, 0);//g_cxt->cap_cnt);
-	if (ret) {
-		CMR_LOGE("Failed to alloc capture buffer");
-		return -CAMERA_NO_MEMORY;
-	}
 
-	ret = cmr_v4l2_buff_cfg(&buffer_info);
-	if (ret) {
-		CMR_LOGE("Failed to Q capture buffer");
-		return -CAMERA_NO_MEMORY;
-	}
-
-	ret = cmr_v4l2_cap_start(0);
-	if (ret) {
-		CMR_LOGE("Fail to start V4L2 Capture");
-		return -CAMERA_FAILED;
-	}
-	g_cxt->v4l2_cxt.v4l2_state = V4L2_PREVIEW;
-	if ((HDR_CAP_NUM-2) == g_cxt->cap_cnt) {
-		camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_1);
-	} else {
-		camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_2);
-	}
-	CMR_PRINT_TIME;
-	ret = Sensor_StreamOn();
-	if (ret) {
-		CMR_LOGE("Fail to switch on the sensor stream");
-		return -CAMERA_FAILED;
-	}
-	g_cxt->capture_status = CMR_CAPTURE;
-	CMR_PRINT_TIME;
-	#endif
 	if(0 != g_cxt->sn_cxt.sn_if.if_type) {
 		/* if mipi, set to half word for capture raw */
 		g_cxt->sn_cxt.sn_if.if_spec.mipi.is_loose = 1;
 	}
-
-/*	ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
+#if USE_SENSOR_OFF_ON_FOR_HDR
+	ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 	if (ret) {
 		CMR_LOGE("the sensor interface is unsupported by V4L2");
 		return -CAMERA_FAILED;
-	}*/
-
+	}
+#endif
 	if ((HDR_CAP_NUM-2) == cap_cnt) {
 		camera_set_hdr_ev(SENSOR_HDR_EV_LEVE_1);
 	} else {
@@ -2865,13 +2841,13 @@ int camera_take_picture_hdr(int cap_cnt)
 	}
 	g_cxt->v4l2_cxt.v4l2_state = V4L2_PREVIEW;
 	CMR_PRINT_TIME;
-
-/*	ret = Sensor_StreamOn();
+#if USE_SENSOR_OFF_ON_FOR_HDR
+	ret = Sensor_StreamOn();
 	if (ret) {
 		CMR_LOGE("Fail to switch on the sensor stream");
 		return -CAMERA_FAILED;
 	}
-*/
+#endif
 	g_cxt->capture_raw_status = CMR_CAPTURE;
 	return ret;
 }
@@ -4495,7 +4471,7 @@ int camera_capture_init(void)
 	sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.capture_mode];
 	sensor_cfg.sn_size.width  = sensor_mode->width;
 	sensor_cfg.sn_size.height = sensor_mode->height;
-	CMR_LOGI("wjp:sensor_cfg.frm_num=%d.",sensor_cfg.frm_num);
+	CMR_LOGI("sensor_cfg.frm_num=%d.",sensor_cfg.frm_num);
 	if (IS_NON_ZSL_MODE(g_cxt->cap_mode)) {
 		if (CAMERA_NORMAL_CONTINUE_SHOT_MODE != g_cxt->cap_mode) {
 			sensor_cfg.frm_num = 1;
