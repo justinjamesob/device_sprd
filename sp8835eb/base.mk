@@ -1,4 +1,4 @@
-MALI := libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so ump.ko mali.ko
+MALI := libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so libboost.so ump.ko mali.ko
 INVENSENSE := libmllite.so libmplmpu.so libinvensense_hal
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_FM),true)

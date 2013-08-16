@@ -1,4 +1,4 @@
-MALI400 := gralloc.mali libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so hwcomposer.default ump.ko mali.ko
+MALI400 := gralloc.mali libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so libboost.so hwcomposer.default ump.ko mali.ko
 
 
 
