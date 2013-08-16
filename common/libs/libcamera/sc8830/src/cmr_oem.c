@@ -289,7 +289,7 @@ JINF_EXIF_INFO_T* camera_get_exif(struct camera_context *p_cxt)
 
 	if(0 == s_position.timestamp)
 		time(&s_position.timestamp);
-	p = localtime(&s_position.timestamp);
+	p = gmtime(&s_position.timestamp);
 	sprintf(gps_date_buf, "%4d:%02d:%02d", (1900+p->tm_year), (1+p->tm_mon),p->tm_mday);
 	gps_date_buf[10] = '\0';
 	gps_date = gps_date_buf;
