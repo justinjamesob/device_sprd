@@ -2633,7 +2633,7 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 		sensor_exif_info_ptr = &s_default_exif;
 		SENSOR_PRINT
 		    ("SENSOR: Sensor_SetSensorExifInfo the get_exif fun is null error \n");
-		return SENSOR_FAIL;
+/*		return SENSOR_FAIL;*/
 	}
 
 	switch (cmd) {
