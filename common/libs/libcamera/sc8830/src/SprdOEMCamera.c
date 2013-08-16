@@ -5760,7 +5760,7 @@ int camera_start_isp_process(struct frm_info *data)
 	ips_in.src_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].cap_raw.addr_phy.addr_y;
 	ips_in.src_frame.img_size.w = g_cxt->cap_mem[frm_id].cap_raw.size.width;
 	ips_in.src_frame.img_size.h = g_cxt->cap_mem[frm_id].cap_raw.size.height;
-	ips_in.dst_frame.img_fmt = ISP_DATA_YVU420_2FRAME;
+	ips_in.dst_frame.img_fmt = ISP_DATA_YUV420_2FRAME;
 	if (NO_SCALING) {
 		ips_in.dst_frame.img_addr_phy.chn0 = g_cxt->cap_mem[frm_id].target_yuv.addr_phy.addr_y;
 		g_cxt->isp_cxt.cur_dst.addr_y = g_cxt->cap_mem[frm_id].target_yuv.addr_vir.addr_y;
