@@ -24,8 +24,7 @@
         android:id="@+id/edittext"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity = "top"
-        android:maxLength="50"
+        android:gravity = "top"        
     />
         
 </LinearLayout>
