@@ -17,13 +17,17 @@
 #include "eng_pcclient.h"
 #include "eng_util.h"
 
+int g_ass_start = 0;
+
 #define DATA_BUF_SIZE (4096*2)
 #define MAX_OPEN_TIMES  10
 #define DATA_EXT_DIAG_SIZE (4096*2)
 
 static char log_data[DATA_BUF_SIZE];
 static char ext_data_buf[DATA_EXT_DIAG_SIZE];
-static int ext_buf_len;
+static char backup_data_buf[DATA_EXT_DIAG_SIZE];
+static int ext_buf_len,backup_data_len;
+static int g_diag_status = ENG_DIAG_RECV_TO_AP;
 AUDIO_TOTAL_T audio_total[4];
 
 static int s_speed_arr[] = {B921600,B115200, B38400, B19200, B9600, B4800, B2400, B1200, B300,
@@ -75,12 +79,13 @@ int get_user_diag_buf(char* buf,int len)
             }
         }
     }
-
+#if 0 // FOR DBEUG
     if ( is_find ) {
         for(i = 0; i < ext_buf_len; i++) {
             ENG_LOG("eng_vdiag 0x%x, ",ext_data_buf[i]);
         }
     }
+#endif    
     return is_find;
 }
 
@@ -216,6 +221,7 @@ void *eng_vdiag_thread(void *x)
     int has_processed = 0;
     int audio_fd;
     int wait_cnt = 0;
+    int type;
     struct eng_param * param = (struct eng_param *)x;
 
     if(param == NULL){
@@ -299,26 +305,72 @@ void *eng_vdiag_thread(void *x)
         }
 
         has_processed = 0; // reset the process flag
-        if (get_user_diag_buf(log_data,r_cnt)) {
-            has_processed = eng_diag(ext_data_buf,ext_buf_len);
-            init_user_diag_buf();
+        switch(g_diag_status) {
+            case ENG_DIAG_RECV_TO_CP:
+                memcpy(backup_data_buf,log_data,r_cnt);
+                backup_data_len = r_cnt;
+                if(0x7E == log_data[r_cnt - 1]){
+                    g_diag_status = ENG_DIAG_RECV_TO_AP;
+                }else{
+                    g_diag_status = ENG_DIAG_RECV_TO_CP;
+                }
+                break;
+            case ENG_DIAG_RECV_TO_AP:
+                if(get_user_diag_buf(log_data,r_cnt)){
+                    g_diag_status = ENG_DIAG_RECV_TO_AP;
+                    memcpy(backup_data_buf,ext_data_buf,ext_buf_len);
+                    backup_data_len = ext_buf_len;
+                    has_processed = eng_diag(ext_data_buf,ext_buf_len);
+                    init_user_diag_buf(); // complete diag framer, so AP decide the following oper
+                }else if(0 == ext_buf_len){
+                    g_diag_status = ENG_DIAG_RECV_TO_AP;
+                    memcpy(backup_data_buf,log_data,r_cnt);
+                    backup_data_len = r_cnt; // not a diag framer, so send data to CP
+                }else if(DATA_EXT_DIAG_SIZE == ext_buf_len){
+                        ENG_LOG("%s: Current data is not a complete diag framer,but buffer is full\n", __FUNCTION__);
+                        type = eng_diag_parse(ext_data_buf, ext_buf_len);
+                        if(type != CMD_COMMON){
+                            g_diag_status = ENG_DIAG_RECV_TO_AP;
+                            ENG_LOG("%s: Buffer is full, so AP will not process the next package\n", __FUNCTION__);
+                            has_processed = 1; // continue to receive the diag_framer
+                        }else{
+                            memcpy(backup_data_buf,ext_data_buf,ext_buf_len);
+                            backup_data_len = ext_buf_len;
+                            init_user_diag_buf();
+                            g_diag_status = ENG_DIAG_RECV_TO_CP; // send diag framer to CP
+                        }
+                } else {
+                    g_diag_status = ENG_DIAG_RECV_TO_AP;
+                    has_processed = 1; // continue to receive the diag framer
+                }
+                break;
+            default:
+                ENG_LOG("%s: ERROR STATUS: %d!!!\n", __FUNCTION__, g_diag_status);
+                break;
         }
 
-        if(1 == has_processed)// Data has been processed & should not send to modem
+        if(1 == has_processed){// Data has been processed & should not send to modem
+            backup_data_len = 0;
             continue;
+        }
+
+        if(2 == r_cnt && log_data[1] == 0xa){
+            ENG_LOG("eng_vdiag: start to dump memory");
+            g_ass_start = 1;
+        }
 
         offset = 0; // reset offset value
         do {
-            w_cnt = write(sipc_fd, log_data + offset, r_cnt);
+            w_cnt = write(sipc_fd, backup_data_buf + offset, backup_data_len);
             if (w_cnt < 0) {
                 ENG_LOG("eng_vdiag no log data write:%d ,%s\n", w_cnt, strerror(errno));
                 continue;
             }else{
-                r_cnt -= w_cnt;
+                backup_data_len -= w_cnt;
                 offset += w_cnt;
             }
             ENG_LOG("eng_vdiag: rcnt:%d, w_cnt:%d, offset:%d\n", r_cnt, w_cnt, offset);
-        }while(r_cnt >0);
+        }while(backup_data_len >0);
     }
 out:
     close(sipc_fd);
