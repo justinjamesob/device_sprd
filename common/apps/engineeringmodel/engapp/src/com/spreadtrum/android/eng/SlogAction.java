@@ -1008,43 +1008,45 @@ public class SlogAction {
     /**
      * XXX: A time casting method, should not use in main thread.
      */
-    public static synchronized boolean sendATCommand(int atCommandCode, boolean openLog) {
+    public static boolean sendATCommand(int atCommandCode, boolean openLog) {
         /* require set AT Control to modem and this may be FIXME
         * 1. Why write byte can catch IOException?
         * 2. Whether Setting AT Command in main thread can cause ANR or not?
         */
 
         // Feature changed, remove close action of openLog now.
-        if (!openLog) {
-            return false;
-        }
+        synchronized (mLock) {
+            if (!openLog) {
+                return false;
+            }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        try {
-            dos.writeBytes(String.format("%d,%d,%d", atCommandCode , 1, openLog ? 1 : 0));
-        } catch (IOException ioException) {
-            Log.e(TAG, "IOException has catched, see logs " + ioException);
-            return false;
-        }
-        /* engfetch em.. is a class! may be a bad coding style */
-        engfetch ef = new engfetch();
-        int sockid = ef.engopen();
-        ef.engwrite(sockid, baos.toByteArray(), baos.toByteArray().length);
-        /* Whether engfetch has free function? */
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            try {
+                dos.writeBytes(String.format("%d,%d,%d", atCommandCode , 1, openLog ? 1 : 0));
+            } catch (IOException ioException) {
+                Log.e(TAG, "IOException has catched, see logs " + ioException);
+                return false;
+            }
+            /* engfetch em.. is a class! may be a bad coding style */
+            engfetch ef = new engfetch();
+            int sockid = ef.engopen();
+            ef.engwrite(sockid, baos.toByteArray(), baos.toByteArray().length);
+            /* Whether engfetch has free function? */
 
-        // Bring from logswitch ...
-        byte[] inputBytes = new byte[512];
-        int showlen= ef.engread(sockid, inputBytes, 512);
-        String result = new String(inputBytes, 0, showlen);
+            // Bring from logswitch ...
+            byte[] inputBytes = new byte[512];
+            int showlen= ef.engread(sockid, inputBytes, 512);
+            String result = new String(inputBytes, 0, showlen);
 
-        if ("OK".equals(result)) {
-            return true;
-        } else if ("Unknown".equals(result)) {
-            Log.w("SlogUI","ATCommand has catch a \"Unknow\" command!");
-            return false;
-        } else {
-            return false;
+            if ("OK".equals(result)) {
+                return true;
+            } else if ("Unknown".equals(result)) {
+                Log.w("SlogUI","ATCommand has catch a \"Unknow\" command!");
+                return false;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -1195,7 +1197,7 @@ public class SlogAction {
     /**
      * Screenshot
      */
-    public static void snap(final Context context) {
+    public static void snap(final Context context, final Handler handler, final Runnable timeout) {
         class SnapThread extends Thread {
             Context mContext;
             SnapThread(Context context) {
@@ -1221,6 +1223,7 @@ public class SlogAction {
                     
                     if (runSlogCommand(SLOG_COMMAND_SCREENSHOT) == 0) {
                         try {
+                            handler.removeCallbacks(timeout);
                             LogSettingSlogUITabHostActivity.mTabHostHandler
                                     .sendEmptyMessage(MESSAGE_SNAP_SUCCESSED);
                         } catch (ExceptionInInitializerError initError) {
@@ -1229,6 +1232,7 @@ public class SlogAction {
                         }
                     } else {
                         try {
+                            handler.removeCallbacks(timeout);
                             LogSettingSlogUITabHostActivity.mTabHostHandler
                                     .sendEmptyMessage(MESSAGE_SNAP_FAILED);
                         } catch (ExceptionInInitializerError initError) {
@@ -1238,6 +1242,7 @@ public class SlogAction {
                     }
                 } catch (Exception e) {
                     try {
+                        handler.removeCallbacks(timeout);
                         LogSettingSlogUITabHostActivity.mTabHostHandler
                                 .sendEmptyMessage(MESSAGE_SNAP_FAILED);
                     } catch (ExceptionInInitializerError initError) {
