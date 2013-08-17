@@ -42,6 +42,11 @@
 #ifdef _HWCOMPOSER_USE_GSP
 #include "sc8830/gsp_hal.h"
 #endif
+
+#ifdef OVERLAY_COMPOSER_GPU
+#include "OverlayComposer/OverlayComposer.h"
+#endif
+
 #define SPRD_ION_DEV "/dev/ion"
 
 #define OVERLAY_BUF_NUM 2
@@ -63,6 +68,12 @@ inline unsigned int round_up_to_page_size(unsigned int x)
 
 using namespace android;
 /*****************************************************************************/
+
+#ifdef OVERLAY_COMPOSER_GPU
+static int OverlayDeviceFlag = 0;
+sp<OverlayComposer> mOLCD;
+#endif
+
 typedef struct {
     char *pFrontAddr;
     char *pBackAddr;
@@ -1127,7 +1138,7 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
                 list->hwLayers[i].hints &= ~HWC_HINT_CLEAR_FB;
             overlay_video = &list->hwLayers[i];
             ALOGI_IF(debugenable , "find video overlay 0x%08x",list->hwLayers[i].handle);
-        } else if((support_overlay == SPRD_LAYERS_OSD) && (ctx->osd_overlay_flag == 0) && (i == 1)) {
+        } else if((support_overlay == SPRD_LAYERS_OSD) && (ctx->osd_overlay_flag == 0)) {
             if ( list->numHwLayers >= 3) {
                 ctx->fb_layer_count++;
                 ALOGI_IF(debugenable,"fb_layer_count++ L%d",__LINE__);
@@ -1155,15 +1166,33 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
         ALOGI_IF(debugenable , "no video layer, abandon osd overlay");
     }
 
+
+#ifdef OVERLAY_COMPOSER_GPU
+                OverlayDeviceFlag = 0;
+#endif
+
 #ifdef _HWCOMPOSER_USE_GSP_BLEND  //Bug 189296
-		if ((ctx->fb_layer_count > 0) && overlay_video){
-			/*no blending use gpu, can be optimized*/
-			overlay_video->compositionType = HWC_FRAMEBUFFER;
-			ctx->video_overlay_flag = 0;
-			ctx->fb_layer_count++;
-			ALOGI_IF(debugenable,"----------------------clear fb");
-			overlay_video->hints = HWC_HINT_CLEAR_FB;
-		}
+        if ((ctx->fb_layer_count > 0 || overlay_osd) && overlay_video){
+            /*no blending use gpu, can be optimized*/
+            //overlay_video->compositionType = HWC_FRAMEBUFFER;
+            //ctx->video_overlay_flag = 0;
+            //ctx->fb_layer_count++;
+            //ALOGI_IF(debugenable,"----------------------clear fb");
+            //overlay_video->hints = HWC_HINT_CLEAR_FB;
+            //
+#ifdef OVERLAY_COMPOSER_GPU
+            OverlayDeviceFlag = 1;
+
+            for (size_t j=0 ; j < list->numHwLayers ; j++)
+            {
+                if (list->hwLayers[j].compositionType == HWC_FRAMEBUFFER)
+                {
+                    list->hwLayers[j].compositionType = HWC_OVERLAY;
+                }
+            }
+            mOLCD->onComposer(list);
+#endif
+        }
 #else
 		    if ((ctx->pre_fb_layer_count != ctx->fb_layer_count) && overlay_video) {
         /*no blending use gpu, can be optimized*/
@@ -1254,7 +1283,11 @@ static int hwc_set(hwc_composer_device_t *dev,
         if (private_h) {
             //ALOGI("layer virtual addr %x -------------------------", private_h->base);
         }
-        if (HWC_OVERLAY == list->hwLayers[i].compositionType) {
+        if (HWC_OVERLAY == list->hwLayers[i].compositionType
+#ifdef OVERLAY_COMPOSER_GPU
+	    && (OverlayDeviceFlag == 0)
+#endif
+	    ) {
             const native_handle_t *pNativeHandle = list->hwLayers[i].handle;
             struct private_handle_t *private_h = (struct private_handle_t *)pNativeHandle;
             if (private_h->format == HAL_PIXEL_FORMAT_RGBA_8888) {
@@ -1271,7 +1304,11 @@ static int hwc_set(hwc_composer_device_t *dev,
 #ifdef _HWCOMPOSER_USE_GSP_BLEND
     // 640x480:video playing have 2-layer, phone rotation have only video layer
     //1280x720:video playing have only video-layer, during operation have 2-layer, phone rotation have only video layer
-    if ((ctx->fb_layer_count == 0) && (ctx->video_overlay_flag || ctx->osd_overlay_flag)) {
+    if ((ctx->fb_layer_count == 0) && (ctx->video_overlay_flag || ctx->osd_overlay_flag)
+#ifdef OVERLAY_COMPOSER_GPU
+        && (OverlayDeviceFlag == 0)
+#endif
+       ) {
         if (video_layer || osd_layer) {
             //only in video playing should walk here
             static nsecs_t total = 0;
@@ -1319,17 +1356,29 @@ static int hwc_set(hwc_composer_device_t *dev,
 
 
 #ifdef _PROC_OSD_WITH_THREAD
-    if (osd_layer) {
+    if (osd_layer
+#ifdef OVERLAY_COMPOSER_GPU
+       && (OverlayDeviceFlag == 0)
+#endif
+	) {
         ALOGI_IF(debugenable , "send command to osd proc thread");
         ctx->osd_proc_cmd = osd_layer;
         sem_post(&ctx->cmd_sem);
     }
 #endif
-    if (video_layer) {
+    if (video_layer
+#ifdef OVERLAY_COMPOSER_GPU
+       && (OverlayDeviceFlag == 0)
+#endif
+	) {
         set_video_layer((struct hwc_context_t *)dev, video_layer);
     }
 
-    if (osd_layer) {
+    if (osd_layer
+#ifdef OVERLAY_COMPOSER_GPU
+       && (OverlayDeviceFlag == 0)
+#endif
+       ) {
 #ifdef _PROC_OSD_WITH_THREAD
         sem_wait(&ctx->done_sem);
 #else
@@ -1345,7 +1394,11 @@ static int hwc_set(hwc_composer_device_t *dev,
              ctx->video_overlay_flag,
              ctx->osd_overlay_flag);
 
-    if ((ctx->fb_layer_count == 0) && (ctx->video_overlay_flag || ctx->osd_overlay_flag)) {
+    if ((ctx->fb_layer_count == 0) && (ctx->video_overlay_flag || ctx->osd_overlay_flag)
+#ifdef OVERLAY_COMPOSER_GPU
+        && (OverlayDeviceFlag == 0)
+#endif
+	) {
         int layer_indexs = 0;
         struct overlay_display_setting display_setting;
         display_setting.display_mode = SPRD_DISPLAY_OVERLAY_ASYNC;
@@ -1426,10 +1479,23 @@ static int hwc_set(hwc_composer_device_t *dev,
             }
             /*************************dump end**************************************/
         }
-        ALOGI_IF(debugenable , "eglSwapBuffers");
+
 	if(NULL == sur)
 	    return HWC_EGL_ERROR;
-        EGLBoolean sucess = eglSwapBuffers((EGLDisplay)dpy, (EGLSurface)sur);
+
+    EGLBoolean sucess = false;
+
+#ifdef OVERLAY_COMPOSER_GPU
+        if (OverlayDeviceFlag == 1)
+        {
+            mOLCD->onDisplay();
+        }
+        else
+#endif
+        {
+            ALOGI_IF(debugenable , "eglSwapBuffers");
+            sucess = eglSwapBuffers((EGLDisplay)dpy, (EGLSurface)sur);
+        }
         /*************************dump framebuffer if need******************************/
         if(0 != property_get("dump.hwcomposer.flag" , value , "0")) {
             int flag = atoi(value);
@@ -1659,6 +1725,27 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
             }
 #endif
         }
+
+
+#ifdef OVERLAY_COMPOSER_GPU
+        /*
+         * Initialize the Overlay Composer Device
+         * */
+
+        dev->OD.fbfd = dev->fbfd;
+        dev->OD.fb_width = dev->fb_width;
+        dev->OD.fb_height = dev->fb_height;
+        dev->OD.overlay_phy_addr = dev->overlay_phy_addr2;
+        dev->OD.overlay_v_addr = dev->overlay_v_addr2;
+        dev->OD.overlay_buf_size = dev->overlay_buf_size2;
+        mOLCD = new OverlayComposer(&(dev->OD));
+        if (mOLCD == NULL)
+        {
+            ALOGE("Cant NOT create OverlayDevice no MEM");
+            return -1;
+        }
+#endif
+
         dev->mVSyncThread = new VSyncThread(dev);
     }
     return status;
