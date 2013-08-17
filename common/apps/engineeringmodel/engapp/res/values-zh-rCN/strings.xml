@@ -63,6 +63,7 @@
     <string name="notification_snapsvc_statusbarprompt">截屏服务已经开启,请查看下拉通知查看</string>
     <string name="progressdialog_tabhost_prompt">请稍候</string>
     <string name="toast_snap_success">截屏成功</string>
+    <string name="toast_snap_timeout">执行slogctl screen超时，本次操作可能无效</string>
     <string name="toast_snap_failed">截屏失败</string>
     <string name="toast_snap_prompt">截屏服务已经开启,下拉通知栏可找到截屏服务</string>
     <string name="toast_service_snap_start_failed">截屏服务开启失败</string>
