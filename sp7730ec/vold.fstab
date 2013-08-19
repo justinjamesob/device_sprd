@@ -9,6 +9,6 @@
 ######################
 
 # Mounts the first usable partition of the specified device
-dev_mount internal /storage/sdcard0 23 /devices/platform/sprd-sdhci.3/mmc_host/mmc0
+dev_mount internal /storage/sdcard0 by-name /devices/platform/sprd-sdhci.3/mmc_host/mmc0
 dev_mount sdcard /storage/sdcard1 auto /devices/platform/sprd-sdhci.0/mmc_host/mmc1
 dev_mount usbdisk /storage/usbdisk auto /devices/platform/dwc_otg.0/usb1/1-1
