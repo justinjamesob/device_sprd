@@ -14780,8 +14780,6 @@
         mcc="639"
         mnc="05"
         apn="internet"
-        proxy="10.4.16.6"
-        port="8080"
         server="http://wap.yu.co.ke"
         user=""
         password=""
