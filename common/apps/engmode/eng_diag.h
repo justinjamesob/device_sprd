@@ -44,10 +44,11 @@ typedef enum
 #define DIAG_CMD_GETVOLTAGE	0x1E
 #define DIAG_CMD_APCALI		0x62
 #define DIAG_CMD_FACTORYMODE	0x0D
+#define DIAG_CMD_ADC_F		0x0F  //add by kenyliu on 2013 07 12 for get ADCV  bug 188809
 #define DIAG_CMD_AT 		0x68
 #define DIAG_CMD_CHANGEMODE     DIAG_CHANGE_MODE_F
 
-
+#define DIAG_CMD_DIRECT_PHSCHK  0x5F
 
 #define DIAG_CMD_IMEIBIT		0x01
 #define DIAG_CMD_BTBIT			0x04
@@ -72,6 +73,9 @@ typedef enum
     CMD_USER_GETVOLTAGE,
     CMD_USER_APCALI,
     CMD_USER_APCMD,
+	CMD_USER_ADC,
+	CMD_USER_PRODUCT_CTRL,
+	CMD_USER_DIRECT_PHSCHK,
     CMD_INVALID
 }DIAG_CMD_TYPE;
 
@@ -81,8 +85,25 @@ typedef enum
 #define ENG_AUDIO       "/sys/class/vbc_param_config/vbc_param_store"
 #define ENG_FM_DEVSTAT	"/sys/class/fm_devstat_config/fm_devstat_store"
 
+#define MAX_SN_LEN                  24
+#define MAX_STATION_NUM             15
+#define MAX_STATION_NAME_LEN        10
+#define MAX_LAST_DESCRIPTION_LEN    32
 
+#define RW_MASK                     0x80 //(BIT_7)
+#define WRITE_MODE                  0
+#define RM_VALID_CMD_MASK           0x7f
 
+#define MSG_NACK                    0
+#define MSG_ACK                     1
+
+typedef enum{
+    IMEI_ERR_NONE = 0,
+    IMEI_CRC_ERR,
+    IMEI_CMD_ERR,
+    IMEI_SAVE_ERR,
+    IMEI_READ_ERR
+}ERR_IMEI_E;
 // This is the communication frame head
 typedef struct msg_head_tag
 {
@@ -111,8 +132,27 @@ typedef struct {
     unsigned char reserved2[16];
 }REF_NVWriteDirect_T;
 
+typedef struct _PHASE_CHECK_HEADER
+{
+    unsigned int Magic; //"SP09"
+    unsigned char SN[MAX_SN_LEN];   //SN,SN_LEN=24
+    unsigned char SN2[MAX_SN_LEN];  //Add for Mobile
 
+    unsigned int StationNum;   //The test station number of the testing
+    unsigned char StationName[MAX_STATION_NUM][MAX_STATION_NAME_LEN];
 
+    unsigned char Reserved[13]; //value: 0
+    unsigned char SignFlag; // internal flag
+    char szLastFailDescription[MAX_LAST_DESCRIPTION_LEN];
+    unsigned short iTestSign; // Bit0~Bit14 --> station0 ~ station14 if tested. 0:tested,1:not tested.
+    unsigned short iItem; // Part1:Bit0~Bit14 indicate test station,0:pass,1:fail
+                        // Part2:Bit15 set to 0;
+}TEST_TRACK_HEADER_T;
+
+typedef struct _PHASE_CHECK_S
+{
+    TEST_TRACK_HEADER_T header;
+}TEST_DATA_INFO_T;
 int eng_diag(char *buf,int len);
 int eng_diag_write2pc(int fd);
 int eng_diag_writeimei(char *req, char *rsp);

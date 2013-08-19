@@ -67,6 +67,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	nvitemd \
 	charge \
+	rawdatad \
 	vcharged \
 	poweroff_alarm \
 	mplayer \

@@ -31,8 +31,8 @@ static char * inotify_event_array[] = {
 
 
 static const char* RAW_DATA_PARTITION[RAWDATA_PARTITION_NUM] = {
-	"/dev/block/mmcblk0p8",
-	"/dev/block/mmcblk0p9"
+	 "/dev/block/mmcblk0p13",
+	 "/dev/block/mmcblk0p14"
 };
 
 static const char* PRODUCT_INFO[] = {
@@ -49,6 +49,14 @@ static const char* NO_FEADBACK[] = {
 static const char * monitored_files[] = {
 	"/productinfo/"
 };
+
+static const char * adc_files[] = {
+	"/productinfo/adc.bin"
+};
+static const char * batter_adc_files[] ={
+	"/dev/block/mmcblk0p24"
+};
+
 
 static struct wd_name wd_array[RAWDATA_MONITOR_ITEM];
 static unsigned short crc;
@@ -218,6 +226,77 @@ static void wirte_productinfo(int partition, int block)
 	DBG("%s: write %s successfully",__FUNCTION__, PRODUCT_INFO[block]);
 }
 
+
+static void wirte_adc(char* buffer )
+{
+	FILE *fp;
+	fp = fopen(adc_files[0],"w+");
+
+	if (!fp) {
+		DBG("%s: open %s fail",__FUNCTION__, adc_files[0]);
+		return;
+	}
+
+	fwrite(buffer,48,1,fp);
+
+	fclose(fp);
+
+	 DBG("%s: write %s successfully",__FUNCTION__, adc_files[0]);
+}
+
+int 	read_adc_data(char *buffer,int size)
+{
+	int fd = -1;
+	int ret = 0;
+	int i;
+	RAW_INFO_DATA_T        cali_info;
+
+	if(size > 48)
+		size = 48;
+
+
+	fd = open(batter_adc_files[0],O_RDWR);
+
+	if(fd < 0){
+		DBG("%s: open %s fail ",__FUNCTION__, batter_adc_files[0]);	
+		return 0;
+	}
+
+	DBG("%s: open %s  ok",__FUNCTION__, batter_adc_files[0]);
+	ret = read(fd,&cali_info,sizeof(cali_info));
+
+	DBG("%s: sizeof(cali_info.adc_para)= %d \n ",__FUNCTION__, sizeof(cali_info.adc_para));
+
+	DBG("%s: cali_info.adc_para.adc[0]= %d \n ",__FUNCTION__, cali_info.adc_para.adc[0]);
+	DBG("%s: cali_info.adc_para.adc[1]= %d \n ",__FUNCTION__, cali_info.adc_para.adc[1]);
+
+	DBG("%s: cali_info.adc_para.battery[0]= %d \n ",__FUNCTION__, cali_info.adc_para.battery[0]);
+	DBG("%s: cali_info.adc_para.battery[1]= %d \n ",__FUNCTION__, cali_info.adc_para.battery[1]);
+
+	if(size < sizeof(cali_info.adc_para))
+		memcpy(buffer,&cali_info.adc_para,size);
+	else	
+		memcpy(buffer,&cali_info.adc_para,sizeof(cali_info.adc_para));
+	close(fd);
+
+	if(ret > 0)
+	{
+	   DBG("%s, read data  ok,  size = %d\n", __FUNCTION__, size);
+	   return size;
+	}
+	DBG("%s, read data fail\n", __FUNCTION__);
+	return 0;
+}
+
+static void init_adc(void)
+{
+	char adc_buffer[48]={0};
+	read_adc_data(adc_buffer,48);
+	DBG("%s, adc_buffer=%s", __FUNCTION__, adc_buffer);
+	wirte_adc(adc_buffer);
+}
+
+
 static void init_productinfo()
 {
 	unsigned int i,j, partition, error_partition;
@@ -386,6 +465,7 @@ int main(int argc, char **argv)
 	DBG("Start RAWDATAD");
 
 	init_productinfo();
+	init_adc();
 	while(1)
 	{
 		fd = inotify_init();
