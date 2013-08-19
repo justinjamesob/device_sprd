@@ -69,9 +69,9 @@ service engpcclient /system/bin/engpc
     user root
 
 #nvitemd
-service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 ./nvitem_td.cfg    TRUE
+service nvitemd_td /bin/nvitemd /dev/spipe_td1 ./nvitem_td.cfg    TRUE
     user root
 
-service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 ./nvitem_w.cfg        TRUE
+service nvitemd_w /bin/nvitemd /dev/spipe_w1 ./nvitem_w.cfg        TRUE
     user root
 
