@@ -26,7 +26,7 @@ extern "C"
 #include "../../arithmetic/sc8825/inc/HDR2.h"
 #include "sprd_dma_copy_k.h"
 
-#define FACE_DETECT_NUM     5
+#define FACE_DETECT_NUM     10
 #define FACE_SMILE_LIMIT    10
 #define HDR_CAP_NUM         3
 #define CB_LIGHT_SYNC       1
