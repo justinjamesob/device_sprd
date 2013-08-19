@@ -27,14 +27,12 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <sys/statfs.h>
 #include <cutils/properties.h>
 
 #include "slog.h"
 
 int slog_enable = SLOG_ENABLE;
 int screenshot_enable = 1;
-int slog_save_all = 0;
 int slog_start_step = 0;
 int slog_init_complete = 0;
 int stream_log_handler_started = 0;
@@ -268,7 +266,7 @@ static void handler_last_dir()
 		return;
 	}
 
-	if(last_flag == 1 && slog_save_all == 0) {
+	if(last_flag == 1) {
 		sprintf(buffer, "rm -r %s/%s/", current_log_path, LAST_LOG);
 		system(buffer);
 	}
@@ -500,15 +498,19 @@ static int sdcard_mounted()
 	return 0;
 }
 
-static void check_sdcard_volume()
+static void check_available_volume()
 {
 	struct statfs diskInfo;
 	char cmd[MAX_NAME_LEN];
 	unsigned int ret;
 
+	if(slog_enable != SLOG_ENABLE)
+		return;
+
 	if(!strncmp(current_log_path, external_storage, strlen(external_storage))) {
+		sleep(3); /* wait 3s to slog reload */
 		if( statfs(external_path, &diskInfo) < 0 ) {
-			err_log("statfs return err!");
+			err_log("statfs %s return err!", external_path);
 			return;
 		}
 		ret = diskInfo.f_bavail * diskInfo.f_bsize >> 20;
@@ -517,6 +519,16 @@ static void check_sdcard_volume()
 			sprintf(cmd, "%s", "am start -n com.spreadtrum.android.eng/.SlogUILowStorage");
 			system(cmd);
 			sleep(300);
+		}
+	} else {
+		if( statfs(current_log_path, &diskInfo) < 0 ) {
+			err_log("statfs %s return err!", current_log_path);
+			return;
+		}
+		ret = diskInfo.f_bavail * diskInfo.f_bsize >> 20;
+		if(ret < 5 && slog_enable != SLOG_DISABLE) {
+			err_log("internal available %dM is not enough, disable slog", ret);
+			slog_enable = SLOG_DISABLE;
 		}
 	}
 }
@@ -572,7 +584,6 @@ int dump_all_log(const char *name)
 	if(!strncmp(current_log_path ,INTERNAL_LOG_PATH, strlen(INTERNAL_LOG_PATH)))
 		return -1;
 	capture_all(snapshot_log_head);
-	capture_by_name(snapshot_log_head, "bugreport", NULL);
 	capture_by_name(snapshot_log_head, "getprop", NULL);
 	sprintf(cmd, "tar czf %s/../%s /%s %s", current_log_path, name, current_log_path, INTERNAL_LOG_PATH);
 	return system(cmd);
@@ -607,20 +618,37 @@ static void *monitor_sdcard_fun()
 static void handler_internal_log_size()
 {
 	struct statfs diskInfo;
+	unsigned int internal_availabled_size;
+	int ret;
 
-	if(!strncmp(current_log_path, external_storage, strlen(external_storage)))
+	if( strncmp(current_log_path, INTERNAL_LOG_PATH, strlen(INTERNAL_LOG_PATH)))
 		return;
+
+	ret = mkdir(current_log_path, S_IRWXU | S_IRWXG | S_IRWXO);
+	if(-1 == ret && (errno != EEXIST)) {
+		err_log("mkdir %s failed.", current_log_path);
+		exit(0);
+	}
+
 	if( statfs(current_log_path, &diskInfo) < 0) {
-		err_log("statfs return err!");
+		slog_enable = SLOG_DISABLE;
+		err_log("statfs %s return err, disable slog", current_log_path);
 		return;
 	}
-	unsigned int blocksize = diskInfo.f_bsize;
-	unsigned int availabledisk = diskInfo.f_bavail * blocksize;
-	debug_log("internal available %dM", availabledisk >> 20);
+	internal_availabled_size = diskInfo.f_bavail * diskInfo.f_bsize / 1024 / 1024;
+	if( internal_availabled_size < 5 ) {
+		slog_enable = SLOG_DISABLE;
+		err_log("internal available space %dM is not enough, disable slog", internal_availabled_size);
+		return;
+	}
 
 	/* default setting internal log size, half of available */
-	internal_log_size = (availabledisk >> 20) /20;
-	debug_log("set internal log size %dM", internal_log_size);
+	internal_log_size = ( internal_availabled_size - 5 ) / 10;
+	if(internal_log_size == 0)
+		internal_log_size = 1;
+	err_log("set internal log size %dM", internal_log_size);
+
+	return;
 }
 
 /*
@@ -644,7 +672,10 @@ static void handle_top_logdir()
 	int ret;
 	char value[PROPERTY_VALUE_MAX];
 
-	property_get("slog.step", value, "");
+	if(slog_enable != SLOG_ENABLE)
+		return;
+
+	property_get("slog.step", value, "0");
 	slog_start_step = atoi(value);
 
 	ret = mkdir(current_log_path, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -654,8 +685,7 @@ static void handle_top_logdir()
 	}
 
 	if( !strncmp(current_log_path, INTERNAL_LOG_PATH, strlen(INTERNAL_LOG_PATH))) {
-		debug_log("slog use internal storage");
-		handler_internal_log_size();
+		err_log("slog use internal storage");
 		switch(slog_start_step){
 		case 0:
 			create_log_dir();
@@ -668,13 +698,20 @@ static void handle_top_logdir()
 			break;
 		}
 	} else {
-		debug_log("slog use external storage");
+		err_log("slog use external storage");
 		switch(slog_start_step){
+		case 0:
+			create_log_dir();
+			capture_snap_for_last(snapshot_log_head);
+			handle_dropbox();
+			handler_modem_memory_log();
+			property_set("slog.step", "2");
+			break;
 		case 1:
 			create_log_dir();
 			handler_modem_memory_log();
 			property_set("slog.step", "2");
-		break;
+			break;
 		default:
 			use_ori_log_dir();
 			break;
@@ -710,10 +747,12 @@ static int start_monitor_sdcard_fun()
  * 1.start running slog system(stream,snapshot,inotify)
  * 2.monitoring sdcard status
  */
-static int do_init()
+static void do_init()
 {
 	if(slog_enable != SLOG_ENABLE)
-		return 0;
+		return;
+
+	handler_internal_log_size();
 
 	handle_top_logdir();
 
@@ -724,17 +763,109 @@ static int do_init()
 
 	slog_init_complete = 1;
 
+	return;
+}
+
+void *handle_request(void *arg)
+{
+	int ret, client_sock;
+	struct slog_cmd cmd;
+	char filename[MAX_NAME_LEN];
+	time_t t;
+	struct tm tm;
+
+	client_sock = * ((int *) arg);
+	ret = recv_socket(client_sock, (void *)&cmd, sizeof(cmd));
+	if(ret <  0) {
+		err_log("recv data failed!");
+		close(client_sock);
+		return 0;
+	}
+	if(cmd.type == CTRL_CMD_TYPE_RELOAD) {
+		cmd.type = CTRL_CMD_TYPE_RSP;
+		sprintf(cmd.content, "OK");
+		send_socket(client_sock, (void *)&cmd, sizeof(cmd));
+		close(client_sock);
+		reload();
+	}
+
+	switch(cmd.type) {
+	case CTRL_CMD_TYPE_SNAP:
+		ret = capture_by_name(snapshot_log_head, cmd.content, NULL);
+		break;
+	case CTRL_CMD_TYPE_SNAP_ALL:
+		ret = capture_all(snapshot_log_head);
+		break;
+	case CTRL_CMD_TYPE_EXEC:
+		/* not implement */
+		ret = -1;
+		break;
+	case CTRL_CMD_TYPE_ON:
+		/* not implement */
+		ret = -1;
+		break;
+	case CTRL_CMD_TYPE_OFF:
+		slog_enable = SLOG_DISABLE;
+		ret = stop_sub_threads();
+		sleep(3);
+		break;
+	case CTRL_CMD_TYPE_QUERY:
+		ret = gen_config_string(cmd.content);
+		break;
+	case CTRL_CMD_TYPE_CLEAR:
+		ret = clear_all_log();
+		break;
+	case CTRL_CMD_TYPE_DUMP:
+		ret = dump_all_log(cmd.content);
+		break;
+	case CTRL_CMD_TYPE_HOOK_MODEM:
+		ret = mkdir("/data/log", S_IRWXU | S_IRWXG | S_IRWXO);
+		if (-1 == ret && (errno != EEXIST)){
+			err_log("mkdir /data/log failed.");
+		}
+		ret = 0;
+		hook_modem_flag = 1;
+		break;
+	case CTRL_CMD_TYPE_SCREEN:
+		if(slog_enable != SLOG_ENABLE || slog_init_complete == 0)
+			break;
+		if(cmd.content[0])
+			ret = screen_shot(cmd.content);
+		else {
+			sprintf(filename, "%s/%s/misc", current_log_path, top_logdir);
+			ret = mkdir(filename, S_IRWXU | S_IRWXG | S_IRWXO);
+			if(-1 == ret && (errno != EEXIST)){
+				err_log("mkdir %s failed.", filename);
+				exit(0);
+			}
+			t = time(NULL);
+			localtime_r(&t, &tm);
+			sprintf(filename, "%s/%s/misc/screenshot_%02d%02d%02d.jpg",
+					current_log_path, top_logdir,
+					tm.tm_hour, tm.tm_min, tm.tm_sec);
+			ret = screen_shot(filename);
+		}
+		break;
+	default:
+		err_log("wrong cmd cmd: %d %s.", cmd.type, cmd.content);
+		break;
+	}
+	cmd.type = CTRL_CMD_TYPE_RSP;
+	if(ret && cmd.content[0] == 0)
+		sprintf(cmd.content, "FAIL");
+	else if(!ret && cmd.content[0] == 0)
+		sprintf(cmd.content, "OK");
+	send_socket(client_sock, (void *)&cmd, sizeof(cmd));
+	close(client_sock);
+
 	return 0;
 }
 
 void *command_handler(void *arg)
 {
-	struct slog_cmd cmd;
 	struct sockaddr_un serv_addr;
 	int ret, server_sock, client_sock;
-	char filename[MAX_NAME_LEN];
-	time_t t;
-	struct tm tm;
+	pthread_t thread_pid;
 
 	/* init unix domain socket */
 	memset(&serv_addr, 0, sizeof(serv_addr));
@@ -767,150 +898,16 @@ void *command_handler(void *arg)
 			sleep(1);
 			continue;
 		}
-		ret = recv_socket(client_sock, (void *)&cmd, sizeof(cmd));
-		if(ret <  0) {
-			err_log("recv data failed!");
-			close(client_sock);
-			continue;
-		}
-		if(cmd.type == CTRL_CMD_TYPE_RELOAD) {
-			cmd.type = CTRL_CMD_TYPE_RSP;
-			sprintf(cmd.content, "OK");
-			send_socket(client_sock, (void *)&cmd, sizeof(cmd));
-			close(client_sock);
-			reload();
-			continue;
-		}
 
-		switch(cmd.type) {
-		case CTRL_CMD_TYPE_SNAP:
-			ret = capture_by_name(snapshot_log_head, cmd.content, NULL);
-			break;
-		case CTRL_CMD_TYPE_SNAP_ALL:
-			ret = capture_all(snapshot_log_head);
-			break;
-		case CTRL_CMD_TYPE_EXEC:
-			/* not implement */
-			ret = -1;
-			break;
-		case CTRL_CMD_TYPE_ON:
-			/* not implement */
-			ret = -1;
-			break;
-		case CTRL_CMD_TYPE_OFF:
-			slog_enable = SLOG_DISABLE;
-			ret = stop_sub_threads();
-			sleep(3);
-			break;
-		case CTRL_CMD_TYPE_QUERY:
-			ret = gen_config_string(cmd.content);
-			break;
-		case CTRL_CMD_TYPE_CLEAR:
-			ret = clear_all_log();
-			break;
-		case CTRL_CMD_TYPE_DUMP:
-			ret = dump_all_log(cmd.content);
-			break;
-		case CTRL_CMD_TYPE_HOOK_MODEM:
-			ret = mkdir("/data/log", S_IRWXU | S_IRWXG | S_IRWXO);
-			if (-1 == ret && (errno != EEXIST)){
-				err_log("mkdir /data/log failed.");
-			}
-			ret = 0;
-			hook_modem_flag = 1;
-			break;
-		case CTRL_CMD_TYPE_SCREEN:
-			if(slog_enable != SLOG_ENABLE || slog_init_complete == 0)
-				break;
-			if(cmd.content[0])
-				ret = screen_shot(cmd.content);
-			else {
-				sprintf(filename, "%s/%s/misc", current_log_path, top_logdir);
-				ret = mkdir(filename, S_IRWXU | S_IRWXG | S_IRWXO);
-				if(-1 == ret && (errno != EEXIST)){
-					err_log("mkdir %s failed.", filename);
-					exit(0);
-				}
-				t = time(NULL);
-				localtime_r(&t, &tm);
-				sprintf(filename, "%s/%s/misc/screenshot_%02d%02d%02d.jpg",
-						current_log_path, top_logdir,
-						tm.tm_hour, tm.tm_min, tm.tm_sec);
-				ret = screen_shot(filename);
-			}
-			break;
-		default:
-			err_log("wrong cmd cmd: %d %s.", cmd.type, cmd.content);
-			break;
-		}
-		cmd.type = CTRL_CMD_TYPE_RSP;
-		if(ret && cmd.content[0] == 0)
-			sprintf(cmd.content, "FAIL");
-		else if(!ret && cmd.content[0] == 0)
-			sprintf(cmd.content, "OK");
-		send_socket(client_sock, (void *)&cmd, sizeof(cmd));
-		close(client_sock);
-	}
-}
-
-void create_pidfile()
-{
-	pid_t pid = 0;
-	FILE *fp;
-	struct stat st;
-	char buffer[MAX_NAME_LEN];
-	int ret;
-
-	if(stat(PID_FILE, &st))
-		goto write_pid;
-
-	fp = fopen(PID_FILE, "r");
-	if(fp == NULL) {
-		err_log("can't open pid file: %s.", PID_FILE);
-		exit(0);
-	}
-	memset(buffer, 0, MAX_NAME_LEN);
-	fgets(buffer, MAX_NAME_LEN, fp);
-	fclose(fp);
-
-	pid = atoi(buffer);
-	if(pid != 0) {
-		sprintf(buffer, "/proc/%d/cmdline", pid);
-		fp = fopen(buffer, "r");
-		if (fp != NULL) {
-			fgets(buffer, MAX_NAME_LEN, fp);
-			if(!strncmp(buffer, "/system/bin/slog", 16)) {
-				/* means daemon has started, just exit */
-				err_log("Slog is running already, the quit immediately.");
-				fclose(fp);
-				exit(0);
-			}
-			fclose(fp);
+		if ( 0 != pthread_create(&thread_pid, NULL, handle_request, (void *) &client_sock) ) {
+			err_log("sock thread create error");
 		}
 	}
-
-write_pid:
-	ret = mkdir(TMP_FILE_PATH, S_IRWXU | S_IRWXG | S_IRWXO);
-	if (-1 == ret && (errno != EEXIST)) {
-		err_log("mkdir %s failed.", TMP_FILE_PATH);
-		exit(0);
-	}
-
-	fp = fopen(PID_FILE, "w");
-	if(fp == NULL) {
-		err_log("can't open pid file: %s.", PID_FILE);
-		exit(0);
-	}
-
-	fprintf(fp, "%d", getpid());
-	fclose(fp);
-	return;
 }
 
 static void sig_handler1(int sig)
 {
 	err_log("get a signal %d.", sig);
-	unlink(PID_FILE);
 	exit(0);
 }
 
@@ -959,12 +956,6 @@ int main(int argc, char *argv[])
 {
 	int opt;
 
-/*
-	if(daemon(0, 0)){
-		err_log("Can't start Slog daemon.");
-		exit(0);
-	}
-*/
 	err_log("Slog begin to work.");
 
 	while ( -1 != (opt = getopt(argc, argv, "t"))) {
@@ -979,9 +970,6 @@ int main(int argc, char *argv[])
 
 	/* sets slog process's file mode creation mask */
 	umask(0);
-
-	/* pid file */
-	create_pidfile();
 
 	/* handle signal */
 	setup_signals();
@@ -1005,7 +993,7 @@ int main(int argc, char *argv[])
 
 	while(1) {
 		sleep(10);
-		check_sdcard_volume();
+		check_available_volume();
 	}
 	return 0;
 }

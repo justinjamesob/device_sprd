@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
         int sockfd, ret;
 	struct slog_cmd cmd;
 	struct sockaddr_un address;
+	struct timeval tv_out;
 
 	/*
 	arguments list:
@@ -210,6 +211,11 @@ int main(int argc, char *argv[])
 		perror("send failed");
 		return -1;
 	}
+
+	tv_out.tv_sec = 120;
+	tv_out.tv_usec = 0;
+	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv_out, sizeof(tv_out));
+
 	ret = recv_socket(sockfd, (void *)&cmd, sizeof(cmd));
         if (ret < 0) {
 		perror("recv failed");

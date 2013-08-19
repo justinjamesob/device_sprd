@@ -106,9 +106,7 @@ int parse_3_entries(char *type)
 	} else if(!strncmp(name, "slogsaveall", 11)) {
 		if(!strncmp(pos3, "on", 2))
 			handle_watchdog(1);
-		//	slog_save_all = 1;
 		else
-		//	slog_save_all = 0;
 			handle_watchdog(0);
 	}
 	return 0;
@@ -324,6 +322,11 @@ int parse_config()
 
 	/* we use tmp log config file first */
 	if(stat(TMP_SLOG_CONFIG, &st)){
+		ret = mkdir(TMP_FILE_PATH, S_IRWXU | S_IRWXG | S_IRWXO);
+		if (-1 == ret && (errno != EEXIST)) {
+			err_log("mkdir %s failed.", TMP_FILE_PATH);
+			exit(0);
+		}
 		property_get("ro.debuggable", buffer, "");
 		if (strcmp(buffer, "1") != 0) {
 			if(!stat(DEFAULT_USER_SLOG_CONFIG, &st))
@@ -345,7 +348,19 @@ int parse_config()
 	fp = fopen(TMP_SLOG_CONFIG, "r");
 	if(fp == NULL) {
 		err_log("open file failed, %s.", TMP_SLOG_CONFIG);
-		return -1;
+		if (strcmp(buffer, "1") != 0) {
+			fp = fopen(DEFAULT_USER_SLOG_CONFIG, "r");
+			if(fp == NULL) {
+				err_log("open file failed, %s.", DEFAULT_USER_SLOG_CONFIG);
+				exit(0);
+			}
+		} else {
+			fp = fopen(DEFAULT_DEBUG_SLOG_CONFIG, "r");
+			if(fp == NULL) {
+				err_log("open file failed, %s.", DEFAULT_DEBUG_SLOG_CONFIG);
+				exit(0);
+			}
+		}
 	}
 
 	/* parse line by line */
