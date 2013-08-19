@@ -29,8 +29,7 @@ typedef int (*alloc_mem_ptr)(void* handle, unsigned int size, unsigned int *addr
 typedef int (*free_mem_ptr)(void* handle);
 
 struct cmr_cap_2_frm {
-	struct img_frm  major_frm;
-	struct img_frm  minor_frm;
+	struct img_frm  mem_frm;
 
 	void* handle;
 	alloc_mem_ptr alloc_mem;
@@ -53,8 +52,7 @@ struct cmr_cap_mem {
 int camera_capture_buf_size(uint32_t     camera_id,
 					uint32_t        sn_fmt,
 					struct img_size *image_size,
-					uint32_t        *size_major,
-					uint32_t        *size_minor);
+					uint32_t        *mem_size);
 
 int camera_arrange_capture_buf(struct cmr_cap_2_frm *cap_2_frm,
 						struct img_size *sn_size,

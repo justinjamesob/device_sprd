@@ -5206,8 +5206,7 @@ int camera_capture_get_buffer_size(uint32_t camera_id,
 	ret = camera_capture_buf_size(camera_id,
 					g_cxt->sn_cxt.sensor_info->image_format,
 					&local_size,
-					size0,
-					size1);
+					size0);
 
 	return ret;
 }
@@ -5258,13 +5257,9 @@ int camera_set_capture_mem(uint32_t     cap_index,
 		return -CAMERA_NO_MEMORY;
 	}
 
-	g_cxt->cap_2_mems.major_frm.buf_size = mem_size0;
-	g_cxt->cap_2_mems.major_frm.addr_phy.addr_y = phy_addr0;
-	g_cxt->cap_2_mems.major_frm.addr_vir.addr_y = vir_addr0;
-
-	g_cxt->cap_2_mems.minor_frm.buf_size = mem_size1;
-	g_cxt->cap_2_mems.minor_frm.addr_phy.addr_y = phy_addr1;
-	g_cxt->cap_2_mems.minor_frm.addr_vir.addr_y = vir_addr1;
+	g_cxt->cap_2_mems.mem_frm.buf_size = mem_size0;
+	g_cxt->cap_2_mems.mem_frm.addr_phy.addr_y = phy_addr0;
+	g_cxt->cap_2_mems.mem_frm.addr_vir.addr_y = vir_addr0;
 
 	return ret;
 }
@@ -5289,10 +5284,9 @@ int camera_set_capture_mem2(uint32_t     cap_index,
 		return -CAMERA_NO_MEMORY;
 	}
 
-	g_cxt->cap_2_mems.major_frm.buf_size = mem_size0;
-	g_cxt->cap_2_mems.major_frm.addr_phy.addr_y = phy_addr0;
-	g_cxt->cap_2_mems.major_frm.addr_vir.addr_y = vir_addr0;
-	g_cxt->cap_2_mems.minor_frm.buf_size = 0;
+	g_cxt->cap_2_mems.mem_frm.buf_size = mem_size0;
+	g_cxt->cap_2_mems.mem_frm.addr_phy.addr_y = phy_addr0;
+	g_cxt->cap_2_mems.mem_frm.addr_vir.addr_y = vir_addr0;
 
 	g_cxt->cap_2_mems.alloc_mem = (alloc_mem_ptr)alloc_mem;
 	g_cxt->cap_2_mems.free_mem = (free_mem_ptr)free_mem;
