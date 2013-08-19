@@ -2398,13 +2398,13 @@ void SprdCameraHardware::receivePreviewFDFrame(camera_frame_type *frame)
     ssize_t offset = frame->buf_id;
     camera_frame_metadata_t metadata;
     camera_face_t face_info[FACE_DETECT_NUM];
-    uint32_t k = 0;
+    int32_t k = 0;
 
    /* if(1 == mParameters.getInt("smile-snap-mode")){*/
     LOGV("receive face_num %d.",frame->face_num);
-    metadata.number_of_faces = frame->face_num;
-    if((0 != frame->face_num)&&(frame->face_num<=FACE_DETECT_NUM)) {
-       for(k=0 ; k<frame->face_num ; k++) {
+   metadata.number_of_faces = frame->face_num <= FACE_DETECT_NUM ? frame->face_num:FACE_DETECT_NUM;
+    if(0 != metadata.number_of_faces) {
+       for(k=0 ; k< metadata.number_of_faces ; k++) {
             face_info[k].id = k;
             face_info[k].rect[0] = (frame->face_ptr->sx*2000/mPreviewWidth)-1000;
             face_info[k].rect[1] = (frame->face_ptr->sy*2000/mPreviewHeight)-1000;
