@@ -51,5 +51,10 @@
 /dev/block/mmcblk0p7    0660     system  system
 /dev/block/mmcblk0p8    0660     system  system
 
+/dev/block/mmcblk0p13    0660     system  system
+/dev/block/mmcblk0p14    0660     system  system
+/dev/block/mmcblk0p15    0660     system  system
+/dev/block/mmcblk0p24    0660     system  system
+
 /dev/vser              0660     system  system
 /dev/ttyGS0            0660     system  system

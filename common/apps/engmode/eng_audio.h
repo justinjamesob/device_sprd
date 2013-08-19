@@ -59,7 +59,10 @@ enum{
     SET_AUDIO_ENHA_DATA_TO_FLASH,
 };
 
-
+enum{
+	SET_CALIBRATION_DISABLE,
+	SET_CALIBRATION_ENABLE,
+};
 
 typedef unsigned char  uint8;
 typedef          char  int8;

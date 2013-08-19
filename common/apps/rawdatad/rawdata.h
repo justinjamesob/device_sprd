@@ -45,4 +45,18 @@ struct wd_name {
 	const char * name;
 };
 
+typedef struct
+{
+    unsigned int     	adc[2];           // calibration of ADC, two test point
+    unsigned int 	battery[2];       // calibraton of battery(include resistance), two test point
+    unsigned int    	reserved[8];      // reserved for feature use.
+} RAW_ADC_T;
+
+typedef struct
+{
+	unsigned int	magic;		  // when create ,magic = "CALI"
+	unsigned int	cali_flag;        // cali_flag   default 0xFFFFFFFF, when calibration finished,it is set "COMP"
+	RAW_ADC_T 	adc_para;         // ADC calibration data.
+}RAW_INFO_DATA_T;
+
 #endif

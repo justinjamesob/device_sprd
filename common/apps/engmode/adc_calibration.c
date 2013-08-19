@@ -12,18 +12,24 @@
 
 #define CONFIG_AP_ADC_CALIBRATION
 #ifdef CONFIG_AP_ADC_CALIBRATION
+
+#define PRECISION_1MV       (1<<24)
+#define PRECISION_10MV      (0)
+#define MAX_VOLTAGE         (0xFFFFFF)
+
 static	int	vbus_charger_disconnect = 0;
 void	disconnect_vbus_charger(void)
 {
-    int fd;
-    if(vbus_charger_disconnect == 0){
-        vbus_charger_disconnect = 1;
-        fd = open(CHARGER_STOP_PATH,O_RDWR);
-        if(fd > 0){
-            write(fd,"1",2);
-            close(fd);
-        }
-    }
+	int fd;
+	if(vbus_charger_disconnect == 0){
+		vbus_charger_disconnect = 1;
+		fd = open(CHARGER_STOP_PATH,O_WRONLY);
+		if(fd >= 0){
+			write(fd,"1",2);
+			close(fd);
+			sleep(1);
+		}
+	}
 }
 void	initialize_ctrl_file(void)
 {
@@ -53,23 +59,60 @@ void	initialize_ctrl_file(void)
     }
     close(fd);
 }
+
 void	disable_calibration(void)
 {
-    CALI_INFO_DATA_T        cali_info;
-    int ret;
+	CALI_INFO_DATA_T        cali_info;
 
-    int fd = open(CALI_CTRL_FILE_PATH,O_RDWR);
+       int fd = open(CALI_CTRL_FILE_PATH,O_RDWR);
 
-    if(fd < 0)
-        return;
-    if(cali_info.magic!=CALI_MAGIC)
-        cali_info.magic = CALI_MAGIC;
-    if(cali_info.cali_flag != CALI_COMP)
-        cali_info.cali_flag = CALI_COMP;
-    lseek(fd,SEEK_SET,0);
-    write(fd,&cali_info,8);
-    close(fd);
+       if(fd < 0){
+		ALOGE("%s open %s failed\n",__func__,CALI_CTRL_FILE_PATH);
+		return;
+	}
+	read(fd,&cali_info,sizeof(cali_info));
+	cali_info.magic = CALI_MAGIC;
+	cali_info.cali_flag = CALI_COMP;
+
+	lseek(fd,SEEK_SET,0);
+	write(fd,&cali_info,sizeof(cali_info));
+	close(fd);
 }
+
+void	enable_calibration(void)
+{
+	CALI_INFO_DATA_T        cali_info;
+
+       int fd = open(CALI_CTRL_FILE_PATH,O_RDWR);
+
+       if(fd < 0){
+		ALOGE("%s open %s failed\n",__func__,CALI_CTRL_FILE_PATH);
+		return;
+	}
+
+	read(fd,&cali_info,sizeof(cali_info));
+	cali_info.magic = 0xFFFFFFFF;
+	cali_info.cali_flag = 0xFFFFFFFF;
+
+	lseek(fd,SEEK_SET,0);
+	write(fd,&cali_info,sizeof(cali_info));
+	close(fd);
+}
+
+void adc_get_result(char* chan)
+{
+      int fd = open(ADC_CHAN_FILE_PATH,O_RDWR);
+      if(fd < 0){
+		ALOGE("%s open %s failed\n",__func__,ADC_CHAN_FILE_PATH);
+		return 0;
+	}
+	write(fd, chan, strlen(chan));
+	lseek(fd,SEEK_SET,0);
+	memset(chan, 0, 8);
+	read(fd, chan , 8);
+	close(fd);
+}
+
 static int AccessADCDataFile(unsigned char flag, char *lpBuff, int size)
 {
     int fd = -1;
@@ -115,13 +158,13 @@ static int get_battery_voltage(void)
 
     fd = open(BATTERY_VOL_PATH,O_RDONLY);
 
-    if(fd > 0){
-        read_len = read(fd,buffer,sizeof(buffer));
-        if(read_len > 0)
-            value = strtol(buffer,&endptr,0);
-        close(fd);
-    }
-    return value;
+        if(fd >= 0){
+                read_len = read(fd,buffer,sizeof(buffer));
+                if(read_len > 0)
+			value = strtol(buffer,&endptr,0);
+                close(fd);
+        }
+        return value;
 }
 static int get_battery_adc_value(void)
 {
@@ -133,13 +176,13 @@ static int get_battery_adc_value(void)
 
     fd = open(BATTERY_ADC_PATH,O_RDONLY);
 
-    if(fd > 0){
-        read_len = read(fd,buffer,sizeof(buffer));
-        if(read_len > 0)
-            value = strtol(buffer,&endptr,0);
-        close(fd);
-    }
-    return value;
+        if(fd >= 0){
+                read_len = read(fd,buffer,sizeof(buffer));
+                if(read_len > 0)
+                        value = strtol(buffer,&endptr,0);
+                close(fd);
+        }
+	return value;
 }
 
 /*copy from packet.c and modify*/
@@ -188,7 +231,7 @@ static int untranslate_packet_header(char *dest,char *src,int size, int unpackSi
     return translated_size;
 }
 
-static int translate_packet(char *dest,char *src,int size)
+int translate_packet(char *dest,char *src,int size)
 {
     int i;
     int translated_size = 0;
@@ -306,9 +349,17 @@ static unsigned int ap_get_voltage(MSG_AP_ADC_CNF *pMsgADC)
         voltage += get_battery_voltage();
     voltage >>= 4;
 
-    para = (int *)(Msg +1);
-    *para = (voltage/10);
-    pMsgADC->msg_head.len = 12;
+	para = (int *)(Msg +1);
+//        *para = (voltage/10);
+        if (voltage > MAX_VOLTAGE)
+        {
+            *para = (PRECISION_10MV | ((voltage/10) & MAX_VOLTAGE));
+        }
+        else
+        {
+            *para = (PRECISION_1MV | (voltage & MAX_VOLTAGE));
+        }
+        pMsgADC->msg_head.len = 12;
 
     return voltage;
 }

@@ -24,6 +24,7 @@ LOCAL_SRC_FILES     := eng_pcclient.c  \
 		       vdiag.c \
 		       bt_eut.c \
 		       wifi_eut.c \
+		       eng_productdata.c \
 		       gps_eut.c \
 		       adc_calibration.c\
 		       crc16.c \

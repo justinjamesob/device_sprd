@@ -80,6 +80,7 @@ PRODUCT_PACKAGES += \
 	nvitemd \
 	charge \
 	refnotify\
+	rawdatad \
 	vcharged \
 	poweroff_alarm \
 	mplayer \
