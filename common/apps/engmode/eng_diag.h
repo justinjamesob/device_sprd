@@ -58,6 +58,7 @@ typedef enum
 #define AUDIO_ENHA_EQ_INDI_FLAG         0x04
 #define AUDIO_DATA_READY_INDI_FLAG      (AUDIO_NV_ARM_INDI_FLAG|AUDIO_ENHA_EQ_INDI_FLAG)
 
+#define DIAG_SUB_MMICIT_READ    0x1A 
 
 #define ENG_TESTMODE			"engtestmode"
 #define ENG_SPRD_VERS			"ro.build.description"
@@ -73,9 +74,10 @@ typedef enum
     CMD_USER_GETVOLTAGE,
     CMD_USER_APCALI,
     CMD_USER_APCMD,
-	CMD_USER_ADC,
-	CMD_USER_PRODUCT_CTRL,
-	CMD_USER_DIRECT_PHSCHK,
+    CMD_USER_ADC,
+    CMD_USER_PRODUCT_CTRL,
+    CMD_USER_DIRECT_PHSCHK,
+    CMD_USER_MMICIT_READ,
     CMD_INVALID
 }DIAG_CMD_TYPE;
 
@@ -146,7 +148,7 @@ typedef struct _PHASE_CHECK_HEADER
     char szLastFailDescription[MAX_LAST_DESCRIPTION_LEN];
     unsigned short iTestSign; // Bit0~Bit14 --> station0 ~ station14 if tested. 0:tested,1:not tested.
     unsigned short iItem; // Part1:Bit0~Bit14 indicate test station,0:pass,1:fail
-                        // Part2:Bit15 set to 0;
+    // Part2:Bit15 set to 0;
 }TEST_TRACK_HEADER_T;
 
 typedef struct _PHASE_CHECK_S

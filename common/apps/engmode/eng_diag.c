@@ -21,6 +21,7 @@
 #include "eng_btwifiaddr.h"
 #include "vlog.h"
 #include "eng_productdata.h"
+#include "eng_sqlite.h"
 #ifdef ENG_AT_CHANNEL
 #include "AtChannel.h"
 #endif
@@ -77,6 +78,7 @@ static int eng_diag_product_ctrl(char *buf,int len, char *rsp, int rsplen);
 static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen);
 int is_audio_at_cmd_need_to_handle(char *buf,int len);
 int eng_diag_factorymode(char *buf,int len, char *rsp);
+int eng_diag_mmicit_read(char *buf,int len, char *rsp, int rsplen);
 int get_sub_str(char *buf,char **revdata, char a, char b);
 int get_cmd_index(char *buf);
 int eng_diag_adc(char *buf, int * Irsp);
@@ -159,22 +161,24 @@ int eng_diag_parse(char *buf,int len)
             ENG_LOG("%s: Handle DIAG_CMD_FACTORYMODE\n",__FUNCTION__);
             if(head_ptr->subtype==0x07) {
                 ret = CMD_USER_FACTORYMODE;
-			} else if(head_ptr->subtype >= 0x2 && head_ptr->subtype <= 0x4) {
-				// 2: NVITEM_PRODUCT_CTRL_READ
-				// 3: NVITEM_PRODUCT_CTRL_WRITE
-				// 4: NVITEM_PRODUCT_CTRL_ERASE
-				ret=CMD_USER_PRODUCT_CTRL;
+            } else if(head_ptr->subtype >= 0x2 && head_ptr->subtype <= 0x4) {
+                // 2: NVITEM_PRODUCT_CTRL_READ
+                // 3: NVITEM_PRODUCT_CTRL_WRITE
+                // 4: NVITEM_PRODUCT_CTRL_ERASE
+                ret=CMD_USER_PRODUCT_CTRL;
+            } else if(head_ptr->subtype==DIAG_SUB_MMICIT_READ){
+                ret=CMD_USER_MMICIT_READ;
             } else {
                 ret=CMD_COMMON;
             }
             break;
-		case DIAG_CMD_DIRECT_PHSCHK:
-			ENG_LOG("%s: Handle DIAG_CMD_DIRECT_PHSCHK\n",__FUNCTION__);
-			ret =CMD_USER_DIRECT_PHSCHK;
-			break;
-		case DIAG_CMD_ADC_F:
-			ret =CMD_USER_ADC;
-			break;
+        case DIAG_CMD_DIRECT_PHSCHK:
+            ENG_LOG("%s: Handle DIAG_CMD_DIRECT_PHSCHK\n",__FUNCTION__);
+            ret =CMD_USER_DIRECT_PHSCHK;
+            break;
+        case DIAG_CMD_ADC_F:
+            ret =CMD_USER_ADC;
+            break;
         case DIAG_CMD_AT:
             if(is_audio_at_cmd_need_to_handle(buf,len)){
                 ENG_LOG("%s: Handle DIAG_CMD_AUDIO\n",__FUNCTION__);
@@ -210,7 +214,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
     int adc_rsp[8];
 
     memset(rsp, 0, sizeof(rsp));
-	memset(adc_rsp, 0, sizeof(adc_rsp));
+    memset(adc_rsp, 0, sizeof(adc_rsp));
 
     ENG_LOG("%s: type=%d\n",__FUNCTION__, type);
 
@@ -228,9 +232,9 @@ int eng_diag_user_handle(int type, char *buf,int len)
         case CMD_USER_FACTORYMODE:
             rlen=eng_diag_factorymode(buf, len, rsp);
             break;
-		case CMD_USER_ADC:
-			rlen=eng_diag_adc(buf, adc_rsp);
-			break;
+        case CMD_USER_ADC:
+            rlen=eng_diag_adc(buf, adc_rsp);
+            break;
         case CMD_USER_AUDIO:
             memset(eng_audio_diag_buf,0,sizeof(eng_audio_diag_buf));
             rlen=eng_diag_audio(buf, len, eng_audio_diag_buf);
@@ -251,19 +255,25 @@ int eng_diag_user_handle(int type, char *buf,int len)
             }
             rlen = eng_diag_apcmd_hdlr(buf, len, rsp);
             break;
-		case CMD_USER_PRODUCT_CTRL:
-			ENG_LOG("%s: CMD_USER_PRODUCT_CTRL\n",__FUNCTION__);
+        case CMD_USER_PRODUCT_CTRL:
+            ENG_LOG("%s: CMD_USER_PRODUCT_CTRL\n",__FUNCTION__);
             memset(eng_diag_buf, 0, sizeof(eng_diag_buf));
             rlen = eng_diag_product_ctrl(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
-			eng_diag_len = rlen;
-			eng_diag_write2pc(get_ser_fd());
-		    return 0;
-		case CMD_USER_DIRECT_PHSCHK:
-			ENG_LOG("%s: CMD_USER_DIRECT_PHSCHK\n", __FUNCTION__);
+            eng_diag_len = rlen;
+            eng_diag_write2pc(get_ser_fd());
+            return 0;
+        case CMD_USER_DIRECT_PHSCHK:
+            ENG_LOG("%s: CMD_USER_DIRECT_PHSCHK\n", __FUNCTION__);
             memset(eng_diag_buf, 0, sizeof(eng_diag_buf));
-			rlen = eng_diag_direct_phschk(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
-			eng_diag_len = rlen;
-			eng_diag_write2pc(get_ser_fd());
+            rlen = eng_diag_direct_phschk(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
+            eng_diag_len = rlen;
+            eng_diag_write2pc(get_ser_fd());
+            return 0;
+        case CMD_USER_MMICIT_READ:
+            ENG_LOG("%s: CMD_USER_MMICIT_READ Req !\n", __FUNCTION__);
+            rlen = eng_diag_mmicit_read(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
+            eng_diag_len = rlen;
+            eng_diag_write2pc(get_ser_fd());
             return 0;
         default:
             break;
@@ -279,17 +289,17 @@ int eng_diag_user_handle(int type, char *buf,int len)
         head.subtype = 0x00;
     }
 
-	if( type == CMD_USER_ADC )
-	{
-		head.subtype = 0x00;
-	}
+    if( type == CMD_USER_ADC )
+    {
+        head.subtype = 0x00;
+    }
 
     memcpy(eng_diag_buf+1,&head,sizeof(MSG_HEAD_T));
 
     if ( type == CMD_USER_AUDIO ) {
         memcpy(eng_diag_buf+sizeof(MSG_HEAD_T)+1,eng_audio_diag_buf,strlen(eng_audio_diag_buf));
-	}else if(type == CMD_USER_ADC ){
-		memcpy(eng_diag_buf+sizeof(MSG_HEAD_T)+1,adc_rsp,sizeof(adc_rsp));
+    }else if(type == CMD_USER_ADC ){
+        memcpy(eng_diag_buf+sizeof(MSG_HEAD_T)+1,adc_rsp,sizeof(adc_rsp));
     }else{
         memcpy(eng_diag_buf+sizeof(MSG_HEAD_T)+1,rsp,sizeof(rsp));
     }
@@ -1114,14 +1124,14 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
             }
         }
     }
-	//AT+CALIBR
-	ret = strncmp(ptr,at_calibr,strlen(at_calibr));
-	if ( 0==ret ) {
-		at_tok_equel_start(&ptr);
-		at_tok_nextint(&ptr,&cmd_type);
-		ENG_LOG("%s,CALIBR :value = 0x%02x",__FUNCTION__,cmd_type);
-		return 1;
-	}
+    //AT+CALIBR
+    ret = strncmp(ptr,at_calibr,strlen(at_calibr));
+    if ( 0==ret ) {
+        at_tok_equel_start(&ptr);
+        at_tok_nextint(&ptr,&cmd_type);
+        ENG_LOG("%s,CALIBR :value = 0x%02x",__FUNCTION__,cmd_type);
+        return 1;
+    }
 
     ENG_LOG("%s,cmd don't need to handle",__FUNCTION__);
 
@@ -1130,44 +1140,44 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
 
 int eng_diag_adc(char *buf, int *Irsp)
 {
-	MSG_HEAD_T *head_ptr=NULL;
-	unsigned char buf1[8];
-	int result;
-	if(Irsp != NULL){
-		sprintf(Irsp,"\r\nERROR\r\n");
-	}
-	else
-	{
-		ENG_LOG("%s,in eng_diag_adc,Irsp is null",__FUNCTION__);
-		return 0;
-	}
+    MSG_HEAD_T *head_ptr=NULL;
+    unsigned char buf1[8];
+    int result;
+    if(Irsp != NULL){
+        sprintf(Irsp,"\r\nERROR\r\n");
+    }
+    else
+    {
+        ENG_LOG("%s,in eng_diag_adc,Irsp is null",__FUNCTION__);
+        return 0;
+    }
 
-      head_ptr = (MSG_HEAD_T *)(buf+1);
-      memset(buf1, 0, 8);
-      sprintf(buf1,"%d", head_ptr->subtype);
-      adc_get_result(buf1);
-      result = atoi(buf1);
-      Irsp[0] = result;
-      return strlen(Irsp);
+    head_ptr = (MSG_HEAD_T *)(buf+1);
+    memset(buf1, 0, 8);
+    sprintf(buf1,"%d", head_ptr->subtype);
+    adc_get_result(buf1);
+    result = atoi(buf1);
+    Irsp[0] = result;
+    return strlen(Irsp);
 }
 
 //for mobile test tool
 void At_cmd_back_sig(void)
 {
-	eng_diag_buf[0] =0x7e;
+    eng_diag_buf[0] =0x7e;
 
-	eng_diag_buf[1] =0x00;
-	eng_diag_buf[2] =0x00;
-	eng_diag_buf[3] =0x00;
-	eng_diag_buf[4] =0x00;
-	eng_diag_buf[5] =0x08;
-	eng_diag_buf[6] =0x00;
-	eng_diag_buf[7] =0xD5;
-	eng_diag_buf[8] =0x00;
+    eng_diag_buf[1] =0x00;
+    eng_diag_buf[2] =0x00;
+    eng_diag_buf[3] =0x00;
+    eng_diag_buf[4] =0x00;
+    eng_diag_buf[5] =0x08;
+    eng_diag_buf[6] =0x00;
+    eng_diag_buf[7] =0xD5;
+    eng_diag_buf[8] =0x00;
 
-	eng_diag_buf[9] =0x7e;
-	eng_diag_write2pc(get_ser_fd());
-	memset(eng_diag_buf, 0, 10);
+    eng_diag_buf[9] =0x7e;
+    eng_diag_write2pc(get_ser_fd());
+    memset(eng_diag_buf, 0, 10);
 }
 
 int eng_diag_audio(char *buf,int len, char *rsp)
@@ -1189,20 +1199,20 @@ int eng_diag_audio(char *buf,int len, char *rsp)
     ENG_LOG("Call %s, subtype=%x\n",__FUNCTION__, head_ptr->subtype);
     ptr = buf + 1 + sizeof(MSG_HEAD_T);
 
-//AT+CALIBR
-	ret = strncmp(ptr,at_calibr,strlen(at_calibr));
-	if ( 0==ret ) {
-		if(SET_CALIBRATION_ENABLE == cmd_type){
-			enable_calibration();
-			sprintf(rsp,"\r\nenable_calibration   \r\n");
-		}else if (SET_CALIBRATION_DISABLE == cmd_type){
-			disable_calibration();
-			sprintf(rsp,"\r\ndisable_calibration   \r\n");
-		}
-		At_cmd_back_sig();
-		//return rsp != NULL ? strlen(rsp):0;
-		return strlen(rsp);
-	}
+    //AT+CALIBR
+    ret = strncmp(ptr,at_calibr,strlen(at_calibr));
+    if ( 0==ret ) {
+        if(SET_CALIBRATION_ENABLE == cmd_type){
+            enable_calibration();
+            sprintf(rsp,"\r\nenable_calibration   \r\n");
+        }else if (SET_CALIBRATION_DISABLE == cmd_type){
+            disable_calibration();
+            sprintf(rsp,"\r\ndisable_calibration   \r\n");
+        }
+        At_cmd_back_sig();
+        //return rsp != NULL ? strlen(rsp):0;
+        return strlen(rsp);
+    }
 
     audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
     if(g_is_data){
@@ -1379,7 +1389,7 @@ static int eng_diag_product_ctrl(char *buf, int len, char *rsp, int rsplen)
     int rsp_len  = 0;
     unsigned char* nvdata = NULL;
     NVITEM_ERROR_E nverr = NVERR_NONE;
-	MSG_HEAD_T *msg_head = (MSG_HEAD_T*)(buf + 1);
+    MSG_HEAD_T *msg_head = (MSG_HEAD_T*)(buf + 1);
 
     head_len = sizeof(MSG_HEAD_T) + 2*sizeof(unsigned short);
     offset   = *(unsigned short*)((char*)msg_head + sizeof(MSG_HEAD_T));
@@ -1393,7 +1403,7 @@ static int eng_diag_product_ctrl(char *buf, int len, char *rsp, int rsplen)
     }
 
     // 2: NVITEM_PRODUCT_CTRL_READ
-	// 3: NVITEM_PRODUCT_CTRL_WRITE
+    // 3: NVITEM_PRODUCT_CTRL_WRITE
     ENG_LOG("%s: msg_head->subtype: %d\n", __FUNCTION__, msg_head->subtype);
     switch(msg_head->subtype) {
         case 2:
@@ -1421,13 +1431,12 @@ static int eng_diag_product_ctrl(char *buf, int len, char *rsp, int rsplen)
                 nvdata = (unsigned char*)malloc(rsplen);
 
 
-                 nverr = eng_read_productnvdata(nvdata , data_len);
+                nverr = eng_read_productnvdata(nvdata , data_len);
                 if(NVERR_NONE != nverr ) {
                     ENG_LOG("%s: Read before writing ERROR: %d\n", __FUNCTION__,nverr);
                 }else {
                     memcpy(nvdata + offset, (char*)msg_head + head_len, data_len);
-
-                     nverr = eng_write_productnvdata(nvdata, data_len);
+                    nverr = eng_write_productnvdata(nvdata, data_len);
                     if(NVERR_NONE != nverr) {
                         ENG_LOG("%s:Write ERROR: %d\n", __FUNCTION__,nverr);
                     }
@@ -1462,7 +1471,7 @@ static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen)
     ERR_IMEI_E error;
 
     NVITEM_ERROR_E nverr = NVERR_NONE;
-	MSG_HEAD_T *msg_head = (MSG_HEAD_T*)(buf + 1);
+    MSG_HEAD_T *msg_head = (MSG_HEAD_T*)(buf + 1);
 
     do {
         recv_crc = *(unsigned short*)&(buf[msg_head->len - sizeof(unsigned short) + 1]);
@@ -1517,7 +1526,7 @@ static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen)
             nvdata = (unsigned char*)malloc(rsplen + sizeof(MSG_HEAD_T) + sizeof(unsigned short));
             memcpy(nvdata, msg_head, sizeof(MSG_HEAD_T));
 
-             nverr = eng_read_productnvdata(nvdata + sizeof(MSG_HEAD_T), rsplen);
+            nverr = eng_read_productnvdata(nvdata + sizeof(MSG_HEAD_T), rsplen);
             if(NVERR_NONE != nverr) {
                 ENG_LOG("%s:Read ERROR: %d\n", __FUNCTION__,nverr);
                 msg_head->len = sizeof(MSG_HEAD_T) + sizeof(unsigned short);
@@ -1540,4 +1549,51 @@ static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen)
     ENG_LOG("%s: rsp_len : %d\n", __FUNCTION__, rsp_len);
 
     return rsp_len;
+}
+
+int eng_diag_mmicit_read(char *buf,int len, char *rsp, int rsplen)
+{
+    int ret = 0, count;
+    int datalen, namelen;
+    char* rspdata = NULL;
+    char* pCur    = NULL;
+    eng_str2int_table_sqlresult result;
+    MSG_HEAD_T *pHead = (MSG_HEAD_T*)(buf + 1);
+
+    ret = eng_sql_string2int_table_get(&result);
+    if(ret) {
+        ENG_LOG("%s: ENG read sqlite table failed\n", __FUNCTION__);
+        memcpy(rsp, buf, len);// return a empty diag framer
+        return len;
+    }
+
+    rspdata = malloc(rsplen - 2);
+    if(NULL == rspdata){
+        ENG_LOG("%s: Buffer malloc failed\n", __FUNCTION__);
+        return 0;
+    }
+
+    memcpy(rspdata, (char*)pHead, sizeof(MSG_HEAD_T));
+    pCur = rspdata + sizeof(MSG_HEAD_T);
+    datalen = sizeof(MSG_HEAD_T);
+
+    for(count = 0; count < result.count; count ++) {
+        namelen   = strlen(result.table[count].name);
+        ENG_LOG("%s: namelen: %d, name: %s\n", __FUNCTION__, namelen, result.table[count].name);
+        *(pCur++) = namelen + 2;
+        *(pCur++) = result.table[count].groupid;
+        *(pCur++) = result.table[count].value;
+        sprintf(pCur, "%s", result.table[count].name);
+        pCur     += namelen;
+        datalen  += (namelen + 3);
+    }
+
+    ENG_LOG("%s: datalen: %d\n", __FUNCTION__, datalen);
+
+    ((MSG_HEAD_T*)rspdata)->len = datalen;
+    rsplen = translate_packet(rsp, rspdata, datalen);
+
+    free(rspdata);
+
+    return rsplen;
 }
