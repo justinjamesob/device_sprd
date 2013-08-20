@@ -7,6 +7,7 @@
 
 static int str2intcallback;
 static int str2strcallback;
+static int str2inttablecallback;
 
 static int eng_str2intcallback(void* param,int argc,char** argv,char** cname)
 {
@@ -37,6 +38,39 @@ static int eng_str2strcallback(void* param,int argc,char** argv,char** cname)
     return 0;
 }
 
+static int eng_str2inttablecallback(void* param,int argc,char** argv,char** cname)
+{
+    int i, finished = 0;
+    eng_str2int_table_sqlresult *sqlresult = (eng_str2int_table_sqlresult *)param;
+
+    for(i=0;i<argc;i++){
+        if(strcmp("value", cname[i])==0){
+            ENG_LOG("%s: value=%s\n",__FUNCTION__, argv[i]);
+            finished |= 0x1;
+            sqlresult->table[sqlresult->count].value = atoi(argv[i]);
+        }
+
+        if(strcmp("name", cname[i])==0){
+            ENG_LOG("%s: name=%s\n",__FUNCTION__, argv[i]);
+            finished |= 0x10;
+            memcpy(sqlresult->table[sqlresult->count].name, argv[i], strlen(argv[i]));
+        }
+
+        if(strcmp("groupid", cname[i])==0){
+            ENG_LOG("%s: groupid=%s\n",__FUNCTION__, argv[i]);
+            finished |= 0x100;
+            sqlresult->table[sqlresult->count].groupid = atoi(argv[i]);
+        }
+
+        if(0x111 == finished){
+            sqlresult->count ++;
+            str2inttablecallback = 1;
+        }
+    }
+
+    ENG_LOG("%s: sqlresult->count: %d\n", __FUNCTION__, sqlresult->count);
+    return 0;
+}
 
 int eng_sqlite_create(void)
 {
@@ -343,3 +377,44 @@ out:
 
 }
 
+int eng_sql_string2int_table_get(eng_str2int_table_sqlresult* result)
+{
+    sqlite3 *db=NULL;
+    char *errmsg=NULL;
+    char sqlbuf[SPRDENG_SQL_LEN];
+    int rc, ret=0;
+
+    memset(result, 0, sizeof(eng_str2int_table_sqlresult));
+
+    rc = sqlite3_open(ENG_ENGTEST_DB, &db);
+    if(rc != 0) {
+        ENG_LOG("%s: open %s fail [%d:%s]\n",__FUNCTION__, ENG_ENGTEST_DB, \
+                sqlite3_errcode(db), sqlite3_errmsg(db));
+        ret = ENG_SQLSTR2INT_ERR;
+        goto out;
+    } else {
+        ENG_LOG("%s: open %s success\n",__FUNCTION__, ENG_ENGTEST_DB);
+    }
+
+    memset(sqlbuf, 0, SPRDENG_SQL_LEN);
+    sprintf(sqlbuf, "SELECT * FROM %s",ENG_STRING2INT_TABLE);
+    ENG_LOG("%s: sqlbuf=%s\n",__FUNCTION__, sqlbuf);
+
+    str2inttablecallback = 0;
+    rc=sqlite3_exec(db,sqlbuf,&eng_str2inttablecallback,result,&errmsg);
+    if(rc != 0) {
+        ENG_LOG("%s: select table fail, errmsg=%s [%d:%s]\n",__FUNCTION__, errmsg, \
+                sqlite3_errcode(db), sqlite3_errmsg(db));
+        ret = ENG_SQLSTR2INT_ERR;
+        goto out;
+    }
+
+    if(!str2inttablecallback)
+        ret = ENG_SQLSTR2INT_ERR;
+
+    ENG_LOG("%s: select table %s success, ret=0x%x\n",__FUNCTION__, ENG_STRING2INT_TABLE, ret);
+
+out:
+    sqlite3_close(db);
+    return ret;
+}
