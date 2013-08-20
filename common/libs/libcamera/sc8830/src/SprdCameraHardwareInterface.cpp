@@ -625,6 +625,11 @@ status_t SprdCameraHardware::autoFocus()
 		return INVALID_OPERATION;
 	}
 
+	if (SPRD_IDLE != getFocusState()) {
+		LOGE("autoFocus existing, direct return!");
+		return ALREADY_EXISTS;
+	}
+
 	if(0 != camera_start_autofocus(CAMERA_AUTO_FOCUS, camera_cb, this)){
 		LOGE("auto foucs fail.");
 		//return INVALID_OPERATION;
@@ -1808,7 +1813,7 @@ void SprdCameraHardware::set_ddr_freq(const char* freq_in_khz)
 status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 {
 	takepicture_mode mode = getCaptureMode();
-	LOGV("startPreview E isRecording=%d.",isRecording);
+	LOGV("startPreview E isRecording=%d.captureMode=%d",isRecording, mCaptureMode);
 
 	if (isPreviewing()) {
 		LOGE("startPreview is already in progress, doing nothing.");
