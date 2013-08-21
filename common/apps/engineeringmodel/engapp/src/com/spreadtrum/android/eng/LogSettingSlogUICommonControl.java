@@ -167,9 +167,6 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         if (chkAlwaysRun.isChecked()) {
             startService(intentSvc);
         }
-        if (chkSnap.isChecked()) {
-            startService(intentSnap);
-        }
 
         // Fetch onclick listenner
         ClkListenner clickListen = new ClkListenner();
@@ -375,6 +372,14 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         rdoSDCard.setEnabled(SlogAction.IsHaveSDCard() ? true : false);
         rdoSDCard.setChecked(isSDCard);
         rdoNAND.setChecked(!isSDCard);
+
+        chkSnap.setEnabled(tempHostOn);
+
+        if (chkSnap.isChecked() && tempHostOn) {
+            startService(intentSnap);
+        } else {
+            stopService(intentSnap);
+        }
 
         // set clear all logs
         if (tempHost) {
