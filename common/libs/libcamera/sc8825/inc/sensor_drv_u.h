@@ -719,6 +719,7 @@ int Sensor_WriteData(uint8_t *regPtr, uint32_t length);
 int Sensor_Open(uint32_t sensor_id);
 SENSOR_EXP_INFO_T *Sensor_GetInfo(void);
 int Sensor_SetMode(uint32_t mode);
+int Sensor_SetMode_WaitDone(void);
 int Sensor_StreamOn(void);
 int Sensor_StreamOff(void);
 int32_t Sensor_WriteReg(uint16_t subaddr, uint16_t data);

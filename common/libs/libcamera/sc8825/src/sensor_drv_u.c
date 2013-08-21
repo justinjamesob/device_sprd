@@ -1636,6 +1636,11 @@ int _Sensor_SetMode(uint32_t mode)
 	return SENSOR_SUCCESS;
 }
 
+int Sensor_SetMode_WaitDone(void)
+{
+	return SENSOR_SUCCESS;
+}
+
 int Sensor_SetMode(uint32_t mode)
 {
 	int                      ret = 0;
