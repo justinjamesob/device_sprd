@@ -76,7 +76,8 @@ enum {
 #define MAX_NAME_LEN			128
 #define MAX_LINE_LEN			2048
 #define DEFAULT_MAX_LOG_SIZE		256 /* MB */
-#define MAXROLLLOGS			10
+#define MAXROLLLOGS			9
+#define INTERNAL_ROLLLOGS		1
 #define TIMEOUT_FOR_SD_MOUNT		5 /* seconds */
 #define MODEM_CIRCULAR_SIZE		(2 * 1024 * 1024) /* 2 MB */
 #define SINGLE_BUFFER_SIZE		(16 * 1024) /* 16k */
@@ -143,6 +144,12 @@ struct slog_cmd {
 	char content[MAX_LINE_LEN];
 };
 
+struct modem_timestamp {
+        long unsigned int magic_number;       /* magic number for verify the structure */
+        struct timeval tv;      /* clock time, seconds since 1970.01.01 */
+        long unsigned int sys_cnt;            /* modem's time */
+};
+
 /* var */
 extern char *config_log_path, *current_log_path;
 extern char top_logdir[MAX_NAME_LEN];
@@ -157,6 +164,7 @@ extern int hook_modem_flag;
 extern int dev_shark_flag;
 
 /* function */
+extern char *parse_string(char *src, char c, char *token);
 extern int parse_config();
 extern void *stream_log_handler(void *arg);
 extern void *snapshot_log_handler(void *arg);

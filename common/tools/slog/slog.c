@@ -42,7 +42,7 @@ int bt_log_handler_started = 0;
 int tcp_log_handler_started = 0;
 int modem_log_handler_started = 0;
 
-int internal_log_size = 5; /*M*/
+int internal_log_size = 5 * 1024; /*M*/
 
 int hook_modem_flag = 0;
 int dev_shark_flag = 0;
@@ -514,7 +514,7 @@ static void check_available_volume()
 			return;
 		}
 		ret = diskInfo.f_bavail * diskInfo.f_bsize >> 20;
-		if(ret < 50) {
+		if(ret > 0 && ret < 50) {
 			err_log("sdcard available %dM", ret);
 			sprintf(cmd, "%s", "am start -n com.spreadtrum.android.eng/.SlogUILowStorage");
 			system(cmd);
@@ -635,18 +635,16 @@ static void handler_internal_log_size()
 		err_log("statfs %s return err, disable slog", current_log_path);
 		return;
 	}
-	internal_availabled_size = diskInfo.f_bavail * diskInfo.f_bsize / 1024 / 1024;
-	if( internal_availabled_size < 5 ) {
+	internal_availabled_size = diskInfo.f_bavail * diskInfo.f_bsize / 1024;
+	if( internal_availabled_size < 10 ) {
 		slog_enable = SLOG_DISABLE;
 		err_log("internal available space %dM is not enough, disable slog", internal_availabled_size);
 		return;
 	}
 
-	/* default setting internal log size, half of available */
-	internal_log_size = ( internal_availabled_size - 5 ) / 10;
-	if(internal_log_size == 0)
-		internal_log_size = 1;
-	err_log("set internal log size %dM", internal_log_size);
+	/* setting internal log size = (available size - 5M) * 80% */
+	internal_log_size = ( internal_availabled_size - 5 * 1024 ) / 5 * 4 / 12;
+	err_log("set internal log size %dKB", internal_log_size);
 
 	return;
 }
@@ -957,7 +955,7 @@ int main(int argc, char *argv[])
 	int opt;
 
 	err_log("Slog begin to work.");
-
+	/* for shark opt:t*/
 	while ( -1 != (opt = getopt(argc, argv, "t"))) {
 		switch (opt) {
 			case 't':

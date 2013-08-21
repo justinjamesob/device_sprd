@@ -34,6 +34,85 @@
 
 #include "slog.h"
 
+#define FD_TIME "/sys/kernel/debug/power/sprd_timestamp"
+static int get_timezone()
+{
+	time_t time_utc;
+	struct tm tm_local, tm_gmt;
+	int time_zone;
+
+	time_utc = time(NULL);
+	localtime_r(&time_utc, &tm_local);
+	gmtime_r(&time_utc, &tm_gmt);
+	time_zone = tm_local.tm_hour - tm_gmt.tm_hour;
+	if (time_zone < -12) {
+		time_zone += 24;
+	} else if (time_zone > 12) {
+		time_zone -= 24;
+	}
+
+	err_log("UTC: %02d-%02d-%02d %02d:%02d:%02d",
+				tm_gmt.tm_year % 100,
+				tm_gmt.tm_mon + 1,
+				tm_gmt.tm_mday,
+				tm_gmt.tm_hour,
+				tm_gmt.tm_min,
+				tm_gmt.tm_sec);
+
+	err_log("LOCAL: %02d-%02d-%02d %02d:%02d:%02d",
+				tm_local.tm_year % 100,
+				tm_local.tm_mon + 1,
+				tm_local.tm_mday,
+				tm_local.tm_hour,
+				tm_local.tm_min,
+				tm_local.tm_sec);
+
+	return time_zone;
+}
+
+static void write_modem_timestamp(struct slog_info *info, char *buffer)
+{
+	int fd, ret;
+	FILE *fp;
+	int time_zone;
+	struct modem_timestamp *mts;
+
+	if (strncmp(info->name, "modem", 5)) {
+		return;
+	}
+
+	mts = calloc(1, sizeof(struct modem_timestamp));
+	fd = open(FD_TIME, O_RDWR);
+	if( fd < 0 ){
+		err_log("Unable to open time stamp device '%s'", FD_TIME);
+		free(mts);
+		return;
+	}
+	ret = read(fd, (char*)mts + 4, 12);
+	if(ret < 12) {
+		close(fd);
+		free(mts);
+		return;
+	}
+	close(fd);
+
+	mts->magic_number = 0x12345678;
+	time_zone = get_timezone();
+	mts->tv.tv_sec += time_zone * 3600;
+	err_log("%lx, %lx, %lx, %lx", mts->magic_number, mts->tv.tv_sec, mts->tv.tv_usec, mts->sys_cnt);
+
+	fp = fopen(buffer, "a+b");
+	if(fp == NULL) {
+		err_log("open file %s failed!", buffer);
+		free(mts);
+		exit(0);
+	}
+	fwrite(mts, sizeof(struct modem_timestamp), 1, fp);
+	fclose(fp);
+
+	free(mts);
+}
+
 static void gen_logfile(char *filename, struct slog_info *info)
 {
 	int ret;
@@ -437,6 +516,7 @@ static int gen_outfd(struct slog_info *info)
 	char buffer[MAX_NAME_LEN];
 
 	gen_logfile(buffer, info);
+	write_modem_timestamp(info, buffer);
 	fd = open(buffer, O_WRONLY | O_CREAT, S_IRUSR | S_IRGRP | S_IROTH);
 	if(fd < 0){
 		err_log("Unable to open file %s.",buffer);
@@ -513,11 +593,11 @@ static void strinst(char* dest, char* src)
 /*
  * The file name to upgrade
  */
-static void file_name_rotate(char *buf)
+static void file_name_rotate(int num, char *buf)
 {
 	int i, err;
 
-	for (i = MAXROLLLOGS ; i > 0 ; i--) {
+	for (i = num; i > 0 ; i--) {
 		char *file0, *file1;
 
 		err = asprintf(&file1, "%s.%d", buf, i);
@@ -556,7 +636,7 @@ static void file_name_rotate(char *buf)
  *  When the file is written full, rename file to file.1
  *  and rename file.1 to file.2, and so on.
  */
-static void rotatelogs(struct slog_info *info)
+static void rotatelogs(int num, struct slog_info *info)
 {
 	int err, i;
 	char buffer[MAX_NAME_LEN];
@@ -565,7 +645,7 @@ static void rotatelogs(struct slog_info *info)
 
 	close(info->fd_out);
 
-	file_name_rotate(buffer);
+	file_name_rotate(num, buffer);
 	info->fd_out = gen_outfd(info);
 	info->outbytecount = 0;
 }
@@ -578,16 +658,15 @@ static void rotatelogs(struct slog_info *info)
 static void log_size_handler(struct slog_info *info)
 {
 	if( !strncmp(current_log_path, INTERNAL_LOG_PATH, strlen(INTERNAL_LOG_PATH)) ) {
-		if(info->outbytecount >= internal_log_size * 1024 * 1024) {
-			lseek(info->fd_out, 0, SEEK_SET);
-			info->outbytecount = 0;
+		if(info->outbytecount >= internal_log_size * 1024) {
+			rotatelogs(INTERNAL_ROLLLOGS, info);
 		}
 		return;
 	}
 
 	if(info->max_size == 0) {
 		if(info->outbytecount >= DEFAULT_MAX_LOG_SIZE * 1024 * 1024)
-			rotatelogs(info);
+			rotatelogs(MAXROLLLOGS, info);
 	} else {
 		if(info->outbytecount >= info->max_size * 1024 * 1024) {
 			lseek(info->fd_out, 0, SEEK_SET);
@@ -618,6 +697,10 @@ static void add_timestamp(struct slog_info *info)
 
 	return;
 }
+
+/**********************************************************************************/
+/***************************** for shark start ************************************/
+/**********************************************************************************/
 
 #define SMSG "/d/sipc/smsg"
 #define SBUF "/d/sipc/sbuf"
@@ -703,6 +786,10 @@ static void handle_dump_shark_modem_memory()
 	err_log("Dump CP memory completed for shark.");
 }
 
+/**********************************************************************************/
+/***************************** for shark end **************************************/
+/**********************************************************************************/
+
 #define MODEMRESET_PROPERTY "persist.sys.sprd.modemreset"
 #define MODEM_SOCKET_NAME       "modemd"
 #define MODEM_SOCKET_BUFFER_SIZE 128
@@ -740,6 +827,7 @@ connect_socket:
 			if(strstr(buffer, "Modem Assert") != NULL) {
 				if(ret == 0) {
 					dump_modem_memory_flag = 1;
+					/* for shark dump sipc info */
 					if(dev_shark_flag == 1)
 						handle_dump_shark_sipc_info();
 				} else {
@@ -759,6 +847,7 @@ connect_socket:
 					pthread_create(&modem_tid, NULL, modem_log_handler, NULL);
 				modem_reset_flag = 0;
 			} else if(strstr(buffer, "Modem Blocked") != NULL) {
+				/* for shark dump sipc info */
 				if(dev_shark_flag == 1)
 					handle_dump_shark_sipc_info();
 			}
@@ -818,6 +907,7 @@ write_cmd:
 		ret = select(info->fd_device + 1, &readset, NULL, NULL, &timeout);
 
 		if( 0 == ret ){
+			/* for shark, when CP can not send integral log to AP, slog will use another way to save CP memory*/
 			if( (receive_from_cp < 10 ) && (dev_shark_flag == 1) )
 				handle_dump_shark_modem_memory();
 			err_log("select timeout ->save finsh");
@@ -1023,6 +1113,7 @@ void *modem_log_handler(void *arg)
 }
 
 static AndroidLogFormat * g_logformat;
+static EventTagMap* g_eventTagMap = NULL;
 
 void *stream_log_handler(void *arg)
 {
@@ -1050,11 +1141,14 @@ void *stream_log_handler(void *arg)
 			open_device(info, KERNEL_LOG_SOURCE);
 			info->fd_out = gen_outfd(info);
 			add_timestamp(info);
-		} else if( !strncmp(info->name, "main", 4) || !strncmp(info->name, "system", 6) || !strncmp(info->name, "radio", 5) ){
+		} else if( !strncmp(info->name, "main", 4) || !strncmp(info->name, "system", 6)
+			|| !strncmp(info->name, "radio", 5) || !strncmp(info->name, "events", 6) ) {
 			sprintf(devname, "%s/%s", "/dev/log", info->name);
 			open_device(info, devname);
 			info->fd_out = gen_outfd(info);
 			add_timestamp(info);
+			if ( !strncmp(info->name, "events", 6) )
+				g_eventTagMap = android_openEventTagMap(EVENT_TAG_MAP_FILE);
 		} else {
 			info = info->next;
 			continue;
@@ -1109,6 +1203,10 @@ void *stream_log_handler(void *arg)
 				memset(wbuf_kmsg, 0, LOGGER_ENTRY_MAX_LEN *2);
 				ret = read(info->fd_device, buf_kmsg, LOGGER_ENTRY_MAX_LEN);
 				if(ret <= 0) {
+					if ( (ret == -1 && (errno == EINTR || errno == EAGAIN) ) || ret == 0 ) {
+						info = info->next;
+						continue;
+					}
 					err_log("read %s log failed!", info->name);
 					close(info->fd_device);
 					sleep(1);
@@ -1119,9 +1217,7 @@ void *stream_log_handler(void *arg)
 				strinst(wbuf_kmsg, buf_kmsg);
 
 				ret = write_from_buffer(info->fd_out, wbuf_kmsg, strlen(wbuf_kmsg));
-
-				if((size_t)ret < strlen(wbuf_kmsg)) {
-					err_log("write %s log partial (%d of %d)", info->name, ret, strlen(wbuf_kmsg));
+				if(ret == -1) {
 					close(info->fd_out);
 					sleep(1);
 					info->fd_out = gen_outfd(info);
@@ -1129,13 +1225,16 @@ void *stream_log_handler(void *arg)
 					info = info->next;
 					continue;
 				}
-
 				info->outbytecount += ret;
 				log_size_handler(info);
 			} else if(!strncmp(info->name, "main", 4) || !strncmp(info->name, "system", 6)
-				|| !strncmp(info->name, "radio", 5) ) {
+				|| !strncmp(info->name, "radio", 5) || !strncmp(info->name, "events", 6) ) {
 				ret = read(info->fd_device, buf, LOGGER_ENTRY_MAX_LEN);
 				if(ret <= 0) {
+					if ( (ret == -1 && (errno == EINTR || errno == EAGAIN) ) || ret == 0 ) {
+						info = info->next;
+						continue;
+					}
 					err_log("read %s log failed!", info->name);
 					close(info->fd_device);
 					sleep(1);
@@ -1148,9 +1247,17 @@ void *stream_log_handler(void *arg)
 				entry = (struct logger_entry *)buf;
 				entry->msg[entry->len] = '\0';
 				/*add android log 'tag' and other format*/
-				android_log_processLogBuffer(entry, &entry_write);
+				if ( !strncmp(info->name, "events", 6) )
+					ret = android_log_processBinaryLogBuffer(entry, &entry_write, g_eventTagMap, buf_kmsg, sizeof(buf_kmsg));
+				else
+					ret = android_log_processLogBuffer(entry, &entry_write);
+				if ( ret < 0 ) {
+					info = info->next;
+					continue;
+				}
+				/* write log to file */
 				ret = android_log_printLogLine(g_logformat, info->fd_out, &entry_write);
-				if(ret == 0 ){
+				if ( ret < 0 ) {
 					close(info->fd_out);
 					sleep(1);
 					info->fd_out = gen_outfd(info);
@@ -1219,7 +1326,7 @@ void *bt_log_handler(void *arg)
 		}
 		sprintf(buffer, "%s/%s/%s/%s.log",
 			current_log_path, top_logdir, bt->log_path, bt->log_basename);
-		file_name_rotate(buffer);
+		file_name_rotate(MAXROLLLOGS, buffer);
 
 #ifdef SLOG_BTLOG_235
 		execl("/system/xbin/hcidump", "hcidump", "-Bw", buffer, (char *)0);
@@ -1278,7 +1385,7 @@ void *tcp_log_handler(void *arg)
 		}
 		sprintf(buffer, "%s/%s/%s/%s.pcap",
 			current_log_path, top_logdir, tcp->log_path, tcp->log_basename);
-		file_name_rotate(buffer);
+		file_name_rotate(MAXROLLLOGS, buffer);
 
 		execl("/system/bin/tcp", "tcp", "-i", "any", "-p", "-s 0", "-w", buffer, (char *)0);
 		exit(0);
