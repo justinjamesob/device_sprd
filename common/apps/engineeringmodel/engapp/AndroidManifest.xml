@@ -330,6 +330,7 @@
                 <action android:name="android.intent.action.SIM_STATE_CHANGED" />
                 <action android:name="android.intent.action.SIM_STATE_CHANGED0" />
                 <action android:name="android.intent.action.SIM_STATE_CHANGED1" />
+                <action android:name="slogui.intent.action.SCREEN_SHOT" />
             </intent-filter>
         </receiver>
 

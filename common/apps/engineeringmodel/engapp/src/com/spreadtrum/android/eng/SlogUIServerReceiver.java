@@ -2,6 +2,7 @@ package com.spreadtrum.android.eng;
 
 import com.spreadtrum.android.eng.R;
 import com.spreadtrum.android.eng.EngInstallHelperService;
+import static com.spreadtrum.android.eng.SlogUISnapService.ACTION_SCREEN_SHOT;
 
 import com.android.internal.telephony.IccCard;
 import com.android.internal.telephony.TelephonyIntents;
@@ -22,6 +23,11 @@ public class SlogUIServerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context receiverContext, Intent receivedIntent) {
+        if (receivedIntent.getAction().equals(ACTION_SCREEN_SHOT)) {
+            // the context need long time life-cycle, so put application context
+            SlogAction.snap(receiverContext.getApplicationContext());
+            return ;
+        }
         /*
          * Feature changed.
          *if ( !"1".equals(android.os.SystemProperties.get("ro.debuggable")) ) {
@@ -67,41 +73,47 @@ public class SlogUIServerReceiver extends BroadcastReceiver {
         }
 
         private void runSlogService() {
-             // Send AT Command to control switch of modem log.
-             if (SlogAction.GetState(SlogAction.GENERALKEY)) {
-                 SlogAction.sendATCommand(engconstents.ENG_AT_SETARMLOG, SlogAction.GetState(SlogAction.MODEMKEY));
-                 SlogAction.sendATCommand(engconstents.ENG_AT_SETCAPLOG, SlogAction.GetState(SlogAction.TCPKEY));
-             }
-
             if (receivedIntent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+                if (receiverContext == null) {
+                    return;
+                }
                 SlogAction.contextMainActivity = receiverContext;
                 if (SlogAction.isAlwaysRun(SlogAction.SERVICESLOG)) {
                     // start service
-                    if (receiverContext.startService(new Intent(receiverContext,
+                    if (receiverContext != null && receiverContext.startService(new Intent(receiverContext,
                            SlogService.class)) == null) {
-                       Toast.makeText(
+                       /*Toast.makeText(
                             receiverContext,
                             receiverContext
                                     .getText(R.string.toast_receiver_failed),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();*/
                     Log.e("Slog->ServerReceiver",
                             "Start service when BOOT_COMPLETE failed");
                     }
                 }
                 // start snap service
-                if (SlogAction.isAlwaysRun(SlogAction.SERVICESNAP)) {
-                    if (receiverContext.startService(new Intent(receiverContext,
+                if (SlogAction.isAlwaysRun(SlogAction.SERVICESNAP) 
+                        && SlogAction.GetState(SlogAction.GENERALKEY, true)
+                                .equals(SlogAction.GENERALON)) {
+                    if (receiverContext != null && receiverContext.startService(new Intent(receiverContext,
                         SlogUISnapService.class)) == null) {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             receiverContext,
                             receiverContext
                                     .getText(R.string.toast_receiver_failed),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();*/
                         Log.e("Slog->ServerReceiver",
                             "Start service when BOOT_COMPLETE failed");
                     }
                 }
             }
+
+            // Send AT Command to control switch of modem log.
+            if (SlogAction.GetState(SlogAction.GENERALKEY)) {
+                SlogAction.sendATCommand(engconstents.ENG_AT_SETARMLOG, SlogAction.GetState(SlogAction.MODEMKEY));
+                SlogAction.sendATCommand(engconstents.ENG_AT_SETCAPLOG, SlogAction.GetState(SlogAction.TCPKEY));
+            }
+
             if (SystemProperties.getBoolean("persist.sys.synchronism.support", false)) { // TODO Here will be a macro control aota checking and running.
                 receiverContext.startService(new Intent(receiverContext, EngInstallHelperService.class));
                 SlogAction.SlogStart(receiverContext);

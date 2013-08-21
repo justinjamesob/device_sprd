@@ -17,6 +17,7 @@ import android.util.Log;
 /* SlogUI Added by Yuntao.xiao*/
 
 public class SlogUISnapService extends Service {
+    public static final String ACTION_SCREEN_SHOT = "slogui.intent.action.SCREEN_SHOT";
 
     private static final Class[] mStartSnapSvcSignature = new Class[] {
             int.class, Notification.class };
@@ -38,23 +39,22 @@ public class SlogUISnapService extends Service {
                 0);
 
         setNotification();
-        registerReceiver(mLocalChangeReceiver,
-                new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
+        //registerReceiver(mLocalChangeReceiver,
+        //        new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
     }
-    private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
+    /*private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Log.d("SlogUISnapService", "language is change....");
             setNotification();
         }
-    };
+    };*/
     private void setNotification() {
         // The PendingIntent to launch our activity if the user selects this
         // notification
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                SlogUISnapService.this, 0, new Intent(SlogUISnapService.this,
-                        SlogUISnapAction.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent
+                .getBroadcast(getApplicationContext(), 0,
+                        new Intent(ACTION_SCREEN_SHOT),
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(SlogUISnapService.this,

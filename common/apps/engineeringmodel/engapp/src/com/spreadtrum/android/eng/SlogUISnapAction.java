@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 public class SlogUISnapAction extends Activity {
     private static final String TAG = "SlogUISnapAction";
-    private HandlerThread mThread;
+/*    private HandlerThread mThread;
     private Handler mHandler;
     private Runnable mTimeOutRunnable ;
     {
@@ -20,11 +20,12 @@ public class SlogUISnapAction extends Activity {
         mThread.start();
         mHandler = new Handler (mThread.getLooper());
     }
+*/
 
     @Override
     protected void onCreate(Bundle snap) {
         super.onCreate(snap);
-        mTimeOutRunnable = new Runnable() {
+        /*mTimeOutRunnable = new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(SlogUISnapAction.this
@@ -43,7 +44,7 @@ public class SlogUISnapAction extends Activity {
             // not init yet.
             // The sender must be fixed.
             android.util.Log.e(TAG, "Illegal state because the activity was uninitialized. Need improve");
-        }
+        }*/
         finish();
         //
         //setTheme()
