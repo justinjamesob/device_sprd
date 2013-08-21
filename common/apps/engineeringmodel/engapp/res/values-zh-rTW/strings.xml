@@ -65,6 +65,7 @@
     <string name="progressdialog_tabhost_prompt">請稍候</string>
     <string name="toast_snap_success">截屏成功</string>
     <string name="toast_snap_timeout">執行slogctl screen超時，操作可能無效</string>
+    <string name="toast_snap_repeatly">截屏頻率過高可能導致結果不準確</string>
     <string name="toast_snap_failed">截屏失敗</string>
     <string name="toast_snap_prompt">截屏服務已經開啓,下拉通知欄可找到截屏服務</string>
     <string name="toast_service_snap_start_failed">截屏服務開啓失敗</string>

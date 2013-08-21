@@ -198,6 +198,7 @@
 
     <string name="toast_snap_success">Screenshot successfully</string>
     <string name="toast_snap_timeout">Run slogctl screen timeout, this action may be invalid.</string>
+    <string name="toast_snap_repeatly">Screenshoting to too repeatly, the action may be inaccurate</string>
     <string name="toast_snap_failed">Failed to screenshot</string>
     <string name="toast_snap_prompt">Pull the statusbar, you\'ll find screenshot service, press it to snap the screen.</string>
     <string name="toast_dump_input_limited">Please input tgz name below 40</string>

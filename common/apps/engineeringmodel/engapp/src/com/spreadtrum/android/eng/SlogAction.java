@@ -18,6 +18,7 @@ import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.StatFs;
@@ -26,6 +27,7 @@ import android.os.SystemProperties;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -149,6 +151,58 @@ public class SlogAction {
 
     private static Object mLock = new Object();
     private static Object mResetLock = new Object();
+
+    private static HandlerThread sHandlerThread;
+    private static Handler sHandler;
+    private static HandlerThread sTimeoutThread;
+    private static Handler sTimeoutHandler;
+
+    static {
+        sHandlerThread = new HandlerThread("SlogActionHandler");
+        sHandlerThread.start();
+        sHandler = new Handler(sHandlerThread.getLooper());
+        sTimeoutThread = new HandlerThread("TimeoutWatchingHandler");
+        sTimeoutThread.start();
+        sTimeoutHandler = new Handler(sTimeoutThread.getLooper());
+    }
+
+    static class TimeoutRunnable extends ToastRunnable {
+        TimeoutRunnable(Context context) {
+            super(context, context.getString(R.string.toast_snap_timeout));
+        }
+    }
+
+    static class ToastRunnable implements Runnable {
+        Context mContext;
+        String mPrompt;
+        ToastRunnable(Context context, String prompt) {
+            mContext = context;
+            mPrompt = prompt;
+        }
+
+        @Override
+        public void run() {
+            Log.d(TAG, "show toast now, the prompt is " + mPrompt);
+            Toast.makeText(mContext, mPrompt, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    static class ScreenshotRunnable implements Runnable {
+        Context mContext;
+        TimeoutRunnable mTimeout;
+        ScreenshotRunnable(Context context, TimeoutRunnable timeout) {
+            mContext = context;
+            mTimeout = timeout;
+        }
+
+        @Override
+        public void run() {
+            synchronized (mLock) {
+                Log.d(TAG, "start screenshot now");
+                screenShot(mContext, mTimeout);
+            }
+        }
+    }
 
     // ========================================================================================================
 
@@ -557,7 +611,7 @@ public class SlogAction {
     }
 
     // Temp Solution for MMC
-    
+
     private static final File EXTERNAL_STORAGE_DIRECTORY
             = getDirectory(getMainStoragePath(), "/mnt/sdcard/");
 
@@ -1197,78 +1251,39 @@ public class SlogAction {
     /**
      * Screenshot
      */
-    public static void snap(final Context context, final Handler handler, final Runnable timeout) {
-        class SnapThread extends Thread {
-            Context mContext;
-            SnapThread(Context context) {
-                this.mContext = context.getApplicationContext();
-            }
-
-            @Override
-            public void run() {
-                screenShot();
-            }
-            synchronized void screenShot() {
-                Message msg = new Message();
-                Looper.prepare();
-                /*Add 20130527 Spreadst of 169012 No init Looper start*/
-                try {
-                    Looper.prepare();
-                } catch(Exception e) {
-                    Log.e(TAG, "Failed prepare Looper");
-                }
-                /*Add 20130527 Spreadst of 169012 No init Looper end*/
-                try {
-                    Thread.sleep(500);
-                    
-                    if (runSlogCommand(SLOG_COMMAND_SCREENSHOT) == 0) {
-                        try {
-                            handler.removeCallbacks(timeout);
-                            LogSettingSlogUITabHostActivity.mTabHostHandler
-                                    .sendEmptyMessage(MESSAGE_SNAP_SUCCESSED);
-                        } catch (ExceptionInInitializerError initError) {
-                            Log.e(TAG, "Failed send message, dump stack trace");
-                            initError.printStackTrace();
-                        }
-                    } else {
-                        try {
-                            handler.removeCallbacks(timeout);
-                            LogSettingSlogUITabHostActivity.mTabHostHandler
-                                    .sendEmptyMessage(MESSAGE_SNAP_FAILED);
-                        } catch (ExceptionInInitializerError initError) {
-                            Log.e(TAG, "Failed send message, dump stack trace");
-                            initError.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    try {
-                        handler.removeCallbacks(timeout);
-                        LogSettingSlogUITabHostActivity.mTabHostHandler
-                                .sendEmptyMessage(MESSAGE_SNAP_FAILED);
-                    } catch (ExceptionInInitializerError initError) {
-                        Log.e(TAG, "Can't send message");
-                    }
-                }
-                File screenpath;
-                if (GetState(STORAGEKEY) && IsHaveSDCard()) {
-                    screenpath = getExternalStorage();
-                } else {
-                    screenpath = android.os.Environment.getDataDirectory();
-                }
-                scanScreenShotFile(new File(screenpath.getAbsolutePath() + File.separator + "slog"), this.mContext);
-                /*Add 20130527 Spreadst of 169012 No init Looper start*/
-                try {
-                    Looper.loop();
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed loop the Looper");
-                }
-                /*Add 20130527 Spreadst of 169012 No init Looper end*/
-                Looper.loop();
-            }
+    public static void snap(final Context context) {
+        if (context == null) {
+            return ;
         }
 
-        new SnapThread(context).start();
+        TimeoutRunnable tr = new TimeoutRunnable(context);
+        ScreenshotRunnable sr = new ScreenshotRunnable(context, tr);
+        sHandler.postDelayed(sr, 500);
+        sTimeoutHandler.postDelayed(tr, 1500);
         return ;
+    }
+
+    private static void screenShot(Context context, TimeoutRunnable timeout) {
+        Log.d(TAG, "in screenshot, the handler will post the delayed runnable");
+        Log.d(TAG, "the delayed message has been posted");
+        try {
+            if (runSlogCommand(SLOG_COMMAND_SCREENSHOT) == 0) {
+                sTimeoutHandler.removeCallbacks(timeout);
+                sHandler.post(new ToastRunnable(context, context.getString(R.string.toast_snap_success)));
+            } else {
+                sTimeoutHandler.removeCallbacks(timeout);
+                sHandler.post(new ToastRunnable(context, context.getString(R.string.toast_snap_failed)));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "screen shot catch exception", e.getCause());
+        }
+        File screenpath;
+        if (GetState(STORAGEKEY) && IsHaveSDCard()) {
+            screenpath = getExternalStorage();
+        } else {
+            screenpath = android.os.Environment.getDataDirectory();
+        }
+        scanScreenShotFile(new File(screenpath.getAbsolutePath() + File.separator + "slog"), context);
     }
 
     private static void scanScreenShotFile(File file, Context context) {
