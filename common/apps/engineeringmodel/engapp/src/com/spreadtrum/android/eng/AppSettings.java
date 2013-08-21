@@ -39,6 +39,7 @@ public class AppSettings extends PreferenceActivity {
     private static final String ACCELEROMETER = "accelerometer_rotation";
 
     private static final String RETRY_SMS_CONTROL="persist.sys.msms_retry_control";
+    private static final String MMS_REPORT_CONTROL="persist.sys.mms_read_report";
     private static final String MODEM_RESET = "modem_reset";
 
     private static final String ENG_TESTMODE = "engtestmode";
@@ -53,6 +54,7 @@ public class AppSettings extends PreferenceActivity {
     private CheckBoxPreference mModemReset;
     private CheckBoxPreference mNotShowDialog;
     private CheckBoxPreference mSmsRetryControl;
+    private CheckBoxPreference mMmsReprotControl;
     private EngSqlite mEngSqlite;
 
     @Override
@@ -75,6 +77,7 @@ public class AppSettings extends PreferenceActivity {
         mModemReset = (CheckBoxPreference) findPreference(MODEM_RESET);
         mNotShowDialog = (CheckBoxPreference) findPreference(NOT_SHOW_DIALOG);
         mSmsRetryControl = (CheckBoxPreference) findPreference("msms_retry_control");
+        mMmsReprotControl = (CheckBoxPreference) findPreference("mms_report_control");
 
         String result = SystemProperties.get("persist.sys.sprd.modemreset");
         /*Add 20130805 spreadst of 198464 add SMS retry control start*/
@@ -85,6 +88,16 @@ public class AppSettings extends PreferenceActivity {
             mSmsRetryControl.setChecked(false);
         }
         /*Add 20130805 spreadst of 198464 add SMS retry control end*/
+
+        /*Add 20130821 spreadst of 203235 add MMS report control start*/
+        boolean mmsReportControl= SystemProperties.getBoolean(MMS_REPORT_CONTROL, false);
+        if(mmsReportControl == true){
+            mMmsReprotControl.setChecked(true);
+        }else{
+            mMmsReprotControl.setChecked(false);
+        }
+        /*Add 20130821 spreadst of 203235 add MMS report control end*/
+
         boolean isShowDialog = Settings.System.getInt(this.getContentResolver(),
                 Settings.System.LONG_PRESS_POWER_KEY, 0) == 1;
         if (isShowDialog) {
@@ -219,6 +232,14 @@ public class AppSettings extends PreferenceActivity {
             }
             return true;
             /*Add 20130805 spreadst of 198464 add SMS retry control end*/
+            /*Add 20130821 spreadst of 203235 add MMS report control start*/
+        } else if ("mms_report_control".equals(key)) {
+            if (preference instanceof CheckBoxPreference) {
+                SystemProperties.set(MMS_REPORT_CONTROL,
+                        ((CheckBoxPreference) preference).isChecked() ? "1" : "0");
+            }
+            return true;
+            /*Add 20130821 spreadst of 203235 add MMS report control end*/
         }else {
             return false;
         }
