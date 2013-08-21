@@ -2895,12 +2895,12 @@ int camera_start_autofocus(camera_focus_e_type focus,
 
 	CMR_LOGV("focus %d, client_data 0x%x", focus, (uint32_t)client_data);
 	CMR_PRINT_TIME;
-	camera_set_af_cb(callback);
 
+	camera_set_client_data(client_data);
 	camera_autofocus();
 
 	message.msg_type = CMR_EVT_AF_START;
-	message.data     = client_data;
+	message.data     = callback;
 	ret = cmr_msg_post(g_cxt->af_msg_que_handle, &message);
 	if (ret) {
 		CMR_LOGE("Faile to send one msg to camera main thread");
@@ -4138,10 +4138,12 @@ void *camera_af_thread_proc(void *data)
 			break;
 		case CMR_EVT_AF_START:
 			CMR_PRINT_TIME;
+			camera_set_af_cb((camera_cb_f_type)(message.data));
+
 			if (CMR_IDLE == g_cxt->preview_status) {
 				CMR_LOGI("preview already stoped.");
 				camera_call_af_cb(CAMERA_EXIT_CB_FAILED,
-					message.data,
+					camera_get_client_data(),
 					CAMERA_FUNC_START_FOCUS,
 					0);
 				break;
@@ -4157,18 +4159,18 @@ void *camera_af_thread_proc(void *data)
 */
 			if (CAMERA_INVALID_STATE == ret) {
 				camera_call_af_cb(CAMERA_EXIT_CB_ABORT,
-					message.data,
+					camera_get_client_data(),
 					CAMERA_FUNC_START_FOCUS,
 					0);
 			} else if (CAMERA_FAILED == ret) {
 				camera_call_af_cb(CAMERA_EXIT_CB_FAILED,
-					message.data,
+					camera_get_client_data(),
 					CAMERA_FUNC_START_FOCUS,
 					0);
 
 			} else {
 				camera_call_af_cb(CAMERA_EXIT_CB_DONE,
-					message.data,
+					camera_get_client_data(),
 					CAMERA_FUNC_START_FOCUS,
 					0);
 			}
