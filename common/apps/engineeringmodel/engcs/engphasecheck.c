@@ -5,7 +5,7 @@
 
 
 #define PHASE_CHECKE_FILE "/productinfo/productinfo.bin"
-#define PHASE_CHECKE_FILE0 "/dev/block/mmcblk0p13" //add by kenyliu on 2013 08 13 for read sn bug 201276
+#define PHASE_CHECKE_FILE0 "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1" //add by kenyliu on 2013 08 13 for read sn bug 201276
 
 int eng_phasechecktest(void)
 {
@@ -34,6 +34,7 @@ int eng_getphasecheck(SP09_PHASE_CHECK_T* phase_check)
 
 		close(fd);
 	}else{
+		phase_check_temp.Magic = 0;
 		ENG_LOG("%s open fail PHASE_CHECKE_FILE0 = %s ",__FUNCTION__ , PHASE_CHECKE_FILE0);
 	}
 
@@ -48,8 +49,8 @@ int eng_getphasecheck(SP09_PHASE_CHECK_T* phase_check)
 		ENG_LOG("SN2=%s",phase_check->SN2);
 
 		if((phase_check_temp.Magic == SP09_SPPH_MAGIC_NUMBER) || (phase_check_temp.Magic == SP05_SPPH_MAGIC_NUMBER)){
-			strcpy(phase_check->SN1, phase_check_temp.SN1);
-			strcpy(phase_check->SN2, phase_check_temp.SN2);
+			memcpy(phase_check->SN1, phase_check_temp.SN1, SP09_MAX_SN_LEN);
+			memcpy(phase_check->SN2, phase_check_temp.SN2, SP09_MAX_SN_LEN);
 		}
 
 		ENG_LOG("SN1=%s",phase_check->SN1);

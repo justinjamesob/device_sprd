@@ -31,8 +31,8 @@ static char * inotify_event_array[] = {
 
 
 static const char* RAW_DATA_PARTITION[RAWDATA_PARTITION_NUM] = {
-	 "/dev/block/mmcblk0p13",
-	 "/dev/block/mmcblk0p14"
+	 "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1",
+	 "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo2"
 };
 
 static const char* PRODUCT_INFO[] = {
@@ -54,7 +54,7 @@ static const char * adc_files[] = {
 	"/productinfo/adc.bin"
 };
 static const char * batter_adc_files[] ={
-	"/dev/block/mmcblk0p24"
+	"/dev/block/platform/sprd-sdhci.3/by-name/prodinfo4"
 };
 
 
@@ -292,7 +292,6 @@ static void init_adc(void)
 {
 	char adc_buffer[48]={0};
 	read_adc_data(adc_buffer,48);
-	DBG("%s, adc_buffer=%s", __FUNCTION__, adc_buffer);
 	wirte_adc(adc_buffer);
 }
 
