@@ -138,6 +138,14 @@
         android:title="SMS Retry Setting" >
     </CheckBoxPreference>
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="mms_report_control"
+        android:summaryOff="Close"
+        android:summaryOn="Open"
+        android:title="Mms Read Report Setting" >
+    </CheckBoxPreference>
+
   <Preference android:key="RFMaxPower" android:title="RFMaxPower" android:summary="">
    	<intent android:action="android.intent.action.MAIN"
    		android:targetPackage="com.spreadtrum.android.eng"
