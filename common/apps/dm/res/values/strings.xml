@@ -23,6 +23,7 @@
         <item>Start service</item> 
         <item>Dm state</item>
         <item>Self register switch</item>
+        <item>Simulator Connect</item>
     </string-array>    
     <string name="menu_save">Save</string>
     <string name="menu_cancel">Cancel</string>
