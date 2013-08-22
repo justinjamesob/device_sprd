@@ -2,6 +2,7 @@
 package com.spreadtrum.dm;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.content.ContentResolver;
 import android.content.SharedPreferences;
 import android.content.Context;
 import android.util.Log;
@@ -16,13 +18,18 @@ import android.content.Intent; //import com.android.dm.vdmc.VdmcFumoHandler;
 //import com.android.dm.vdmc.MyConfirmation;
 import android.app.AlertDialog;
 import android.content.DialogInterface; //import com.redbend.vdm.*;
+import android.database.Cursor;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.os.Handler;
+
+import java.io.File;
 import java.lang.Runnable;
 import android.view.WindowManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.provider.Browser;
+import android.provider.MediaStore;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 
@@ -224,7 +231,16 @@ public class DmAlertDialog extends Activity {
         Notification n = new Notification();
 
         n.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
-        n.defaults = Notification.DEFAULT_SOUND;
+        
+        //Fix 204720 on 20130822:the alert sound should be same to sms sound start
+        Uri smsSoundUri = getSMSSoundUri();        
+        Log.i(TAG, "playAlertSound  Uri = " + smsSoundUri);
+        if(null == smsSoundUri){
+        	n.defaults = Notification.DEFAULT_SOUND;        	 
+        }else{
+        	n.sound = smsSoundUri;        
+        }
+        //Fix 204720 on 20130822:the alert sound should be same to sms sound end
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         boolean nowSilent = audioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL;
@@ -235,6 +251,57 @@ public class DmAlertDialog extends Activity {
         mNotificationMgr.notify(100, n);
     }
 
+    //Fix 204720 on 20130822:the alert sound should be same to sms sound start
+    private static final String SMS_SOUND = "SMS_SOUND";    
+    
+	private Uri getSMSSoundUri() {
+		
+		SharedPreferences smsSoundSP;
+		smsSoundSP = getSharedPreferences(SMS_SOUND, MODE_PRIVATE);
+
+		String smsSoundString = smsSoundSP.getString("smssound_dm", "Default");
+		Log.i(TAG, "getSMSSoundUri smsSoundString : " + smsSoundString);		
+
+		if("Default".equals(smsSoundString)){			
+			return null;
+		}else{			
+			Uri uri = Uri.parse(smsSoundString);	
+			String smsSoundPath = null;
+			Cursor smsSoundCursor = null;
+			String[] proj = { MediaStore.Files.FileColumns.DATA };
+			
+			try{
+				smsSoundCursor = getContentResolver().query(uri, proj, null, null, null);
+				
+				if ((null != smsSoundCursor) && (smsSoundCursor.moveToFirst())) {
+					int smsSoundColumnIndex = smsSoundCursor
+							.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA);
+					smsSoundPath = smsSoundCursor.getString(smsSoundColumnIndex);
+					Log.i(TAG, "smsSoundPath = " + smsSoundPath);
+				}
+				
+	        }catch (IllegalStateException e) {
+	            Log.e(TAG, "getSMSSoundUri", e);
+	        } finally {
+	        	if(null != smsSoundCursor){
+					smsSoundCursor.close();
+				}
+	        }		
+			
+			if(null == smsSoundPath){
+				Log.i(TAG, "smsSoundPath is null ");
+				return null;
+			}
+			
+			File file = new File(smsSoundPath);
+			Uri fileUri = Uri.fromFile(file);			
+			Log.i(TAG, "fileUri = " + fileUri);			
+			
+			return fileUri;
+		}		
+	}
+	//Fix 204720 on 20130822:the alert sound should be same to sms sound end
+    
     private void startTimer(int timeout) // timeout : s
     {
         Log.d(TAG, "startTimer: timeout = " + timeout);

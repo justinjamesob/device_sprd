@@ -61,7 +61,9 @@ public class DmDebugMenu extends Activity {
     protected static final int ITEM_DM_STATE = 13;
 
     protected static final int ITEM_SELFREG_SWITCH = 14;
-
+    
+    protected static final int ITEM_SIMULATOR = 15;	//for simulator wap push
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,13 +86,65 @@ public class DmDebugMenu extends Activity {
         super.onDestroy();
     }
 
+     
     private void ShowMessage(CharSequence msg) {
         if (mToast == null)
             mToast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
         mToast.setText(msg);
         mToast.show();
     }
+  //for simulator wap push
+	private boolean startSimulator() {
+		boolean result = true;
+		String addr = DmService.getInstance().getSmsAddr();
 
+		byte[] header = new byte[6];
+		byte[] data = new byte[30];
+		header[0] = -60;
+		header[1] = -81;
+		header[2] = -121;
+		header[3] = 0;
+
+		data[0] = (byte) 0x83;
+		data[1] = (byte) 0x91;
+		data[2] = (byte) 0xd4;
+		data[3] = (byte) 0x79;
+		data[4] = (byte) 0x75;
+		data[5] = (byte) 0x44;
+		data[6] = (byte) 0xb3;
+		data[7] = (byte) 0x32;
+		data[8] = (byte) 0x03;
+		data[9] = (byte) 0xbf;
+		data[10] = (byte) 0xae;
+		data[11] = (byte) 0xf1;
+		data[12] = (byte) 0xef;
+		data[13] = (byte) 0xb4;
+		data[14] = (byte) 0xe0;
+		data[15] = (byte) 0xc1;
+		data[16] = (byte) 0x02;
+		data[17] = (byte) 0xf8;
+		data[18] = (byte) 0x0;
+		data[19] = (byte) 0x0;
+		data[20] = (byte) 0x0;
+		data[21] = (byte) 0xc9;
+		data[22] = (byte) 0x25;
+		data[23] = (byte) 0x05;
+		data[24] = (byte) 0x4f;
+		data[25] = (byte) 0x4d;
+		data[26] = (byte) 0x41;
+		data[27] = (byte) 0x44;
+		data[28] = (byte) 0x4d;
+		Log.d(TAG, "start simulator onReceive, WAP_PUSH_RECEIVED_ACTION");
+		Intent vdmIntent = new Intent("com.android.dm.NIA");
+		Bundle extras = new Bundle();
+		extras.putByteArray("msg_body", data);
+		extras.putString("msg_org", addr);
+		vdmIntent.putExtras(extras);
+		startService(vdmIntent);
+
+		return result;
+	}
+	
     private OnItemClickListener mItemClickListenter = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent;
@@ -238,7 +292,14 @@ public class DmDebugMenu extends Activity {
                     }
 
                     break;
-
+                    
+                case ITEM_SIMULATOR://for simulator wap push
+                    if (DmService.getInstance().isDebugMode()) {
+                        startSimulator();
+                    } else {
+                        ShowMessage("Open debug mode first!");
+                    }
+                    break;
                 default:
                     break;
             }

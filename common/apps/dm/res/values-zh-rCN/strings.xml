@@ -23,6 +23,7 @@
 		<item>启动服务</item>
 		<item>DM状态</item>
 		<item>自注册开关</item>
+		<item>模拟采配</item>
     </string-array>    
     <string name="menu_save">保存</string>
     <string name="menu_cancel">取消</string>

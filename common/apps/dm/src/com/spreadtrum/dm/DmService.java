@@ -103,6 +103,8 @@ public class DmService extends Service {
     private static boolean mIsRealNetParam; // if current is read net parameter
 
     private static final String DM_CONFIG = "DmConfig";
+    //Fix 204720 on 20130822:the alert sound should be same to sms sound
+    private static final String SMS_SOUND = "SMS_SOUND";
 
     private static final String ITEM_DEBUG_MODE = "DebugMode";
 
@@ -517,12 +519,28 @@ public class DmService extends Service {
         }
         Log.d(TAG, "stop listen service state for phone " + phoneId);
     }
-
+    //Fix 204720 on 20130822:the alert sound should be same to sms sound start
+    public void setSMSSoundUri(String newSmsSoundString){
+    	SharedPreferences smsSoundSP;        
+        smsSoundSP = getSharedPreferences(SMS_SOUND,MODE);
+        String smsSoundString = smsSoundSP.getString("smssound_dm", "Default");
+        if(!smsSoundString.equals(newSmsSoundString)){
+        	SharedPreferences.Editor editor = smsSoundSP.edit();
+            editor.putString("smssound_dm", newSmsSoundString);
+            editor.commit();
+        }        
+    }
+    //Fix 204720 on 20130822:the alert sound should be same to sms sound end
     // init dm relative parameter
     private void initParam() {
         SharedPreferences sharedPreferences;
+      //Fix 204720 on 20130822:the alert sound should be same to sms sound
+        SharedPreferences smsSoundSP;
         sharedPreferences = getSharedPreferences(DM_CONFIG, MODE);
-
+        
+        smsSoundSP = getSharedPreferences(SMS_SOUND,MODE);                
+        Log.i(TAG, "initParam smssound_dm = " + smsSoundSP.getString("smssound_dm", "Default"));
+        
         // init self registe switch
         if ((SystemProperties.get("ro.hisense.cmcc.test.datong", "0").equals("1"))
                 || (SystemProperties.get("ro.hisense.cta.test", "0").equals("1"))) {
