@@ -63,11 +63,11 @@ static char               scaler_dev_name[50] = "/dev/sprd_scale";
 static int                scaler_fd = -1;
 static cmr_evt_cb         scaler_evt_cb = NULL;
 static pthread_mutex_t    scaler_cb_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t     scaler_cond;
 static pthread_t          scaler_thread;
 static struct scale_cxt   *sc_cxt;
 static sem_t              scaler_sem;
 static sem_t              scaler_init_sem;
+static sem_t              scaler_sync_sem;
 
 static enum scale_fmt cmr_scale_fmt_cvt(uint32_t cmt_fmt)
 {
@@ -126,7 +126,7 @@ static void* cmr_scale_thread_proc(void* data)
 				CMR_LOGI("IO Deinit");
 				ioctl(scaler_fd, SCALE_IO_STOP, NULL);
 				ioctl(scaler_fd, SCALE_IO_DEINIT);
-				pthread_cond_signal(&scaler_cond);
+				sem_post(&scaler_sync_sem);
 			} else {
 				evt_id = CMR_IMG_CVT_SC_DONE;
 				CMR_LOGI("out height %d", sc_frm.height);
@@ -234,10 +234,10 @@ int cmr_scale_init(void)
 		CMR_LOGE("Failed to init mutex : %d", ret);
 		exit(EXIT_FAILURE);
 	}
-	pthread_cond_init(&scaler_cond, NULL);
 
 	sem_init(&scaler_sem, 0, 1);
 	sem_init(&scaler_init_sem, 0, 0);
+	sem_init(&scaler_sync_sem, 0, 0);
 	ret = cmr_scale_create_thread();
 	sem_wait(&scaler_init_sem);
 
@@ -474,9 +474,11 @@ int  cmr_scale_start(uint32_t slice_height,
 		CVT_EXIT_IF_ERR(ret);
 		pthread_mutex_lock(&scaler_cb_mutex);
 		if (NULL == scaler_evt_cb) {
-			pthread_cond_wait(&scaler_cond, &scaler_cb_mutex);
+			pthread_mutex_unlock(&scaler_cb_mutex);
+			sem_wait(&scaler_sync_sem);
+		} else {
+			pthread_mutex_unlock(&scaler_cb_mutex);
 		}
-		pthread_mutex_unlock(&scaler_cb_mutex);
 		CMR_LOGI("End");
 		CMR_PRINT_TIME;
 	}
@@ -706,9 +708,11 @@ int cmr_scale_deinit(void)
 
 	pthread_mutex_lock(&scaler_cb_mutex);
 	if (NULL == scaler_evt_cb) {
-		pthread_cond_signal(&scaler_cond);
+		pthread_mutex_unlock(&scaler_cb_mutex);
+		sem_post(&scaler_sync_sem);
+	} else {
+		pthread_mutex_unlock(&scaler_cb_mutex);
 	}
-	pthread_mutex_unlock(&scaler_cb_mutex);
 	sem_wait(&scaler_sem);
 	sem_post(&scaler_sem);
 	/* thread should be killed before fd deinited */
@@ -720,6 +724,7 @@ int cmr_scale_deinit(void)
 
 	sem_destroy(&scaler_sem);
 	sem_destroy(&scaler_init_sem);
+	sem_destroy(&scaler_sync_sem);
 
 	/* then close fd */
 	if (-1 == close(scaler_fd)) {
@@ -736,7 +741,6 @@ int cmr_scale_deinit(void)
 	scaler_evt_cb = NULL;
 	pthread_mutex_unlock(&scaler_cb_mutex);
 	pthread_mutex_destroy(&scaler_cb_mutex);
-	pthread_cond_destroy(&scaler_cond);
 	CMR_LOGV("close device.");
 	return 0;
 }
