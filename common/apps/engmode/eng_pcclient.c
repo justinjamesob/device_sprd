@@ -16,7 +16,8 @@
 #include "eng_sqlite.h"
 
 #define VLOG_PRI  -20
-#define USB_CONFIG_PROPERTY  "mass_storage,adb,vser,gser"
+#define USB_CONFIG_VSER_GSER  "mass_storage,adb,vser,gser"
+#define USB_CONFIG_GSER6  "mass_storage,adb,gser6"
 
 // current run mode: TD or W
 int g_run_mode = ENG_RUN_TYPE_TD;
@@ -94,18 +95,27 @@ void eng_check_factorymode_fornand(void)
     int status = eng_sql_string2int_get(ENG_TESTMODE);
     char status_buf[8];
     char config_property[64];
+    char modem_enable[5];
+    char usb_config[64];
 
 #ifdef USE_BOOT_AT_DIAG
     ENG_LOG("%s: status=%x\n",__func__, status);
     property_get("persist.sys.usb.config", config_property, "");
+    property_get("ro.modem.wcn.enable", modem_enable, "");
     if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {
         fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC);
         if(fd > 0)
             close(fd);
 
-        if(strncmp(config_property, USB_CONFIG_PROPERTY, strlen(USB_CONFIG_PROPERTY))){
-            property_set("sys.usb.config", USB_CONFIG_PROPERTY);
-            property_set("persist.sys.usb.config", USB_CONFIG_PROPERTY);
+        ENG_LOG("%s: modem_enable: %s\n", __FUNCTION__, modem_enable);
+        if(!strcmp(modem_enable, "1")) {
+            strcpy(usb_config, USB_CONFIG_GSER6);
+        }else {
+            strcpy(usb_config, USB_CONFIG_VSER_GSER);
+        }
+        if(strncmp(config_property, usb_config, strlen(usb_config))){
+            property_set("sys.usb.config", usb_config);
+            property_set("persist.sys.usb.config", usb_config);
         }
     } else if (status == 0) {
         remove(ENG_FACOTRYMODE_FILE);

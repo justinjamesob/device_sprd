@@ -9,7 +9,6 @@
 #include "eng_attok.h"
 #include "eng_pcclient.h"
 #include "eng_diag.h"
-//#include "eng_sqlite.h"
 #include "vlog.h"
 #include "crc16.h"
 #include "string.h"
