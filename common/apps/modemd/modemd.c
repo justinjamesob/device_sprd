@@ -94,6 +94,11 @@ static int stop_engservice(int modem)
 			property_set("ctl.stop", "engmodemclientw");
 			property_set("ctl.stop", "engpcclientw");
 			break;
+		case WCN_MODEM:
+			property_set("ctl.stop", "engservicewcn");
+			property_set("ctl.stop", "engmodemclientwcn");
+			property_set("ctl.stop", "engpcclientwcn");
+			break;
 		default:
 			property_set("ctl.stop", "engservicet");
 			property_set("ctl.stop", "engmodemclientt");
@@ -118,6 +123,11 @@ static int start_engservice(int modem)
 			property_set("ctl.start", "engservicew");
 			property_set("ctl.start", "engmodemclientw");
 			property_set("ctl.start", "engpcclientw");
+			break;
+		case WCN_MODEM:
+			property_set("ctl.start", "engservicewcn");
+			property_set("ctl.start", "engmodemclientwcn");
+			property_set("ctl.start", "engpcclientwcn");
 			break;
 		default:
 			property_set("ctl.start", "engservicet");
@@ -225,6 +235,8 @@ int stop_service(int modem, int is_vlx)
 
 	/* stop eng */
 	stop_engservice(modem);
+	if(modem == WCN_MODEM)
+		return 0;
 
 	/* stop phoneserver */
 	stop_phser(modem);
@@ -289,9 +301,13 @@ int start_service(int modem, int is_vlx, int restart)
 		if(modem == TD_MODEM) {
 			property_get(TD_TTY_DEV_PRO, modem_dev, "");
 			property_get(TD_SIM_NUM, phoneCount, "");
-		} else {
+		} else if(modem == W_MODEM) {
 			property_get(W_TTY_DEV_PRO, modem_dev, "");
 			property_get(W_SIM_NUM, phoneCount, "");
+		} else if(modem == WCN_MODEM) {
+			/*start eng*/
+			start_engservice(modem);
+			return 0;
 		}
 		sprintf(path, "%s0", modem_dev);
 		MODEMD_LOGD("open stty dev: %s", path);
@@ -416,7 +432,7 @@ static void *modemd_listenaccept_thread(void *par)
 
 static void start_modem(int *para)
 {
-	pthread_t tid1, tid2, tid3, tid4;
+	pthread_t tid1, tid2, tid3, tid4, tid5;
 	int modem = -1;
 	char prop[30];
 	char modem_enable[5];
@@ -429,6 +445,8 @@ static void start_modem(int *para)
 		strcpy(prop, TD_MODEM_ENABLE);
 	} else if(modem == W_MODEM) {
 		strcpy(prop, W_MODEM_ENABLE);
+	} else if(modem == WCN_MODEM) {
+		strcpy(prop, WCN_MODEM_ENABLE);
 	} else {
 		MODEMD_LOGE("Invalid modem type");
 		return;
@@ -436,12 +454,16 @@ static void start_modem(int *para)
 
 	property_get(prop, modem_enable, "");
 	if(!strcmp(modem_enable, "1")) {
-		MODEMD_LOGD("%s modem is enabled", modem == TD_MODEM?"TD":"W");
-
-		if(modem == TD_MODEM)
+		if(modem == TD_MODEM) {
+			MODEMD_LOGD("TD modem is enabled");
 			strcpy(prop, TD_PROC_PRO);
-		else if(modem == W_MODEM)
+		} else if(modem == W_MODEM) {
+			MODEMD_LOGD("W modem is enabled");
 			strcpy(prop, W_PROC_PRO);
+		} else if(modem == WCN_MODEM) {
+			MODEMD_LOGD("WCN modem is enabled");
+			strcpy(prop, WCN_PROC_PRO);
+		}
 
 		property_get(prop, modem_dev, "");
 		if(!strcmp(modem_dev, TD_PROC_DEV)) {
@@ -456,6 +478,11 @@ static void start_modem(int *para)
 			start_service(modem, 0, 0);
 			pthread_create(&tid2, NULL, (void*)detect_sipc_modem, (void *)para);
 			pthread_create(&tid4, NULL, (void*)detect_modem_blocked, (void *)para);
+		} else if(!strcmp(modem_dev, WCN_PROC_DEV)) {
+			/*  sipc wcn modem */
+			MODEMD_LOGD("It's wcn native version");
+			start_service(modem, 0, 0);
+			pthread_create(&tid5, NULL, (void*)detect_sipc_modem, (void *)para);
 		} else {
 			/*  vlx version, only one modem */
 			MODEMD_LOGD("It's vlx version");
@@ -464,7 +491,12 @@ static void start_modem(int *para)
 			detect_vlx_modem(modem);
 		}
 	} else {
-		MODEMD_LOGD("%s modem is not enabled", modem == TD_MODEM?"TD":"W");
+		if(modem == TD_MODEM)
+			MODEMD_LOGD("TD modem is not enabled");
+		else if(modem == W_MODEM)
+			MODEMD_LOGD("W modem is not enabled");
+		else if(modem == WCN_MODEM)
+			MODEMD_LOGD("WCN modem is not enabled");
 	}
 }
 
@@ -475,6 +507,7 @@ int main(int argc, char *argv[])
 	int ret;
 	int modem_td = TD_MODEM;
 	int modem_w = W_MODEM;
+	int modem_wcn = WCN_MODEM;
 
 	memset(&action, 0x00, sizeof(action));
 	action.sa_handler = SIG_IGN;
@@ -497,6 +530,9 @@ int main(int argc, char *argv[])
 
 	/* start w modem*/
 	start_modem(&modem_w);
+
+	/* start wcn modem*/
+	start_modem(&modem_wcn);
 
 	do {
 		pause();

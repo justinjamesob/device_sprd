@@ -31,7 +31,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.msms.phone_count=2 \
 	h_bright=true \
 	persist.msms.phone_default=0 \
-	ro.modem.count=1 \
+	ro.modem.count=2 \
 	ro.digital.fm.support=0 \
 	ro.modem.t.enable=1 \
 	ro.modem.t.dev=/dev/cpt \
@@ -49,7 +49,14 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.config.hw.camera_support=false \
 	ro.config.hw.search_support=false \
     persist.surpport.oplpnn=true \
-    persist.surpport.cphsfirst=false
+    persist.surpport.cphsfirst=false \
+	ro.modem.wcn.enable=1 \
+	ro.modem.wcn.dev=/dev/cpwcn \
+	ro.modem.wcn.tty=/deiv/stty_wcn \
+	ro.modem.wcn.diag=/dev/slog_wcn \
+	ro.modem.wcn.assert=/dev/spipe_wcn2 \
+	ro.modem.wcn.id=1 \
+	ro.modem.wcn.count=1
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
   PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=1
