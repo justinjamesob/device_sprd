@@ -82,17 +82,19 @@ BOARD_FLASH_BLOCK_SIZE := 4096
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 USE_OPENGL_RENDERER := true
 
-
+HAVE_WLAN_CMCC_FEATURE      := false
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION     := VER_0_8_X
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_ittiam
 BOARD_HOSTAPD_DRIVER        := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_bcmdhd
-BOARD_WLAN_DEVICE           := bcmdhd
-WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
-WIFI_DRIVER_FW_PATH_STA     := "/etc/wifi/fw_bcmdhd.bin"
-WIFI_DRIVER_FW_PATH_P2P     := "/etc/wifi/fw_bcmdhd_p2p.bin"
-WIFI_DRIVER_FW_PATH_AP      := "/etc/wifi/fw_bcmdhd_apsta.bin"
+BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_ittiam
+BOARD_WLAN_DEVICE           := ittiam
+WIFI_DRIVER_FW_PATH_PARAM   := ""
+WIFI_DRIVER_FW_PATH_STA     := "sta_mode"
+WIFI_DRIVER_FW_PATH_P2P     := "p2p_mode"
+WIFI_DRIVER_FW_PATH_AP      := "ap_mode"
+WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/ittiam.ko"
+WIFI_DRIVER_MODULE_NAME            := "ittiam"
 USE_CAMERA_STUB := true
 
 BOARD_USES_GENERIC_AUDIO := true

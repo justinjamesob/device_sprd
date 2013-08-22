@@ -145,7 +145,6 @@ PRODUCT_COPY_FILES := \
 	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
 	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
 
-BOARD_WLAN_DEVICE_REV       := bcm4330_b2
-$(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
+$(call inherit-product, device/sprd/partner/ittiam/wlan/device-itm.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/engineeringmodel/module.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)
