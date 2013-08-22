@@ -7,6 +7,11 @@
 #ifdef _HWCOMPOSER_USE_GSP
 #include "sc8830/gsp_hal.h"
 #endif
+
+#ifdef OVERLAY_COMPOSER_GPU
+#include "OverlayComposer/OverlayComposer.h"
+#endif
+
 struct sprd_img {
     uint32_t w;
     uint32_t h;
@@ -68,5 +73,9 @@ struct hwc_context_t {
 #endif
     sp<VSyncThread> mVSyncThread;
     void *fb_virt_addr;
+
+#ifdef OVERLAY_COMPOSER_GPU
+    overlayDevice_t OD;
+#endif
 };
 #endif

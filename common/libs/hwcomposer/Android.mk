@@ -38,7 +38,7 @@ LOCAL_CFLAGS:= -DLOG_TAG=\"SPRDhwcomposer\"
 LOCAL_CFLAGS += -D_USE_SPRD_HWCOMPOSER -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
 	LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libcamera/sc8830/inc	
-	# LOCAL_CFLAGS += -DVIDEO_LAYER_USE_RGB
+	#LOCAL_CFLAGS += -DVIDEO_LAYER_USE_RGB
 	# _HWCOMPOSER_USE_GSP : protecting sc8830 code
 	LOCAL_CFLAGS += -D_HWCOMPOSER_USE_GSP
         LOCAL_CFLAGS += -DGSP_SCALING_UP_TWICE
@@ -50,6 +50,27 @@ ifeq ($(strip $(HWCOMPOSER_USE_GSP_BLEND)),true)
 else	
 	LOCAL_CFLAGS += -D_ALLOC_OSD_BUF
 endif
+
+endif
+
+# OVERLAY_COMPOSER_GPU_CONFIG: Enable or disable OVERLAY_COMPOSER_GPU
+# Macro, OVERLAY_COMPOSER will do Hardware layer blending and then
+# post the overlay buffer to OSD display plane.
+# If you want to know how OVERLAY_COMPOSER use and work,
+# Please see the OverlayComposer/OverlayComposer.h for more details.
+ifeq ($(strip $(USE_OVERLAY_COMPOSER_GPU)),true)
+
+	LOCAL_CFLAGS += -D_ALLOC_OSD_BUF
+
+	LOCAL_CFLAGS += -DOVERLAY_COMPOSER_GPU
+
+	LOCAL_SRC_FILES += OverlayComposer/OverlayComposer.cpp
+
+	LOCAL_SRC_FILES += OverlayComposer/OverlayNativeWindow.cpp
+
+	LOCAL_SRC_FILES += OverlayComposer/Layer.cpp
+
+	LOCAL_SRC_FILES += OverlayComposer/Utility.cpp
 
 endif
 
