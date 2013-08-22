@@ -763,6 +763,10 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	uint32_t i = 0;
 
 	SENSOR_PRINT("SENSOR: Sensor_SetExportInfo.\n");
+	if (NULL == sensor_info_ptr) {
+		SENSOR_PRINT("SENSOR: sensor_info_ptr is null.\n");
+		return;
+	}
 
 	SENSOR_MEMSET(exp_info_ptr, 0x00, sizeof(SENSOR_EXP_INFO_T));
 	exp_info_ptr->name= sensor_info_ptr->name;
@@ -777,7 +781,7 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	exp_info_ptr->pclk_delay =
 	    ((sensor_info_ptr->hw_signal_polarity >> 5) & 0x07);
 
-	if ((NULL!=sensor_info_ptr) && (NULL!=sensor_info_ptr->raw_info_ptr)) {
+	if (NULL!=sensor_info_ptr->raw_info_ptr) {
 		exp_info_ptr->raw_info_ptr = (struct sensor_raw_info*)*sensor_info_ptr->raw_info_ptr;
 	}
 

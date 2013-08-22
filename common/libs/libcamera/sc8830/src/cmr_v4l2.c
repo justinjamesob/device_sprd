@@ -611,6 +611,7 @@ static int cmr_v4l2_evt_id(int isr_flag)
 		break;
 	case V4L2_FLAG_TIME_OUT:
 		ret = CMR_V4L2_TIME_OUT;
+		break;
 	default:
 		CMR_LOGV("isr_flag 0x%x", isr_flag);
 		break;

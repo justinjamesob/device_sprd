@@ -1368,7 +1368,7 @@ static int camera_check_autofocus_aera(SENSOR_RECT_T *rect_ptr,uint32_t rect_num
 	}
 	sensor_mode = &cxt->sn_cxt.sensor_info->sensor_mode_info[sn_work_mode];
 
-	for ( i==0 ; i<rect_num ; i++) {
+	for ( i=0 ; i<rect_num ; i++) {
 		if ((0 == rect_ptr[i].w) || (0 == rect_ptr[i].h)
 			|| (rect_ptr->w > sensor_mode->trim_width)
 			|| (rect_ptr->h > sensor_mode->trim_height)

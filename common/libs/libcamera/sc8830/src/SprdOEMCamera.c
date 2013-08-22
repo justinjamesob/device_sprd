@@ -4477,13 +4477,14 @@ int camera_capture_init(void)
 	sensor_mode = &g_cxt->sn_cxt.sensor_info->sensor_mode_info[g_cxt->sn_cxt.capture_mode];
 	sensor_cfg.sn_size.width  = sensor_mode->width;
 	sensor_cfg.sn_size.height = sensor_mode->height;
-	CMR_LOGI("sensor_cfg.frm_num=%d.",sensor_cfg.frm_num);
+
 	if (IS_NON_ZSL_MODE(g_cxt->cap_mode)) {
 		if (CAMERA_NORMAL_CONTINUE_SHOT_MODE != g_cxt->cap_mode) {
 			sensor_cfg.frm_num = 1;
 		} else {
 			sensor_cfg.frm_num = -1;
 		}
+		CMR_LOGI("wjp:sensor_cfg.frm_num=%d.",sensor_cfg.frm_num);
 		ret = cmr_v4l2_sn_cfg(&sensor_cfg);
 		if (ret) {
 			CMR_LOGE("Failed to set V4L2 the size of sensor");
@@ -6930,6 +6931,10 @@ void camera_callback_start(camera_cb_info *cb_info)
 		}
 	}
 
+	CMR_LOGE("send cb_data,0x%x, cb data length %d refer data 0x%x, refer data length 0x%x",
+		(uint32_t)msg_cb_info->cb_data, (uint32_t)msg_cb_info->cb_data_length,
+		(uint32_t)msg_cb_info->refer_data, (uint32_t)msg_cb_info->refer_data_length);
+
 	message.msg_type = CMR_EVT_CB_HANDLE;
 	ret = cmr_msg_post(g_cxt->cb_msg_que_handle, &message);
 	if (ret) {
@@ -6938,10 +6943,6 @@ void camera_callback_start(camera_cb_info *cb_info)
 		free(message.data);
 		CMR_LOGE("Fail to send one msg to camera callback thread");
 	}
-
-	CMR_LOGE("send cb_data,0x%x, cb data length %d refer data 0x%x, refer data length 0x%x",
-		(uint32_t)msg_cb_info->cb_data, (uint32_t)msg_cb_info->cb_data_length,
-		(uint32_t)msg_cb_info->refer_data, (uint32_t)msg_cb_info->refer_data_length);
 
 	return;
 }

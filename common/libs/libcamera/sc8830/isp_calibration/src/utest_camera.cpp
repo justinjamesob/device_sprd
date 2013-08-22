@@ -459,7 +459,7 @@ static int32_t utest_dcam_find_param_index(struct utest_cmr_context *cmr_cxt_ptr
 
 		}
 
-		if  ((0 == trim_ptr[i].trim_height) || (0 == trim_ptr[i].trim_height)) {
+		if  (0 == trim_ptr[i].trim_height) {
 			index = -1;
 			INFO("do not find the param: i = %d \n", (int32_t)i);
 			break;
