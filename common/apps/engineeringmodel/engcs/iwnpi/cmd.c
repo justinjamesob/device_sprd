@@ -191,6 +191,40 @@ TOPLEVEL(set_reg, "<mac/phy0/phy1/rf> <addr_offset> <value>",
 	 NLNPI_CMD_SET_REG, 0, npi_set_reg_cmd,
 	 "<addr_offset> and <value> should be hex type like(0x1234).");
 
+/* data format is len(2 bytes) + name + value */
+static int npi_set_debug_cmd(struct nlnpi_state *state,
+			     struct nl_cb *cb,
+			     struct nl_msg *msg, int argc, char **argv)
+{
+	unsigned short len;
+	unsigned char data[38];
+	unsigned int value;
+
+	if (argc != 2 || !argv)
+		return 1;
+
+	len = strlen(argv[0]);
+	if (len > 32) {
+		fprintf(stderr, "Invild debug name length(%d)\n", len);
+		return 2;
+	}
+	memcpy(data, &len, sizeof(len));
+	sscanf(argv[0], "%s", &(data[2]));
+	value = strtol(argv[1], NULL, 16);
+	memcpy(&(data[2 + len]), &value, sizeof(value));
+	NLA_PUT(msg, NLNPI_ATTR_SET_DEBUG, (sizeof(len) + len + sizeof(value)), data);
+
+	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_reply_status, NULL);
+
+	return 0;
+nla_put_failure:
+	return -ENOBUFS;
+}
+
+TOPLEVEL(set_debug, "<value_name> <value>",
+         NLNPI_CMD_SET_DEBUG, 0, npi_set_debug_cmd,
+         "value should be like 0x12345678 hex type.");
+
 /* ----------------GET CMD WITH INT ARG REPLY-------------------- */
 static int print_reply_rx_count_data(struct nl_msg *msg, void *arg)
 {
@@ -469,3 +503,58 @@ nla_put_failure:
 TOPLEVEL(get_reg, "<mac/phy0/phy1/rf> <addr_offset> [count]", NLNPI_CMD_GET_REG,
 	 0, npi_get_reg_cmd,
 	 "<addr_offset>: should be hex type like(0x1234)\n[count]: if not set default is 1.");
+
+static int print_get_debug_result(struct nl_msg *msg, void *arg)
+{
+        struct nlattr *tb_msg[NLNPI_ATTR_MAX + 1];
+        struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+
+        nla_parse(tb_msg, NLNPI_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+                  genlmsg_attrlen(gnlh, 0), NULL);
+
+        if (tb_msg[NLNPI_ATTR_REPLY_DATA]) {
+                if (nla_len(tb_msg[NLNPI_ATTR_REPLY_DATA]) == 4)
+                        printf("ret: 0x%08x :end\n", *(unsigned int *)
+                               nla_data(tb_msg[NLNPI_ATTR_REPLY_DATA]));
+                else
+                        printf("ret: Invild len %d :end\n",
+                               nla_len(tb_msg[NLNPI_ATTR_REPLY_DATA]));
+        } else {
+                printf("ret: Failed to get result! :end\n");
+        }
+
+        return NL_SKIP;
+}
+
+static int npi_get_debug_cmd(struct nlnpi_state *state,
+                           struct nl_cb *cb,
+                           struct nl_msg *msg, int argc, char **argv)
+{
+        unsigned int get_len;
+        unsigned int count = 1;
+        unsigned int start_addr;
+        unsigned char name[32];
+        unsigned int name_len;
+
+	if (argc != 1 || !argv)
+                return 1;
+
+        name_len = strlen(argv[0]);
+        if (name_len > 32) {
+                fprintf(stderr, "Invild debug name length(%d)\n", name_len);
+                return 2;
+        }
+
+        sscanf(argv[0], "%s", name);
+        get_len = 4;
+        NLA_PUT_U32(msg, NLNPI_ATTR_GET_DEBUG, get_len);
+
+        NLA_PUT(msg, NLNPI_ATTR_GET_DEBUG_ARG, name_len, name);
+        nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_get_debug_result, NULL);
+
+        return 0;
+nla_put_failure:
+        return -ENOBUFS;
+}
+TOPLEVEL(get_debug, "<value_name>", NLNPI_CMD_GET_DEBUG,
+	 0, npi_get_debug_cmd, NULL);
