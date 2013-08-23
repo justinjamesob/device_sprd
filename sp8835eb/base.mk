@@ -154,12 +154,12 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
-PRODUCT_COPY_FILES := \
+PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml
 endif
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_GPS),true)
-PRODUCT_COPY_FILES := \
+PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
@@ -167,7 +167,7 @@ PRODUCT_COPY_FILES := \
 endif
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_WIFI),true)
-PRODUCT_COPY_FILES := \
+PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 endif
 
