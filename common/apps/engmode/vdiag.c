@@ -250,6 +250,7 @@ void *eng_vdiag_thread(void *x)
             ENG_LOG("eng_vdiag cannot open %s, times:%d\n", s_cp_pipe[param->cp_type], wait_cnt);
             if(wait_cnt++ >= MAX_OPEN_TIMES){
                 ENG_LOG("eng_vdiag cannot open SIPC, try times exceed the max open times\n");
+                close(ser_fd);
                 return NULL;
             }
             sleep(5);

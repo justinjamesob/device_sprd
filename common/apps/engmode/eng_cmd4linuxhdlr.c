@@ -192,6 +192,9 @@ out:
     else
         sprintf(rsp, "%s%s", SPRDENG_ERROR, ENG_STREND);
 
+    if(fd >= 0)
+        close(fd);
+
     return 0;
 }
 
@@ -260,7 +263,7 @@ int eng_linuxcmd_vbat(char *req, char *rsp)
         sprintf(rsp, "%s%s", SPRDENG_ERROR, ENG_STREND);
     }
 
-    if(fd > 0)
+    if(fd >= 0)
         close(fd);
 
     ENG_LOG("%s: rsp=%s\n",__FUNCTION__,rsp);
@@ -289,7 +292,7 @@ int eng_linuxcmd_stopchg(char *req, char *rsp)
         sprintf(rsp, "%s%s", SPRDENG_ERROR, ENG_STREND);
     }
 
-    if(fd > 0)
+    if(fd >= 0)
         close(fd);
     ENG_LOG("%s: rsp=%s\n",__FUNCTION__,rsp);
     return 0;
@@ -506,7 +509,7 @@ int eng_linuxcmd_getich(char *req, char *rsp)
         sprintf(rsp, "%s%s", SPRDENG_ERROR, ENG_STREND);
     }
 
-    if(fd > 0)
+    if(fd >= 0)
         close(fd);
 
     ENG_LOG("%s: rsp=%s\n",__FUNCTION__,rsp);
@@ -728,7 +731,7 @@ int eng_linuxcmd_chargertest(char *req, char *rsp)
             if(status==1) {
                 ENG_LOG("%s: Create %s",__FUNCTION__,ENG_CHARGERTEST_FILE);
                 fd=open(ENG_CHARGERTEST_FILE, O_RDWR|O_CREAT|O_TRUNC);
-                if(fd > 0)
+                if(fd >= 0)
                     close(fd);
                 sprintf(rsp, "%s\r\n", SPRDENG_OK);
 
