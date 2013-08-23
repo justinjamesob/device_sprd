@@ -326,10 +326,13 @@ static int test_fm(int test_item, char *ret_buf)
     if (ioctl(fd, KT0812G_FM_IOCTL_ENABLE, &on_off) < 0) {
         ENG_LOG("%s: ioctl open fm fail ", __FUNCTION__);
         strcpy(ret_buf, "FAIL");
+        close(fd);
         return -1;
     }
 
     strcpy(ret_buf, "PASS");
+
+    close(fd);
 
     return 0;
 }

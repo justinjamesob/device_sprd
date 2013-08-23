@@ -125,7 +125,7 @@ void eng_check_factorymode_fornand(void)
 #endif
 
     fd=open(ENG_FACOTRYSYNC_FILE, O_RDWR|O_CREAT|O_TRUNC);
-    if(fd > 0)
+    if(fd >= 0)
         close(fd);
 }
 
@@ -200,8 +200,8 @@ static int eng_parse_cmdline(struct eng_param * cmdvalue)
             /*engtest*/
             if(strstr(cmdline,"engtest") != NULL)
                 cmdvalue->engtest = 1;
-            close(fd);
         }
+        close(fd);
     }
 
     ENG_LOG("eng_pcclient califlag=%d \n", cmdparam.califlag);
