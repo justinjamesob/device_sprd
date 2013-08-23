@@ -1166,20 +1166,25 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
         ALOGI_IF(debugenable , "no video layer, abandon osd overlay");
     }
 
-
+        bool postProcessVideoCond = false;
 #ifdef OVERLAY_COMPOSER_GPU
-                OverlayDeviceFlag = 0;
+        OverlayDeviceFlag = 0;
+        postProcessVideoCond = ((ctx->fb_layer_count > 0 || overlay_osd) && overlay_video);
+#else
+        postProcessVideoCond = ((ctx->fb_layer_count > 0) && overlay_video);
 #endif
 
 #ifdef _HWCOMPOSER_USE_GSP_BLEND  //Bug 189296
-        if ((ctx->fb_layer_count > 0 || overlay_osd) && overlay_video){
+        if (postProcessVideoCond){
             /*no blending use gpu, can be optimized*/
-            //overlay_video->compositionType = HWC_FRAMEBUFFER;
-            //ctx->video_overlay_flag = 0;
-            //ctx->fb_layer_count++;
-            //ALOGI_IF(debugenable,"----------------------clear fb");
-            //overlay_video->hints = HWC_HINT_CLEAR_FB;
-            //
+#ifndef OVERLAY_COMPOSER_GPU
+            overlay_video->compositionType = HWC_FRAMEBUFFER;
+            ctx->video_overlay_flag = 0;
+            ctx->fb_layer_count++;
+            ALOGI_IF(debugenable,"----------------------clear fb");
+            overlay_video->hints = HWC_HINT_CLEAR_FB;
+#endif
+
 #ifdef OVERLAY_COMPOSER_GPU
             OverlayDeviceFlag = 1;
 
@@ -1193,15 +1198,6 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
             mOLCD->onComposer(list);
 #endif
         }
-#else
-		    if ((ctx->pre_fb_layer_count != ctx->fb_layer_count) && overlay_video) {
-        /*no blending use gpu, can be optimized*/
-        //overlay_video->compositionType = HWC_FRAMEBUFFER;
-        //ctx->video_overlay_flag = 0;
-        //ctx->fb_layer_count++;
-        //ALOGI("----------------------clear fb");
-        //overlay_video->hints = HWC_HINT_CLEAR_FB;
-    }
 #endif
 
     //if(1) {

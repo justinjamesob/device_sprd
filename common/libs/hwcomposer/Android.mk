@@ -47,8 +47,6 @@ ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
 HWCOMPOSER_USE_GSP_BLEND := true
 ifeq ($(strip $(HWCOMPOSER_USE_GSP_BLEND)),true)
 	LOCAL_CFLAGS += -D_HWCOMPOSER_USE_GSP_BLEND
-else	
-	LOCAL_CFLAGS += -D_ALLOC_OSD_BUF
 endif
 
 endif
