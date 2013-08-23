@@ -290,9 +290,20 @@ int 	read_adc_data(char *buffer,int size)
 
 static void init_adc(void)
 {
+	int ret = 0;
+	int fd = -1;
 	char adc_buffer[48]={0};
-	read_adc_data(adc_buffer,48);
-	wirte_adc(adc_buffer);
+
+	fd = open(adc_files[0],O_RDONLY);
+	if(fd >= 0){
+		DBG("%s:  %s already exist ",__FUNCTION__, adc_files[0]);
+		close(fd);
+		return ;
+	}
+
+	ret = read_adc_data(adc_buffer,48);
+	if (ret >0)
+		wirte_adc(adc_buffer);
 }
 
 
