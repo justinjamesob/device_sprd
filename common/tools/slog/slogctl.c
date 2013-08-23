@@ -57,7 +57,41 @@ recv_socket(int sockfd, void* buffer, int size)
         return received;
 }
 
-void update_conf(const char *keyword)
+void update_5_entries(const char *keyword, const char *status, char *line)
+{
+	char *name, *pos3, *pos4, *pos5;
+	char buffer[MAX_NAME_LEN];
+
+	/* sanity check */
+	if(line == NULL) {
+		printf("type is null!");
+		return;
+	}
+
+	strcpy(buffer, line);
+	/* fetch each field */
+	if((name = parse_string(buffer, '\t', "name")) == NULL) return;
+	if((pos3 = parse_string(name, '\t', "pos3")) == NULL) return;
+	if((pos4 = parse_string(pos3, '\t', "pos4")) == NULL) return;
+	if((pos5 = parse_string(pos4, '\t', "pos5")) == NULL) return;
+
+	if ( !strncmp("android", keyword, 7) ) {
+		if ( !strncmp("main", name, 4) || !strncmp("system", name, 6) || !strncmp("radio", name, 5)
+		|| !strncmp("events", name, 6) || !strncmp("kernel", name, 6) )
+			sprintf(line, "%s\t%s\t%s\t%s\t%s", "stream", name, status, pos4, pos5);
+	} else if  ( !strncmp("modem", keyword, 5) ) {
+		if  ( !strncmp("modem", name, 5) )
+			sprintf(line, "%s\t%s\t%s\t%s\t%s", "stream", name, status, pos4, pos5);
+	} else if  ( !strncmp("tcp", keyword, 3) ) {
+		if  ( !strncmp("tcp", name, 3) )
+			sprintf(line, "%s\t%s\t%s\t%s\t%s", "stream", name, status, pos4, pos5);
+	} else if  ( !strncmp("bt", keyword, 2) ) {
+		if  ( !strncmp("bt", name, 2) )
+			sprintf(line, "%s\t%s\t%s\t%s\t%s", "stream", name, status, pos4, pos5);
+	}
+}
+
+void update_conf(const char *keyword, const char *status)
 {
 	FILE *fp;
 	int len = 0;
@@ -69,10 +103,19 @@ void update_conf(const char *keyword)
 		return;
 	}
 
-	while(fgets(line, MAX_NAME_LEN, fp) != NULL) {
-		if(!strncmp("enable", line, 6) || !strncmp("disable", line, 7) || !strncmp("low_power", line, 8)) {
-			len += sprintf(buffer + len, "%s\n", keyword);
-		} else {
+	if (!strncmp("enable", keyword, 6) || !strncmp("disable", keyword, 7) || !strncmp("low_power", keyword, 8)) {
+		while (fgets(line, MAX_NAME_LEN, fp) != NULL) {
+			if(!strncmp("enable", line, 6) || !strncmp("disable", line, 7) || !strncmp("low_power", line, 8)) {
+				sprintf(line, "%s\n",  keyword);
+			}
+			len += sprintf(buffer + len, "%s", line);
+		}
+	} else if ( !strncmp("android", keyword, 6) || !strncmp("modem", keyword, 5) || !strncmp("bt", keyword, 2) || !strncmp("tcp", keyword, 3)) {
+		while (fgets(line, MAX_NAME_LEN, fp) != NULL) {
+			if (!strncmp("stream", line, 6)) {
+				update_5_entries(keyword, status, line);
+			}
+
 			len += sprintf(buffer + len, "%s", line);
 		}
 	}
@@ -92,19 +135,23 @@ void usage(const char *name)
 {
 	printf("Usage: %s <operation> [arguments]\n", name);
 	printf("Operation:\n"
-               "\tenable      update config file and enable slog\n"
-               "\tdisable     update config file and disable slog\n"
-               "\tlow_power   update config file and make slog in low_power state\n"
-               "\treload      reboot slog and parse config file.\n"
-               "\tsnap [arg]  catch certain snapshot log, catch all snapshot without any arg\n"
-               "\texec <arg>  through the slogctl to run a command.\n"
-               "\ton          start slog.\n"
-               "\toff         pause slog.\n"
-               "\tclear       delete all log.\n"
-               "\tdump [file] dump all log to a tar file.\n"
-               "\tscreen [file] screen shot, if no file given, will be put into misc dir\n"
-               "\thook_modem  dump current modem log to /data/log\n"
-               "\tquery       print the current slog configuration.\n");
+               "\tenable             update config file and enable slog\n"
+               "\tdisable            update config file and disable slog\n"
+               "\tlow_power          update config file and make slog in low_power state\n"
+               "\tandroid [on/off]   update config file and enable/disable android log\n"
+               "\tmodem [on/off]     update config file and enable/disable modem log\n"
+               "\ttcp [on/off]       update config file and enable/disable cap log\n"
+               "\tbt  [on/off]       update config file and enable/disable bluetooth log\n"
+               "\treload             reboot slog and parse config file.\n"
+               "\tsnap [arg]         catch certain snapshot log, catch all snapshot without any arg\n"
+               "\texec <arg>         through the slogctl to run a command.\n"
+               "\ton                 start slog.\n"
+               "\toff                pause slog.\n"
+               "\tclear              delete all log.\n"
+               "\tdump [file]        dump all log to a tar file.\n"
+               "\tscreen [file]      screen shot, if no file given, will be put into misc dir\n"
+               "\thook_modem         dump current modem log to /data/log\n"
+               "\tquery              print the current slog configuration.\n");
 	return;
 }
 
@@ -178,14 +225,46 @@ int main(int argc, char *argv[])
 	} else if(!strncmp(argv[1], "hook_modem", 10)) {
 		cmd.type = CTRL_CMD_TYPE_HOOK_MODEM;
 	} else if(!strncmp(argv[1], "enable", 6)) {
-		update_conf("enable");
+		update_conf("enable", NULL);
 		cmd.type = CTRL_CMD_TYPE_RELOAD;
 	} else if(!strncmp(argv[1], "disable", 7)) {
-		update_conf("disable");
+		update_conf("disable", NULL);
 		cmd.type = CTRL_CMD_TYPE_RELOAD;
 	} else if(!strncmp(argv[1], "low_power", 9)) {
-		update_conf("low_power");
+		update_conf("low_power", NULL);
 		cmd.type = CTRL_CMD_TYPE_RELOAD;
+	} else if(!strncmp(argv[1], "android", 7)) {
+		if(argc == 3 && ( strcmp(argv[2], "on") == 0 || strcmp(argv[2], "off") == 0 )) {
+			update_conf("android", argv[2]);
+			cmd.type = CTRL_CMD_TYPE_RELOAD;
+		} else {
+			usage(argv[0]);
+			return -1;
+		}
+	} else if(!strncmp(argv[1], "modem", 5)) {
+		if(argc == 3 && ( strcmp(argv[2], "on") == 0 || strcmp(argv[2], "off") == 0 )) {
+			update_conf("modem", argv[2]);
+			cmd.type = CTRL_CMD_TYPE_RELOAD;
+		} else {
+			usage(argv[0]);
+			return -1;
+		}
+	} else if(!strncmp(argv[1], "tcp", 3)) {
+		if(argc == 3 && ( strcmp(argv[2], "on") == 0 || strcmp(argv[2], "off") == 0 )) {
+			update_conf("tcp", argv[2]);
+			cmd.type = CTRL_CMD_TYPE_RELOAD;
+		} else {
+			usage(argv[0]);
+			return -1;
+		}
+	} else if(!strncmp(argv[1], "bt", 2)) {
+		if(argc == 3 && ( strcmp(argv[2], "on") == 0 || strcmp(argv[2], "off") == 0 )) {
+			update_conf("bt", argv[2]);
+			cmd.type = CTRL_CMD_TYPE_RELOAD;
+		} else {
+			return -1;
+			usage(argv[0]);
+		}
 	} else {
 		usage(argv[0]);
 		return 0;
