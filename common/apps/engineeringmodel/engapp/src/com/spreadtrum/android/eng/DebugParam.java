@@ -363,6 +363,10 @@ public class DebugParam extends PreferenceActivity {
     }
 
     private boolean setSelectedBand(int bands) {
+		/* SPRD: Add 20130823 of bug 200304, comment @{ */
+		mEf.engclose(mSocketID);
+		mSocketID = mEf.engopen();
+		/* @} */
         //Sim1
         outputBuffer = new ByteArrayOutputStream();
         outputBufferStream = new DataOutputStream(outputBuffer);
@@ -394,6 +398,10 @@ public class DebugParam extends PreferenceActivity {
     }
 
     private int getSelectedBand() {
+		/* SPRD: Add 20130823 of bug 200304, comment @{ */
+		mEf.engclose(mSocketID);
+		mSocketID = mEf.engopen();
+		/* @} */
         outputBuffer = new ByteArrayOutputStream();
         outputBufferStream = new DataOutputStream(outputBuffer);
         /*Modify 20130205 Spreadst of 125480 change the method of creating cmd start*/
@@ -427,6 +435,10 @@ public class DebugParam extends PreferenceActivity {
     }
 
     private int getAssertMode() {
+		/* SPRD: Add 20130823 of bug 200304, comment @{ */
+		mEf.engclose(mSocketID);
+		mSocketID = mEf.engopen();
+		/* @} */
         outputBuffer = new ByteArrayOutputStream();
         outputBufferStream = new DataOutputStream(outputBuffer);
         /*Modify 20130205 Spreadst of 125480 change the method of creating cmd start*/
@@ -459,7 +471,10 @@ public class DebugParam extends PreferenceActivity {
     }
 
     private boolean setAssertMode(int mode) {
-
+		/* SPRD: Add 20130823 of bug 200304, comment @{ */
+		mEf.engclose(mSocketID);
+		mSocketID = mEf.engopen();
+		/* @} */
         outputBuffer = new ByteArrayOutputStream();
         outputBufferStream = new DataOutputStream(outputBuffer);
         /*Modify 20130205 Spreadst of 125480 change the method of creating cmd start*/
@@ -490,6 +505,10 @@ public class DebugParam extends PreferenceActivity {
     }
 
     private void setManualAssert() {
+		/* SPRD: Add 20130823 of bug 200304, comment @{ */
+		mEf.engclose(mSocketID);
+		mSocketID = mEf.engopen();
+		/* @} */
         outputBuffer = new ByteArrayOutputStream();
         outputBufferStream = new DataOutputStream(outputBuffer);
         /*Modify 20130205 Spreadst of 125480 change the method of creating cmd start*/
