@@ -2112,7 +2112,7 @@ int camera_start_preview_internal(void)
 				if (ret) {
 					CMR_LOGE("Failed to close sensor interface");
 				}
-
+				usleep(100);
 				ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 				if (ret) {
 					CMR_LOGE("the sensor interface is unsupported by V4L2");
@@ -2315,7 +2315,7 @@ int camera_stop_preview_internal(void)
 	if (ret) {
 		CMR_LOGE("ae disable fail %d", ret);
 	}
-    if (0 == g_cxt->stop_preview_mode) {
+	if (0 == g_cxt->stop_preview_mode) {
 		ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
 		if (ret) {
 			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
@@ -2332,8 +2332,8 @@ int camera_stop_preview_internal(void)
 		} else {
 			CMR_LOGI("get sensor mode is %d.",g_cxt->sn_cxt.previous_sensor_mode);
 		}
-    } else {
-        g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+	} else {
+		g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 		ret = Sensor_StreamOff();
 		if (ret) {
 			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
@@ -3230,9 +3230,11 @@ void camera_v4l2_evt_cb(int evt, void* data)
 	}
 
 	if ((V4L2_IDLE == g_cxt->v4l2_cxt.v4l2_state) || (1 == info->free)) {
-		ret = cmr_v4l2_free_frame(info->channel_id, info->frame_id);
-		CMR_LOGE("Wrong status, %d", g_cxt->v4l2_cxt.v4l2_state);
-		return;
+		if (CMR_V4L2_TX_DONE == evt) {
+			ret = cmr_v4l2_free_frame(info->channel_id, info->frame_id);
+			CMR_LOGE("Wrong status, %d", g_cxt->v4l2_cxt.v4l2_state);
+			return;
+		}
 	}
 	if (CMR_V4L2_TX_DONE == evt) {
 		if ((CHN_BUSY != g_cxt->chn_2_status) &&

@@ -155,6 +155,10 @@ private:
 	void                  FreePmem(sprd_camera_memory_t* camera_memory);
 	void                  setFdmem(uint32_t size);	
 	void                  FreeFdmem(void);
+	uint32_t              getPreviewBufferID(buffer_handle_t *buffer_handle);
+	void                  canclePreviewMem();
+	int                     releasePreviewFrame();
+	bool                  allocatePreviewMemByGraphics();
 	bool                  allocatePreviewMem();
 	void                  freePreviewMem();
 	bool                  allocateCaptureMem(bool initJpegHeap);
@@ -264,7 +268,8 @@ private:
 	void                            restoreFreq();
 	bool                            displayOneFrame(uint32_t width, 
 							uint32_t height,
-							uint32_t phy_addr, char *frame_addr);
+							uint32_t phy_addr, char *frame_addr,
+							uint32_t id);
 	bool                            iSDisplayCaptureFrame();
 	bool                            iSZslMode();
 	/* These constants reflect the number of buffers that libqcamera requires
@@ -285,9 +290,12 @@ private:
 
 	uint32_t                        mPreviewHeapSize;
 	uint32_t                        mPreviewHeapNum;
+	uint32_t                        mPreviewDcamAllocBufferCnt;
 	sprd_camera_memory_t*           *mPreviewHeapArray;
 	uint32_t                        mPreviewHeapArray_phy[kPreviewBufferCount+kPreviewRotBufferCount];
 	uint32_t                           mPreviewHeapArray_vir[kPreviewBufferCount+kPreviewRotBufferCount];
+	buffer_handle_t           *mPreviewBufferHandle[kPreviewBufferCount];
+	buffer_handle_t           *mPreviewCancelBufHandle[kPreviewBufferCount];
 
 	sprd_camera_memory_t            *mRawHeap;
 	uint32_t                        mRawHeapSize;
@@ -341,6 +349,7 @@ private:
 	bool                            mCaptureRawMode;
 	bool                            mIsRotCapture;
 	uint32_t                        mTimeCoeff;
+	uint32_t                        mPreviewBufferUsage;
 };
 
 }; // namespace android

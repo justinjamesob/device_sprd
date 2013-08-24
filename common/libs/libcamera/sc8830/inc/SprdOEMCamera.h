@@ -397,6 +397,11 @@ typedef enum {
 	CAMERA_TOOL_CAP_RAW_ENABLE
 } camera_tool_cap_raw_mode;
 
+typedef enum preview_buffer_usage{
+	PREVIEW_BUFFER_USAGE_DCAM = 0,/*camera allocate buffer and copy to grapics buffer*/
+	PREVIEW_BUFFER_USAGE_GRAPHICS/*camera use the grapics buffer directly*/
+} preview_buffer_usage_mode;
+
 camera_ret_code_type camera_encode_picture(camera_frame_type *frame,
 					camera_handle_type *handle,
 					camera_cb_f_type callback,
