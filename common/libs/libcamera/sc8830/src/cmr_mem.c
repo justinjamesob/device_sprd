@@ -992,10 +992,6 @@ int arrange_rot_buf(struct cmr_cap_2_frm *cap_2_frm,
 	align16_cap_size.width    = CAMERA_ALIGNED_16(cap_size->width);
 	align16_cap_size.height   = CAMERA_ALIGNED_16(cap_size->height);
 
-	mem_res    = *io_mem_res;
-	mem_end    = *io_mem_end;
-	channel_size = *io_channel_size;
-
 	if (NULL == io_mem_res ||
 		NULL == io_mem_end ||
 		NULL == io_channel_size) {
@@ -1006,6 +1002,10 @@ int arrange_rot_buf(struct cmr_cap_2_frm *cap_2_frm,
 		return -1;
 	}
 	CMR_LOGV("rotation buf arrange");
+
+	mem_res    = *io_mem_res;
+	mem_end    = *io_mem_end;
+	channel_size = *io_channel_size;
 
 	size_pixel = (channel_size * 3) >> 1;
 	CMR_LOGV("Rot channel size 0x%x, buf size 0x%X", channel_size, size_pixel);

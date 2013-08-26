@@ -759,7 +759,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	params.getPreviewSize(&width, &height);
 	LOGV("setParameters: requested preview size %d x %d", width, height);
 	params.getPictureSize(&rawWidth, &rawHeight);
-	LOGV("setParameters:requested picture size %d x %d", width, height);
+	LOGV("setParameters:requested picture size %d x %d", rawWidth, rawHeight);
 
 	mPreviewWidth = (width + 1) & ~1;
 	mPreviewHeight = (height + 1) & ~1;
