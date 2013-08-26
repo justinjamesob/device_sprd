@@ -35,7 +35,7 @@ PRODUCT_PACKAGES := \
 	engpc
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
-PRODUCT_PACKAGES := \
+PRODUCT_PACKAGES += \
 	Bluetooth \
 	bluetooth-health \
 	hciconfig \
@@ -46,7 +46,7 @@ PRODUCT_PACKAGES := \
 endif
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_WIFI),true)
-PRODUCT_PACKAGES := \
+PRODUCT_PACKAGES += \
 	hostapd \
 	wpa_supplicant.conf
 endif
