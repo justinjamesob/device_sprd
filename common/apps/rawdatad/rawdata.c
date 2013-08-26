@@ -237,7 +237,7 @@ static void wirte_adc(char* buffer )
 		return;
 	}
 
-	fwrite(buffer,48,1,fp);
+	fwrite(buffer,56,1,fp);
 
 	fclose(fp);
 
@@ -251,10 +251,6 @@ int 	read_adc_data(char *buffer,int size)
 	int i;
 	RAW_INFO_DATA_T        cali_info;
 
-	if(size > 48)
-		size = 48;
-
-
 	fd = open(batter_adc_files[0],O_RDWR);
 
 	if(fd < 0){
@@ -265,7 +261,7 @@ int 	read_adc_data(char *buffer,int size)
 	DBG("%s: open %s  ok",__FUNCTION__, batter_adc_files[0]);
 	ret = read(fd,&cali_info,sizeof(cali_info));
 
-	DBG("%s: sizeof(cali_info.adc_para)= %d \n ",__FUNCTION__, sizeof(cali_info.adc_para));
+	DBG("%s: sizeof(cali_info.adc_para)= %d \n ",__FUNCTION__, sizeof(cali_info));
 
 	DBG("%s: cali_info.adc_para.adc[0]= %d \n ",__FUNCTION__, cali_info.adc_para.adc[0]);
 	DBG("%s: cali_info.adc_para.adc[1]= %d \n ",__FUNCTION__, cali_info.adc_para.adc[1]);
@@ -273,10 +269,10 @@ int 	read_adc_data(char *buffer,int size)
 	DBG("%s: cali_info.adc_para.battery[0]= %d \n ",__FUNCTION__, cali_info.adc_para.battery[0]);
 	DBG("%s: cali_info.adc_para.battery[1]= %d \n ",__FUNCTION__, cali_info.adc_para.battery[1]);
 
-	if(size < sizeof(cali_info.adc_para))
-		memcpy(buffer,&cali_info.adc_para,size);
+	if(size < sizeof(cali_info))
+		memcpy(buffer,&cali_info,size);
 	else	
-		memcpy(buffer,&cali_info.adc_para,sizeof(cali_info.adc_para));
+		memcpy(buffer,&cali_info,sizeof(cali_info));
 	close(fd);
 
 	if(ret > 0)
@@ -290,20 +286,26 @@ int 	read_adc_data(char *buffer,int size)
 
 static void init_adc(void)
 {
-	int ret = 0;
-	int fd = -1;
-	char adc_buffer[48]={0};
+  int ret = 0;
+  int fd = -1;
+  int size = 56;
+  char adc_buffer[56]={0};
+  unsigned long adc_value[14] = {0};
 
-	fd = open(adc_files[0],O_RDONLY);
-	if(fd >= 0){
-		DBG("%s:  %s already exist ",__FUNCTION__, adc_files[0]);
+   fd = open(adc_files[0], O_RDONLY);
+   if(fd >= 0){
+              ret = read(fd,adc_value, size);
+		if((ret>0) && (0x00000001 == adc_value[13]))
+		{
+			DBG("%s:  ADC already calibration \n",__FUNCTION__);
+			close(fd);
+			return ;
+		}
 		close(fd);
-		return ;
-	}
-
-	ret = read_adc_data(adc_buffer,48);
-	if (ret >0)
-		wirte_adc(adc_buffer);
+     }
+     ret = read_adc_data(adc_buffer,size);
+     if (ret >0)
+	   wirte_adc(adc_buffer);
 }
 
 
