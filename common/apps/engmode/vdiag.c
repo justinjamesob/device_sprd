@@ -298,7 +298,7 @@ void *eng_vdiag_thread(void *x)
 
                 if((++wait_cnt) > MAX_OPEN_TIMES) {
                     ENG_LOG("eng_vdiag serial port open times exceed the max open times !!!\n");
-                    return 0;
+                    goto out;
                 }
             } while(ser_fd < 0);
 

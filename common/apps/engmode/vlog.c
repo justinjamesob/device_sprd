@@ -109,7 +109,7 @@ void *eng_vlog_thread(void *x)
 
         if((++retry_num) > MAX_OPEN_TIMES) {
             ENG_LOG("eng_vlog SIPC open times exceed the max times, vlog thread stopped.\n");
-            return NULL;
+            goto out;
         }
     }while(sipc_fd < 0);
 
