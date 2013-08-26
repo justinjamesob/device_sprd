@@ -105,22 +105,29 @@ static int __ump_alloc_should_fail()
 
 int open_ion_device(private_module_t* m)
 {
-	if(m->mIonFd<0)
-		m->mIonFd = open(ION_DEVICE, O_RDONLY|O_SYNC);
+	int res=-1;
+	pthread_mutex_lock(&m->fd_lock);
 	if(m->mIonFd < 0)
 	{
-       	return -1;
-       }else
-       {
-       	return 0;
-       }
+		m->mIonFd = open(ION_DEVICE, O_RDONLY|O_SYNC);
+	}
+	if(m->mIonFd >= 0)
+	{
+		res=0;
+	}
+	pthread_mutex_unlock(&m->fd_lock);
+	return res;
 }
 
 void close_ion_device(private_module_t* m)
 {
-    if(m->mIonFd >= 0)
-        close(m->mIonFd);
-    m->mIonFd = -1;
+	pthread_mutex_lock(&m->fd_lock);
+	if(m->mIonFd >= 0)
+	{
+		close(m->mIonFd);
+	}
+	m->mIonFd = -1;
+	pthread_mutex_unlock(&m->fd_lock);
 }
 
 static int gralloc_alloc_ionbuffer_locked(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle,  int is_overlay)
