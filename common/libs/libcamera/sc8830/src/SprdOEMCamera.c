@@ -2927,7 +2927,9 @@ int camera_af_init(void)
 		sem_init(&g_cxt->af_sync_sem, 0, 0);
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+		CMR_LOGI("create before.");
 		ret = pthread_create(&g_cxt->af_thread, &attr, camera_af_thread_proc, NULL);
+		CMR_LOGI("create after.");
 		sem_wait(&g_cxt->af_sync_sem);
 		g_cxt->af_inited = 1;
 		g_cxt->af_busy = 0;
