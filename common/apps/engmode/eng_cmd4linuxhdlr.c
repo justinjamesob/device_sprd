@@ -148,7 +148,7 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
 {
     int ret = 1;
     char cmd[]="--wipe_data";
-    int fd;
+    int fd=-1;
     mode_t mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
     ENG_LOG("Call %s\n",__FUNCTION__);
