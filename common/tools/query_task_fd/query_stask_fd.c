@@ -135,19 +135,10 @@ err2:
 static DIR* get_dir(const char *path) {
 
 	/*definition*/
-    DIR *dir = opendir(path);
-
-	/*check*/
-	if(!path) {
-		printf("ERROR! get_dir::opendir path == NULL\n");
-		return NULL;
-	}
+	DIR *dir = opendir(path);
 
 	/*dir*/
-	if(!dir) {
-		printf("ERROR! opendir %s\n", path);
-		return NULL;
-	}
+	if(!dir) printf("ERROR! Fail to opendir %s\n", (path ? path : "NULL"));
 
 	return dir;
 
@@ -160,12 +151,6 @@ static int get_subdir_counts(const char *path) {
 	struct dirent *dir_entry = NULL;
 	DIR *dir = get_dir(path);
 
-	/*check*/
-	if(!path) {
-		printf("ERROR! Dir path not exist!\n");
-		goto err;
-	}
-
 	/*count, excluding . && ..*/
 	while (dir && (NULL != (dir_entry = readdir(dir)))) {
 		if(!strcmp(".", dir_entry->d_name) || !strcmp("..", dir_entry->d_name)) {
@@ -176,9 +161,6 @@ static int get_subdir_counts(const char *path) {
 	if(dir) closedir(dir);
 
 	return i;
-
-err:
-	return 0;
 
 }
 
