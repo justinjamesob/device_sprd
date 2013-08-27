@@ -1593,6 +1593,8 @@ int camera_autofocus_stop(void)
 	pthread_mutex_unlock(&cxt->cmr_set.set_mutex);
 
 	CMR_LOGV("af_cancelled %d", cxt->cmr_set.af_cancelled);
+	camera_autofocus_quit();
+	CMR_LOGV("quit.");
 	return ret;
 }
 
