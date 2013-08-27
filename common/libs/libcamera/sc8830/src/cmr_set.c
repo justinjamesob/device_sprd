@@ -1454,10 +1454,29 @@ int camera_autofocus_start(void)
 		af_param.param = SENSOR_EXT_FOCUS_MACRO;
 		af_param.zone_cnt = zone_cnt;
 		CMR_LOGV("SPRD OEM: camera_start_focus macro");
+		af_param.zone_cnt = 1;
+		af_param.zone[0].x = *ptr++;
+		af_param.zone[0].y = *ptr++;
+		af_param.zone[0].w = *ptr++;
+		af_param.zone[0].h = *ptr++;
+		if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+			af_param.zone_cnt = 0;
+		}
 	} else {
 		if ((0 == zone_cnt) || (CAMERA_FOCUS_MODE_AUTO == cxt->cmr_set.af_mode)) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
 			af_param.param = SENSOR_EXT_FOCUS_TRIG;
+			af_param.zone_cnt = 0;
+			if (zone_cnt) {
+				af_param.zone_cnt = 1;
+				af_param.zone[0].x = *ptr++;
+				af_param.zone[0].y = *ptr++;
+				af_param.zone[0].w = *ptr++;
+				af_param.zone[0].h = *ptr++;
+				if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+					af_param.zone_cnt = 0;
+				}
+			}
 		} else if (1 == zone_cnt) {
 			af_param.cmd = SENSOR_EXT_FOCUS_START;
 			af_param.param = SENSOR_EXT_FOCUS_ZONE;
@@ -1492,7 +1511,7 @@ int camera_autofocus_start(void)
 			ret = CAMERA_NOT_SUPPORTED;
 		}
 	}
-
+    CMR_LOGI("cnt %d",af_param.zone_cnt);
 	if (CAMERA_SUCCESS == ret) {
 		cxt->af_busy = 1;
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {

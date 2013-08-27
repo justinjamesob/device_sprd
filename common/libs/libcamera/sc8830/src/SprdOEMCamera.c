@@ -2955,7 +2955,6 @@ int camera_af_deinit(void)
 		message.msg_type = CMR_EVT_AF_EXIT;
 		ret = cmr_msg_post(g_cxt->af_msg_que_handle, &message);
 		if (ret) {
-			free(message.data);
 			CMR_LOGE("Faile to send one msg to camera main thread");
 		}
 		sem_wait(&g_cxt->af_sync_sem);
@@ -3211,7 +3210,6 @@ void camera_sensor_evt_cb(int evt, void* data)
 	message.msg_type = evt;
 	ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
 	if (ret) {
-		free(message.data);
 		CMR_LOGE("Faile to send one msg to camera main thread");
 	}
 
@@ -3314,13 +3312,13 @@ int32_t camera_isp_evt_cb(int32_t evt, void* data)
 	}
 	message.msg_type = evt;
     if (CMR_IDLE != g_cxt->preview_status) {
-	ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
-	if (ret) {
-		if (message.data) {
-			free(message.data);
+		ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
+		if (ret) {
+			if (message.data) {
+				free(message.data);
+			}
+			CMR_LOGE("Faile to send one msg to camera main thread");
 		}
-		CMR_LOGE("Faile to send one msg to camera main thread");
-	}
     } else {
 		ret = camera_isp_handle(message.msg_type,
 					message.sub_msg_type,
@@ -3372,8 +3370,10 @@ void camera_jpeg_evt_cb(int evt, void* data)
 	}
 
 	if (ret) {
-		free(message.data);
-		CMR_LOGE("Faile to send one msg to camera main thread");
+		if (message.data) {
+			free(message.data);
+			CMR_LOGE("Faile to send one msg to camera main thread");
+		}
 	}
 
 	return;
@@ -3416,19 +3416,6 @@ void camera_rot_evt_cb(int evt, void* data)
 		free(message.data);
 		CMR_LOGE("Faile to send one msg to camera main thread");
 	}
-/*	message.data = malloc(sizeof(struct img_frm));
-	if (NULL == message.data) {
-		CMR_LOGE("NO mem, Faile to alloc memory for one msg");
-		return;
-	}
-	message.msg_type = evt;
-	message.alloc_flag = 1;
-	memcpy(message.data, data, sizeof(struct img_frm));
-	ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
-	if (ret) {
-		free(message.data);
-		CMR_LOGE("Faile to send one msg to camera main thread");
-	}*/
 
 	return;
 }
@@ -6942,8 +6929,12 @@ void camera_callback_start(camera_cb_info *cb_info)
 	message.msg_type = CMR_EVT_CB_HANDLE;
 	ret = cmr_msg_post(g_cxt->cb_msg_que_handle, &message);
 	if (ret) {
-		free(msg_cb_info->refer_data);
-		free(msg_cb_info->cb_data);
+		if (msg_cb_info->refer_data) {
+			free(msg_cb_info->refer_data);
+		}
+		if (msg_cb_info->cb_data) {
+			free(msg_cb_info->cb_data);
+		}
 		free(message.data);
 		CMR_LOGE("Fail to send one msg to camera callback thread");
 	}
