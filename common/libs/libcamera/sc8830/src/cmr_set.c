@@ -39,6 +39,7 @@ static int camera_set_iso(uint32_t iso, uint32_t *skip_mode, uint32_t *skip_num)
 static int camera_set_flash(uint32_t flash_mode, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_set_video_mode(uint32_t mode, uint32_t frame_rate, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_get_video_mode(uint32_t frame_rate, uint32_t *video_mode);
+static int camera_set_preview_env(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode, uint32_t *skip_num);
 
 
 static int camera_param_to_isp(uint32_t cmd, uint32_t in_param, uint32_t *ptr_out_param)
@@ -566,6 +567,26 @@ int camera_set_video_mode(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode
 	return ret;
 }
 
+int camera_set_preview_env(uint32_t mode, uint32_t frame_rate,uint32_t *skip_mode, uint32_t *skip_num)
+{
+	struct camera_context    *cxt = camera_get_cxt();
+	int                      ret = CAMERA_SUCCESS;
+	uint32_t                 isp_param = 0;
+
+	CMR_LOGI("preview env %d", mode);
+	*skip_mode = IMG_SKIP_SW;
+	*skip_num  = 0;
+	if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
+		isp_param = mode;
+		*skip_num  = 0;
+		CMR_LOGI("frame rate:%d.",isp_param);
+		ret = isp_ioctl(ISP_CTRL_VIDEO_MODE, (void *)&isp_param);
+		camera_param_to_isp(ISP_CTRL_ISO, 5, &isp_param);
+		ret = isp_ioctl(ISP_CTRL_ISO, (void *)&isp_param);
+	}
+	return ret;
+}
+
 int camera_flash_process(uint32_t on_off)
 {
 	struct camera_context    *cxt = camera_get_cxt();
@@ -695,7 +716,10 @@ int camera_preview_start_set(void)
 		ret = camera_set_video_mode(set->video_mode, set->frame_rate, &skip, &skip_num);
 		CMR_RTN_IF_ERR(ret);
 	}
-
+	if (INVALID_SET_WORD != set->preview_env) {
+		ret = camera_set_preview_env(set->preview_env, cxt->cmr_set.frame_rate, &skip, &skip_num);
+		CMR_RTN_IF_ERR(ret);
+	}
 	ret = camera_flash_process(1);
 exit:
 	return ret;
@@ -894,7 +918,8 @@ int camera_set_ctrl(camera_parm_type id,
 		&& (CAMERA_PARM_AUTO_EXPOSURE_MODE != id)
 		&& (CAMERA_PARM_EXPOSURE_METERING != id)
 		&& (CAMERA_PARM_SHARPNESS != id)
-		&& (CAMERA_PARAM_ROTATION_CAPTURE != id)) {
+		&& (CAMERA_PARAM_ROTATION_CAPTURE != id)
+		&& (CAMERA_PARM_PREVIEW_ENV != id)) {
 		return ret;
 	}
 
@@ -906,6 +931,24 @@ int camera_set_ctrl(camera_parm_type id,
 	}
 
 	switch (id) {
+	case CAMERA_PARM_PREVIEW_ENV:
+		cxt->cmr_set.preview_env = parm;
+		CMR_LOGI("preview env %d.",parm);
+		if ((CMR_PREVIEW == cxt->preview_status) &&
+			(0 != cxt->cmr_set.preview_env)){
+
+			if (before_set) {
+				ret = (*before_set)(RESTART_LIGHTLY);
+				CMR_RTN_IF_ERR(ret);
+			}
+			ret = camera_set_preview_env(parm, cxt->cmr_set.frame_rate, &skip_mode, &skip_number);
+			CMR_RTN_IF_ERR(ret);
+			if (after_set) {
+				ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
+				CMR_RTN_IF_ERR(ret);
+			}
+		}
+		break;
 	case CAMERA_PARAM_ROTATION_CAPTURE:
 		cxt->is_cfg_rot_cap = parm;
 		CMR_LOGI("is_cfg_rot_cap:%d.",parm);

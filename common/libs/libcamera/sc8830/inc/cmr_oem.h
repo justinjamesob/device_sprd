@@ -251,6 +251,7 @@ struct camera_settings {
 	uint32_t                 frame_rate;
 	uint32_t                 sensor_mode;
 	uint32_t                 auto_exposure_mode;
+	uint32_t                 preview_env;
 	/*all the above value will be set as 0xFFFFFFFF after inited*/
 	uint32_t                 set_end;
 

@@ -85,6 +85,7 @@ const char SprdCameraParameters::KEY_SHARPNESS[] = "sharpness";
 const char SprdCameraParameters::KEY_PREVIEWFRAMERATE[] = "preview-frame-rate";
 const char SprdCameraParameters::KEY_AUTO_EXPOSURE[] = "auto-exposure";
 const char SprdCameraParameters::KEY_METERING_AREAS[] = "metering-areas";
+const char SprdCameraParameters::KEY_PREVIEW_ENV[] = "preview-env";
 
 ////////////////////////////////////////////////////////////////////////////////////
 SprdCameraParameters::SprdCameraParameters():CameraParameters()
@@ -345,6 +346,13 @@ int SprdCameraParameters::getSlowmotion()
 	const char *p = get(KEY_SLOWMOTION);
 
 	return lookup(slowmotion_map, p, CAMERA_SLOWMOTION_0);
+}
+
+int SprdCameraParameters::getPreviewEnv()
+{
+	const char *p = get(KEY_PREVIEW_ENV);
+
+	return lookup(previewenv_map, p, CAMERA_DC_PREVIEW);
 }
 
 int SprdCameraParameters::getAutoExposureMode()

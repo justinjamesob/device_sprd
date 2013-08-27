@@ -70,6 +70,7 @@ public:
 	int getRecordingHint();
 	int getFlashMode();
 	int getSlowmotion();
+	int getPreviewEnv();
 	int getPreviewFameRate();
 	int getAutoExposureMode();
 	void getMeteringAreas(int *area, int *count, Size *preview_size,
@@ -109,6 +110,7 @@ public:
 	static const char KEY_PREVIEWFRAMERATE[];
 	static const char KEY_AUTO_EXPOSURE[];
 	static const char KEY_METERING_AREAS[];
+	static const char KEY_PREVIEW_ENV[];
 
 private:
 

@@ -184,6 +184,12 @@ enum {
 };
 
 enum {
+	CAMERA_DC_PREVIEW = 0,
+	CAMERA_DV_PREVIEW,
+	CAMERA_PREVIEW_ENV_MAX
+};
+
+enum {
 	CAMERA_AE_FRAME_AVG = 0,
 	CAMERA_AE_CENTER_WEIGHTED,
 	CAMERA_AE_SPOT_METERING,
@@ -369,6 +375,12 @@ const struct str_map slowmotion_map[] = {
 	{NULL,              0}
 };
 
+const struct str_map previewenv_map[] = {
+	{"0",               CAMERA_DC_PREVIEW},
+	{"1",               CAMERA_DV_PREVIEW},
+	{NULL,              0}
+};
+
 const struct str_map auto_exposure_mode_map[] = {
 	{"frame-average",   CAMERA_AE_FRAME_AVG},
 	{"center-weighted", CAMERA_AE_CENTER_WEIGHTED},
@@ -473,7 +485,8 @@ struct config_element sprd_front_camera_hardware_config[] = {
 	{"slow-motion", "1"},
 	{"max-num-metering-areas", "0"},
 	{"auto-exposure","0"},
-	{"auto-exposure-supported", "0"}
+	{"auto-exposure-supported", "0"},
+    {"preview-env","0"}
 };
 struct config_element sprd_back_camera_hardware_config[] = {
 	{"whitebalance-values", "auto,incandescent,fluorescent,daylight,cloudy-daylight"},
@@ -592,7 +605,8 @@ struct config_element sprd_back_camera_hardware_config[] = {
 	{"slow-motion", "1"},
 	{"max-num-metering-areas", "1"},
     {"auto-exposure","frame-average"},
-    {"auto-exposure-values", "frame-average,center-weighted,spot-metering"}
+    {"auto-exposure-values", "frame-average,center-weighted,spot-metering"},
+    {"preview-env","0"}
 };
 
 #endif //_SPRD_CAMERA_HARDWARE_CONFIG_H_

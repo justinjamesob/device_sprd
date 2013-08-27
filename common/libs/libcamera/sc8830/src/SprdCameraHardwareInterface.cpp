@@ -987,6 +987,11 @@ void SprdCameraHardware::setCameraPreviewMode()
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, mParameters.getPreviewFameRate());
 	} else {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
+		if (mParameters.getPreviewEnv()) {
+		    SET_PARM(CAMERA_PARM_PREVIEW_ENV, mParameters.getPreviewFameRate());
+		} else {
+			SET_PARM(CAMERA_PARM_PREVIEW_ENV, CAMERA_PREVIEW_MODE_SNAPSHOT);
+		}
 	}
 }
 
