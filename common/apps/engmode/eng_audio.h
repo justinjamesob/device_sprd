@@ -32,6 +32,10 @@
 #define AUDIO_NV_INTPA_SWITCH_INDEX  	44
 #define AUDIO_NV_INTPA_GAIN_INDEX    	45
 
+#define ENG_RAM_OPS 0x01
+#define ENG_FLASH_OPS 0x10
+#define ENG_PGA_OPS 0x100
+
 #define ENG_AUDIO_PARA  			"/etc/audio_para"
 #define ENG_AUDIO_PARA_DEBUG 			"/data/local/tmp/audio_para"
 

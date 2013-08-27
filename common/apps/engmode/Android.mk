@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_PRELINK_MODULE    := false
-LOCAL_SHARED_LIBRARIES  := libcutils libsqlite libhardware libhardware_legacy libvbeffect libvbpga libatcommand.$(TARGET_BOARD_PLATFORM) 
+LOCAL_SHARED_LIBRARIES  := libcutils libsqlite libhardware libhardware_legacy libvbeffect libvbpga libnvexchange libatcommand.$(TARGET_BOARD_PLATFORM) 
 LOCAL_STATIC_LIBRARIES  :=
 LOCAL_LDLIBS        += -Idl
 ifeq ($(strip $(BOARD_USE_EMMC)),true)
@@ -16,8 +16,8 @@ LOCAL_CFLAGS += -DUSE_BOOT_AT_DIAG
 endif
 
 LOCAL_C_INCLUDES    +=  external/sqlite/dist/
-LOCAL_C_INCLUDES    +=  device/sprd/common/libs/lib_atcommand/
-
+LOCAL_C_INCLUDES    +=  device/sprd/common/libs/audio/nv_exchange/
+LOCAL_C_INCLUDES    +=  device/sprd/common/libs/audio/
 LOCAL_SRC_FILES     := eng_pcclient.c  \
 		       eng_diag.c \
 		       vlog.c \

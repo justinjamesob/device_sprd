@@ -28,7 +28,9 @@ static char ext_data_buf[DATA_EXT_DIAG_SIZE];
 static char backup_data_buf[DATA_EXT_DIAG_SIZE];
 static int ext_buf_len,backup_data_len;
 static int g_diag_status = ENG_DIAG_RECV_TO_AP;
-AUDIO_TOTAL_T audio_total[4];
+//AUDIO_TOTAL_T audio_total[4];
+extern int adev_get_audiomodenum4eng(void);
+AUDIO_TOTAL_T *audio_total = NULL;
 
 static int s_speed_arr[] = {B921600,B115200, B38400, B19200, B9600, B4800, B2400, B1200, B300,
     B921600,B115200, B38400, B19200, B9600, B4800, B2400, B1200, B300, };
@@ -222,6 +224,7 @@ void *eng_vdiag_thread(void *x)
     int audio_fd;
     int wait_cnt = 0;
     int type;
+    int ret=0;
     struct eng_param * param = (struct eng_param *)x;
 
     if(param == NULL){
@@ -257,17 +260,16 @@ void *eng_vdiag_thread(void *x)
         }
     }while(sipc_fd < 0);
 
-    memset(&audio_total, 0, sizeof(audio_total));
-    if(0 == ensure_audio_para_file_exists((char *)(ENG_AUDIO_PARA_DEBUG))){
-        audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
-        if (audio_fd > 0) {
-            read(audio_fd, &audio_total, sizeof(audio_total));
-            close(audio_fd);
-        }else {
-            ENG_LOG("eng_vdiag open audio para failed\n");
-        }
+ 
+    audio_total = calloc(1,sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng());
+    if(!audio_total)
+    {
+        ENG_LOG("eng_vdiag_thread malloc audio_total memory error\n");
+        return NULL;
     }
-
+    memset(audio_total, 0, sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng());
+    ret = ensure_audio_para_file_exists((char *)(ENG_AUDIO_PARA_DEBUG));
+    eng_getpara();
     ENG_LOG("eng_vdiag put diag data from serial to SIPC\n");
 
     // initialize extra data buffer

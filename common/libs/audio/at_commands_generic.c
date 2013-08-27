@@ -1,10 +1,11 @@
-#include <engat.h>
+#include <eng_at.h>
 #include <sys/uio.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <cutils/properties.h>
+#include "AtChannel.h"
 
 static int at_cmd_fd = -1;
 static int at_cmd_prefix_len;
@@ -22,7 +23,7 @@ extern "C" {
 }
 #endif
 
-#define do_cmd(at_cmd) \
+/*#define do_cmd(at_cmd) \
     pthread_mutex_lock(&ATlock);\
     if (at_cmd && at_cmd_send_recv((void*)at_cmd, strlen(at_cmd), r_buf, sizeof r_buf)) { \
         ALOGE("do_cmd Switch incall AT command [%s][%s] failed", at_cmd, r_buf); \
@@ -30,8 +31,16 @@ extern "C" {
         ALOGW("do_cmd Switch incall AT command [%s][%s] good", at_cmd, r_buf); \
     }\
     pthread_mutex_unlock(&ATlock);
-
-
+*/
+#define do_cmd_dual(modemId, simId, at_cmd) \
+    pthread_mutex_lock(&ATlock);\
+    if (at_cmd && sendAt(modemId, simId, at_cmd)) { \
+        ALOGE("do_cmd_dual Switch incall AT command [%s][%s] failed", at_cmd); \
+    } else if (at_cmd) { \
+        ALOGW("do_cmd_dual Switch incall AT command [%s][%s] good", at_cmd); \
+    }\
+    pthread_mutex_unlock(&ATlock);
+	
 int at_cmd_deinit(void)
 {
     if (at_cmd_fd > 0) {
@@ -42,12 +51,15 @@ int at_cmd_deinit(void)
 }
 
 static int cur_call_sim = 0;
+static int cur_cp_type = 0;
+
 int at_cmd_init(void)
 {
 #ifndef _VOICE_CALL_VIA_LINEIN
     if (at_cmd_fd <= 0 || cur_call_sim != android_sim_num) {
         at_cmd_deinit();
         cur_call_sim = android_sim_num;
+	 cur_cp_type =  st_vbc_ctrl_thread_para->adev->cp_type;
         at_cmd_fd = engapi_open(cur_call_sim);
         at_cmd_prefix_len = sprintf(at_cmd_prefix, "%d,%d,", ENG_AT_NOHANDLE_CMD, 1);
     }
@@ -120,7 +132,7 @@ static int at_cmd_route(struct tiny_audio_device *adev)
     } else {
         at_cmd = "AT+SSAM=0";
     }
-    do_cmd(at_cmd);
+    do_cmd_dual(adev->cp_type, cur_call_sim, at_cmd);
 
     return 0;
 }
@@ -133,11 +145,11 @@ static int at_cmd_route(struct tiny_audio_device *adev)
 int at_cmd_incall_tone(int type)
 {
     char r_buf[32];
-    do_cmd(AT_CMD_INCALL_FREQ2);
+    do_cmd_dual(cur_cp_type, cur_call_sim, AT_CMD_INCALL_FREQ2);
     usleep(100*1000);
-    do_cmd(AT_CMD_INCALL_FREQ1);
+    do_cmd_dual(cur_cp_type, cur_call_sim, AT_CMD_INCALL_FREQ1);
     usleep(100*1000);
-    do_cmd(AT_CMD_INCALL_STOP);
+    do_cmd_dual(cur_cp_type, cur_call_sim, AT_CMD_INCALL_STOP);
 
     return 0;
 }
@@ -151,12 +163,12 @@ int at_cmd_incall_tone(int type)
     {\
         tv.tv_sec = time / 1000;\
         tv.tv_usec = (time % 1000) * 1000;\
-        do_cmd(at_cmd); \
+        do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd); \
         retval = select(incalltone_stop + 1, &rfds, NULL, NULL, &tv);\
         if (retval) {\
             read(incalltone_stop, r_buf, sizeof(r_buf) - 1);\
             at_cmd = AT_CMD_INCALL_STOP; \
-            do_cmd(at_cmd);\
+            do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);\
             break;\
         }\
     }\
@@ -207,14 +219,14 @@ void *at_incall_tone_thread(void *args)
                 #if 1
                 check_incalltone_stop(AT_CMD_INCALL_FREQ2, 50);
                 check_incalltone_stop(AT_CMD_INCALL_FREQ1, 100);
-                at_cmd = AT_CMD_INCALL_STOP; do_cmd(at_cmd);
+                at_cmd = AT_CMD_INCALL_STOP; do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
                 check_incalltone_stop(NULL, 1500);
                 #else
                 check_incalltone_stop(AT_CMD_INCALL_FREQ3, 1000);
                 check_incalltone_stop(AT_CMD_INCALL_FREQ4, 4000);
                 #endif
             }
-            if (retval == 0) { at_cmd = AT_CMD_INCALL_STOP; do_cmd(at_cmd); }
+            if (retval == 0) { at_cmd = AT_CMD_INCALL_STOP; do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd); }
             ALOGW("stop incalltone");
 
             FD_ZERO(&rfds);
@@ -241,7 +253,7 @@ int at_cmd_headset_volume_max(void)
     char r_buf[32];
     const char *at_cmd = "AT+CLVL=7";
     ALOGW("audio at_cmd_headset_volume_max");
-    do_cmd(at_cmd);
+    do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
     return 0;
 }
 
@@ -259,7 +271,7 @@ int at_cmd_volume(float vol, int mode)
     if (volume >= VOICECALL_VOLUME_MAX_UI) volume = VOICECALL_VOLUME_MAX_UI;
     ALOGI("%s mode=%d ,volume=%d, android vol:%f ", __func__,mode,volume,vol);
     snprintf(at_cmd, sizeof buf, "AT+VGR=%d", volume);
-    do_cmd(at_cmd);
+    do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
     return 0;
 }
 
@@ -270,7 +282,7 @@ int at_cmd_mic_mute(bool mute)
     ALOGW("audio at_cmd_mic_mute %d", mute);
     if (mute) at_cmd = "AT+CMUT=1";
     else at_cmd = "AT+CMUT=0";
-    do_cmd(at_cmd);
+    do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
     return 0;
 }
 
@@ -285,6 +297,6 @@ int at_cmd_audio_loop(int enable, int mode, int volume,int loopbacktype,int voic
     ALOGW("audio at_cmd_audio_loop enable:%d,mode:%d,voluem:%d,loopbacktype:%d,voiceformat:%d,delaytime:%d",enable,mode,volume,loopbacktype,voiceformat,delaytime);
 
     snprintf(at_cmd, sizeof buf, "AT+SPVLOOP=%d,%d,%d,%d,%d,%d", enable,mode,volume,loopbacktype,voiceformat,delaytime);
-    do_cmd(at_cmd);
+    do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
     return 0;
 }
