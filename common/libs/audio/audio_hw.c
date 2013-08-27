@@ -56,6 +56,7 @@
 #endif
 
 //#define XRUN_DEBUG
+//#define VOIP_DEBUG
 
 #ifdef XRUN_DEBUG
 #define XRUN_TRACE  ALOGW
@@ -63,6 +64,13 @@
 #define XRUN_TRACE
 #endif
 #define BLUE_TRACE  ALOGW
+
+#ifdef VOIP_DEBUG
+#define VOIP_TRACE  ALOGW
+#else
+#define VOIP_TRACE
+#endif
+
 
 //#define AUDIO_DUMP
 #define AUDIO_OUT_FILE_PATH    "data/audio_out.pcm"
@@ -1511,9 +1519,8 @@ static ssize_t out_write_vaudio(struct tiny_stream_out *out, const void* buffer,
 		int16_t * buf_p = buffer;
 		for(i=0;i<5;i++)
 		{
-			ALOGD("voip:out_write_vaudio is %d,%d,%d,%d,%d,%d,%d,%d,%d,%d",*(buf_p+0),*(buf_p+1),*(buf_p+2),*(buf_p+3),*(buf_p+4),*(buf_p+5),*(buf_p+6),*(buf_p+7),*(buf_p+8),*(buf_p+9));
+			VOIP_TRACE("voip:out_write_vaudio is %d,%d,%d,%d,%d,%d,%d,%d,%d,%d",*(buf_p+0),*(buf_p+1),*(buf_p+2),*(buf_p+3),*(buf_p+4),*(buf_p+5),*(buf_p+6),*(buf_p+7),*(buf_p+8),*(buf_p+9));
 		}
-
         
         ret = pcm_write(out->pcm_vplayback, (void *)buf, out_frames*frame_size);
         BLUE_TRACE("out_write_vaudio out out frames  is %d",out_frames);
