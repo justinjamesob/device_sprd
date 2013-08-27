@@ -78,7 +78,9 @@ int cmr_msg_get(unsigned int queue_handle, struct cmr_msg *message)
 	} else {
 		
 		if (msg_cxt->msg_read != msg_cxt->msg_write) {
-			*message = *msg_cxt->msg_read++;
+			*message = *msg_cxt->msg_read;
+			bzero(msg_cxt->msg_read, sizeof(struct cmr_msg));
+			msg_cxt->msg_read++;
 			if (msg_cxt->msg_read > msg_cxt->msg_head + msg_cxt->msg_count - 1) {
 				msg_cxt->msg_read = msg_cxt->msg_head;
 			}
@@ -88,7 +90,11 @@ int cmr_msg_get(unsigned int queue_handle, struct cmr_msg *message)
 
 	pthread_mutex_unlock(&msg_cxt->mutex);
 
-	CMR_LOGI("queue_handle 0x%x, msg type 0x%x", queue_handle, message->msg_type);
+	CMR_LOGI("queue_handle 0x%x, msg type 0x%x num %d cnt %d",
+		queue_handle,
+		message->msg_type,
+		msg_cxt->msg_number,
+		msg_cxt->msg_count);
 	return CMR_MSG_SUCCESS;
 }
 
@@ -100,13 +106,17 @@ int cmr_msg_post(unsigned int queue_handle, struct cmr_msg *message)
 	if (0 == queue_handle || NULL == message) {
 		return -CMR_MSG_PARAM_ERR;
 	}
-	CMR_LOGI("queue_handle 0x%x, msg type 0x%x ", queue_handle, message->msg_type);
+	CMR_LOGI("queue_handle 0x%x, msg type 0x%x num %d cnt %d",
+		queue_handle,
+		message->msg_type,
+		msg_cxt->msg_number,
+		msg_cxt->msg_count);
 
 	MSG_CHECK_MSG_MAGIC(queue_handle);
 
 	pthread_mutex_lock(&msg_cxt->mutex);
 
-	if (msg_cxt->msg_number >= msg_cxt->msg_count) {
+	if ((msg_cxt->msg_number + 1) >= msg_cxt->msg_count) {
 		pthread_mutex_unlock(&msg_cxt->mutex);
 		CMR_LOGE("MSG Overflow");
 		return CMR_MSG_OVERFLOW;
