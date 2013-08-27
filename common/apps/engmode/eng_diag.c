@@ -836,17 +836,10 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
             eng_btwifimac_write(btaddr, wifiaddr);
         }
 
-        if(ret==0){
-            //write successfully
-            head_ptr->subtype = 0x01;
-            rsp[0]=0x00; rsp[1]=0x00;
-            rlen=2;
-        } else {
-            //write fail
-            head_ptr->subtype = 0x00;
-            rsp[0]=0x00; rsp[1]=0x00;
-            rlen=2;
-        }
+        //alreays write successfully
+        head_ptr->subtype = 0x01;
+        rsp[0]=0x00; rsp[1]=0x00;
+        rlen=2;
     } else {//read command
         direct = (REF_NVWriteDirect_T *)rsp;
 

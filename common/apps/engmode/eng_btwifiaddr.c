@@ -69,7 +69,7 @@ static int get_urandom(unsigned int *buf, size_t len){
 
 static void mac_rand(char *btmac, char *wifimac)
 {
-    int fd,i, j, k;
+    int fd=0,i, j, k;
     off_t pos;
     char buf[80];
     char *ptr;
@@ -205,7 +205,7 @@ int eng_btwifimac_read(char* mac, MacType type)
     int fd, rcount;
     int ret = 0;
 
-    if(mac)
+    if(!mac)
         return -1;
 
     if(ENG_WIFI_MAC == type) {
@@ -217,7 +217,7 @@ int eng_btwifimac_read(char* mac, MacType type)
         fd = open(BT_MAC_FILE, O_RDONLY);
     }
 
-    if(fd > 0) {
+    if(fd >= 0) {
         rcount = read(fd, mac, 32);
         if(rcount <= 0)
         {
