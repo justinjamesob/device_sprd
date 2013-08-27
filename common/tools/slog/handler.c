@@ -1282,6 +1282,8 @@ void *stream_log_handler(void *arg)
 			close(info->fd_out);
 		info = info->next;
 	}
+
+	android_closeEventTagMap(g_eventTagMap);
 	stream_log_handler_started = 0;
 
 	return NULL;

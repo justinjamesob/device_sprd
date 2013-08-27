@@ -348,6 +348,7 @@ int parse_config()
 	fp = fopen(TMP_SLOG_CONFIG, "r");
 	if(fp == NULL) {
 		err_log("open file failed, %s.", TMP_SLOG_CONFIG);
+		property_get("ro.debuggable", buffer, "");
 		if (strcmp(buffer, "1") != 0) {
 			fp = fopen(DEFAULT_USER_SLOG_CONFIG, "r");
 			if(fp == NULL) {
