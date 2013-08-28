@@ -1319,6 +1319,8 @@ RESTART:
                         force_all_standby(adev);
                     pcm_close(adev->pcm_modem_ul);
                     pcm_close(adev->pcm_modem_dl);
+                    adev->pcm_modem_ul = NULL;
+                    adev->pcm_modem_dl = NULL;
                     adev->call_start = 0;
                     adev->call_connected = 0;
                     adev->cur_vbpipe_fd = -1;
@@ -1368,6 +1370,8 @@ RESTART:
                         force_all_standby(adev);
                     pcm_close(adev->pcm_modem_ul);
                     pcm_close(adev->pcm_modem_dl);
+                    adev->pcm_modem_ul = NULL;
+                    adev->pcm_modem_dl = NULL;
                     adev->call_start = 0;
                     adev->call_connected = 0;
                     adev->cur_vbpipe_fd = -1;
@@ -1460,6 +1464,8 @@ RESTART:
 
                         pcm_close(adev->pcm_modem_ul);
                         pcm_close(adev->pcm_modem_dl);
+                        adev->pcm_modem_ul = NULL;
+                        adev->pcm_modem_dl = NULL;
                         adev->call_start = 0;
                         adev->call_connected = 0;
                         i2s_pin_mux_sel(adev,2);

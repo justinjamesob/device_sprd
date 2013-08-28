@@ -10,6 +10,7 @@
 <i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
 
 <voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="1" />
+<voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="1" />
 
 <audiomode num="4">
 	<item name="Headset" index="0" />
