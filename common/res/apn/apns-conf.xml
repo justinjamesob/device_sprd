@@ -16956,6 +16956,32 @@
         type="mms"
         authtype="1"
     />
+    <!-- SPRD：Add movistar apn configuration information . @{-->
+    <!-- movistar -->
+    <apn carrier="movistar INTERNET"
+        mcc="710"
+        mnc="300"
+        apn="internet.movistar.ni"
+        proxy=""
+        port=""
+        user="movistarni"
+        password="movistarni"
+        type="default,supl"
+        authtype="1"
+    />
+    <apn carrier="movistar MMS"
+        mcc="710"
+        mnc="300"
+        apn="mms.movistar.ni"
+        mmsproxy="10.12.23.1"
+        mmsport="80"
+        user="movistarni"
+        password="movistarni"
+        mmsc="http://mms.movistar.ni"
+        type="mms"
+        authtype="1"
+    />
+    <!-- @} -->
     <!-- Nigeria MTN -->
     <apn carrier="mtn gprs/mtn wap"
         mcc="621"
