@@ -2026,7 +2026,12 @@ static int do_input_standby(struct tiny_stream_in *in)
             
         }
         adev->active_input = 0;
-        if (adev->mode != AUDIO_MODE_IN_CALL) {
+        if ((adev->mode != AUDIO_MODE_IN_CALL)
+#ifdef VOIP_DSP_PROCESS
+            &&(adev->mode !=AUDIO_MODE_IN_COMMUNICATION)
+#endif     
+        ) 
+        {
             adev->devices &= ~AUDIO_DEVICE_IN_ALL;
             select_devices_signal(adev);
         }
@@ -2812,7 +2817,7 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
         val = atoi(value);
         pthread_mutex_lock(&adev->lock);
         ALOGI("get adev lock adev->devices is %x,%x",adev->devices,adev->devices&AUDIO_DEVICE_OUT_ALL);
-        if((adev->mode == AUDIO_MODE_IN_CALL) && (adev->call_connected) && ((adev->devices & AUDIO_DEVICE_OUT_ALL) != val)) {
+        if(((adev->mode == AUDIO_MODE_IN_CALL) && (adev->call_connected) && ((adev->devices & AUDIO_DEVICE_OUT_ALL) != val))||(adev->mode == AUDIO_MODE_IN_COMMUNICATION && adev->voip_state == 3)){
             if(val&AUDIO_DEVICE_OUT_ALL) {
                 ALOGE("adev set device in val is %x",val);
                 adev->devices &= ~AUDIO_DEVICE_OUT_ALL;
@@ -4063,13 +4068,14 @@ static int adev_open(const hw_module_t* module, const char* name,
 #endif
 
 	adev->cp->voip_res.adev = adev;
+#ifdef VOIP_DSP_PROCESS
 	ret = vbc_ctrl_voip_open(&(adev->cp->voip_res));
 	//ret = 0;//vbc_ctrl_voip_open(&(adev->cp->voip_res));
 	if (ret < 0) {
 	ALOGE("voip: vbc_ctrl_voip_open error ");
 	goto ERROR;
 	}
-
+#endif
 
     ret = mmi_audio_loop_open();
     if (ret)  ALOGW("Warning: audio loop can NOT work.");

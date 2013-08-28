@@ -1418,6 +1418,7 @@ RESTART:
                     if (!pcm_is_ready(adev->pcm_modem_dl)) {
                         ALOGE("cannot open pcm_modem_dl : %s", pcm_get_error(adev->pcm_modem_dl));
                         pcm_close(adev->pcm_modem_dl);
+                        adev->pcm_modem_dl = NULL;
                         para->is_exit = 1;
                     }
                     adev->pcm_modem_ul= pcm_open(s_tinycard, PORT_MODEM, PCM_IN, &pcm_config_vrec_vx);
@@ -1425,6 +1426,8 @@ RESTART:
                         ALOGE("cannot open pcm_modem_ul : %s", pcm_get_error(adev->pcm_modem_ul));
                         pcm_close(adev->pcm_modem_ul);
                         pcm_close(adev->pcm_modem_dl);
+                        adev->pcm_modem_ul = NULL;
+                        adev->pcm_modem_dl = NULL;
                         para->is_exit = 1;
                     }
                     ALOGW("START CALL,open pcm device...");
