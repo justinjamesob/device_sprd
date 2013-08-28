@@ -65,6 +65,8 @@ TARGET_BOARD_FRONT_CAMERA_ROTATION := false
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := false
 #video size 1080P,720P,D1
 TARGET_BOARD_CAMERA_SUPPORT_VIDEO_SIZE := 1080P
+#framebuffer switch to rgb16 in 1080P video recorder, only for shark!
+FB_FORMAT_SWITCH := true
 
 
 BOARD_HAVE_BLUETOOTH := true
