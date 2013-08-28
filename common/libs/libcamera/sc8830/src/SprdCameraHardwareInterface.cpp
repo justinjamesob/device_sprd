@@ -1673,6 +1673,7 @@ void SprdCameraHardware::FreeReDisplayMem()
 void SprdCameraHardware::freePreviewMem()
 {
 	uint32_t i;
+	LOGV("freePreviewMem s.");
 	FreeFdmem();
 
 	if (mPreviewHeapArray != NULL) {
@@ -1687,6 +1688,7 @@ void SprdCameraHardware::freePreviewMem()
 	canclePreviewMem();
 	mPreviewHeapSize = 0;
 	mPreviewHeapNum = 0;
+	LOGV("freePreviewMem e.");
 }
 
 bool SprdCameraHardware::initPreview()
@@ -3125,7 +3127,7 @@ void SprdCameraHardware::HandleStopPreview(camera_cb_type cb,
 	transitionState(SPRD_INTERNAL_PREVIEW_STOPPING,
 				SPRD_IDLE,
 				STATE_PREVIEW);
-	freePreviewMem();
+	/*freePreviewMem();*/
 
 	LOGV("HandleStopPreview out, state = %s", getCameraStateStr(getPreviewState()));
 }
