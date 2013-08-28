@@ -22537,7 +22537,8 @@
         mmsc="http://omms.nate.com:9082/oma_mms"
         type="default,supl,mms"
     />
-    <!-- Salvador -->
+    <!-- SPRD：Change Brand @{ -->
+    <!-- claro -->
     <apn carrier="INTERNET CLARO"
           mcc="706"
           mnc="01"
@@ -22559,6 +22560,8 @@
           authtype="1"
           type="mms"
     />
+    <!-- @} -->
+    <!-- Salvador -->
     <apn carrier="DIGICEL web"
         mcc="706"
         mnc="02"
@@ -22703,4 +22706,22 @@
         proxy="10.0.0.172"
         port="80"
     />
+    <!-- SPRD：Add mcc=454,mnc=00/07 apn type @{ -->
+    <apn carrier="CMCC DM"
+        mcc="454"
+        mnc="00"
+        apn="cmwap"
+        proxy="10.0.0.172"
+        port="80"
+        type="dm"
+    />
+    <apn carrier="CMCC DM"
+        mcc="454"
+        mnc="07"
+        apn="cmwap"
+        proxy="10.0.0.172"
+        port="80"
+        type="dm"
+    />
+    <!-- @} -->
 </apns>
