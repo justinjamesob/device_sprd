@@ -16,6 +16,7 @@ LOCAL_CFLAGS += -DUSE_BOOT_AT_DIAG
 endif
 
 LOCAL_C_INCLUDES    +=  external/sqlite/dist/
+LOCAL_C_INCLUDES    +=  device/sprd/common/libs/lib_atcommand/
 LOCAL_C_INCLUDES    +=  device/sprd/common/libs/audio/nv_exchange/
 LOCAL_C_INCLUDES    +=  device/sprd/common/libs/audio/
 LOCAL_SRC_FILES     := eng_pcclient.c  \
