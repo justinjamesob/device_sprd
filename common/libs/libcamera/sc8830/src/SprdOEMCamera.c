@@ -6437,18 +6437,13 @@ int camera_get_data_redisplay(int output_addr,
 	CMR_LOGV("(w,h)%d %d; addr src, 0x%x dst, (w,h)%d %d,0x%x",
 		input_width, input_height, input_addr_y, output_width,output_height,output_addr);
 
-	if (!IS_CAPTURE) {
-		CMR_LOGE("Capture Stoped");
-		return ret;
-	}
-
 	src_frame.addr_phy.addr_y = input_addr_y;
 	src_frame.addr_phy.addr_u = input_addr_uv;
 	src_frame.size.width      = input_width;
 	src_frame.size.height     = input_height;
 	src_frame.fmt             = IMG_DATA_TYPE_YUV420;
 	src_frame.data_end.y_endian = 1;
-	src_frame.data_end.uv_endian = 2;
+	src_frame.data_end.uv_endian = 1;
 	dst_frame.addr_phy.addr_y = output_addr;
 	dst_frame.addr_phy.addr_u = output_addr + img_len;
 	dst_frame.size.width      = output_width;
@@ -6460,6 +6455,7 @@ int camera_get_data_redisplay(int output_addr,
 	rect.start_y              = 0;
 	rect.width                = input_width;
 	rect.height               = input_height;
+	camera_sync_scale_start(g_cxt);
 	cmr_scale_evt_reg(NULL);
 	ret = cmr_scale_start(input_height,
 			&src_frame,
@@ -6468,6 +6464,7 @@ int camera_get_data_redisplay(int output_addr,
 			NULL,
 			NULL);
 	cmr_scale_evt_reg(camera_scaler_evt_cb);
+	camera_sync_scale_done(g_cxt);
 	CMR_LOGV("Done, %d", ret);
 	return 0;
 }
@@ -6554,7 +6551,7 @@ static int camera_convert_to_thumb(void)
 	rect.start_y              = 0;
 	rect.width                = src_frame.size.width;
 	rect.height               = src_frame.size.height;
-
+	camera_sync_scale_start(g_cxt);
 	cmr_scale_evt_reg(NULL);
 	ret = cmr_scale_start(src_frame.size.height,
 			&src_frame,
@@ -6563,6 +6560,7 @@ static int camera_convert_to_thumb(void)
 			NULL,
 			NULL);
 	cmr_scale_evt_reg(camera_scaler_evt_cb);
+	camera_sync_scale_done(g_cxt);
 	CMR_LOGV("Done, %d", ret);
 	g_cxt->thum_ready = 1;
 	camera_convert_thum_done(g_cxt);

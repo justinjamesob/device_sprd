@@ -2470,6 +2470,57 @@ int SprdCameraHardware::displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_
 	return ret;
 }
 
+bool SprdCameraHardware::displayOneFrameForCapture(uint32_t width, uint32_t height, uint32_t phy_addr, char *virtual_addr)
+{
+	if (!mPreviewWindow || !mGrallocHal || 0 == phy_addr) {
+		return false;
+	}
+
+	LOGV("%s: size = %dx%d, addr = %d", __func__, width, height, phy_addr);
+
+	buffer_handle_t 	*buf_handle = NULL;
+	int 				stride = 0;
+	void 				*vaddr = NULL;
+	int					ret = 0;
+	struct _dma_copy_cfg_tag dma_copy_cfg;
+	struct private_handle_t *private_h = NULL;
+	uint32_t dst_phy_addr = 0;
+
+	ret = mPreviewWindow->dequeue_buffer(mPreviewWindow, &buf_handle, &stride);
+	if (0 != ret) {
+		LOGE("%s: failed to dequeue gralloc buffer!", __func__);
+		return false;
+	}
+
+	ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
+							0, 0, (width+15)&(~15), (height+15)&(~15), &vaddr);
+
+	if (0 != ret || NULL == vaddr) {
+		LOGE("%s: failed to lock gralloc buffer", __func__);
+		return false;
+	}
+
+	private_h = (struct private_handle_t *)(*buf_handle);
+	dst_phy_addr =  (uint32_t)(private_h->phyaddr);
+	ret = displayCopy(dst_phy_addr, (uint32_t)vaddr, phy_addr, (uint32_t)virtual_addr, width, height);
+
+	mGrallocHal->unlock(mGrallocHal, *buf_handle);
+
+	if (0 != ret) {
+		LOGE("%s: camera_copy_data_virtual() failed.", __func__);
+		return false;
+	}
+
+	ret = mPreviewWindow->enqueue_buffer(mPreviewWindow, buf_handle);
+	if (0 != ret) {
+		LOGE("%s: enqueue_buffer() failed.", __func__);
+		return false;
+	}
+
+	return true;
+}
+
+
 bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32_t phy_addr, char *virtual_addr, uint32_t id)
 {
 	if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
@@ -2728,28 +2779,28 @@ void SprdCameraHardware::receiveRawPicture(camera_frame_type *frame)
 	uint32_t phy_addr = 0;
 	uint32_t width = mPreviewWidth;
 	uint32_t height = mPreviewHeight;
-/* to do it
+
 	if (iSDisplayCaptureFrame()) {
 		phy_addr = getRedisplayMem();
 
-		if(0 == phy_addr) {
+		if (0 == phy_addr) {
 			LOGE("%s: get review memory failed", __func__);
 			goto callbackraw;
 		}
 
-		if( 0 != camera_get_data_redisplay(phy_addr, width, height, frame->buffer_phy_addr,
+		if ( 0 != camera_get_data_redisplay(phy_addr, width, height, frame->buffer_phy_addr,
 										frame->buffer_uv_phy_addr, frame->dx, frame->dy)) {
 			LOGE("%s: Fail to camera_get_data_redisplay.", __func__);
 			FreeReDisplayMem();
 			goto callbackraw;
 		}
 
-		if (!displayOneFrame(width, height, phy_addr, (char *)frame->buf_Virt_Addr))
-		{
+		if (!displayOneFrameForCapture(width, height, phy_addr, (char *)mReDisplayHeap->data)) {
 			LOGE("%s: displayOneFrame failed", __func__);
 		}
+
 		FreeReDisplayMem();
-	}*/
+	}
 callbackraw:
 	if (mData_cb!= NULL) {
 		// Find the offset within the heap of the current buffer.

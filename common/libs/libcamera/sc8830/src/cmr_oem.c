@@ -428,6 +428,7 @@ int camera_sync_var_init(struct camera_context *p_cxt)
 	sem_init(&p_cxt->thum_sem, 0, 0);
 	sem_init(&p_cxt->takepicdone_sem, 0, 0);
 	sem_init(&p_cxt->takepic_callback_sem, 0, 0);
+	sem_init(&p_cxt->sync_scale_sem, 0, 1);
 
 	return ret;
 }
@@ -446,6 +447,7 @@ int camera_sync_var_deinit(struct camera_context *p_cxt)
 	sem_destroy(&p_cxt->thum_sem);
 	sem_destroy(&p_cxt->takepicdone_sem);
 	sem_destroy(&p_cxt->takepic_callback_sem);
+	sem_destroy(&p_cxt->sync_scale_sem);
 
 	return ret;
 }
@@ -650,6 +652,23 @@ int camera_takepic_callback_done(struct camera_context *p_cxt)
 	return ret;
 }
 
+int camera_sync_scale_start(struct camera_context *p_cxt)
+{
+	int                      ret = CAMERA_SUCCESS;
+
+	sem_wait(&p_cxt->sync_scale_sem);
+
+	return ret;
+}
+
+int camera_sync_scale_done(struct camera_context *p_cxt)
+{
+	int                      ret = CAMERA_SUCCESS;
+
+	sem_post(&p_cxt->sync_scale_sem);
+
+	return ret;
+}
 
 int camera_save_to_file(uint32_t index, uint32_t img_fmt,
 	uint32_t width, uint32_t height, struct img_addr *addr)

@@ -886,8 +886,8 @@ LOCAL const SENSOR_REG_T ov8825_1632x1224_setting[] = {
 	{0x380b, 0xc8}, //ISPVO
 	{0x380c, 0x0d}, //HTS =, 0x3516
 	{0x380d, 0xbc}, //HTS
-	{0x380e, 0x04}, //VTS =, 0x1264
-	{0x380f, 0xf0}, //VTS
+	{0x380e, 0x05}, //VTS =, 0x1264
+	{0x380f, 0xf4}, //VTS
 	{0x3810, 0x00}, //HOFF =, 0x8
 	{0x3811, 0x08}, //HOFF
 	{0x3812, 0x00}, //VOFF =, 0x4
@@ -1173,8 +1173,8 @@ LOCAL const SENSOR_REG_T ov8825_3264x2448_setting[] = {
 LOCAL SENSOR_REG_TAB_INFO_T s_ov8825_resolution_Tab_RAW[] = {
 	{ADDR_AND_LEN_OF_ARRAY(ov8825_common_init), 0, 0, 24, SENSOR_IMAGE_FORMAT_RAW},
 //	{ADDR_AND_LEN_OF_ARRAY(ov8825_720x480_setting), 720, 480, 24, SENSOR_IMAGE_FORMAT_RAW},
-//	{ADDR_AND_LEN_OF_ARRAY(ov8825_1632x1224_setting), 1632, 1224, 24, SENSOR_IMAGE_FORMAT_RAW},
-	{ADDR_AND_LEN_OF_ARRAY(ov8825_1920x1080_setting), 1920, 1080, 24, SENSOR_IMAGE_FORMAT_RAW},
+	{ADDR_AND_LEN_OF_ARRAY(ov8825_1632x1224_setting), 1632, 1224, 24, SENSOR_IMAGE_FORMAT_RAW},
+/*	{ADDR_AND_LEN_OF_ARRAY(ov8825_1920x1080_setting), 1920, 1080, 24, SENSOR_IMAGE_FORMAT_RAW},*/
 	{ADDR_AND_LEN_OF_ARRAY(ov8825_3264x2448_setting), 3264, 2448, 24, SENSOR_IMAGE_FORMAT_RAW},
 	{PNULL, 0, 0, 0, 0, 0},
 	{PNULL, 0, 0, 0, 0, 0},
@@ -1186,8 +1186,8 @@ LOCAL SENSOR_REG_TAB_INFO_T s_ov8825_resolution_Tab_RAW[] = {
 
 LOCAL SENSOR_TRIM_T s_ov8825_Resolution_Trim_Tab[] = {
 	{0, 0, 0, 0, 0, 0, 0},
-
-	{0, 0, 1920, 1080, 178, 90, 1868},
+	{0, 0, 1632, 1224, 262, 100, 1524},
+/*	{0, 0, 1920, 1080, 178, 90, 1868},*/
 	{0, 0, 3264, 2448, 168, 82, 2480},
 
 	{0, 0, 0, 0, 0, 0, 0},
@@ -1257,7 +1257,7 @@ LOCAL const SENSOR_REG_T  s_ov8825_3264x2448_video_tab[SENSOR_VIDEO_MODE_MAX][1]
 
 LOCAL SENSOR_VIDEO_INFO_T s_ov8825_video_info[] = {
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
-	{{{30, 30, 178, 90}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},(SENSOR_REG_T**)s_ov8825_1920x1080_video_tab},
+	{{{30, 30, 262, 100}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},(SENSOR_REG_T**)s_ov8825_1920x1080_video_tab},
 	{{{15, 15, 168, 64}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},(SENSOR_REG_T**)s_ov8825_3264x2448_video_tab},
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
@@ -1450,7 +1450,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	struct sensor_raw_info* raw_sensor_ptr=Sensor_GetContext();
 	struct sensor_raw_tune_info* sensor_ptr=raw_sensor_ptr->tune_ptr;
 	struct sensor_raw_cali_info* cali_ptr=raw_sensor_ptr->cali_ptr;
-
+#if 0
 	raw_sensor_ptr->version_info->version_id=0x00010000;
 	raw_sensor_ptr->version_info->srtuct_size=sizeof(struct sensor_raw_info);
 
@@ -1941,7 +1941,21 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->gamma.axis[1][23]=0xf0;
 	sensor_ptr->gamma.axis[1][24]=0xf6;
 	sensor_ptr->gamma.axis[1][25]=0xff;
+#endif
+	sensor_ptr->ae.smart=0x00;// bit0: denoise bit1: edge bit2: startion
+	sensor_ptr->ae.smart_rotio=255;
+	sensor_ptr->ae.smart_mode=0; // 0: gain 1: lum
+	sensor_ptr->ae.smart_base_gain=64;
+	sensor_ptr->ae.smart_wave_min=0;
+	sensor_ptr->ae.smart_wave_max=1023;
+	sensor_ptr->ae.smart_pref_min=0;
+	sensor_ptr->ae.smart_pref_max=255;
+	sensor_ptr->ae.smart_denoise_min_index=0;
+	sensor_ptr->ae.smart_denoise_max_index=254;
+	sensor_ptr->ae.smart_edge_min_index=0;
+	sensor_ptr->ae.smart_edge_max_index=7;
 
+#if 0
 	//uv div
 	sensor_ptr->uv_div.thrd[0]=252;
 	sensor_ptr->uv_div.thrd[1]=250;
@@ -2059,6 +2073,136 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->chn.r_offset=0x00;
 	sensor_ptr->chn.r_offset=0x00;
 	sensor_ptr->chn.r_offset=0x00;
+#endif
+
+	sensor_ptr->af.max_step = 0x3ff;
+	sensor_ptr->af.min_step = 0;
+	sensor_ptr->af.stab_period = 100;
+	sensor_ptr->af.alg_id = 2;
+	sensor_ptr->af.rough_count = 17;
+	sensor_ptr->af.af_rough_step[0] = 0;
+	sensor_ptr->af.af_rough_step[1] = 64;
+	sensor_ptr->af.af_rough_step[2] = 128;
+	sensor_ptr->af.af_rough_step[3] = 192;
+	sensor_ptr->af.af_rough_step[4] = 256;
+	sensor_ptr->af.af_rough_step[5] = 320;
+	sensor_ptr->af.af_rough_step[6] = 384;
+	sensor_ptr->af.af_rough_step[7] = 448;
+	sensor_ptr->af.af_rough_step[8] = 512;
+	sensor_ptr->af.af_rough_step[9] = 576;
+	sensor_ptr->af.af_rough_step[10] = 640;
+	sensor_ptr->af.af_rough_step[11] = 704;
+	sensor_ptr->af.af_rough_step[12] = 768;
+	sensor_ptr->af.af_rough_step[13] = 832;
+	sensor_ptr->af.af_rough_step[14] = 896;
+	sensor_ptr->af.af_rough_step[15] = 960;
+	sensor_ptr->af.af_rough_step[16] = 1023;
+
+	/*normal*/
+	sensor_ptr->special_effect[0].matrix[0]=0x004d;
+	sensor_ptr->special_effect[0].matrix[1]=0x0096;
+	sensor_ptr->special_effect[0].matrix[2]=0x001d;
+	sensor_ptr->special_effect[0].matrix[3]=0xffd5;
+	sensor_ptr->special_effect[0].matrix[4]=0xffab;
+	sensor_ptr->special_effect[0].matrix[5]=0x0080;
+	sensor_ptr->special_effect[0].matrix[6]=0x0080;
+	sensor_ptr->special_effect[0].matrix[7]=0xff95;
+	sensor_ptr->special_effect[0].matrix[8]=0xffeb;
+	sensor_ptr->special_effect[0].y_shift=0xff00;
+	sensor_ptr->special_effect[0].u_shift=0x0000;
+	sensor_ptr->special_effect[0].v_shift=0x0000;
+
+	/*gray*/
+	sensor_ptr->special_effect[1].matrix[0]=0x004d;
+	sensor_ptr->special_effect[1].matrix[1]=0x0096;
+	sensor_ptr->special_effect[1].matrix[2]=0x001d;
+	sensor_ptr->special_effect[1].matrix[3]=0x0000;
+	sensor_ptr->special_effect[1].matrix[4]=0x0000;
+	sensor_ptr->special_effect[1].matrix[5]=0x0000;
+	sensor_ptr->special_effect[1].matrix[6]=0x0000;
+	sensor_ptr->special_effect[1].matrix[7]=0x0000;
+	sensor_ptr->special_effect[1].matrix[8]=0x0000;
+	sensor_ptr->special_effect[1].y_shift=0xff00;
+	sensor_ptr->special_effect[1].u_shift=0x0000;
+	sensor_ptr->special_effect[1].v_shift=0x0000;
+	/*warm*/
+	sensor_ptr->special_effect[2].matrix[0]=0x004d;
+	sensor_ptr->special_effect[2].matrix[1]=0x0096;
+	sensor_ptr->special_effect[2].matrix[2]=0x001d;
+	sensor_ptr->special_effect[2].matrix[3]=0xffd5;
+	sensor_ptr->special_effect[2].matrix[4]=0xffab;
+	sensor_ptr->special_effect[2].matrix[5]=0x0080;
+	sensor_ptr->special_effect[2].matrix[6]=0x0080;
+	sensor_ptr->special_effect[2].matrix[7]=0xff95;
+	sensor_ptr->special_effect[2].matrix[8]=0xffeb;
+	sensor_ptr->special_effect[2].y_shift=0xff00;
+	sensor_ptr->special_effect[2].u_shift=0xffd4;
+	sensor_ptr->special_effect[2].v_shift=0x0080;
+	/*green*/
+	sensor_ptr->special_effect[3].matrix[0]=0x004d;
+	sensor_ptr->special_effect[3].matrix[1]=0x0096;
+	sensor_ptr->special_effect[3].matrix[2]=0x001d;
+	sensor_ptr->special_effect[3].matrix[3]=0xffd5;
+	sensor_ptr->special_effect[3].matrix[4]=0xffab;
+	sensor_ptr->special_effect[3].matrix[5]=0x0080;
+	sensor_ptr->special_effect[3].matrix[6]=0x0080;
+	sensor_ptr->special_effect[3].matrix[7]=0xff95;
+	sensor_ptr->special_effect[3].matrix[8]=0xffeb;
+	sensor_ptr->special_effect[3].y_shift=0xff00;
+	sensor_ptr->special_effect[3].u_shift=0xffd5;
+	sensor_ptr->special_effect[3].v_shift=0xffca;
+	/*cool*/
+	sensor_ptr->special_effect[4].matrix[0]=0x004d;
+	sensor_ptr->special_effect[4].matrix[1]=0x0096;
+	sensor_ptr->special_effect[4].matrix[2]=0x001d;
+	sensor_ptr->special_effect[4].matrix[3]=0xffd5;
+	sensor_ptr->special_effect[4].matrix[4]=0xffab;
+	sensor_ptr->special_effect[4].matrix[5]=0x0080;
+	sensor_ptr->special_effect[4].matrix[6]=0x0080;
+	sensor_ptr->special_effect[4].matrix[7]=0xff95;
+	sensor_ptr->special_effect[4].matrix[8]=0xffeb;
+	sensor_ptr->special_effect[4].y_shift=0xff00;
+	sensor_ptr->special_effect[4].u_shift=0x0040;
+	sensor_ptr->special_effect[4].v_shift=0x000a;
+	/*orange*/
+	sensor_ptr->special_effect[5].matrix[0]=0x004d;
+	sensor_ptr->special_effect[5].matrix[1]=0x0096;
+	sensor_ptr->special_effect[5].matrix[2]=0x001d;
+	sensor_ptr->special_effect[5].matrix[3]=0xffd5;
+	sensor_ptr->special_effect[5].matrix[4]=0xffab;
+	sensor_ptr->special_effect[5].matrix[5]=0x0080;
+	sensor_ptr->special_effect[5].matrix[6]=0x0080;
+	sensor_ptr->special_effect[5].matrix[7]=0xff95;
+	sensor_ptr->special_effect[5].matrix[8]=0xffeb;
+	sensor_ptr->special_effect[5].y_shift=0xff00;
+	sensor_ptr->special_effect[5].u_shift=0xff00;
+	sensor_ptr->special_effect[5].v_shift=0x0028;
+	/*negtive*/
+	sensor_ptr->special_effect[6].matrix[0]=0xffb3;
+	sensor_ptr->special_effect[6].matrix[1]=0xff6a;
+	sensor_ptr->special_effect[6].matrix[2]=0xffe3;
+	sensor_ptr->special_effect[6].matrix[3]=0x002b;
+	sensor_ptr->special_effect[6].matrix[4]=0x0055;
+	sensor_ptr->special_effect[6].matrix[5]=0xff80;
+	sensor_ptr->special_effect[6].matrix[6]=0xff80;
+	sensor_ptr->special_effect[6].matrix[7]=0x006b;
+	sensor_ptr->special_effect[6].matrix[8]=0x0015;
+	sensor_ptr->special_effect[6].y_shift=0x00ff;
+	sensor_ptr->special_effect[6].u_shift=0x0000;
+	sensor_ptr->special_effect[6].v_shift=0x0000;
+	/*old*/
+	sensor_ptr->special_effect[7].matrix[0]=0x004d;
+	sensor_ptr->special_effect[7].matrix[1]=0x0096;
+	sensor_ptr->special_effect[7].matrix[2]=0x001d;
+	sensor_ptr->special_effect[7].matrix[3]=0x0000;
+	sensor_ptr->special_effect[7].matrix[4]=0x0000;
+	sensor_ptr->special_effect[7].matrix[5]=0x0000;
+	sensor_ptr->special_effect[7].matrix[6]=0x0000;
+	sensor_ptr->special_effect[7].matrix[7]=0x0000;
+	sensor_ptr->special_effect[7].matrix[8]=0x0000;
+	sensor_ptr->special_effect[7].y_shift=0xff00;
+	sensor_ptr->special_effect[7].u_shift=0xffe2;
+	sensor_ptr->special_effect[7].v_shift=0x0028;
 
 	return rtn;
 }
@@ -2330,6 +2474,7 @@ LOCAL uint32_t _ov8825_BeforeSnapshot(uint32_t param)
 	capture_maxline = (ret_h << 8) + ret_l;
 
 	capture_exposure = preview_exposure * prv_linetime/cap_linetime;
+	capture_exposure *= 2;
 
 	if(0 == capture_exposure){
 		capture_exposure = 1;
@@ -2481,13 +2626,13 @@ static uint32_t _ov8825_SetEV(uint32_t param)
 
 	switch(ev) {
 	case SENSOR_HDR_EV_LEVE_0:
-		_calculate_hdr_exposure(s_ov8825_gain/16,s_capture_VTS,s_capture_shutter/8);
+		_calculate_hdr_exposure(s_ov8825_gain/2,s_capture_VTS,s_capture_shutter);
 		break;
 	case SENSOR_HDR_EV_LEVE_1:
 		_calculate_hdr_exposure(s_ov8825_gain,s_capture_VTS,s_capture_shutter);
 		break;
 	case SENSOR_HDR_EV_LEVE_2:
-		_calculate_hdr_exposure(s_ov8825_gain*8,s_capture_VTS,s_capture_shutter*3);
+		_calculate_hdr_exposure(s_ov8825_gain,s_capture_VTS,s_capture_shutter *4);
 		break;
 	default:
 		break;

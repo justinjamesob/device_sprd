@@ -148,9 +148,18 @@ struct sensor_ae_param{
 	uint8_t smart;
 	uint8_t smart_rotio;
 	uint8_t quick_mode;
-	uint8_t reserved0;
+	uint8_t smart_mode;
 	int8_t ev[16];
-	uint32_t reserved[40];
+	uint16_t smart_base_gain;
+	uint16_t smart_wave_min;
+	uint16_t smart_wave_max;
+	uint8_t smart_pref_min;
+	uint8_t smart_pref_max;
+	uint8_t smart_denoise_min_index;
+	uint8_t smart_denoise_max_index;
+	uint8_t smart_edge_min_index;
+	uint8_t smart_edge_max_index;
+	uint32_t reserved[37];
 };
 
 struct sensor_ae_tab{
@@ -243,9 +252,13 @@ struct sensor_cce_parm{
 	uint16_t v_shift;
 };
 
+struct sensor_gamma_tab{
+	uint16_t axis[2][26];
+};
+
 struct sensor_gamma_param{
 	uint16_t axis[2][26];
-	uint32_t reserved[130];
+	struct sensor_gamma_tab tab[5];
 };
 
 struct sensor_cce_uvdiv{
@@ -426,6 +439,8 @@ struct sensor_raw_tune_info{
 	struct sensor_global_gain_param global;
 	struct sensor_chn_gain_param chn;
 	struct sensor_flash_cali_param flash;
+	struct sensor_cce_parm special_effect[16];
+	uint32_t reserved[256];
  };
 
 struct sensor_raw_fix_info{

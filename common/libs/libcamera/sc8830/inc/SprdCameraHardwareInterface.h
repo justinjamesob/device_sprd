@@ -267,9 +267,13 @@ private:
 	void                            set_ddr_freq(const char* freq_in_khz);
 	void                            restoreFreq();
 	bool                            displayOneFrame(uint32_t width, 
-							uint32_t height,
-							uint32_t phy_addr, char *frame_addr,
-							uint32_t id);
+							          uint32_t height,
+							          uint32_t phy_addr, char *frame_addr,
+							          uint32_t id);
+	bool                            displayOneFrameForCapture(uint32_t width,
+		                              uint32_t height,
+		                              uint32_t phy_addr,
+		                              char *virtual_addr);
 	bool                            iSDisplayCaptureFrame();
 	bool                            iSZslMode();
 	/* These constants reflect the number of buffers that libqcamera requires
