@@ -262,8 +262,8 @@ int main(int argc, char *argv[])
 			update_conf("bt", argv[2]);
 			cmd.type = CTRL_CMD_TYPE_RELOAD;
 		} else {
-			return -1;
 			usage(argv[0]);
+			return -1;
 		}
 	} else {
 		usage(argv[0]);
@@ -293,8 +293,10 @@ int main(int argc, char *argv[])
 
 	tv_out.tv_sec = 120;
 	tv_out.tv_usec = 0;
-	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv_out, sizeof(tv_out));
-
+	ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv_out, sizeof(tv_out));
+	if (ret < 0) {
+		perror("setsockopt failed");
+	}
 	ret = recv_socket(sockfd, (void *)&cmd, sizeof(cmd));
         if (ret < 0) {
 		perror("recv failed");
