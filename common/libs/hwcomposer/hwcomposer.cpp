@@ -809,11 +809,11 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
         gsp_cfg_info.layer_des_info.endian_mode.a_swap_mode = GSP_A_SWAP_RGBA;
         gsp_cfg_info.layer_des_info.endian_mode.y_word_endn = GSP_WORD_ENDN_1;
 #else
-        //videoOverlayFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP;
-        //gsp_cfg_info.layer_des_info.img_format = GSP_DST_FMT_YUV420_2P;
+        videoOverlayFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP;
+        gsp_cfg_info.layer_des_info.img_format = GSP_DST_FMT_YUV420_2P;
 
-        videoOverlayFormat = HAL_PIXEL_FORMAT_YCbCr_422_SP;
-        gsp_cfg_info.layer_des_info.img_format = GSP_DST_FMT_YUV422_2P;
+        //videoOverlayFormat = HAL_PIXEL_FORMAT_YCbCr_422_SP;
+        //gsp_cfg_info.layer_des_info.img_format = GSP_DST_FMT_YUV422_2P;
 #endif
 
         //in sc8830 first GSP version hw, GSP don't support odd width/height and x/y
@@ -921,8 +921,8 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
             ov_setting.uv_endian = SPRD_DATA_ENDIAN_B0B1B2B3;
             ov_setting.rb_switch = 1;
 #else
-            ov_setting.data_type = SPRD_DATA_FORMAT_YUV422;
-            //ov_setting.data_type = SPRD_DATA_FORMAT_YUV420;
+            //ov_setting.data_type = SPRD_DATA_FORMAT_YUV422;
+            ov_setting.data_type = SPRD_DATA_FORMAT_YUV420;
             ov_setting.y_endian = SPRD_DATA_ENDIAN_B3B2B1B0;
             ov_setting.uv_endian = SPRD_DATA_ENDIAN_B3B2B1B0;
             ov_setting.rb_switch = 0;
@@ -1654,8 +1654,7 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
             dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*4);
 #else
 #ifdef _HWCOMPOSER_USE_GSP_BLEND
-            dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*2);//YUV422
-#else
+//            dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*2);//YUV422
             dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*3/2);//YUV420
 #endif
 #endif
