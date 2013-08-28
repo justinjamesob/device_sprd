@@ -3569,12 +3569,14 @@ int camera_internal_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info
 				} else {
 					frm_num = 1;
 				}
+				g_cxt->chn_2_status = CHN_BUSY;
 				ret = cmr_v4l2_cap_resume(CHN_2,
 					0,
 					g_cxt->v4l2_cxt.chn_frm_deci[CHN_2],
 					frm_num);
 				if (ret) {
 					SET_CHN_IDLE(CHN_2);
+					g_cxt->chn_2_status = CHN_IDLE;
 					CMR_LOGE("error.");
 				}
 			}
