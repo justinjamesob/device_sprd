@@ -154,6 +154,8 @@ bool Layer::init()
 
     mNumVertices = 4;
 
+    mFilteringEnabled = true;
+
     return true;
 }
 
@@ -289,6 +291,10 @@ void Layer::computeTransformMatrix()
     bool mFilteringEnabled = true;
     float tx = 0.0f, ty = 0.0f, sx = 1.0f, sy = 1.0f;
 
+    sp<GraphicBuffer>& buf(mGFXBuffer);
+    float bufferWidth = buf->getWidth();
+    float bufferHeight = buf->getHeight();
+
     memcpy(xform, mtxIdentity, sizeof(xform));
     if (mTransform & NATIVE_WINDOW_TRANSFORM_FLIP_H) {
         float result[16];
@@ -306,6 +312,49 @@ void Layer::computeTransformMatrix()
         memcpy(xform, result, sizeof(xform));
     }
 
+    if (mRect) {
+        float shrinkAmount = 0.0f;
+        if (mFilteringEnabled) {
+            /* In order to prevent bilinear sampling beyond the edge of the
+             * crop rectangle we may need to shrink it by 2 texels in each
+             * dimension.  Normally this would just need to take 1/2 a texel
+             * off each end, but because the chroma channels of YUV420 images
+             * are subsampled we may need to shrink the crop region by a whole
+             * texel on each side.
+             * */
+            switch (buf->getPixelFormat()) {
+                case PIXEL_FORMAT_RGBA_8888:
+                case PIXEL_FORMAT_RGBX_8888:
+                case PIXEL_FORMAT_RGB_888:
+                case PIXEL_FORMAT_RGB_565:
+                case PIXEL_FORMAT_BGRA_8888:
+                case PIXEL_FORMAT_RGBA_5551:
+                case PIXEL_FORMAT_RGBA_4444:
+                    // We know there's no subsampling of any channels, so we
+                    // only need to shrink by a half a pixel.
+                    shrinkAmount = 0.5;
+
+                default:
+                    // If we don't recognize the format, we must assume the
+                    // worst case (that we care about), which is YUV420.
+                    shrinkAmount = 1.0;
+            }
+        }
+
+        // Only shrink the dimensions that are not the size of the buffer.
+        int width = mRect->right - mRect->left;
+        int height = mRect->bottom - mRect->top;
+        if ( width < bufferWidth) {
+            tx = ((float)(mRect->left) + shrinkAmount) / bufferWidth;
+            sx = ((float)(width) - (2.0f * shrinkAmount)) / bufferWidth;
+        }
+        if (height < bufferHeight) {
+            ty = ((float)(bufferHeight - mRect->bottom) + shrinkAmount) /
+                    bufferHeight;
+            sy = ((float)(height) - (2.0f * shrinkAmount)) /
+                    bufferHeight;
+        }
+    }
 
     float crop[16] = {
         sx, 0, 0, 0,
