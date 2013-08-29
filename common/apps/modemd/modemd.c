@@ -269,7 +269,7 @@ int start_service(int modem, int is_vlx, int restart)
 {
 	char mux_2sim_swap[]="echo 1 > /proc/mux_mode";
 	char mux_3sim_swap[]="echo 2 > /proc/mux_mode";
-	char phoneCount[5];
+	char phoneCount[5]="";
 	char path[32];
 	int stty_fd;
         char modem_dev[20];
