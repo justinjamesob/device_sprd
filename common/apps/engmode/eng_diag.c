@@ -205,6 +205,12 @@ int eng_diag_parse(char *buf,int len)
         case DIAG_CMD_APCALI:
             ret = CMD_USER_APCALI;
             break;
+        case DIAG_CMD_VER:
+            ENG_LOG("%s: Handle DIAG_CMD_VER",__FUNCTION__);
+            if(head_ptr->subtype==0x2) {
+                ret = CMD_USER_VER;
+            }
+            break;
         default:
             ENG_LOG("%s: Default\n",__FUNCTION__);
             ret = CMD_COMMON;
@@ -632,6 +638,7 @@ int eng_diag_getver(unsigned char *buf,int len, char *rsp)
     property_get(ENG_SPRD_VERS, sprdver, "");
     ENG_LOG("%s: %s",__FUNCTION__, sprdver);
 
+#if 0 // For getting AP version
 #ifndef ENG_AT_CHANNEL
     // open at sipc channel
     sipc_fd = eng_open_dev(at_sipc_devname[g_run_mode], O_WRONLY);
@@ -661,9 +668,9 @@ int eng_diag_getver(unsigned char *buf,int len, char *rsp)
 
     ptr = strstr(modemver, "HW");
     *ptr = 0;
-
+#endif
     //ok
-    sprintf(rsp, "%s %s",sprdver,modemver);
+    sprintf(rsp, "%s",sprdver);
     rlen = strlen(rsp);
 
     if(rlen > maxlen) {
