@@ -14286,14 +14286,15 @@
         server="www.mci.ir"
         type="default,supl"
     />
+    <!-- SPRD：remove port @{ -->
     <apn carrier="IR - MCI Wap"
         mcc="432"
         mnc="11"
         apn="mcinet"
-        port="80"
         server="www.mci.ir"
         type="default,supl"
     />
+    <!-- @} -->
     <apn carrier="IR - MCI MMS"
         mcc="432"
         mnc="11"
@@ -19795,18 +19796,18 @@
         type="default,supl"
         authtype="1"
     />
+    <!-- SPRD：Remove user and password @{ -->
     <apn carrier="AIS MMS"
         mcc="520"
         mnc="01"
         apn="multimedia"
         mmsproxy="203.170.229.34"
         mmsport="8080"
-        user="ais"
-        password="ais"
         mmsc="http://mms.mobilelife.co.th"
         type="mms"
         authtype="1"
     />
+    <!-- @} -->
     <!-- Thailand i-mobile3GX -->
     <apn carrier="i-mobile3GX internet"
         mcc="520"
@@ -19894,15 +19895,15 @@
     />
     -->
     <!-- Thailand True Move -->
+    <!-- SPRD：Remove user and password @{ -->
     <apn carrier="TRUE GPRS"
         mcc="520"
         mnc="99"
         apn="internet"
-        user="true"
-        password="true"
         type="default,supl"
         authtype="1"
     />
+    <!-- @} -->
     <apn carrier="TRUE WAP"
         mcc="520"
         mnc="99"
@@ -19915,17 +19916,17 @@
         type="default,supl"
         authtype="1"
     />
+    <!-- SPRD：Remove user and password @{ -->
     <apn carrier="TRUE MMS"
         mcc="520"
         mnc="99"
         apn="hmms"
         mmsproxy="10.4.7.39"
         mmsport="8080"
-        user="true"
-        password="true"
         mmsc="http://mms.trueh.com:8002"
         type="mms"
     />
+    <!-- @} -->
     <!-- Thailand TRUE-H -->
     <apn carrier="TRUE-H internet"
         mcc="520"
