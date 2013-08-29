@@ -79,6 +79,7 @@ private:
     uint32_t mTransform;
     float    mAlpha;
     bool mSkipFlag;
+    bool mFilteringEnabled;
 
 
     struct LayerRect *mRect;
