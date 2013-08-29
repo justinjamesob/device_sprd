@@ -2528,7 +2528,7 @@ int camera_take_picture_internal(takepicture_mode cap_mode)
 					CMR_LOGE("the senso interface is unsupported by V4L2");
 					return -CAMERA_FAILED;
 				}
-
+				usleep(100);
 				ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 				if (ret) {
 					CMR_LOGE("the sensor interface is unsupported by V4L2");
@@ -2645,6 +2645,7 @@ int camera_take_picture_internal_raw(takepicture_mode cap_mode)
 				CMR_LOGE("Sensor can't work at this mode %d", g_cxt->sn_cxt.capture_mode);
 				return -CAMERA_FAILED;
 			}
+			usleep(100);
 			ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 			if (ret) {
 				CMR_LOGE("the sensor interface is unsupported by V4L2");
