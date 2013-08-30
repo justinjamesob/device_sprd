@@ -4686,15 +4686,6 @@
         password="orange"
         type="default,supl"
     />
-    <apn carrier="Virgin"
-        mcc="208"
-        mnc="01"
-        apn="ofnew.fr"
-        user="orange"
-        password="orange"
-        type="default,supl"
-        authtype="3"
-    />
     <apn carrier="Orange Internet"
         mcc="208"
         mnc="01"
@@ -4805,6 +4796,16 @@
         type="mms"
         authtype="3"
     />
+    <!-- SPRD: Add Wap Simplicime apn @{ -->
+    <apn carrier="Wap Simplicime"
+        mcc="208"
+        mnc="10"
+        apn="wapdebitel"
+        proxy="192.168.21.3"
+        port="8080"
+        type="default,supl"
+    />
+    <!-- @} -->
     <apn carrier="ACCESS DATA"
         mcc="208"
         mnc="11"
