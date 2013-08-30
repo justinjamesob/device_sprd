@@ -110,6 +110,8 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/jpeg/jpeg_fw_8825/inc \
 	$(LOCAL_PATH)/jpeg/jpeg_fw_8825/src \
 	$(LOCAL_PATH)/sc8825/inc \
+	$(LOCAL_PATH)/sc8825/isp_calibration/inc \
+	$(LOCAL_PATH)/sensor_drv_u/inc \
 	$(LOCAL_PATH)/isp/inc \
 	external/skia/include/images \
 	external/skia/include/core\
@@ -132,8 +134,8 @@ LOCAL_SRC_FILES:= \
 	sc8825/src/dc_cfg.c \
 	sc8825/src/dc_product_cfg.c \
 	sc8825/src/sensor_cfg.c \
-	sc8825/src/sensor_drv_u.c \
 	sc8825/src/cmr_arith.c \
+	sensor_drv_u/src/sensor_drv_u.c \
 	sensor/sensor_ov5640_raw.c  \
 	sensor/sensor_ov5640.c  \
 	sensor/sensor_ov2640.c  \
@@ -189,6 +191,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/jpeg/jpeg_fw_8830/src \
 	$(LOCAL_PATH)/sc8830/inc \
 	$(LOCAL_PATH)/sc8830/isp_calibration/inc \
+	$(LOCAL_PATH)/sensor_drv_u/inc \
 	$(LOCAL_PATH)/isp/inc \
 	external/skia/include/images \
 	external/skia/include/core\
@@ -214,8 +217,8 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/dc_cfg.c \
 	sc8830/src/dc_product_cfg.c \
 	sc8830/src/sensor_cfg.c \
-	sc8830/src/sensor_drv_u.c \
 	sc8830/src/cmr_arith.c \
+	sensor_drv_u/src/sensor_drv_u.c \
 	sensor/sensor_ov8825_mipi_raw.c \
 	sensor/sensor_ov5648_mipi_raw.c \
 	sensor/sensor_imx179_mipi_raw.c \
@@ -263,10 +266,6 @@ endif
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc7710)
 LOCAL_CFLAGS += -DCONFIG_CAMERA_5M
-endif
-
-ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
-LOCAL_CFLAGS += -DCONFIG_CAMERA_SENSOR_NEW_FEATURE
 endif
 
 ifeq ($(strip $(TARGET_BOARD_CAMERA_FLASH_CTRL)),true)

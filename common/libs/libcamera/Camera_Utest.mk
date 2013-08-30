@@ -8,6 +8,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/jpeg/jpeg_fw_8830/inc \
 	$(LOCAL_PATH)/jpeg/jpeg_fw_8830/src \
 	$(LOCAL_PATH)/sc8830/inc \
+	$(LOCAL_PATH)/sensor_drv_u/inc \
 	$(LOCAL_PATH)/isp/inc \
 	$(LOCAL_PATH)/sc8830/isp_calibration/inc \
 	external/skia/include/images \
@@ -34,8 +35,8 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/dc_cfg.c \
 	sc8830/src/dc_product_cfg.c \
 	sc8830/src/sensor_cfg.c \
-	sc8830/src/sensor_drv_u.c \
 	sc8830/src/cmr_arith.c \
+	sensor_drv_u/src/sensor_drv_u.c \
 	sensor/sensor_ov8825_mipi_raw.c \
 	sensor/sensor_ov5648_mipi_raw.c \
 	sensor/sensor_imx179_mipi_raw.c \
@@ -79,10 +80,6 @@ LOCAL_CFLAGS := -fno-strict-aliasing -D_VSP_ -DJPEG_ENC -D_VSP_LINUX_ -DCHIP_END
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8810)
 LOCAL_CFLAGS += -DCONFIG_CAMERA_5M
-endif
-
-ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
-LOCAL_CFLAGS += -DCONFIG_CAMERA_SENSOR_NEW_FEATURE
 endif
 
 ifeq ($(strip $(TARGET_BOARD_CAMERA_FLASH_CTRL)),true)

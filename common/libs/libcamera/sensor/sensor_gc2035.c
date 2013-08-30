@@ -763,7 +763,6 @@ static SENSOR_REG_TAB_INFO_T s_GC2035_resolution_Tab_YUV[]=
 	{PNULL, 0, 0, 0, 0, 0}
 };
 
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 LOCAL SENSOR_VIDEO_INFO_T s_GC2035_video_info[] = {
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
@@ -775,7 +774,6 @@ LOCAL SENSOR_VIDEO_INFO_T s_GC2035_video_info[] = {
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL},
 	{{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, PNULL}
 };
-#endif
 
 static SENSOR_IOCTL_FUNC_TAB_T s_GC2035_ioctl_func_tab = 
 {
@@ -906,13 +904,9 @@ SENSOR_INFO_T g_GC2035_yuv_info =
 	0,						//atv output start postion
 	0,						//atv output end postion
 	0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1},
 	s_GC2035_video_info,
 	4,						//skip frame num while change setting
-#else
-	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1}
-#endif
 };
 
 static void GC2035_WriteReg( uint8_t  subaddr, uint8_t data )

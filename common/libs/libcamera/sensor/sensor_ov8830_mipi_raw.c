@@ -544,13 +544,9 @@ SENSOR_INFO_T g_ov8830_mipi_raw_info = {
 	0,
 	0,
 	0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CSI2, 4, 10, 0},
 	PNULL,
 	3,			// skip frame num while change setting
-#else
-	{SENSOR_INTERFACE_TYPE_CSI2, 4, 10, 0}
-#endif
 };
 
 LOCAL struct sensor_raw_info* Sensor_GetContext(void)

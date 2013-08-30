@@ -28,11 +28,12 @@
 #include "sensor_cfg.h"
 #include "sensor_drv_u.h"
 #include "cmr_msg.h"
+#include "isp_cali_interface.h"
 
 #define SENSOR_ONE_I2C	1
 #define SENSOR_ZERO_I2C	0
 #define SENSOR_16_BITS_I2C	2
-#define SENSOR_CHECK_STATUS_INTERVAL   100000
+#define SENSOR_CHECK_STATUS_INTERVAL   50000
 
 /*
 #define SENSOR_I2C_FREQ      (100*1000)
@@ -57,6 +58,10 @@ static char                     dev_name[50] = "/dev/sprd_sensor";
 static int                      g_fd_sensor = -1;
 static cmr_evt_cb               sensor_event_cb = NULL;
 static pthread_mutex_t          cb_mutex = PTHREAD_MUTEX_INITIALIZER;
+uint32_t g_is_calibration = 0;
+LOCAL pthread_t                 s_monitor_thread = 0;
+LOCAL volatile uint32_t         s_monitor_exit = 0;
+LOCAL uint32_t                  s_stream_on = 0;
 
 LOCAL int _Sensor_SetId(SENSOR_ID_E sensor_id);
 
@@ -99,33 +104,36 @@ LOCAL sem_t                       sensor_sync_sem;
 LOCAL sem_t                       st_on_sem;
 LOCAL sem_t                       st_off_sem;
 LOCAL sem_t                       st_af_sem;
+LOCAL sem_t                       st_setmode_sem;
 LOCAL volatile uint32_t           s_exit_flag = 0;
 #if 0
 LOCAL pthread_t                   s_sensor_monitor_thread = 0;
 LOCAL volatile uint32_t           s_exit_monitor_flag = 0;
 #endif
 /* Sensor Device IO Control  */
+#if 0
 #define SENSOR_IOC_MAGIC		'R'
 
-#define SENSOR_IO_PD				_IOW(SENSOR_IOC_MAGIC, 0,  BOOLEAN)
-#define SENSOR_IO_SET_AVDD			_IOW(SENSOR_IOC_MAGIC, 1,  uint32_t)
-#define SENSOR_IO_SET_DVDD			_IOW(SENSOR_IOC_MAGIC, 2,  uint32_t)
-#define SENSOR_IO_SET_IOVDD			_IOW(SENSOR_IOC_MAGIC, 3,  uint32_t)
-#define SENSOR_IO_SET_MCLK			_IOW(SENSOR_IOC_MAGIC, 4,  uint32_t)
-#define SENSOR_IO_RST				_IOW(SENSOR_IOC_MAGIC, 5,  uint32_t)
-#define SENSOR_IO_I2C_INIT			_IOW(SENSOR_IOC_MAGIC, 6,  uint32_t)
-#define SENSOR_IO_I2C_DEINIT		_IOW(SENSOR_IOC_MAGIC, 7,  uint32_t)
-#define SENSOR_IO_SET_ID			_IOW(SENSOR_IOC_MAGIC, 8,  uint32_t)
-#define SENSOR_IO_RST_LEVEL			_IOW(SENSOR_IOC_MAGIC, 9,  uint32_t)
-#define SENSOR_IO_I2C_ADDR			_IOW(SENSOR_IOC_MAGIC, 10, uint16_t)
-#define SENSOR_IO_I2C_READ			_IOWR(SENSOR_IOC_MAGIC, 11, SENSOR_REG_BITS_T)
-#define SENSOR_IO_I2C_WRITE			_IOW(SENSOR_IOC_MAGIC, 12, SENSOR_REG_BITS_T)
-#define SENSOR_IO_SET_FLASH			_IOW(SENSOR_IOC_MAGIC, 13, uint32_t)
-#define SENSOR_IO_I2C_WRITE_REGS	_IOW(SENSOR_IOC_MAGIC, 14, SENSOR_REG_TAB_T)
-#define SENSOR_IO_SET_CAMMOT		_IOW(SENSOR_IOC_MAGIC, 15,  uint32_t)
-#define SENSOR_IO_SET_I2CCLOCK		_IOW(SENSOR_IOC_MAGIC, 16,  uint32_t)
-#define SENSOR_IO_I2C_WRITE_EXT		_IOW(SENSOR_IOC_MAGIC, 17,  SENSOR_I2C_T)
-
+#define SENSOR_IO_PD                _IOW(SENSOR_IOC_MAGIC, 0,  BOOLEAN)
+#define SENSOR_IO_SET_AVDD          _IOW(SENSOR_IOC_MAGIC, 1,  uint32_t)
+#define SENSOR_IO_SET_DVDD          _IOW(SENSOR_IOC_MAGIC, 2,  uint32_t)
+#define SENSOR_IO_SET_IOVDD         _IOW(SENSOR_IOC_MAGIC, 3,  uint32_t)
+#define SENSOR_IO_SET_MCLK          _IOW(SENSOR_IOC_MAGIC, 4,  uint32_t)
+#define SENSOR_IO_RST               _IOW(SENSOR_IOC_MAGIC, 5,  uint32_t)
+#define SENSOR_IO_I2C_INIT          _IOW(SENSOR_IOC_MAGIC, 6,  uint32_t)
+#define SENSOR_IO_I2C_DEINIT        _IOW(SENSOR_IOC_MAGIC, 7,  uint32_t)
+#define SENSOR_IO_SET_ID            _IOW(SENSOR_IOC_MAGIC, 8,  uint32_t)
+#define SENSOR_IO_RST_LEVEL         _IOW(SENSOR_IOC_MAGIC, 9,  uint32_t)
+#define SENSOR_IO_I2C_ADDR          _IOW(SENSOR_IOC_MAGIC, 10, uint16_t)
+#define SENSOR_IO_I2C_READ          _IOWR(SENSOR_IOC_MAGIC, 11, SENSOR_REG_BITS_T)
+#define SENSOR_IO_I2C_WRITE         _IOW(SENSOR_IOC_MAGIC, 12, SENSOR_REG_BITS_T)
+#define SENSOR_IO_SET_FLASH         _IOW(SENSOR_IOC_MAGIC, 13, uint32_t)
+#define SENSOR_IO_I2C_WRITE_REGS    _IOW(SENSOR_IOC_MAGIC, 14, SENSOR_REG_TAB_T)
+#define SENSOR_IO_SET_CAMMOT        _IOW(SENSOR_IOC_MAGIC, 15,  uint32_t)
+#define SENSOR_IO_SET_I2CCLOCK      _IOW(SENSOR_IOC_MAGIC, 16,  uint32_t)
+#define SENSOR_IO_I2C_WRITE_EXT     _IOW(SENSOR_IOC_MAGIC, 17,  SENSOR_I2C_T)
+#define SENSOR_IO_GET_FLASH_LEVEL   _IOWR(SENSOR_IOC_MAGIC, 18,  SENSOR_FLASH_LEVEL_T)
+#endif
 #define SENSOR_MSG_QUEUE_SIZE           10
 
 enum {
@@ -134,7 +142,8 @@ enum {
 	SENSOR_EVT_STREAM_ON,
 	SENSOR_EVT_STREAM_OFF,
 	SENSOR_EVT_AF_INIT,
-	SENSOR_EVT_DEINIT
+	SENSOR_EVT_DEINIT,
+	SENSOR_EVT_SET_MODE_DONE
 };
 
 
@@ -481,6 +490,29 @@ LOCAL int _Sensor_Device_I2CWrite(SENSOR_I2C_T_PTR i2c_tab)
 	return ret;
 }
 
+LOCAL int _Sensor_Device_GetFlashLevel(SENSOR_FLASH_LEVEL_T *level)
+{
+	int ret = SENSOR_SUCCESS;
+
+	ret = xioctl(g_fd_sensor, SENSOR_IO_GET_FLASH_LEVEL, level);
+	if (0 != ret)
+	{
+		SENSOR_PRINT_ERR("_Sensor_Device_GetFlashLevel failed, ret=%d \n",  ret);
+		ret = -1;
+	}
+
+	return ret;
+}
+
+int Sensor_GetFlashLevel(SENSOR_FLASH_LEVEL_T *level)
+{
+	int ret = SENSOR_SUCCESS;
+
+	ret = _Sensor_Device_GetFlashLevel(level);
+
+	return ret;
+}
+
 int Sensor_WriteI2C(uint16_t slave_addr, uint8_t *cmd, uint16_t cmd_length)
 {
 	SENSOR_I2C_T i2c_tab;
@@ -557,7 +589,7 @@ int Sensor_SetMCLK(uint32_t mclk)
 }
 
 int Sensor_SetVoltage(SENSOR_AVDD_VAL_E dvdd_val, SENSOR_AVDD_VAL_E avdd_val,
-		       SENSOR_AVDD_VAL_E iodd_val)
+			SENSOR_AVDD_VAL_E iodd_val)
 {
 
 	int err = 0;
@@ -577,6 +609,31 @@ int Sensor_SetVoltage(SENSOR_AVDD_VAL_E dvdd_val, SENSOR_AVDD_VAL_E avdd_val,
 	SENSOR_PRINT_HIGH("Sensor_SetVoltage avdd_val = %d,  dvdd_val=%d, iodd_val=%d \n", avdd_val, dvdd_val, iodd_val);
 
 	return err;
+}
+
+int Sensor_SetAvddVoltage(SENSOR_AVDD_VAL_E vdd_val)
+{
+	int rtn  = SENSOR_SUCCESS;
+	rtn = _Sensor_Device_SetVoltageAVDD((uint32_t)vdd_val);
+	SENSOR_PRINT_HIGH("Sensor_SetAvddVoltage vdd_val is %d, set result is =%d \n", vdd_val, rtn);
+	return rtn;
+}
+
+int Sensor_SetDvddVoltage(SENSOR_AVDD_VAL_E vdd_val)
+{
+	int rtn  = SENSOR_SUCCESS;
+	rtn = _Sensor_Device_SetVoltageDVDD((uint32_t)vdd_val);
+	SENSOR_PRINT_HIGH("Sensor_SetDvddVoltage vdd_val is %d, set result is =%d \n", vdd_val, rtn);
+	return rtn;
+}
+
+
+int Sensor_SetIovddVoltage(SENSOR_AVDD_VAL_E vdd_val)
+{
+	int rtn  = SENSOR_SUCCESS;
+	rtn = _Sensor_Device_SetVoltageIOVDD((uint32_t)vdd_val);
+	SENSOR_PRINT_HIGH("Sensor_SetIovddVoltage vdd_val is %d, set result is =%d \n", vdd_val, rtn);
+	return rtn;
 }
 
 int Sensor_SetMonitorVoltage(SENSOR_AVDD_VAL_E vdd_val)
@@ -702,12 +759,12 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	SENSOR_REG_TAB_INFO_T *resolution_info_ptr = PNULL;
 	SENSOR_TRIM_T_PTR resolution_trim_ptr = PNULL;
 	SENSOR_INFO_T *sensor_info_ptr = s_sensor_info_ptr;
+	SENSOR_VIDEO_INFO_T   *video_info_ptr = PNULL;
 	uint32_t i = 0;
 
 	SENSOR_PRINT("SENSOR: Sensor_SetExportInfo.\n");
-
 	if (NULL == sensor_info_ptr) {
-		SENSOR_PRINT("SENSOR: s_sensor_info_ptr is NULL, direct return abnormal!");
+		SENSOR_PRINT("SENSOR: sensor_info_ptr is null.\n");
 		return;
 	}
 
@@ -723,7 +780,8 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	    ((sensor_info_ptr->hw_signal_polarity >> 4) & 0x1);
 	exp_info_ptr->pclk_delay =
 	    ((sensor_info_ptr->hw_signal_polarity >> 5) & 0x07);
-	if ((NULL != sensor_info_ptr) && (NULL!=sensor_info_ptr->raw_info_ptr)) {
+
+	if (NULL!=sensor_info_ptr->raw_info_ptr) {
 		exp_info_ptr->raw_info_ptr = (struct sensor_raw_info*)*sensor_info_ptr->raw_info_ptr;
 	}
 
@@ -797,19 +855,27 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 				exp_info_ptr->sensor_mode_info[i].image_format =
 				    resolution_info_ptr->image_format;
 			}
-/*
-			SENSOR_PRINT
-			    ("SENSOR: SENSOR mode Info > mode = %d, width = %d, height = %d, format = %d.\n",
-			     i, resolution_info_ptr->width,
-			     resolution_info_ptr->height,
-			     exp_info_ptr->sensor_mode_info[i].image_format);
-*/
 		} else {
 			exp_info_ptr->sensor_mode_info[i].mode =
 			    SENSOR_MODE_MAX;
 		}
+		if (PNULL != sensor_info_ptr->video_tab_info_ptr) {
+			video_info_ptr = &sensor_info_ptr->video_tab_info_ptr[i];
+			if (PNULL != video_info_ptr) {
+				memcpy((void*)&exp_info_ptr->sensor_video_info[i], (void*)video_info_ptr,sizeof(SENSOR_VIDEO_INFO_T));
+	/*			SENSOR_PRINT("mode1:%d,%d,%d,%d.",exp_info_ptr->sensor_video_info[i].ae_info[0].min_frate,exp_info_ptr->sensor_video_info[i].ae_info[0].max_frate,
+					exp_info_ptr->sensor_video_info[i].ae_info[0].gain,exp_info_ptr->sensor_video_info[i].ae_info[0].line_time);
+				SENSOR_PRINT("mode2:%d,%d,%d,%d.",exp_info_ptr->sensor_video_info[i].ae_info[1].min_frate,exp_info_ptr->sensor_video_info[i].ae_info[1].max_frate,
+					exp_info_ptr->sensor_video_info[i].ae_info[1].gain,exp_info_ptr->sensor_video_info[i].ae_info[1].line_time);
+				SENSOR_PRINT("mode3:%d,%d,%d,%d.",exp_info_ptr->sensor_video_info[i].ae_info[2].min_frate,exp_info_ptr->sensor_video_info[i].ae_info[2].max_frate,
+					exp_info_ptr->sensor_video_info[i].ae_info[2].gain,exp_info_ptr->sensor_video_info[i].ae_info[2].line_time);
+				SENSOR_PRINT("mode4:%d,%d,%d,%d.",exp_info_ptr->sensor_video_info[i].ae_info[3].min_frate,exp_info_ptr->sensor_video_info[i].ae_info[3].max_frate,
+					exp_info_ptr->sensor_video_info[i].ae_info[3].gain,exp_info_ptr->sensor_video_info[i].ae_info[3].line_time);*/
+			}
+		}
 	}
 	exp_info_ptr->sensor_interface = sensor_info_ptr->sensor_interface;
+	exp_info_ptr->change_setting_skip_num = sensor_info_ptr->change_setting_skip_num;
 }
 
 int32_t Sensor_WriteReg(uint16_t subaddr, uint16_t data)
@@ -1328,7 +1394,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 	SENSOR_PRINT("_Sensor_SetStatus: 3");
 	//reset target sensor. and make normal.
 /*	Sensor_Reset_EX((BOOLEAN)s_sensor_info_ptr->power_down_level, s_sensor_info_ptr->reset_pulse_level);*/
-	//Sensor_SetExportInfo(&s_sensor_exp_info);
+	Sensor_SetExportInfo(&s_sensor_exp_info);
 	SENSOR_PRINT("_Sensor_SetStatus: 4");
 }
 
@@ -1357,6 +1423,11 @@ LOCAL int _Sensor_DeviceInit()
 	}
 
 	ret = _Sensor_CreateThread();
+	if (ret) {
+		SENSOR_PRINT_HIGH("Failed to create sensor thread");
+		return ret;
+	}
+	ret = _Sensor_CreateMonitorThread();
 	sensor_event_cb = NULL;
 
 	return ret;
@@ -1370,6 +1441,7 @@ LOCAL int _Sensor_DeviceDeInit()
 		g_fd_sensor = -1;
 		SENSOR_PRINT("SENSOR: _Sensor_DeviceDeInit is done, ret = %d \n", ret);
 	}
+	_Sensor_KillMonitorThread();
 	_Sensor_KillThread();
 
 	return 0;
@@ -1474,6 +1546,481 @@ void _Sensor_save_sensor_type(void)
 	}
 }
 
+static uint32_t s_lnc_addr_bakup[8][4]; /*item0: index, item1: new_address, item2: original address, item3: length*/
+static void _sensor_calil_lnc_param_recover(SENSOR_INFO_T *sensor_info_ptr)
+{
+	uint32_t i = 0;
+	uint32_t index = 0;
+	uint32_t length = 0;
+	uint32_t addr = 0;
+	struct sensor_raw_fix_info *raw_fix_info_ptr = PNULL;
+	raw_fix_info_ptr = ((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->fix_ptr;
+
+	for (i = 0; i < 8; i++) {
+
+		if (s_lnc_addr_bakup[i][1]) {
+
+			free((void*)s_lnc_addr_bakup[i][1]);
+			s_lnc_addr_bakup[i][1] = 0;
+			index = s_lnc_addr_bakup[i][0];//index
+			length = s_lnc_addr_bakup[i][3];//length
+			addr = s_lnc_addr_bakup[i][2];//original address
+
+			raw_fix_info_ptr->lnc.map[index][0].param_addr = (uint16_t*)addr;
+			raw_fix_info_ptr->lnc.map[index][0].len = length;
+			s_lnc_addr_bakup[i][0] = 0;
+			s_lnc_addr_bakup[i][1] = 0;
+			s_lnc_addr_bakup[i][2] = 0;
+			s_lnc_addr_bakup[i][3] = 0;
+		}
+	}
+
+//memset((void*)&s_lnc_addr_bakup[0][0], 0x00, sizeof(s_lnc_addr_bakup));
+	g_is_calibration = 0;
+
+	SENSOR_PRINT("hait_test: _sensor_calil_lnc_param_recover g_is_calibration: %d\n", g_is_calibration);
+
+}
+
+static int _sensor_cali_lnc_param_update(char *cfg_file_dir,SENSOR_INFO_T *sensor_info_ptr,SENSOR_ID_E sensor_id)
+{
+	const char *sensor_name = sensor_info_ptr->name;
+	FILE *fp = PNULL;
+	char file_name[80] = {0};
+	char* file_name_ptr = 0;
+	uint32_t str_len = 0;
+	int file_pos = 0;
+	uint32_t file_size = 0;
+	char *data_ptr;
+	int i,j;
+	uint16_t *temp_buf_16 = PNULL;
+	uint32_t width;
+	uint32_t height;
+	uint32_t index = 0;
+	uint32_t rtn = SENSOR_SUCCESS;
+	SENSOR_TRIM_T *trim_ptr = 0;
+	struct sensor_raw_fix_info *raw_fix_info_ptr = PNULL;
+
+	if(SENSOR_IMAGE_FORMAT_RAW != sensor_info_ptr->image_format){
+		rtn = SENSOR_FAIL;
+		goto cali_lnc_param_update_exit;
+	}
+
+	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
+	file_name_ptr = (char*)&file_name[0] + str_len;
+
+	/*LNC DATA Table*/
+	temp_buf_16 = (uint16_t*)malloc(128*1024*2);
+	if(!temp_buf_16){
+
+		rtn = SENSOR_FAIL;
+		goto cali_lnc_param_update_exit;
+	}
+
+	trim_ptr = (SENSOR_TRIM_T *)(s_sensor_info_ptr->ioctl_func_tab_ptr->get_trim(0));
+	raw_fix_info_ptr = ((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->fix_ptr;
+	i = 1;
+	while(1) {
+		height = trim_ptr[i].trim_height;
+		width = trim_ptr[i].trim_width;
+		//SENSOR_PRINT("_sensor_cali_param_update: w:%d, h:%d\n", width, height);
+		if ((0 == height) || (0 == width)) {
+			break;
+		}
+
+		sprintf(file_name_ptr, "_lnc_%d_%d_%d_rdm.dat", width, height, (i - 1));
+
+		fp = fopen(file_name, "rb");
+		if (0 == fp) {
+
+			SENSOR_PRINT("_sensor_cali_param_update: does not find calibration file\n");
+			i++;
+			continue;
+		}
+
+		fseek(fp, 0L, SEEK_END);
+		file_pos = ftell(fp);
+		if (file_pos >= 0) {
+			file_size = (uint32_t)file_pos;
+		} else {
+			fclose(fp);
+			free(temp_buf_16);
+			temp_buf_16 = NULL;
+			SENSOR_PRINT("file pointers error!");
+			rtn = SENSOR_FAIL;
+			goto cali_lnc_param_update_exit;
+		}
+		fseek(fp, 0L, SEEK_SET);
+
+		fread(temp_buf_16,1,file_size,fp);
+		fclose(fp);
+
+		if (file_size != raw_fix_info_ptr->lnc.map[i-1][0].len) {
+			SENSOR_PRINT("_sensor_cali_param_update: file size dis-match, do not replace, w:%d, h:%d, ori: %d, now:%d/n", 
+				width, height, raw_fix_info_ptr->lnc.map[i-1][0].len, file_size);
+		} else {
+			if (s_lnc_addr_bakup[index][1]) {
+				free((void*)s_lnc_addr_bakup[index][1]);
+				s_lnc_addr_bakup[index][1] = 0;
+			}
+			s_lnc_addr_bakup[index][1] = (uint32_t)malloc(file_size);
+			if (0 == s_lnc_addr_bakup[index][1]) {
+				rtn = SENSOR_FAIL;
+				SENSOR_PRINT("malloc failed i = %d\n", i);
+				goto cali_lnc_param_update_exit;
+			}
+			memset((void*)s_lnc_addr_bakup[index][1], 0x00, file_size);
+
+			s_lnc_addr_bakup[index][0] = i -1;
+			s_lnc_addr_bakup[index][2] = (uint32_t)raw_fix_info_ptr->lnc.map[i-1][0].param_addr;	/*save the original address*/
+			s_lnc_addr_bakup[index][3] = file_size;
+			data_ptr = (char*)s_lnc_addr_bakup[index][1];
+			raw_fix_info_ptr->lnc.map[i-1][0].param_addr = (uint16_t*)data_ptr;
+			memcpy(data_ptr, temp_buf_16, file_size);
+			index++;
+			SENSOR_PRINT("_sensor_cali_param_update: replace finished/n");
+		}
+
+		i++;
+	}
+
+	if (temp_buf_16) {
+
+		free((void*)temp_buf_16);
+		temp_buf_16 = 0;
+
+	}
+	return rtn;
+
+cali_lnc_param_update_exit:
+
+	if (temp_buf_16) {
+
+		free((void*)temp_buf_16);
+		temp_buf_16 = 0;
+
+	}
+
+	_sensor_calil_lnc_param_recover(sensor_info_ptr);
+
+	return rtn;
+}
+
+
+static int _sensor_cali_awb_param_update(char *cfg_file_dir,SENSOR_INFO_T *sensor_info_ptr,SENSOR_ID_E sensor_id)
+{
+	int rtn = 0;
+	const char *sensor_name = sensor_info_ptr->name;
+	FILE *fp = PNULL;
+	char file_name[80] = {0};
+	char buf[256] = {0x00};
+	char* file_name_ptr = 0;
+	uint32_t str_len = 0;
+	int file_pos = 0;
+	uint32_t file_size = 0;
+	struct isp_bayer_ptn_stat_t *stat_ptr = PNULL;
+	struct sensor_cali_info *cali_info_ptr = PNULL;
+	struct sensor_raw_tune_info *raw_tune_info_ptr = PNULL;
+
+	if(SENSOR_IMAGE_FORMAT_RAW != sensor_info_ptr->image_format){
+		return SENSOR_FAIL;
+	}
+	raw_tune_info_ptr = (struct sensor_raw_tune_info*)(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->tune_ptr);
+	cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.cali_info);
+
+	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
+	file_name_ptr = (char*)&file_name[0] + str_len;
+
+	sprintf(file_name_ptr, "_awb_rdm.dat");
+
+	SENSOR_PRINT("_sensor_cali_awb_param_update: %s\n", file_name);
+	fp = fopen(file_name, "rb");
+	if (0 == fp) {
+
+		SENSOR_PRINT("_sensor_cali_awb_param_update: does not find calibration file\n");
+
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.golden_cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+		rtn = SENSOR_SUCCESS;
+		return rtn;
+
+	} else {
+		fseek(fp, 0L, SEEK_END);
+		file_pos = ftell(fp);
+		if (file_pos >= 0) {
+			file_size = (uint32_t)file_pos;
+		} else {
+			fclose(fp);
+			SENSOR_PRINT("file pointers error!");
+			return SENSOR_FAIL;
+		}
+		fseek(fp, 0L, SEEK_SET);
+
+		fread(buf,1,file_size,fp);
+		fclose(fp);
+
+		stat_ptr = (struct isp_bayer_ptn_stat_t*)&buf[0];
+		cali_info_ptr->r_sum = stat_ptr->r_stat;
+		cali_info_ptr->b_sum = stat_ptr->b_stat;
+		cali_info_ptr->gr_sum = stat_ptr->gr_stat;
+		cali_info_ptr->gb_sum = stat_ptr->gb_stat;
+
+//		SENSOR_PRINT("_sensor_cali_awb_param_update: %d, %d, %d, %d\n",  stat_ptr->r_stat,  stat_ptr->b_stat, stat_ptr->gr_stat, stat_ptr->gb_stat);
+
+		rtn = SENSOR_SUCCESS;
+	}
+
+	memset (&file_name[0], 0x00, sizeof (file_name));
+	memset (&buf[0], 0x00, sizeof (buf));
+	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
+	file_name_ptr = (char*)&file_name[0] + str_len;
+
+	sprintf(file_name_ptr, "_awb_gldn.dat");
+
+	SENSOR_PRINT("_sensor_cali_awb_param_update: %s\n", file_name);
+	cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.golden_cali_info);
+	fp = fopen(file_name, "rb");
+	if (0 == fp) {
+
+		SENSOR_PRINT("_sensor_cali_awb_param_update: does not find calibration file\n");
+
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		rtn = SENSOR_SUCCESS;
+		return rtn;
+
+	} else {
+		fseek(fp, 0L, SEEK_END);
+		file_pos = ftell(fp);
+		if (file_pos >= 0) {
+			file_size = (uint32_t)file_pos;
+		} else {
+			fclose(fp);
+			SENSOR_PRINT("file pointers error!");
+			return SENSOR_FAIL;
+		}
+		fseek(fp, 0L, SEEK_SET);
+
+		fread(buf,1,file_size,fp);
+		fclose(fp);
+
+		stat_ptr = (struct isp_bayer_ptn_stat_t*)&buf[0];
+		cali_info_ptr->r_sum = stat_ptr->r_stat;
+		cali_info_ptr->b_sum = stat_ptr->b_stat;
+		cali_info_ptr->gr_sum = stat_ptr->gr_stat;
+		cali_info_ptr->gb_sum = stat_ptr->gb_stat;
+
+//		SENSOR_PRINT("_sensor_cali_awb_param_update: %d, %d, %d, %d\n",  stat_ptr->r_stat,  stat_ptr->b_stat, stat_ptr->gr_stat, stat_ptr->gb_stat);
+
+		rtn = SENSOR_SUCCESS;
+	}
+
+
+	return rtn;
+}
+
+static int _sensor_cali_flashlight_param_update(char *cfg_file_dir,SENSOR_INFO_T *sensor_info_ptr, SENSOR_ID_E sensor_id)
+{
+	int rtn = 0;
+	const char *sensor_name = sensor_info_ptr->name;
+	FILE *fp = PNULL;
+	char file_name[80] = {0};
+	char buf[256] = {0x00};
+	char* file_name_ptr = 0;
+	uint32_t str_len = 0;
+	int file_pos = 0;
+	uint32_t file_size = 0;
+	struct isp_bayer_ptn_stat_t *stat_ptr = PNULL;
+	struct sensor_cali_info *cali_info_ptr = PNULL;
+	struct sensor_raw_tune_info *raw_tune_info_ptr = PNULL;
+
+	if(SENSOR_IMAGE_FORMAT_RAW != sensor_info_ptr->image_format){
+		return SENSOR_FAIL;
+	}
+	raw_tune_info_ptr = (struct sensor_raw_tune_info*)(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->tune_ptr);
+	cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.cali_info);
+
+	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
+	file_name_ptr = (char*)&file_name[0] + str_len;
+
+	sprintf(file_name_ptr, "_flashlight_rdm.dat");
+
+	SENSOR_PRINT("_sensor_cali_flashlight_param_update: %s\n", file_name);
+	fp = fopen(file_name, "rb");
+	if (0 == fp) {
+
+		SENSOR_PRINT("_sensor_cali_flashlight_param_update: does not find calibration file\n");
+
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.golden_cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		rtn = SENSOR_SUCCESS;
+		return rtn;
+
+	} else {
+		fseek(fp, 0L, SEEK_END);
+		file_pos = ftell(fp);
+		if (file_pos >= 0) {
+			file_size = (uint32_t)file_pos;
+		} else {
+			fclose(fp);
+			SENSOR_PRINT("file pointers error!");
+			return SENSOR_FAIL;
+		}
+		fseek(fp, 0L, SEEK_SET);
+
+		fread(buf,1,file_size,fp);
+		fclose(fp);
+
+		stat_ptr = (struct isp_bayer_ptn_stat_t*)&buf[0];
+		cali_info_ptr->r_sum = stat_ptr->r_stat;
+		cali_info_ptr->b_sum = stat_ptr->b_stat;
+		cali_info_ptr->gr_sum = stat_ptr->gr_stat;
+		cali_info_ptr->gb_sum = stat_ptr->gb_stat;
+
+//		SENSOR_PRINT("_sensor_cali_flashlight_param_update: %d, %d, %d, %d\n",  stat_ptr->r_stat,  stat_ptr->b_stat, stat_ptr->gr_stat, stat_ptr->gb_stat);
+
+		rtn = SENSOR_SUCCESS;
+	}
+
+	memset (&file_name[0], 0x00, sizeof (file_name));
+	memset (&buf[0], 0x00, sizeof (buf));
+	str_len = sprintf(file_name, "%ssensor_%s",cfg_file_dir, sensor_name);
+	file_name_ptr = (char*)&file_name[0] + str_len;
+
+	sprintf(file_name_ptr, "_flashlight_gldn.dat");
+
+	SENSOR_PRINT("_sensor_cali_flashlight_param_update: %s\n", file_name);
+	cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.golden_cali_info);
+	fp = fopen(file_name, "rb");
+	if (0 == fp) {
+
+		SENSOR_PRINT("_sensor_cali_flashlight_param_update: does not find calibration file\n");
+
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		rtn = SENSOR_SUCCESS;
+		return rtn;
+
+	} else {
+		fseek(fp, 0L, SEEK_END);
+
+		file_pos = ftell(fp);
+		if (file_pos >= 0) {
+			file_size = (uint32_t)file_pos;
+		} else {
+			fclose(fp);
+			SENSOR_PRINT("file pointers error!");
+			return SENSOR_FAIL;
+		}
+		fseek(fp, 0L, SEEK_SET);
+
+		fread(buf,1,file_size,fp);
+		fclose(fp);
+
+		stat_ptr = (struct isp_bayer_ptn_stat_t*)&buf[0];
+		cali_info_ptr->r_sum = stat_ptr->r_stat;
+		cali_info_ptr->b_sum = stat_ptr->b_stat;
+		cali_info_ptr->gr_sum = stat_ptr->gr_stat;
+		cali_info_ptr->gb_sum = stat_ptr->gb_stat;
+
+//		SENSOR_PRINT("_sensor_cali_flashlight_param_update: %d, %d, %d, %d\n",  stat_ptr->r_stat,  stat_ptr->b_stat, stat_ptr->gr_stat, stat_ptr->gb_stat);
+
+		rtn = SENSOR_SUCCESS;
+	}
+
+
+	return rtn;
+}
+
+static int  _sensor_cali_load_param(char *cfg_file_dir,SENSOR_INFO_T *sensor_info_ptr,SENSOR_ID_E sensor_id)
+{
+	int rtn = 0;
+
+	if (1 != g_is_calibration) {/*for normal*/
+
+		rtn = _sensor_cali_lnc_param_update(cfg_file_dir,sensor_info_ptr, sensor_id);
+		if (rtn) {
+
+			return SENSOR_FAIL;
+		}
+		rtn = _sensor_cali_flashlight_param_update(cfg_file_dir,sensor_info_ptr, sensor_id);
+		if (rtn) {
+			return SENSOR_FAIL;
+		}
+		rtn = _sensor_cali_awb_param_update(cfg_file_dir,sensor_info_ptr, sensor_id);
+		if (rtn) {
+			return SENSOR_FAIL;
+		}
+	} else {/*for calibration*/
+
+		struct sensor_cali_info *cali_info_ptr = PNULL;
+
+		/*for awb calibration*/
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->awb.golden_cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		/*for flash  calibration*/
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+
+		cali_info_ptr = (struct sensor_cali_info*)&(((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->cali_ptr->flashlight.golden_cali_info);
+		cali_info_ptr->r_sum = 1024;
+		cali_info_ptr->b_sum = 1024;
+		cali_info_ptr->gr_sum = 1024;
+		cali_info_ptr->gb_sum = 1024;
+	}
+
+	return SENSOR_SUCCESS;
+}
+
+static char cali_file_dir[64] = "/data/";
 int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 {
 	int ret_val = SENSOR_FAIL;
@@ -1502,9 +2049,11 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 			if (SENSOR_SUCCESS == _Sensor_Register(SENSOR_MAIN)) {
 				sensor_num++;
 			}
+#ifndef CONFIG_DCAM_SENSOR_NO_FRONT_SUPPORT
 			if (SENSOR_SUCCESS == _Sensor_Register(SENSOR_SUB)) {
 				sensor_num++;
 			}
+#endif
 			SENSOR_PRINT("1");
 
 			ret_val = Sensor_Open(sensor_id);
@@ -1518,8 +2067,10 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 			SENSOR_PRINT("Sensor_Init: register sesnor fail, start identify \n");
 			if (_Sensor_Identify(SENSOR_MAIN))
 				sensor_num++;
+#ifndef CONFIG_DCAM_SENSOR_NO_FRONT_SUPPORT
 			if (_Sensor_Identify(SENSOR_SUB))
 				sensor_num++;
+#endif
 			ret_val = Sensor_Open(sensor_id);
 		}
 		s_sensor_identified = SCI_TRUE;
@@ -1533,6 +2084,18 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 	}
 
 	_Sensor_save_sensor_type();
+
+	if (SENSOR_IMAGE_FORMAT_RAW == s_sensor_info_ptr->image_format) {
+		if (SENSOR_SUCCESS == ret_val) {
+			//SENSOR_PRINT("hait_test: g_is_calibration: %d\n", g_is_calibration);
+			ret_val = _sensor_cali_load_param(cali_file_dir, s_sensor_info_ptr, sensor_id);
+			if (ret_val) {
+				SENSOR_PRINT("load cali data fail!! rtn:%d",ret_val);
+				return ret_val;
+			}
+		}
+	}
+
 
 	*sensor_num_ptr = sensor_num;
 
@@ -1589,6 +2152,14 @@ int Sensor_Open(uint32_t sensor_id)
 			_Sensor_I2CDeInit(sensor_id);
 			ret_val = SENSOR_FAIL;
 		}
+
+		if((NULL != s_sensor_info_ptr)
+			&&(NULL != s_sensor_info_ptr->ioctl_func_tab_ptr)
+			&&(PNULL != s_sensor_info_ptr->ioctl_func_tab_ptr->cfg_otp))
+		{
+			s_sensor_info_ptr->ioctl_func_tab_ptr->cfg_otp(0);
+		}
+
 		SENSOR_PRINT("Sensor_Open: 4\n");
 		//s_sensor_init = SENSOR_TRUE;
 		SENSOR_PRINT("SENSOR: Sensor_Init  Success");
@@ -1602,6 +2173,7 @@ int Sensor_Open(uint32_t sensor_id)
 
 int _Sensor_SetMode(uint32_t mode)
 {
+	int32_t rtn;
 	uint32_t mclk;
 	SENSOR_IOCTL_FUNC_PTR set_reg_tab_func=s_sensor_info_ptr->ioctl_func_tab_ptr->cus_func_1;
 
@@ -1636,11 +2208,6 @@ int _Sensor_SetMode(uint32_t mode)
 	return SENSOR_SUCCESS;
 }
 
-int Sensor_SetMode_WaitDone(void)
-{
-	return SENSOR_SUCCESS;
-}
-
 int Sensor_SetMode(uint32_t mode)
 {
 	int                      ret = 0;
@@ -1654,6 +2221,30 @@ int Sensor_SetMode(uint32_t mode)
 	}
 
 	return ret;
+}
+
+int Sensor_SetMode_WaitDone(void)
+{
+	int                      ret = 0;
+	CMR_MSG_INIT(message);
+
+	message.msg_type = SENSOR_EVT_SET_MODE_DONE;
+	ret = cmr_msg_post(s_queue_handle, &message);
+	if (ret) {
+		CMR_LOGE("Fail to send message");
+	}
+	sem_wait(&st_setmode_sem);
+	return ret;
+}
+
+int Sensor_GetMode(uint32_t *mode)
+{
+	if (SENSOR_FALSE == Sensor_IsInit()) {
+		SENSOR_PRINT("sensor has not init");
+		return SENSOR_OP_STATUS_ERR;
+	}
+	*mode = s_sensor_mode[Sensor_GetCurId()];
+	return SENSOR_SUCCESS;
 }
 
 int _Sensor_StreamOn(void)
@@ -1674,7 +2265,10 @@ int _Sensor_StreamOn(void)
 	if (PNULL != stream_on_func) {
 		err = stream_on_func(param);
 	}
-	//_Sensor_CreateMonitorThread();
+
+	if (0 == err) {
+		s_stream_on = 1;
+	}
 	sem_post(&st_on_sem);
 	return err;
 }
@@ -1729,7 +2323,7 @@ int _Sensor_StreamOff(void)
 	if (PNULL != stream_off_func) {
 		err = stream_off_func(param);
 	}
-	//_Sensor_KillMonitorThread();
+	s_stream_on = 0;
 	sem_post(&st_off_sem);
 	return err;
 }
@@ -1758,8 +2352,9 @@ uint32_t Sensor_Ioctl(uint32_t cmd, uint32_t arg)
 	uint32_t temp;
 	uint32_t ret_value = SENSOR_SUCCESS;
 
-	SENSOR_PRINT("SENSOR: Sensor_Ioctl -> cmd = %d, arg = %d.\n", cmd, arg);
-
+	if (SENSOR_IOCTL_GET_STATUS != cmd) {
+		SENSOR_PRINT("SENSOR: Sensor_Ioctl -> cmd = %d, arg = %d.\n", cmd, arg);
+	}
 	if (!Sensor_IsInit()) {
 		SENSOR_PRINT("SENSOR: Sensor_Ioctl -> sensor has not init.\n");
 		return SENSOR_OP_STATUS_ERR;
@@ -1779,8 +2374,8 @@ uint32_t Sensor_Ioctl(uint32_t cmd, uint32_t arg)
 		ret_value = func_ptr(arg);
 		//ImgSensor_PutMutex();
 	} else {
-		SENSOR_PRINT
-		    ("SENSOR: Sensor_Ioctl -> the ioctl function has not register err!\n");
+/*		SENSOR_PRINT
+		    ("SENSOR: Sensor_Ioctl -> the ioctl function has not register err!\n");*/
 	}
 	return ret_value;
 }
@@ -1799,6 +2394,12 @@ SENSOR_EXP_INFO_T *Sensor_GetInfo(void)
 ERR_SENSOR_E Sensor_Close(void)
 {
 	SENSOR_PRINT("SENSOR: Sensor_close");
+
+	if (SENSOR_IMAGE_FORMAT_RAW == s_sensor_info_ptr->image_format) {
+		if (0 == g_is_calibration) {
+			_sensor_calil_lnc_param_recover(s_sensor_info_ptr);
+		}
+	}
 
 	if (1 == g_is_register_sensor) {
 		if (1 == g_is_main_sensor) {
@@ -2036,7 +2637,7 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 		sensor_exif_info_ptr = &s_default_exif;
 		SENSOR_PRINT
 		    ("SENSOR: Sensor_SetSensorExifInfo the get_exif fun is null error \n");
-		return SENSOR_FAIL;
+/*		return SENSOR_FAIL;*/
 	}
 
 	switch (cmd) {
@@ -2092,6 +2693,32 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 	case SENSOR_EXIF_CTRL_APERTUREVALUE:
 		break;
 	case SENSOR_EXIF_CTRL_BRIGHTNESSVALUE:
+		{
+			sensor_exif_info_ptr->valid.BrightnessValue = 1;
+			switch (param) {
+			case 0:
+			case 1:
+			case 2:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 1;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 1;
+				break;
+			case 3:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 0;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 0;
+				break;
+			case 4:
+			case 5:
+			case 6:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 2;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 2;
+				break;
+			default:
+				sensor_exif_info_ptr->BrightnessValue.numerator = 0xff;
+				sensor_exif_info_ptr->BrightnessValue.denominator = 0xff;
+				break;
+			}
+			break;
+		}
 		break;
 	case SENSOR_EXIF_CTRL_EXPOSUREBIASVALUE:
 		break;
@@ -2369,6 +2996,7 @@ LOCAL int   _Sensor_CreateThread(void)
 	sem_init(&st_off_sem, 0, 0);
 	sem_init(&st_af_sem, 0, 0);
 	sem_init(&sensor_sync_sem, 0, 0);
+	sem_init(&st_setmode_sem, 0, 0);
 	s_exit_flag = 0;
 	ret = cmr_msg_queue_create(SENSOR_MSG_QUEUE_SIZE, &s_queue_handle);
 	if (ret) {
@@ -2418,6 +3046,7 @@ LOCAL int _Sensor_KillThread(void)
 	s_sensor_thread = 0;
 	sem_destroy(&st_on_sem);
 	sem_destroy(&st_off_sem);
+	sem_destroy(&st_setmode_sem);
 	sem_destroy(&st_af_sem);
 	sem_destroy(&sensor_sync_sem);
 
@@ -2477,7 +3106,10 @@ LOCAL void* _Sensor_ThreadProc(void* data)
 			CMR_LOGV("SENSOR_EVT_AF_INIT");
 			ret = _Sensor_AutoFocusInit();
 			sem_post(&st_af_sem);
-			CMR_LOGV("SENSOR_EVT_AF_INIT, Done");
+			/*CMR_LOGV("SENSOR_EVT_AF_INIT, Done");*/
+			break;
+		case SENSOR_EVT_SET_MODE_DONE:
+			sem_post(&st_setmode_sem);
 			break;
 		default:
 			CMR_LOGE("Unsupported MSG");
@@ -2519,7 +3151,7 @@ LOCAL int _Sensor_SyncDone(void)
 	ret = pthread_cond_signal(&sensor_sync_cond);
 	pthread_mutex_unlock(&sensor_sync_mutex);*/
 	sem_post(&sensor_sync_sem);
-	CMR_LOGI("post done.");
+/*	CMR_LOGI("post done.");*/
 	return ret;
 }
 
@@ -2543,28 +3175,33 @@ LOCAL int _Sensor_AutoFocusInit(void)
 }
 
 
-#if 0
 LOCAL void* _Sensor_MonitorProc(void* data)
 {
-	uint32_t                 ret = 0, param;
+	uint32_t                 ret = 0, param = 0;
 
 	while (1) {
-		CMR_LOGV("Cycle");
+/*		CMR_LOGV("Cycle");*/
 		usleep(SENSOR_CHECK_STATUS_INTERVAL);
 
-		if (s_exit_monitor_flag) {
-			s_exit_monitor_flag = 0;
+		if (s_monitor_exit) {
+			s_monitor_exit = 0;
 			CMR_LOGV("EXIT");
 			break;
 		} else {
-			ret = Sensor_Ioctl(SENSOR_IOCTL_GET_STATUS, param);
-			if (ret) {
-				CMR_LOGE("Sensor run in wrong way");
-				pthread_mutex_lock(&cb_mutex);
-				if (sensor_event_cb)
-					(*sensor_event_cb)(CMR_SENSOR_ERROR, NULL);
-				pthread_mutex_unlock(&cb_mutex);
-			}
+			if (s_stream_on) {
+				ret = Sensor_Ioctl(SENSOR_IOCTL_GET_STATUS, (uint32_t)&param);
+				if (ret) {
+					CMR_LOGE("Sensor run in wrong way");
+					pthread_mutex_lock(&cb_mutex);
+					if (sensor_event_cb)
+						(*sensor_event_cb)(CMR_SENSOR_ERROR, NULL);
+					pthread_mutex_unlock(&cb_mutex);
+				}/* else {
+					CMR_LOGV("NO wrong");
+				}*/
+			}/* else {
+				CMR_LOGV("Sensor no run");
+			}*/
 		}
 
 	}
@@ -2579,10 +3216,10 @@ LOCAL int   _Sensor_CreateMonitorThread(void)
 
 	CMR_LOGV("Create status monitor thread");
 
-	if (0 == s_sensor_monitor_thread) {
+	if (0 == s_monitor_thread) {
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		ret = pthread_create(&s_sensor_monitor_thread, &attr, _Sensor_MonitorProc, NULL);
+		ret = pthread_create(&s_monitor_thread, &attr, _Sensor_MonitorProc, NULL);
 		pthread_attr_destroy(&attr);
 	}
 
@@ -2596,16 +3233,15 @@ LOCAL int _Sensor_KillMonitorThread(void)
 
 	CMR_LOGV("To kill sensor monitor thread");
 
-	if (s_sensor_monitor_thread) {
-		s_exit_monitor_flag = 1;
-		while (1 == s_exit_monitor_flag) {
+	if (s_monitor_thread) {
+		s_monitor_exit = 1;
+		while (1 == s_monitor_exit) {
 			CMR_LOGE("Wait 10 ms");
 			usleep(10000);
 		}
-		//ret = pthread_join(s_sensor_monitor_thread, &dummy);
-		s_sensor_monitor_thread = 0;
+		ret = pthread_join(s_monitor_thread, &dummy);
+		s_monitor_thread = 0;
 	}
 
 	return ret;
 }
-#endif

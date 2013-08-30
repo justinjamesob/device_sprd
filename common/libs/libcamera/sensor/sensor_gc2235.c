@@ -303,13 +303,9 @@ SENSOR_INFO_T g_gc2235_raw_info = {
 	0,
 	0,
 	0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1},
 	PNULL,
 	3,			// skip frame num while change setting
-#else
-	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1}
-#endif
 };
 
 LOCAL struct sensor_raw_info* Sensor_GetContext(void)

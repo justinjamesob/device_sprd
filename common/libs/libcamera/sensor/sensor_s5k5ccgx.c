@@ -273,13 +273,9 @@ SENSOR_INFO_T g_s5k5ccgx_yuv_info =
     0,                     // threshold start postion	
     0,                     // threshold end postion 
 	-1,                     // i2c_dev_handler
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1}, // SENSOR_INF_T
 	PNULL,
 	4,						// skip frame num while change setting
-#else
-	{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1} // SENSOR_INF_T
-#endif
 };
 
 /**---------------------------------------------------------------------------*

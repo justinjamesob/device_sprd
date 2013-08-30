@@ -556,13 +556,9 @@ SENSOR_INFO_T g_OV2655_yuv_info = {
 	0,			// threshold start postion
 	0,			// threshold end postion
 	0,			// i2c_dev_handler
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{0, 2, 8, 1},
 	PNULL,
 	4,			// skip frame num while change setting
-#else
-	{0, 2, 8, 1}
-#endif
 };
 
 /**---------------------------------------------------------------------------*

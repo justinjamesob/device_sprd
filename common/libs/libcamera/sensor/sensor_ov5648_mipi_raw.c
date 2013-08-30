@@ -307,7 +307,6 @@ LOCAL SENSOR_TRIM_T s_ov5648_Resolution_Trim_Tab[] = {
 	{0, 0, 0, 0, 0, 0, 0}
 };
 
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 LOCAL const SENSOR_REG_T s_ov5648_1296X972_video_tab[SENSOR_VIDEO_MODE_MAX][1] = {
 	/*video mode 0: ?fps*/
 	{
@@ -389,7 +388,6 @@ LOCAL uint32_t _ov5648_set_video_mode(uint32_t param)
 	SENSOR_PRINT("0x%02x", param);
 	return 0;
 }
-#endif
 
 struct sensor_raw_info* s_ov5648_mipi_raw_info_ptr=&s_ov5648_mipi_raw_info;
 
@@ -438,11 +436,7 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov5648_ioctl_func_tab = {
 	PNULL, //_ov5648_GetExifInfo,
 	_ov5648_ExtFunc,
 	PNULL, //_ov5648_set_anti_flicker,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	_ov5648_set_video_mode,
-#else
-	PNULL,  //_ov5648_set_video_mode,
-#endif
 	PNULL, //pick_jpeg_stream
 	PNULL,  //meter_mode
 	PNULL, //get_status
@@ -518,13 +512,9 @@ SENSOR_INFO_T g_ov5648_mipi_raw_info = {
 	0,
 	0,
 	0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	{SENSOR_INTERFACE_TYPE_CSI2, 2, 10, 0},
 	s_ov5648_video_info,
 	3,			// skip frame num while change setting
-#else
-	{SENSOR_INTERFACE_TYPE_CSI2, 2, 10, 0}
-#endif
 };
 
 LOCAL struct sensor_raw_info* Sensor_GetContext(void)

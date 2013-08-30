@@ -519,13 +519,9 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_GC0309_ioctl_func_tab =
 		0,			// threshold start postion
 		0,			// threshold end postion
 		0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 		{0, 2, 8, 1},
 		PNULL,
 		2,			// skip frame num while change setting
-#else
-		{0, 2, 8, 1}
-#endif
 };
 /**---------------------------------------------------------------------------*
  ** 							Function  Definitions

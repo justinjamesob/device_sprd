@@ -1197,7 +1197,6 @@ LOCAL SENSOR_TRIM_T s_ov8825_Resolution_Trim_Tab[] = {
 	{0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0}
 };
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 
 LOCAL const SENSOR_REG_T s_ov8825_1632x1224_video_tab[SENSOR_VIDEO_MODE_MAX][1] = {
 	/*video mode 0: ?fps*/
@@ -1300,7 +1299,6 @@ LOCAL uint32_t _ov8825_set_video_mode(uint32_t param)
 	return 0;
 }
 
-#endif
 
 LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov8825_ioctl_func_tab = {
 	PNULL,
@@ -1347,11 +1345,7 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov8825_ioctl_func_tab = {
 	PNULL, //_ov8825_GetExifInfo,
 	_ov8825_ExtFunc,
 	PNULL, //_ov8825_set_anti_flicker,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	_ov8825_set_video_mode,
-#else
-	PNULL,
-#endif
 	PNULL, //pick_jpeg_stream
 	PNULL,  //meter_mode
 	PNULL, //get_status
@@ -1433,10 +1427,8 @@ SENSOR_INFO_T g_ov8825_mipi_raw_info = {
 	{SENSOR_INTERFACE_TYPE_CSI2, 4, 10, 0},
 #endif
 
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	s_ov8825_video_info,
 	3,			// skip frame num while change setting
-#endif
 };
 
 LOCAL struct sensor_raw_info* Sensor_GetContext(void)

@@ -7191,13 +7191,9 @@ SENSOR_INFO_T g_hi351_mipi_yuv_info =
     0,
     0,
     0,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
     {SENSOR_INTERFACE_TYPE_CSI2, 1, 8, 1},
     PNULL,
     0,						// skip frame num while change setting
-#else
-    {SENSOR_INTERFACE_TYPE_CSI2, 1, 8, 1}
-#endif
 };
 /******************************************************************************/
 // Description:
