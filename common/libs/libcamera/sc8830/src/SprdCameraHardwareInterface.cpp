@@ -206,7 +206,7 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mIsRotCapture(0),
 #endif
 	mTimeCoeff(1),
-	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS)
+	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_DCAM)
 {
 	LOGV("openCameraHardware: E cameraId: %d.", cameraId);
 
