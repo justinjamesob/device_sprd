@@ -34,11 +34,9 @@ extern "C" {
 */
 #define do_cmd_dual(modemId, simId, at_cmd) \
     pthread_mutex_lock(&ATlock);\
-    if (at_cmd && sendAt(modemId, simId, at_cmd)) { \
-        ALOGE("do_cmd_dual Switch incall AT command [%s][%s] failed", at_cmd); \
-    } else if (at_cmd) { \
-        ALOGW("do_cmd_dual Switch incall AT command [%s][%s] good", at_cmd); \
-    }\
+    if (at_cmd)  { \
+        ALOGE("do_cmd_dual Switch incall AT command [%s][%s] ", at_cmd, sendAt(modemId, simId, at_cmd)); \
+    } \
     pthread_mutex_unlock(&ATlock);
 	
 int at_cmd_deinit(void)
@@ -132,8 +130,9 @@ static int at_cmd_route(struct tiny_audio_device *adev)
     } else {
         at_cmd = "AT+SSAM=0";
     }
-    do_cmd_dual(adev->cp_type, cur_call_sim, at_cmd);
 
+    do_cmd_dual(adev->cp_type, cur_call_sim, at_cmd);
+    //ALOGW("%s out ",__func__);
     return 0;
 }
 
@@ -271,6 +270,7 @@ int at_cmd_volume(float vol, int mode)
     if (volume >= VOICECALL_VOLUME_MAX_UI) volume = VOICECALL_VOLUME_MAX_UI;
     ALOGI("%s mode=%d ,volume=%d, android vol:%f ", __func__,mode,volume,vol);
     snprintf(at_cmd, sizeof buf, "AT+VGR=%d", volume);
+
     do_cmd_dual(cur_cp_type, cur_call_sim, at_cmd);
     return 0;
 }
