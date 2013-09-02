@@ -76,7 +76,9 @@
 
 //#define AUDIO_DUMP
 #define AUDIO_DUMP_EX
-char AUDIO_OUT_FILE_PATH[DUMP_FILE_PATH_LEN_MAX]; //"data/audio_out.pcm"
+
+#define AUDIO_OUT_FILE_PATH  "data/audio_out.pcm"
+
 
 #define PRIVATE_NAME_LEN 60
 
