@@ -317,10 +317,13 @@ reconnect:
 				goto raw_reset;
 			}
 			usleep(100*1000);
-			ret = read(loop_fd, buffer, sizeof(buffer));
+			do {
+				ret = read(loop_fd, buffer, sizeof(buffer));
+			} while(ret < 0 && errno == EINTR);
 			if (ret <= 0) {
 				MODEMD_LOGE("%s: read %d return %d, errno = %s", __func__, loop_fd , ret, strerror(errno));
 				close(loop_fd);
+				goto raw_reset;
 			}
 			if(!strcmp(buffer, "AT")) {
 				MODEMD_LOGD("%s: loop spipe %s is OK", __func__, loop_dev);
