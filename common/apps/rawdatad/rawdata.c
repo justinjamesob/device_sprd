@@ -385,6 +385,11 @@ static void read_productinfo(unsigned int block, unsigned char *pdata)
 
 	fseek(fp,0L,SEEK_END);
 	long size=ftell(fp);
+	if (size < 0){
+		DBG("%s: fail to read file\n", __FUNCTION__);
+		fclose(fp);
+		return;
+	}
 	fseek(fp,0L,SEEK_SET);
 	DBG("%s: size = %d\n", __FUNCTION__,size);
 
