@@ -51,6 +51,7 @@
 #include "vb_control_parameters.h"
 #include "string_exchange_bin.h"
 
+#include "dumpdata.h"
 
 #ifdef AUDIO_MUX_PCM
 #include "audio_mux_pcm.h"
@@ -74,7 +75,8 @@
 
 
 //#define AUDIO_DUMP
-#define AUDIO_OUT_FILE_PATH    "data/audio_out.pcm"
+#define AUDIO_DUMP_EX
+char AUDIO_OUT_FILE_PATH[DUMP_FILE_PATH_LEN_MAX]; //"data/audio_out.pcm"
 
 #define PRIVATE_NAME_LEN 60
 
@@ -422,7 +424,7 @@ static int s_sco= -1;
 static AUDIO_TOTAL_T *audio_para_ptr = NULL;
 static struct tiny_audio_device *s_adev= NULL;
 
-
+static dump_data_info_t dump_info;
 
 /**
  * NOTE: when multiple mutexes have to be acquired, always respect the following order:
@@ -1600,6 +1602,14 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
     
     pthread_mutex_lock(&adev->lock);
     pthread_mutex_lock(&out->lock);
+
+
+#ifdef AUDIO_DUMP_EX
+		dump_info.buf = buffer;
+		dump_info.buf_len = bytes;
+		dump_info.dump_switch_info = DUMP_MUSIC_HWL_BEFORE_EXPRESS;
+	    dump_data(dump_info);
+#endif	
 #ifndef _VOICE_CALL_VIA_LINEIN
     if (out_bypass_data(out,audio_stream_frame_size(&stream->common),out_get_sample_rate(&stream->common),bytes)) {
         return bytes;
@@ -1731,6 +1741,12 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         ret = pcm_mmap_write(out->pcm, (void *)buf, out_frames * frame_size);//music playback
 #ifdef AUDIO_DUMP
         out_dump_doing(out->out_dump_fd, (void *)buf, out_frames * frame_size);
+#endif
+#ifdef AUDIO_DUMP_EX
+	dump_info.buf = buf;
+	dump_info.buf_len = out_frames * frame_size;
+	dump_info.dump_switch_info = DUMP_MUSIC_HWL_BEFOORE_VBC;
+    dump_data(dump_info);
 #endif
     }
 
@@ -2314,6 +2330,14 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
                 in->config.period_size *
                 audio_stream_frame_size(&in->stream.common));
        buffer1 = (void*)in->buffer;         
+
+#ifdef AUDIO_DUMP_EX
+	dump_info.buf = in->buffer;
+	dump_info.buf_len = in->config.period_size *
+                audio_stream_frame_size(&in->stream.common);
+	dump_info.dump_switch_info =  DUMP_RECORD_HWL_AFTER_VBC;
+    dump_data(dump_info);
+#endif
     
                 
 #else
@@ -2590,6 +2614,13 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         if (ret == 0 && in->active_rec_proc)
             aud_rec_do_process(buffer, bytes);
     }
+
+#ifdef AUDIO_DUMP_EX
+		dump_info.buf = buffer;
+		dump_info.buf_len = bytes;
+		dump_info.dump_switch_info =  DUMP_RECORD_HWL_AFTER_EXPRESS;
+       	dump_data(dump_info);
+#endif
 
     if (ret > 0)
         ret = 0;
@@ -4019,6 +4050,12 @@ static int adev_open(const hw_module_t* module, const char* name,
     }
     BLUE_TRACE("ret=%d, num_dev_cfgs=%d", ret, adev->num_dev_cfgs);
     BLUE_TRACE("dev_cfgs_on depth=%d, dev_cfgs_off depth=%d", adev->dev_cfgs->on_len,  adev->dev_cfgs->off_len);
+
+	ret = dump_parse_xml();
+	if (ret < 0) {
+        ALOGE("Unable to locate dump information  from XML, aborting.");
+        goto ERROR;
+    }
 
     /* generate eq params file of vbc effect*/
     adev->eq_available = false;

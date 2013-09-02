@@ -50,8 +50,9 @@ LOCAL_C_INCLUDES += \
 	device/sprd/common/libs/audio/vb_pga \
 	device/sprd/common/libs/audio/record_process \
 	device/sprd/common/libs/audio/nv_exchange \
-	device/sprd/common/libs/lib_atcommand
-
+	device/sprd/common/libs/lib_atcommand  \
+	device/sprd/common/libs/audio/DumpData
+	
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
 	BOARD_EQ_DIR := v2
 else
@@ -72,7 +73,7 @@ endif
 LOCAL_SHARED_LIBRARIES := \
 	liblog libcutils libtinyalsa libaudioutils \
 	libexpat libdl \
-	libengclient libvbeffect libvbpga libnvexchange \
+	libengclient libvbeffect libvbpga libnvexchange libdumpdata\
 	libatcommand.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_TAGS := optional
