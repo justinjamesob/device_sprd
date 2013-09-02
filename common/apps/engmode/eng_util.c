@@ -20,6 +20,7 @@ int eng_open_dev(char* dev, int mode)
         return -1;
 
     if(isatty(fd)) {
+        tcgetattr(fd, &ser_settings);
         cfmakeraw(&ser_settings);
         tcsetattr(fd, TCSANOW, &ser_settings);
     }
