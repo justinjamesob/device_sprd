@@ -1,4 +1,4 @@
-#define LOG_TAG "nvitemd"
+#define LOG_TAG "refnotify"
 
 #include <cutils/log.h>
 #include <sys/types.h>

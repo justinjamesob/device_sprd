@@ -384,7 +384,7 @@ service refnotify /system/bin/refnotify -t 0
     class main
     user root
 
-service refnotify /system/bin/refnotify -t 1
+service refnotify_w /system/bin/refnotify -t 1
     class main
     user root
 
