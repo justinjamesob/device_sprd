@@ -34,7 +34,7 @@ typedef enum {
 	WIFI_MAC_ADDR
 }MAC_ADDR;
 
-//#define MAC_FROM_ANDROID
+#define MAC_FROM_ANDROID
 static int counter=0;
 
 static int read_btwifimac_from_database(char *btmac, char *wifimac)

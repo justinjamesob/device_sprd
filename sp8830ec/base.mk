@@ -148,5 +148,6 @@ PRODUCT_COPY_FILES := \
 	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
 
 $(call inherit-product, device/sprd/partner/ittiam/wlan/device-itm.mk)
+$(call inherit-product, device/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/engineeringmodel/module.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)

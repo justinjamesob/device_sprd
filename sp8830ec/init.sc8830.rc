@@ -296,7 +296,7 @@ service akmd /system/bin/akmd8975 -m 3
     class main
     oneshot
 
-service hciattach /system/bin/hciattach -n /dev/sttybt0 any
+service hciattach /system/bin/hciattach -n /dev/sttybt0 sprd_shark
     socket bluetooth stream 660 bluetooth bluetooth
     user root
     group bluetooth net_bt_admin
