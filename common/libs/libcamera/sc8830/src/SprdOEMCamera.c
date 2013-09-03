@@ -212,6 +212,7 @@ static void *camera_cb_thread_proc(void *data);
 static void camera_callback_handle(camera_cb_type cb, camera_func_type func, int32_t cb_param);
 static void camera_capture_step_statisic(void);
 static int camera_capture_init_continue(void);
+static void _camera_autofocus_stop_handle(void);
 
 camera_ret_code_type camera_encode_picture(camera_frame_type *frame,
 					camera_handle_type *handle,
@@ -2264,6 +2265,19 @@ int camera_stop_capture_raw_internal(void)
 	return ret;
 }
 
+static void _camera_autofocus_stop_handle(void)
+{
+	int                    status = CAMERA_SUCCESS;
+	status = pthread_mutex_trylock(&g_cxt->af_cb_mutex);
+	if (EBUSY != status) {
+		pthread_mutex_unlock(&g_cxt->af_cb_mutex);
+	} else {
+		camera_autofocus_quit();
+		pthread_mutex_lock(&g_cxt->af_cb_mutex);
+		pthread_mutex_unlock(&g_cxt->af_cb_mutex);
+	}
+}
+
 int camera_stop_preview_internal(void)
 {
 	int                      ret = CAMERA_SUCCESS;
@@ -2280,11 +2294,9 @@ int camera_stop_preview_internal(void)
 	CMR_PRINT_TIME;
 
 	g_cxt->preview_status = CMR_IDLE;
-	if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
-		camera_autofocus_quit();
-		pthread_mutex_lock(&g_cxt->af_cb_mutex);
-		pthread_mutex_unlock(&g_cxt->af_cb_mutex);
-	}
+
+	_camera_autofocus_stop_handle();
+
 	g_cxt->chn_1_status   = CHN_IDLE;
 	SET_CHN_IDLE(CHN_1);
 	CMR_PRINT_TIME;
@@ -4285,11 +4297,15 @@ void camera_call_af_cb(camera_cb_type cb,
                  camera_func_type func,
                  int32_t parm4)
 {
+	camera_cb_f_type         camera_af_run_cb = PNULL;
 	pthread_mutex_lock(&g_cxt->af_cb_mutex);
 	if (g_cxt->camera_af_cb) {
-		(*g_cxt->camera_af_cb)(cb, client_data, func, parm4);
+		camera_af_run_cb = g_cxt->camera_af_cb;
 	}
 	pthread_mutex_unlock(&g_cxt->af_cb_mutex);
+	if (camera_af_run_cb) {
+		(*camera_af_run_cb)(cb, client_data, func, parm4);
+	}
 	return;
 }
 void camera_set_hal_cb(camera_cb_f_type cmr_cb)

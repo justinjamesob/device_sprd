@@ -1163,6 +1163,27 @@ bool SprdCameraHardware::isCapturing()
 #endif
 }
 
+bool SprdCameraHardware::checkPreviewStateForCapture()
+{
+	bool ret = true;
+	Sprd_camera_state tmpState = SPRD_IDLE;
+
+	tmpState = getPreviewState();
+	if (iSZslMode()) {
+		if (SPRD_PREVIEW_IN_PROGRESS != tmpState) {
+			LOGV("incorrect preview status %d of ZSL capture mode", (uint32_t)tmpState);
+			ret = false;
+		}
+	} else {
+		if (SPRD_IDLE != tmpState) {
+			LOGV("incorrect preview status %d of normal capture mode", (uint32_t)tmpState);
+			ret = false;
+		}
+	}
+
+	return ret;
+}
+
 bool SprdCameraHardware::WaitForCameraStart()
 {
 	Mutex::Autolock stateLock(&mStateLock);
@@ -1981,7 +2002,7 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 		return UNKNOWN_ERROR;
 	}
 	if (iSZslMode()) {
-		set_ddr_freq("400000");
+		set_ddr_freq("500000");
 		if (!initCapture(mData_cb != NULL)) {
 			deinitCapture();
 			LOGE("initCapture failed. Not taking picture.");
@@ -2018,6 +2039,10 @@ void SprdCameraHardware::stopPreviewInternal()
 	}
 
 	setCameraState(SPRD_INTERNAL_PREVIEW_STOPPING, STATE_PREVIEW);
+
+	if (isCapturing()) {
+		cancelPictureInternal();
+	}
 
 	if(CAMERA_SUCCESS != camera_stop_preview()) {
 		setCameraState(SPRD_ERROR, STATE_PREVIEW);
@@ -3020,6 +3045,10 @@ void SprdCameraHardware::receiveJpegPictureError(void)
 	LOGV("receiveJpegPictureError.");
 	print_time();
 	Mutex::Autolock cbLock(&mCaptureCbLock);
+	if (!checkPreviewStateForCapture()) {
+		LOGE("drop current jpegPictureError msg");
+		return;
+	}
 
 	int index = 0;
 	if (mData_cb) {
@@ -3041,7 +3070,10 @@ void SprdCameraHardware::receiveCameraExitError(void)
 {
 	Mutex::Autolock cbPreviewLock(&mPreviewCbLock);
 	Mutex::Autolock cbCaptureLock(&mCaptureCbLock);
-
+	if (!checkPreviewStateForCapture()) {
+		LOGE("drop current cameraExit msg");
+		return;
+	}
 	if((mMsgEnabled & CAMERA_MSG_ERROR) && (mData_cb != NULL)) {
 		LOGE("HandleErrorState");
 		mNotify_cb(CAMERA_MSG_ERROR, 0,0,mUser);
@@ -3053,6 +3085,10 @@ void SprdCameraHardware::receiveCameraExitError(void)
 void SprdCameraHardware::receiveTakePictureError(void)
 {
 	Mutex::Autolock cbLock(&mCaptureCbLock);
+	if (!checkPreviewStateForCapture()) {
+		LOGE("drop current takePictureError msg");
+		return;
+	}
 
 	LOGE("camera cb: invalid state %s for taking a picture!",
 		 getCameraStateStr(getCaptureState()));
@@ -3132,16 +3168,16 @@ void SprdCameraHardware::HandleStartPreview(camera_cb_type cb,
 		LOGV("CAMERA_EVT_CB_FRAME");
 		switch (getPreviewState()) {
 		case SPRD_PREVIEW_IN_PROGRESS:
-	        receivePreviewFrame((camera_frame_type *)parm4);
+			receivePreviewFrame((camera_frame_type *)parm4);
 			break;
 
 		case SPRD_INTERNAL_PREVIEW_STOPPING:
-            LOGV("camera cb: discarding preview frame "
-                 "while stopping preview");
+			LOGV("camera cb: discarding preview frame "
+			"while stopping preview");
 			break;
 
 		default:
-            LOGV("HandleStartPreview: invalid state");
+			LOGV("HandleStartPreview: invalid state");
 			break;
 			}
 		break;
@@ -3149,7 +3185,7 @@ void SprdCameraHardware::HandleStartPreview(camera_cb_type cb,
 	case CAMERA_EVT_CB_FD:
 		LOGV("CAMERA_EVT_CB_FD");
 		if (isPreviewing()) {
-	    	receivePreviewFDFrame((camera_frame_type *)parm4);
+			receivePreviewFDFrame((camera_frame_type *)parm4);
 		}
 		break;
 
@@ -3214,8 +3250,12 @@ void SprdCameraHardware::HandleTakePicture(camera_cb_type cb,
 		}
 		else
 			LOGV("receiveRawPicture: not setting image location");
-		notifyShutter();
-		receiveRawPicture((camera_frame_type *)parm4);
+		if (checkPreviewStateForCapture()) {
+			notifyShutter();
+			receiveRawPicture((camera_frame_type *)parm4);
+		} else {
+			LOGE("HandleTakePicture: drop current rawPicture");
+		}
 		break;
 
 	case CAMERA_EXIT_CB_DONE:
@@ -3230,7 +3270,11 @@ void SprdCameraHardware::HandleTakePicture(camera_cb_type cb,
 	        // waiting in cancelPicture(), and then delete this object.
 	        // If the order were reversed, we might call
 	        // receiveRawPicture on a dead object.
-			receivePostLpmRawPicture((camera_frame_type *)parm4);
+			if (checkPreviewStateForCapture()) {
+				receivePostLpmRawPicture((camera_frame_type *)parm4);
+			} else {
+				LOGE("HandleTakePicture drop current LpmRawPicture");
+			}
 		}
 		break;
 
@@ -3257,7 +3301,7 @@ void SprdCameraHardware::HandleCancelPicture(camera_cb_type cb,
 	LOGV("HandleCancelPicture in: cb = %d, parm4 = 0x%x, state = %s",
 				cb, parm4, getCameraStateStr(getCaptureState()));
 
-	{
+	if (checkPreviewStateForCapture()) {
 		Mutex::Autolock cbLock(&mCaptureCbLock);
 	}
 
@@ -3285,13 +3329,17 @@ void SprdCameraHardware::HandleEncode(camera_cb_type cb,
 
 	case CAMERA_EXIT_CB_DONE:
 		LOGV("HandleEncode: CAMERA_EXIT_CB_DONE");
-		if (SPRD_WAITING_JPEG == getCaptureState()) {
-	        // Receive the last fragment of the image.
-	        receiveJpegPictureFragment((JPEGENC_CBrtnType *)parm4);
+		if ((SPRD_WAITING_JPEG == getCaptureState())) {
+			// Receive the last fragment of the image.
+			receiveJpegPictureFragment((JPEGENC_CBrtnType *)parm4);
 			LOGV("CAMERA_EXIT_CB_DONE MID.");
-	        receiveJpegPicture((JPEGENC_CBrtnType *)parm4);
+			if (checkPreviewStateForCapture()) {
+				receiveJpegPicture((JPEGENC_CBrtnType *)parm4);
+			} else {
+				LOGE("HandleEncode: drop current jpgPicture");
+			}
 #if 1//to do it
-			if( ((JPEGENC_CBrtnType *)parm4)->need_free ) {
+			if (((JPEGENC_CBrtnType *)parm4)->need_free) {
 				transitionState(SPRD_WAITING_JPEG,
 						SPRD_IDLE,
 						STATE_CAPTURE);

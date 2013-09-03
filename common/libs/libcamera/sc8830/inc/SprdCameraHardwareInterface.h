@@ -276,6 +276,7 @@ private:
 		                              char *virtual_addr);
 	bool                            iSDisplayCaptureFrame();
 	bool                            iSZslMode();
+	bool                            checkPreviewStateForCapture();
 	/* These constants reflect the number of buffers that libqcamera requires
 	for preview and raw, and need to be updated when libqcamera
 	changes.
