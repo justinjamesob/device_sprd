@@ -22,6 +22,7 @@ on fs
 on post-fs
     insmod /system/lib/modules/ump.ko
     insmod /system/lib/modules/mali.ko
+	insmod /system/lib/modules/trout_fm.ko
 
 on post-fs-data
     # we will remap this as /storage/sdcard0 with the sdcard fuse tool
