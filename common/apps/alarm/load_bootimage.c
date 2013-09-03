@@ -96,9 +96,17 @@ void print_time_num(int time_icon_y)
 
 	time(&timep);
 	time_cur = localtime(&timep);
-        if((time_dm == 12)&&(time_cur->tm_hour-12 >=0)){
-	    hour_dec = (time_cur->tm_hour-12)/10;
-	    hour_unit = (time_cur->tm_hour-12)%10;
+	if(time_dm == 12){
+		if(time_cur->tm_hour-12> 0){
+			hour_dec = (time_cur->tm_hour-12)/10;
+			hour_unit = (time_cur->tm_hour-12)%10;
+		}else if(time_cur->tm_hour ==0){
+			hour_dec = 1;
+			hour_unit = 2;
+		}else{
+			hour_dec = time_cur->tm_hour/10;
+			hour_unit = time_cur->tm_hour%10;
+		}
         }else{
 	    hour_dec = time_cur->tm_hour/10;
 	    hour_unit = time_cur->tm_hour%10;
