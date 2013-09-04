@@ -23,7 +23,7 @@
 #define RAWDATA_COUNTER_THRES	0xEFFFFFFF
 #define RAWDATA_PROPERTY	"sys.rawdata.ready"
 #define RAWDATA_READY		"1"
-
+#define RAM_SP09_SPPH_MAGIC_NUMBER             (0X53503039)    // "SP09"
 
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
@@ -58,5 +58,21 @@ typedef struct
 	unsigned int	cali_flag;        // cali_flag   default 0xFFFFFFFF, when calibration finished,it is set "COMP"
 	RAW_ADC_T 	adc_para;         // ADC calibration data.
 }RAW_INFO_DATA_T;
+
+typedef struct RAM_tagSP09_PHASE_CHECK
+{
+	unsigned long Magic;                	// "SP09"   (¿œ\u0153”ø⁄Œ™SP05)
+	char    	SN1[24]; 	// SN , SN_LEN=24
+	char    	SN2[24];    // add for Mobile
+	int     	StationNum;                 	// the test station number of the testing
+	char    	StationName[15][10];
+	unsigned char 	Reserved[13];
+	unsigned char 	SignFlag;
+	char    	szLastFailDescription[32];
+	unsigned short  iTestSign;				// Bit0~Bit14 ---> station0~station 14
+										//if tested. 0: tested, 1: not tested
+	unsigned short  iItem;    // part1: Bit0~ Bit_14 indicate test Station,1±Ì \u0178Pass
+
+}RAM_SP09_PHASE_CHECK_T, *RAM_LPSP09_PHASE_CHECK_T;
 
 #endif

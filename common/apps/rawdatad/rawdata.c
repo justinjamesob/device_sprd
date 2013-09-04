@@ -57,6 +57,11 @@ static const char * batter_adc_files[] ={
 	"/dev/block/platform/sprd-sdhci.3/by-name/prodinfo4"
 };
 
+static const char * batter_prodinfo_files[] ={
+	"/dev/block/platform/sprd-sdhci.3/by-name/miscdata",
+	"/productinfo/productinfo.bin"
+};
+
 
 static struct wd_name wd_array[RAWDATA_MONITOR_ITEM];
 static unsigned short crc;
@@ -309,6 +314,47 @@ static void init_adc(void)
 }
 
 
+static void init_productinfo_ext(void)
+{
+	int fd = -1;
+	int fdx = -1;
+	int ret = 0;
+	int i;
+	int wsize =0;
+	RAM_SP09_PHASE_CHECK_T        phase_check;
+
+	fd = open(batter_prodinfo_files[0],O_RDWR);
+
+	if(fd < 0){
+		DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[0]);
+		return ;
+	}
+
+	DBG("%s: open %s  ok",__FUNCTION__, batter_prodinfo_files[0]);
+	ret = read(fd,&phase_check,sizeof(phase_check));
+
+	DBG("%s: phase_check.Magic= %d \n ",__FUNCTION__, phase_check.Magic);
+	if (phase_check.Magic == RAM_SP09_SPPH_MAGIC_NUMBER)
+	{
+		close(fd);
+		return;
+	}
+
+	fdx = open(batter_prodinfo_files[1],O_RDONLY);
+	if(fdx< 0){
+		DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[1]);
+		close(fd);
+		return ;
+	}
+	DBG("%s: open %s  ok",__FUNCTION__, batter_prodinfo_files[1]);
+	ret = read(fdx,&phase_check,sizeof(phase_check));
+	close(fdx);
+	DBG("%s: phase_check.Magic= %d \n ",__FUNCTION__, phase_check.Magic);
+      wsize = write(fd,&phase_check,sizeof(phase_check));
+	DBG("write error rsize = %d  size = %d\n", wsize, sizeof(phase_check));
+	close(fd);
+}
+
 static void init_productinfo()
 {
 	unsigned int i,j, partition, error_partition;
@@ -481,8 +527,10 @@ int main(int argc, char **argv)
 
 	DBG("Start RAWDATAD");
 
-	init_productinfo();
-	init_adc();
+	//init_productinfo();
+	//init_adc();
+	init_productinfo_ext();
+#if 0
 	while(1)
 	{
 		fd = inotify_init();
@@ -595,6 +643,7 @@ int main(int argc, char **argv)
 		close(fd);
 
 	}
+#endif
 	return 0;
 }
 
