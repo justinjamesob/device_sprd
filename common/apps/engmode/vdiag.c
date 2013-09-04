@@ -300,7 +300,8 @@ void *eng_vdiag_thread(void *x)
 
                 if((++wait_cnt) > MAX_OPEN_TIMES) {
                     ENG_LOG("eng_vdiag serial port open times exceed the max open times !!!\n");
-                    goto out;
+                    close(sipc_fd);
+                    return NULL;
                 }
             } while(ser_fd < 0);
 
@@ -375,7 +376,6 @@ void *eng_vdiag_thread(void *x)
             ENG_LOG("eng_vdiag: rcnt:%d, w_cnt:%d, offset:%d\n", r_cnt, w_cnt, offset);
         }while(backup_data_len >0);
     }
-out:
     close(sipc_fd);
     close(ser_fd);
     return 0;
