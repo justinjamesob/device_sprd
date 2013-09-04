@@ -4,8 +4,7 @@
 #include "engphasecheck.h"
 
 
-#define PHASE_CHECKE_FILE "/productinfo/productinfo.bin"
-#define PHASE_CHECKE_FILE0 "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1" //add by kenyliu on 2013 08 13 for read sn bug 201276
+#define PHASE_CHECKE_FILE  "/dev/block/platform/sprd-sdhci.3/by-name/miscdata"
 
 int eng_phasechecktest(void)
 {
@@ -18,41 +17,14 @@ int eng_getphasecheck(SP09_PHASE_CHECK_T* phase_check)
 {
 	int ret = 0;
 	int len;
-	//modify  by kenyliu on 2013 08 13 for read sn bug 201276
 
-       SP09_PHASE_CHECK_T phase_check_temp;
-	int fd = open(PHASE_CHECKE_FILE0,O_RDONLY);
-	if(fd >= 0)
-	{
-		ENG_LOG("%s open Ok PHASE_CHECKE_FILE0 = %s ",__FUNCTION__ , PHASE_CHECKE_FILE0);
-		len = read(fd,&phase_check_temp,sizeof(SP09_PHASE_CHECK_T));
-
-		ENG_LOG("Magic0=%d",phase_check_temp.Magic);
-
-		ENG_LOG("SN01=%s",phase_check_temp.SN1);
-		ENG_LOG("SN02=%s",phase_check_temp.SN2);
-
-		close(fd);
-	}else{
-		phase_check_temp.Magic = 0;
-		ENG_LOG("%s open fail PHASE_CHECKE_FILE0 = %s ",__FUNCTION__ , PHASE_CHECKE_FILE0);
-	}
-
-	fd = open(PHASE_CHECKE_FILE,O_RDONLY);
+	int fd = open(PHASE_CHECKE_FILE,O_RDONLY);
 	if (fd >= 0){
 		ENG_LOG("%s open Ok PHASE_CHECKE_FILE = %s ",__FUNCTION__ , PHASE_CHECKE_FILE);
 		len = read(fd,phase_check,sizeof(SP09_PHASE_CHECK_T));
 
 		ENG_LOG("Magic=%d",phase_check->Magic);
 	
-		ENG_LOG("SN1=%s",phase_check->SN1);
-		ENG_LOG("SN2=%s",phase_check->SN2);
-
-		if((phase_check_temp.Magic == SP09_SPPH_MAGIC_NUMBER) || (phase_check_temp.Magic == SP05_SPPH_MAGIC_NUMBER)){
-			memcpy(phase_check->SN1, phase_check_temp.SN1, SP09_MAX_SN_LEN);
-			memcpy(phase_check->SN2, phase_check_temp.SN2, SP09_MAX_SN_LEN);
-		}
-
 		ENG_LOG("SN1=%s",phase_check->SN1);
 		ENG_LOG("SN2=%s",phase_check->SN2);
 
@@ -64,7 +36,6 @@ int eng_getphasecheck(SP09_PHASE_CHECK_T* phase_check)
 		ENG_LOG("%s open fail PHASE_CHECKE_FILE = %s ",__FUNCTION__ , PHASE_CHECKE_FILE);
 		ret = 1;
 	}
-//end modify kenyliu
 	return ret;
 }
 

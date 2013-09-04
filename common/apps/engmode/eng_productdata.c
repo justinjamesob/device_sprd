@@ -3,8 +3,7 @@
 #include <pthread.h>
 #include "eng_productdata.h"
 
-
-#define PRODUCTINFO_FILE "/productinfo/productinfo.bin"
+#define PRODUCTINFO_FILE  "/dev/block/platform/sprd-sdhci.3/by-name/miscdata"
 
 int eng_read_productnvdata(char *databuf,  int data_len)
 {
