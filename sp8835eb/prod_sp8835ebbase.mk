@@ -83,7 +83,7 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
-PRODUCT_CONFIG_SUPPORT_FM := true 
+PRODUCT_CONFIG_SUPPORT_FM := true
 PRODUCT_CONFIG_SUPPORT_WIFI := true
 PRODUCT_CONFIG_SUPPORT_BT := true
 PRODUCT_CONFIG_SUPPORT_GPS := true
