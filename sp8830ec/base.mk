@@ -69,8 +69,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	nvitemd \
 	charge \
-	vcharged \
 	rawdatad \
+	batterysrv \
 	poweroff_alarm \
 	mplayer \
 	sqlite3 \

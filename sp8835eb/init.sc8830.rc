@@ -307,11 +307,11 @@ service rawdatadinit /bin/rawdatad
     user root
     oneshot
 
-#service vcharged /bin/vcharged
-#    class core
-#    user root
-#    disabled
-#    oneshot
+service batterysrv /bin/batterysrv
+    class core
+    user system
+    group system shell
+    oneshot
 
 service charge /bin/charge
     class charger

@@ -72,7 +72,7 @@ PRODUCT_PACKAGES += \
 	rawdatad \
 	nvm_daemon \
 	charge \
-	vcharged \
+	batterysrv \
 	poweroff_alarm \
 	mplayer \
 	sqlite3 \

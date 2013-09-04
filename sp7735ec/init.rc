@@ -307,8 +307,11 @@ on boot
     chown system system /sys/kernel/ipv4/tcp_rmem_def
     chown system system /sys/kernel/ipv4/tcp_rmem_max
     chown root radio /proc/cmdline
-
-
+    chown system system /sys/class/power_supply/usb/online
+    chown system system /sys/class/power_supply/ac/online
+    chown system system /sys/class/power_supply/battery/battery_0
+    chown system system /sys/class/power_supply/battery/battery_1
+    chown system system /sys/class/power_supply/battery/hw_switch_point
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
     setprop net.tcp.buffersize.default 4096,87380,110208,4096,16384,110208
@@ -329,6 +332,11 @@ on nonencrypted
     class_start late_start
 
 on charger
+    chown system system /sys/class/power_supply/usb/online
+    chown system system /sys/class/power_supply/ac/online
+    chown system system /sys/class/power_supply/battery/battery_0
+    chown system system /sys/class/power_supply/battery/battery_1
+    chown system system /sys/class/power_supply/battery/hw_switch_point
     class_start core
     class_start charger
 

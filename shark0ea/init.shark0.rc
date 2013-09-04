@@ -173,11 +173,10 @@ service enghardwaretest /system/bin/enghardwaretest
 #    disabled
 #    oneshot
 
-service vcharged /bin/vcharged
+service batterysrv /bin/batterysrv
     class core
     user system
-    group system
-    disabled
+    group system shell
     oneshot
 
 service charge /bin/charge

@@ -71,7 +71,7 @@ PRODUCT_PACKAGES += \
 	charge \
 	refnotify\
 	rawdatad \
-	vcharged \
+	batterysrv \
 	poweroff_alarm \
 	mplayer \
 	sqlite3 \
