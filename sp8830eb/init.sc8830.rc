@@ -3,8 +3,6 @@ import init.sc8830.usb.rc
 on early-init
     export EXTERNAL_STORAGE /storage/sdcard0
     export SECONDARY_STORAGE /storage/sdcard1
-    # 0 for nand,1 for emmc,2 for sdcard
-    export SECOND_STORAGE_TYPE 2
     mkdir /storage 0777 system sdcard_rw
     mkdir /storage/sdcard0 0000 system system
     mkdir /storage/sdcard1 0000 system system

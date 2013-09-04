@@ -13,6 +13,7 @@ ro.callfirewall.disabled=true
 debug.hwui.render_dirty_regions=false
 
 persist.ttydev=ttyVUART0
+persist.storage.type=2
 
 # delay for ConnectivityChange broadcast (ms)
 conn.connectivity_change_delay = 0

@@ -8,6 +8,7 @@ ro.product.hardware=SP8835EB_V1.0.1
 debug.hwui.render_dirty_regions=false
 
 persist.ttydev=ttyVUART0
+persist.storage.type=1
 
 # delay for ConnectivityChange broadcast (ms)
 conn.connectivity_change_delay = 0

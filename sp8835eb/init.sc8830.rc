@@ -1,17 +1,15 @@
 import init.sc8830.usb.rc
 
 on early-init
-    export EXTERNAL_STORAGE /storage/sdcard1
-    export SECONDARY_STORAGE /storage/sdcard0
-    # 0 for nand,1 for emmc,2 for sdcard
-    export SECOND_STORAGE_TYPE 1
+    export EXTERNAL_STORAGE /storage/sdcard0
+    export SECONDARY_STORAGE /storage/sdcard1
     mkdir /storage 0777 system sdcard_rw
     mkdir /storage/sdcard0 0000 system system
     mkdir /storage/sdcard1 0000 system system
     mkdir /storage/usbdisk 0000 system system
     # for backwards compatibility
-    symlink /storage/sdcard1 /sdcard
-    symlink /storage/sdcard1 /mnt/sdcard
+    symlink /storage/sdcard0 /sdcard
+    symlink /storage/sdcard0 /mnt/sdcard
     symlink /storage/usbdisk /mnt/usbdisk
 # radio pipe
     mkdir /dev/rpipe 0550 radio radio

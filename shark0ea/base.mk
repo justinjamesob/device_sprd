@@ -118,6 +118,7 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/ueventd.shark0.rc:root/ueventd.shark0.rc \
 	$(BOARDDIR)/fstab.shark0:root/fstab.shark0 \
 	$(BOARDDIR)/vold.fstab:system/etc/vold.fstab \
+        $(BOARDDIR)/vold_e.fstab:system/etc/vold_e.fstab \
 	device/sprd/common/libs/audio/apm/devicevolume.xml:system/etc/devicevolume.xml \
 	device/sprd/common/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
         $(BOARDDIR)/hw_params/tiny_hw.xml:system/etc/tiny_hw.xml \

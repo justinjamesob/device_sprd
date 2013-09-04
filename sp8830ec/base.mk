@@ -106,6 +106,7 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/ueventd.sc8830.rc:root/ueventd.sc8830.rc \
 	$(BOARDDIR)/fstab.sc8830:root/fstab.sc8830 \
 	$(BOARDDIR)/vold.fstab:system/etc/vold.fstab \
+        $(BOARDDIR)/vold_e.fstab:system/etc/vold_e.fstab \
 	$(BOARDDIR)/nvitem_td.cfg:root/nvitem_td.cfg \
 	device/sprd/common/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
 	device/sprd/common/res/CDROM/adb.iso:system/etc/adb.iso \
