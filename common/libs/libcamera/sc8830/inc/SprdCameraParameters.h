@@ -75,6 +75,7 @@ public:
 	int getAutoExposureMode();
 	void getMeteringAreas(int *area, int *count, Size *preview_size,
 					 Rect *preview_rect, int orientation, bool mirror);
+	void setZSLSupport(const char* value);
 
 
 	// These sizes have to be a multiple of 16 in each dimension

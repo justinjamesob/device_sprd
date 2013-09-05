@@ -76,7 +76,7 @@ typedef struct{
   	struct img_frm  *src_img;
 	uint32_t slice_height;
 	uint32_t total_height;  //current total current
-
+	struct img_data_end data_endian;
 }JPEG_DEC_CB_PARAM_T;
 
 struct jpeg_wexif_cb_param{

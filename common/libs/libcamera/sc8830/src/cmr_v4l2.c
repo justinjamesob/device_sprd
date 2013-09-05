@@ -558,7 +558,7 @@ int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index)
 	v4l2_buf.flags = 1;
 	v4l2_buf.index = index;
 	if (CHN_0 == channel_id) {
-
+		v4l2_buf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	} else if (CHN_1 == channel_id) {
 		v4l2_buf.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	} else {

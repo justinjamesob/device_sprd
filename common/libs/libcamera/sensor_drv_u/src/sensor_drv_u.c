@@ -815,6 +815,11 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 	for (i = SENSOR_MODE_COMMON_INIT; i < SENSOR_MODE_MAX; i++) {
 		resolution_info_ptr =
 		    &(sensor_info_ptr->resolution_tab_info_ptr[i]);
+
+		if (SENSOR_IMAGE_FORMAT_JPEG == resolution_info_ptr->image_format) {
+			exp_info_ptr->sensor_image_type = SENSOR_IMAGE_FORMAT_JPEG;
+		}
+
 		if ((PNULL != resolution_info_ptr->sensor_reg_tab_ptr)
 		    || ((0x00 != resolution_info_ptr->width)
 			&& (0x00 != resolution_info_ptr->width))) {

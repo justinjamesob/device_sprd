@@ -429,6 +429,7 @@ int camera_sync_var_init(struct camera_context *p_cxt)
 	sem_init(&p_cxt->takepicdone_sem, 0, 0);
 	sem_init(&p_cxt->takepic_callback_sem, 0, 0);
 	sem_init(&p_cxt->sync_scale_sem, 0, 1);
+	sem_init(&p_cxt->jpeg_specify_cxt.jpeg_specify_cap_sem, 0, 0);
 
 	return ret;
 }
@@ -448,6 +449,7 @@ int camera_sync_var_deinit(struct camera_context *p_cxt)
 	sem_destroy(&p_cxt->takepicdone_sem);
 	sem_destroy(&p_cxt->takepic_callback_sem);
 	sem_destroy(&p_cxt->sync_scale_sem);
+	sem_destroy(&p_cxt->jpeg_specify_cxt.jpeg_specify_cap_sem);
 
 	return ret;
 }

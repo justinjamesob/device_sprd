@@ -1287,6 +1287,10 @@ bool SprdCameraHardware::startCameraIfNecessary()
 			return false;
 		}
 
+		if (!camera_is_sensor_support_zsl()) {
+			mParameters.setZSLSupport("false");
+		}
+
 		LOGV("waiting for camera_start.g_camera_id: %d.", mCameraId);
 		if(CAMERA_SUCCESS != camera_start(camera_cb, this, mPreviewHeight, mPreviewWidth)){
 			setCameraState(SPRD_ERROR, STATE_CAMERA);

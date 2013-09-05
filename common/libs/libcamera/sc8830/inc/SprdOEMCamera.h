@@ -54,6 +54,7 @@ typedef enum {
 	CAMERA_INVALID_STAND_ALONE_FORMAT,
 	CAMERA_MALLOC_FAILED_STAND_ALONE,
 	CAMERA_EXIT,
+	CAMERA_JPEG_SPECIFY_FAILED,
 	CAMERA_RET_CODE_MAX
 } camera_ret_code_type;
 
@@ -523,6 +524,7 @@ int camera_dma_copy_data(struct _dma_copy_cfg_tag dma_copy_cfg);
 camera_ret_code_type camera_zsl_rot_cap_param_reset(void);
 int camera_get_is_nonzsl(void);
 void camera_set_stop_preview_mode(uint32_t stop_mode);
+int camera_is_sensor_support_zsl(void);
 
 #ifdef __cplusplus
 }

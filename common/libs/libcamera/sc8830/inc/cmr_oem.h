@@ -229,6 +229,12 @@ struct arithmetic_context {
 	uint32_t                 fd_flag;
 };
 
+struct jpeg_specify_context {
+	uint32_t                jpeg_specify_state;
+	pthread_mutex_t         jpeg_specify_mutex;
+	sem_t                   jpeg_specify_cap_sem;
+};
+
 struct camera_settings {
 	uint32_t                 focal_len;
 	uint32_t                 brightness;
@@ -277,6 +283,7 @@ struct camera_context {
 	struct scaler_context    scaler_cxt;
 	struct rotation_context  rot_cxt;
 	struct arithmetic_context arithmetic_cxt;
+	struct jpeg_specify_context jpeg_specify_cxt;
 
 	/*for the workflow management*/
 	pthread_t                camera_main_thr;
@@ -397,6 +404,8 @@ struct camera_context {
 	pthread_mutex_t          cancel_mutex;
 	uint32_t                 cap_canceled;
 	takepicture_mode         cap_mode;
+
+	uint32_t                 is_reset_if_cfg;
 	/* for capture ZSL */
 	struct frm_info          cap_frm_info[CAMERA_CAP_FRM_CNT];
 	struct img_frm           cap_frm[CAMERA_CAP_FRM_CNT];
