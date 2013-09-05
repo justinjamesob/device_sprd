@@ -40,6 +40,10 @@ on init
 on fs
    mount_all /fstab.sc8830
 
+on post-fs
+    write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
+    write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot1/force_ro 0
+
 on boot
 
     ifup lo
@@ -52,6 +56,8 @@ service ueventd /sbin/ueventd
     critical
 
 service recovery /sbin/recovery
+    user root
+    group root
 
 service adbd /sbin/adbd recovery
   disabled
@@ -67,11 +73,19 @@ on property:service.adb.root=1
     restart adbd
     write /sys/class/android_usb/android0/enable 1
 
+
+on cali
+    class_start cali
+
 service engpcclient /system/bin/engpc
+    class cali
     user root
+    group root
 
 #nvitemd
 service nvitemd_td /bin/nvitemd /dev/spipe_td1 ./nvitem_td.cfg    TRUE
+    class cali
     user root
+    group root
 
 
