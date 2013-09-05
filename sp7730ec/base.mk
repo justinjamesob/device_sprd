@@ -38,6 +38,7 @@ PRODUCT_PACKAGES := \
 	calibration_init \
 	nvm_daemon \
 	modemd\
+	engpc\
 	audio.a2dp.default
 
 # own copyright packages files

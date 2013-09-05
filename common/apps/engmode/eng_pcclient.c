@@ -18,6 +18,7 @@
 #define VLOG_PRI  -20
 #define USB_CONFIG_VSER_GSER  "mass_storage,adb,vser,gser"
 #define USB_CONFIG_GSER6  "mass_storage,adb,gser6"
+#define SYS_CLASS_ANDUSB_ENABLE "/sys/class/android_usb/android0/enable"
 
 // current run mode: TD or W
 int g_run_mode = ENG_RUN_TYPE_TD;
@@ -209,6 +210,21 @@ static int eng_parse_cmdline(struct eng_param * cmdvalue)
     return 0;
 }
 
+static void eng_usb_enable(void)
+{
+    int fd  = -1;
+    int ret = 0;
+
+    fd = open(SYS_CLASS_ANDUSB_ENABLE, O_WRONLY);
+    if(fd >= 0){
+        ret = write(fd, "1", 1);
+        ENG_LOG("%s: Write sys class androidusb enable file: %d\n", __FUNCTION__, ret);
+        close(fd);
+    }else{
+        ENG_LOG("%s: Open sys class androidusb enable file failed!\n", __FUNCTION__);
+    }
+}
+
 int main (int argc, char** argv)
 {
     static char atPath[ENG_DEV_PATH_LEN];
@@ -265,10 +281,12 @@ int main (int argc, char** argv)
 
     if(cmdparam.califlag != 1){
         cmdparam.cp_type = run_type;
+        // Check factory mode and switch device mode.
+        eng_check_factorymode_fornand();
+    }else{
+        // Enable usb enum
+        eng_usb_enable();
     }
-
-    // Check factory mode and switch device mode.
-    eng_check_factorymode_fornand();
 
     set_vlog_priority();
 
