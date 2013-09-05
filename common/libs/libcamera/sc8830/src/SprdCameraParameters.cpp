@@ -362,6 +362,10 @@ int SprdCameraParameters::getAutoExposureMode()
 	return lookup(auto_exposure_mode_map, p, CAMERA_AE_FRAME_AVG);
 }
 
+void SprdCameraParameters::setZSLSupport(const char* value)
+{
+	set("zsl-supported",value);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //

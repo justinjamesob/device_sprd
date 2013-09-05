@@ -2357,7 +2357,7 @@ int OV5640_capture(uint32_t param)
 	average = Sensor_ReadReg(0x56a1);
 
 	Sensor_SetMode(param);
-	Sensor_StreamOff();
+	Sensor_SetMode_WaitDone();
 
 	// read capture VTS
 	capture_VTS = OV5640_get_VTS();
@@ -2441,21 +2441,9 @@ LOCAL uint32_t _ov5640_BeforeSnapshot(uint32_t param)
 
 	param = param&0xffff;
 	SENSOR_PRINT("%d,%d.",cap_mode,param);
-	if (SENSOR_MODE_PREVIEW_ONE >= param) {
-		int ae_ag_ctrl;
-		//turn off AE/AG
-		ae_ag_ctrl = Sensor_ReadReg(0x3503);
-		SENSOR_PRINT("before, ae_ag_ctrl 0x%x", ae_ag_ctrl);
-		ae_ag_ctrl = ae_ag_ctrl | 0x03;
-		Sensor_WriteReg(0x3503, ae_ag_ctrl);
-		SENSOR_PRINT("after, ae_ag_ctrl 0x%x", ae_ag_ctrl);
-		s_capture_shutter = OV5640_get_shutter();
-		s_capture_VTS = OV5640_get_VTS();
-		_ov5640_ReadGain(param);
-		return SENSOR_SUCCESS;
-	}
-	OV5640_capture(param);
 
+	OV5640_capture(param);
+	usleep(15*1000);
 	return SENSOR_SUCCESS;
 }
 

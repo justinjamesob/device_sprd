@@ -486,6 +486,9 @@ void _dec_callback(uint32_t buf_id, uint32_t stream_size, uint32_t is_last_slice
 	struct img_frm			img_frm;
 	JPEG_DEC_CB_PARAM_T     param;
 
+	param.data_endian.y_endian = 1;
+	param.data_endian.uv_endian = 1;
+
 	param.src_img = &img_frm;
 	if (dec_cxt_ptr->cur_line_num + dec_cxt_ptr->set_slice_height > dec_cxt_ptr->size.height) {
 		cpy_height = dec_cxt_ptr->size.height - dec_cxt_ptr->cur_line_num;
@@ -582,19 +585,20 @@ static int _dec_start(uint32_t handle)
 		ret = JPEG_CODEC_ERROR;
 	}
 
-	if(dec_cxt_ptr->slice_height == dec_cxt_ptr->size.height) {
-		//while(1 != dec_cxt_ptr->is_finish) {
-		while(1 != slice_out.is_over) {
-			_dec_callback(0,0,0);
-			next_param.dst_addr_phy.addr_y = 0;
-			next_param.slice_height = JPEG_SLICE_HEIGHT;
-			if(JPEG_CODEC_SUCCESS != _dec_next(handle,&next_param)) {
-				CMR_LOGE("dec next error!");
-				return JPEG_CODEC_ERROR;
+	if (JPEG_CODEC_SUCCESS == ret) {
+		if(dec_cxt_ptr->slice_height == dec_cxt_ptr->size.height) {
+			//while(1 != dec_cxt_ptr->is_finish) {
+			while(1 != slice_out.is_over) {
+				_dec_callback(0,0,0);
+				next_param.dst_addr_phy.addr_y = 0;
+				next_param.slice_height = JPEG_SLICE_HEIGHT;
+				if(JPEG_CODEC_SUCCESS != _dec_next(handle,&next_param)) {
+					CMR_LOGE("dec next error!");
+					return JPEG_CODEC_ERROR;
+				}
 			}
 		}
 	}
-
 	CMR_LOGI("dec start end.");
 
 	return ret;

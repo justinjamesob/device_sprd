@@ -295,6 +295,7 @@ int cmr_scale_local_init(uint32_t slice_height,
 		memcpy(&sc_cxt->src_rect, rect, sizeof(struct img_rect));
 	}
 
+#if 0
 	if (slice_height >= sc_cxt->src_rect.height) {
 		if (sc_cxt->dst_frame.size.width > sc_cxt->sc_threshold) {
 			sc_cxt->sc_work_mode = SC_SLICE_INTERNAL;
@@ -307,6 +308,11 @@ int cmr_scale_local_init(uint32_t slice_height,
 		sc_cxt->sc_work_mode = SC_SLICE_EXTERNAL;
 		sc_cxt->slice_height = slice_height;
 	}
+#else
+	sc_cxt->sc_work_mode = SC_FRAME;
+	sc_cxt->slice_height = slice_height;
+#endif
+
 
 	sc_cxt->tmp_slice.addr_phy.addr_y = dst_img->addr_phy.addr_y;
 	sc_cxt->tmp_slice.addr_vir.addr_y = dst_img->addr_vir.addr_y;

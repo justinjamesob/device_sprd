@@ -634,6 +634,7 @@ typedef struct sensor_exp_info_tag {
 	const char *name;
 	SENSOR_VIDEO_INFO_T sensor_video_info[SENSOR_MODE_MAX];
 	uint32_t change_setting_skip_num;
+	uint32_t sensor_image_type;
 } SENSOR_EXP_INFO_T, *SENSOR_EXP_INFO_T_PTR;
 
 typedef struct sensor_info_tag {
