@@ -81,6 +81,9 @@ on boot
 
     copy /dev/sprd-watchdog /dev/null
 
+    write /proc/sys/net/ipv6/conf/all/disable_ipv6 1
+    write /proc/sys/net/ipv6/conf/default/disable_ipv6 1
+
 on property:ro.debuggable=1
     write /proc/input_power 1
     mount debugfs debugfs /sys/kernel/debug

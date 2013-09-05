@@ -60,7 +60,11 @@ on boot
     chown system root /proc/nk/guest-02/guestOS_2_bank
     chown system root /proc/mtd
 
-    chown system system /sys/class/power_supply/*
+    chown system system /sys/class/power_supply
+
+    write /proc/sys/net/ipv6/conf/all/disable_ipv6 1
+    write /proc/sys/net/ipv6/conf/default/disable_ipv6 1
+/*
 
     insmod /system/lib/modules/ft5306_ts.ko
 

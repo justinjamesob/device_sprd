@@ -42,7 +42,11 @@ on boot
     chown system system /sys/class/compass/akm8975/delay_ori
     chown system system /sys/class/compass/akm8975/accel
 
-    chown system system /sys/class/power_supply/*
+    chown system system /sys/class/power_supply
+
+    write /proc/sys/net/ipv6/conf/all/disable_ipv6 1
+    write /proc/sys/net/ipv6/conf/default/disable_ipv6 1
+/*
 
     chown system system /proc/sys/kernel/printk
 

@@ -57,6 +57,9 @@ on boot
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.interface wlan0
 
+    write /proc/sys/net/ipv6/conf/all/disable_ipv6 1
+    write /proc/sys/net/ipv6/conf/default/disable_ipv6 1
+
 on property:ro.debuggable=1
     mount debugfs debugfs /sys/kernel/debug
 #start rawdata daemon.
