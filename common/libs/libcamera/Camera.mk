@@ -224,6 +224,7 @@ LOCAL_SRC_FILES:= \
 	sensor/sensor_imx179_mipi_raw.c \
 	sensor/sensor_ov5640_mipi.c \
 	sensor/sensor_gc2035.c \
+	sensor/sensor_ov8865_mipi_raw.c \
 	vsp/sc8830/src/jpg_drv_sc8830.c \
 	jpeg/jpeg_fw_8830/src/jpegcodec_bufmgr.c \
 	jpeg/jpeg_fw_8830/src/jpegcodec_global.c \
