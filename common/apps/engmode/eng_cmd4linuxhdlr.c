@@ -737,8 +737,11 @@ int eng_linuxcmd_chargertest(char *req, char *rsp)
 
             } else if(status==0){
                 ENG_LOG("%s: Delete %s",__FUNCTION__,ENG_CHARGERTEST_FILE);
-                remove(ENG_CHARGERTEST_FILE);
-                sprintf(rsp, "%s\r\n", SPRDENG_OK);
+                if (remove(ENG_CHARGERTEST_FILE) == 0) {
+                    sprintf(rsp, "%s\r\n", SPRDENG_OK);
+                } else {
+                    sprintf(rsp, "%s\r\n", SPRDENG_ERROR);
+                }
             } else {
                 sprintf(rsp, "%s\r\n", SPRDENG_ERROR);
             }
