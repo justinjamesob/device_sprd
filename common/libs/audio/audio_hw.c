@@ -99,6 +99,10 @@
 #define PRIVATE_VBC_DA_EQ_PROFILE            "da eq profile"
 #define PRIVATE_VBC_AD01_EQ_PROFILE            "ad01 eq profile"
 #define PRIVATE_VBC_AD23_EQ_PROFILE            "ad23 eq profile"
+#define PRIVATE_SPEAKER_MUTE            "spk mute"
+#define PRIVATE_SPEAKER2_MUTE           "spk2 mute"
+#define PRIVATE_EARPIECE_MUTE           "earpiece mute"
+#define PRIVATE_HEADPHONE_MUTE           "hp mute"
 
 /* ALSA cards for sprd */
 #define CARD_SPRDPHONE "sprdphone"
@@ -249,6 +253,10 @@ struct tiny_private_ctl {
     struct mixer_ctl *vbc_da_eq_profile_select;
     struct mixer_ctl *vbc_ad01_eq_profile_select;
     struct mixer_ctl *vbc_ad23_eq_profile_select;
+    struct mixer_ctl *speaker_mute;
+    struct mixer_ctl *speaker2_mute;
+    struct mixer_ctl *earpiece_mute;
+    struct mixer_ctl *headphone_mute;
 };
 
 struct stream_routing_manager {
@@ -300,6 +308,7 @@ struct tiny_audio_device {
     struct stream_routing_manager  routing_mgr;
 
     int voip_state;
+    bool master_mute;
 };
 
 struct tiny_stream_out {
@@ -438,6 +447,7 @@ static void select_devices_signal(struct tiny_audio_device *adev);
 static void do_select_devices(struct tiny_audio_device *adev);
 static int set_route_by_array(struct mixer *mixer, struct route_setting *route,unsigned int len);
 static int adev_set_voice_volume(struct audio_hw_device *dev, float volume);
+static int adev_set_master_mute(struct audio_hw_device *dev, bool mute);
 static int do_input_standby(struct tiny_stream_in *in);
 static int do_output_standby(struct tiny_stream_out *out);
 static void force_all_standby(struct tiny_audio_device *adev);
@@ -2925,11 +2935,48 @@ static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
     pthread_mutex_lock(&adev->lock);
     if (adev->mode != mode) {
         adev->mode = mode;
+        adev_set_master_mute(dev, false);
         select_mode(adev);
     }else{
         BLUE_TRACE("adev_set_mode,the same mode(%d)",mode);
     }
     pthread_mutex_unlock(&adev->lock);
+
+    return 0;
+}
+
+static int adev_set_master_mute(struct audio_hw_device *dev, bool mute)
+{
+    struct tiny_audio_device *adev = (struct tiny_audio_device *)dev;
+
+    //ALOGD("%s, mute=%d, master_mute=%d", __func__, mute, adev->master_mute);
+    if (adev->master_mute == mute)
+        return 0;
+    adev->master_mute = mute;
+    if (adev->private_ctl.speaker_mute
+            && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
+        mixer_ctl_set_value(adev->private_ctl.speaker_mute, 0, mute);
+
+    if (adev->private_ctl.speaker2_mute
+            && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
+        mixer_ctl_set_value(adev->private_ctl.speaker2_mute, 0, mute);
+
+    if (adev->private_ctl.earpiece_mute
+            && (adev->devices & AUDIO_DEVICE_OUT_EARPIECE))
+        mixer_ctl_set_value(adev->private_ctl.earpiece_mute, 0, mute);
+
+    if (adev->private_ctl.headphone_mute
+            && (adev->devices & (AUDIO_DEVICE_OUT_WIRED_HEADPHONE | AUDIO_DEVICE_OUT_WIRED_HEADPHONE)))
+        mixer_ctl_set_value(adev->private_ctl.headphone_mute, 0, mute);
+
+    return 0;
+}
+
+static int adev_get_master_mute(const struct audio_hw_device *dev, bool *mute)
+{
+    struct tiny_audio_device *adev = (struct tiny_audio_device *)dev;
+
+    *mute = adev->master_mute;
 
     return 0;
 }
@@ -3177,6 +3224,26 @@ static void adev_config_parse_private(struct config_parse_state *s, const XML_Ch
             s->adev->private_ctl.vbc_ad23_eq_profile_select =
                 mixer_get_ctl_by_name(s->adev->mixer, name);
             CTL_TRACE(s->adev->private_ctl.vbc_ad23_eq_switch);
+        }
+        else if (strcmp(s->private_name, PRIVATE_SPEAKER_MUTE) == 0) {
+            s->adev->private_ctl.speaker_mute =
+                mixer_get_ctl_by_name(s->adev->mixer, name);
+            CTL_TRACE(s->adev->private_ctl.speaker_mute);
+        }
+        else if (strcmp(s->private_name, PRIVATE_SPEAKER2_MUTE) == 0) {
+            s->adev->private_ctl.speaker2_mute =
+                mixer_get_ctl_by_name(s->adev->mixer, name);
+            CTL_TRACE(s->adev->private_ctl.speaker2_mute);
+        }
+        else if (strcmp(s->private_name, PRIVATE_EARPIECE_MUTE) == 0) {
+            s->adev->private_ctl.earpiece_mute =
+                mixer_get_ctl_by_name(s->adev->mixer, name);
+            CTL_TRACE(s->adev->private_ctl.earpiece_mute);
+        }
+        else if (strcmp(s->private_name, PRIVATE_HEADPHONE_MUTE) == 0) {
+            s->adev->private_ctl.headphone_mute =
+                mixer_get_ctl_by_name(s->adev->mixer, name);
+            CTL_TRACE(s->adev->private_ctl.headphone_mute);
         }
     }
 }
@@ -4000,6 +4067,8 @@ static int adev_open(const hw_module_t* module, const char* name,
     adev->hw_device.set_voice_volume = adev_set_voice_volume;
     adev->hw_device.set_master_volume = adev_set_master_volume;
     adev->hw_device.set_mode = adev_set_mode;
+    adev->hw_device.set_master_mute = adev_set_master_mute;
+    adev->hw_device.get_master_mute = adev_get_master_mute;
     adev->hw_device.set_mic_mute = adev_set_mic_mute;
     adev->hw_device.get_mic_mute = adev_get_mic_mute;
     adev->hw_device.set_parameters = adev_set_parameters;

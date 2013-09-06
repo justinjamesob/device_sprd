@@ -50,9 +50,11 @@
 <private name="da eq profile">
   <func name="VBC DA EQ Profile Select" val="0" />
 </private>
+
 <private name="ad01 eq profile">
   <func name="VBC AD01 EQ Profile Select" val="0" />
 </private>
+
 <private name="ad23 eq profile">
   <func name="VBC AD23 EQ Profile Select" val="0" />
 </private>
@@ -60,6 +62,20 @@
 <private name="internal PA">
   <func name="Inter PA Config" val="304" />
 </private>
+
+<private name="spk mute">
+  <func name="Speaker Mute" val="0" />
+</private>
+
+<private name="earpiece mute">
+  <func name="Earpiece Mute" val="0" />
+</private>
+
+<private name="hp mute">
+  <func name="HeadPhone Mute" val="0" />
+</private>
+
+<!-- END OF MUST NOT modify private field directly -->
 
 <device name="builtin-mic">
   <path name="on">
