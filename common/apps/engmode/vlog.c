@@ -155,7 +155,8 @@ void *eng_vlog_thread(void *x)
 
 out:
     ENG_LOG("eng_vlog thread end\n");
-    close(sipc_fd);
+    if (sipc_fd >= 0)
+        close(sipc_fd);
     close(ser_fd);
 
     return 0;
