@@ -86,7 +86,8 @@ PRODUCT_PACKAGES += \
     CMCCREAD.apk \
     CMCCTelenav_Nav.apk \
     CMCCWIFI.apk \
-    PimClient.apk
+    PimClient.apk \
+    SogouInput.apk
 
 	
 # packages files
