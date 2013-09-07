@@ -16,7 +16,22 @@
 #include "isp_calibration.h"
 #include "sensor_raw.h"
 
-#define CLIP(x, bottom, top) ((x)<bottom ? bottom : (x) > top ? top : (x))
+//#define CLIP(x, bottom, top) ((x)<bottom ? bottom : (x) > top ? top : (x))
+
+int32_t CLIP(int32_t x, int32_t bottom, int32_t top)
+{
+	int32_t val = 0;
+
+	if (x < bottom) {
+		val = bottom;
+	} else if (x > top) {
+		val = top;
+	} else {
+		val = x;
+	}
+
+	return val;
+}
 
 static uint32_t ISP_Alloc(uint32_t mem_len)
 {
@@ -401,11 +416,11 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 	int32_t rtn = ISP_CALI_RTN_SUCCESS;
 	struct isp_lnc_cali_info *in_param_ptr = (struct isp_lnc_cali_info*)in_ptr;
 	struct isp_lnc_cali_gain *rtn_param_ptr = (struct isp_lnc_cali_gain*)out_ptr;
-	uint16_t std_gain = base_gain;
+	int32_t std_gain = base_gain;
 	uint16_t shf_bit = shf;
-	uint32_t map_gain = 0x00;
+	int32_t map_gain = 0x00;
 	uint32_t x = 0x00;
-	uint32_t tmp_val = 0;
+	int32_t tmp_val = 0;
 
 	uint32_t prc_00 = 0x00;
 	uint32_t prc_01 = 0x00;
@@ -459,32 +474,32 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain *= prc_00;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
-		rtn_param_ptr->chn_00[x] = tmp_val;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_00[x] = (uint16_t)tmp_val;
 
 		map_gain = (in_param_ptr->chn_01.max_stat << shf_bit) / (in_param_ptr->chn_01.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_01;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
-		rtn_param_ptr->chn_01[x] = tmp_val;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_01[x] = (uint16_t)tmp_val;
 
 		map_gain = (in_param_ptr->chn_10.max_stat << shf_bit) / (in_param_ptr->chn_10.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_10;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
-		rtn_param_ptr->chn_10[x] = tmp_val;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_10[x] = (uint16_t)tmp_val;
 
 		map_gain = (in_param_ptr->chn_11.max_stat << shf_bit) / (in_param_ptr->chn_11.stat_ptr[x]+1);
 		map_gain -= std_gain;
 		map_gain *= prc_11;
 		map_gain >>= shf_bit;
 		tmp_val = std_gain + map_gain;
-		tmp_val = (uint32_t)CLIP((int32_t)tmp_val, 0, 0xfff);
-		rtn_param_ptr->chn_11[x] = tmp_val;
+		tmp_val = CLIP(tmp_val, 0, 0xfff);
+		rtn_param_ptr->chn_11[x] = (uint16_t)tmp_val;
 	}
 
 	return rtn;
@@ -542,7 +557,7 @@ int32_t ISP_Cali_LNCTaleCalc(struct isp_addr_t img_addr, uint32_t bayer_pttn, st
 
 	_isp_Cali_LNCResAlloc((void*)&cali_in_param, (void*)&cali_info_param, (void*)&cali_gain_param);
 	_isp_Cali_LNC_Calc((void*)&cali_in_param, (void*)&cali_info_param);
-	_isp_Cali_LNC_GainCalc(1024, 10, bayer_pttn, 256, 256, 256, (void*)&cali_info_param, (void*)&cali_gain_param);
+	_isp_Cali_LNC_GainCalc(1024, 10, bayer_pttn, 1024, 1024, 1024, (void*)&cali_info_param, (void*)&cali_gain_param);
 	_isp_Cali_LNCTabMerge(&cali_gain_param, cali_info_param.num, lnc_tab);
 	_isp_Cali_LNCResFree(&cali_info_param, &cali_gain_param);
 
@@ -1029,10 +1044,148 @@ uint32_t ISP_Cali_LNCCorrection(struct isp_addr_t * src_data, struct isp_addr_t 
 
 			temp1 = CLIP(temp1, 0, 1023);
 
-			dst_ptr[SliceY * iSliceWidth + SliceX] = temp1;
+			dst_ptr[SliceY * iSliceWidth + SliceX] = (uint16_t)temp1;
 
 		}
 	}
 
 	return 0;
+}
+
+int32_t ISP_Cali_BLCorrecton(struct isp_addr_t *in_img_addr,
+								struct isp_addr_t *out_img_addr,
+								struct isp_rect_t *rect,
+								struct isp_size_t *img_size,
+								uint32_t  bayer_pttn,
+								struct isp_bayer_ptn_stat_t *stat_param
+								)
+{
+	uint32_t i, j;
+	int32_t tmp;
+	uint16_t blc_gr;
+	uint16_t blc_gb;
+	uint16_t blc_r;
+	uint16_t blc_b;
+	uint16_t st_x, ed_x;
+	uint16_t st_y, ed_y;
+	uint16_t imagewidth;
+	uint16_t *in_data_ptr = PNULL;
+	uint16_t *out_data_ptr = PNULL;
+	uint32_t bayer_mode;
+
+	if ((PNULL == in_img_addr)
+		||(PNULL == out_img_addr)
+		||(PNULL == stat_param)
+		||(PNULL == rect)
+		||(PNULL == img_size)) {
+
+		ISP_CALI_LOG("The ISP_Cali_Blc pointer is NULL, in_ptr: 0x%x, out_ptr: 0x%x, stat_ptr: 0x%x, rect:0x%x, img_size:0x%x\n",
+			(uint32_t)in_img_addr, (uint32_t)out_img_addr, (uint32_t)stat_param, (uint32_t)rect, (uint32_t)img_size);
+
+		return -1;
+	}
+
+	in_data_ptr = (uint16_t*)in_img_addr->y_addr;
+	out_data_ptr = (uint16_t*)out_img_addr->y_addr;
+	if ((PNULL == in_data_ptr)
+		||(PNULL == out_data_ptr)) {
+		ISP_CALI_LOG("The ISP_Cali_Blc data address is NULL, in data addr: 0x%x, out data addr: 0x%x\n",
+			(uint32_t)in_data_ptr, (uint32_t)out_data_ptr);
+
+		return -1;
+	}
+
+	bayer_mode = bayer_pttn;
+	imagewidth = img_size->width;
+
+	blc_gr = stat_param->gr_stat;
+	blc_gb = stat_param->gb_stat;
+	blc_r = stat_param->r_stat;
+	blc_b = stat_param->b_stat;
+
+	st_x = rect->x;
+	st_y = rect->y;
+	ed_x = rect->x + rect->width -1;
+	ed_y = rect->y + rect->height -1;
+
+	for (i = st_y; i <= ed_y; i++) {
+		for (j = st_x; j <= ed_x; j++) {
+			if ((i &1)&&(j &1)) {
+				if (0 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gb;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (1 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_b;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (2 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_r;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (3 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gr;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				}
+			} else if ((i &1)&&(!(j &1))) {
+				if (0 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_b;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (1 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gb;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (2 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] -blc_gr;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (3 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_r;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				}
+			}else if ((!(i &1))&&(j &1)) {
+				if (0 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_r;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (1 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gr;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (2 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gb;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (3 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_b;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				}
+			}else if ((!(i &1))&&(!(j &1))) {
+				if (0 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gr;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (1 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_r;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (2 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_b;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				} else if (3 == bayer_mode) {
+					tmp = in_data_ptr[i * imagewidth + j] - blc_gb;
+					tmp = CLIP(tmp, 0, 1023);
+					*(out_data_ptr++) = (uint16_t)tmp;
+				}
+			}
+		}
+	}
+
+	return 0;
+
 }

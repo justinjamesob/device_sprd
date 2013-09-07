@@ -741,7 +741,7 @@ void send_capture_data(uint32_t format, uint32_t width, uint32_t height, char *c
 {
 	int ret;
 
-	if ((0 == capture_img_end_flag)&&(format == capture_format))
+	if ((0 == capture_img_end_flag)&&(format == (uint32_t)capture_format))
 	{
 		DBG("ISP_TOOL: capture format: %d, width: %d, height: %d.\n", format, width, height);
 		ret = handle_img_data(format, width, height, ch0_ptr, ch0_len, ch1_ptr, ch1_len, ch2_ptr, ch2_len);

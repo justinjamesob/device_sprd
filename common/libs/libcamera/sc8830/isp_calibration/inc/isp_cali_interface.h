@@ -43,6 +43,14 @@ int32_t ISP_Cali_UnCompressedPacket(struct isp_addr_t src_addr, struct isp_addr_
 void ISP_Cali_GetLensTabSize(struct isp_size_t img_size, uint32_t grid, uint32_t *tab_size);
 
 uint32_t ISP_Cali_LensCorrection(struct isp_addr_t * src_data, struct isp_addr_t * dst_data, struct isp_size_t img_size, uint8_t grid, uint16_t *lnc_tab);
+
+int32_t ISP_Cali_BlackLevelCorrection(struct isp_addr_t *in_img_addr,
+										struct isp_addr_t *out_img_addr,
+										struct isp_rect_t *rect,
+										struct isp_size_t *img_size,
+										uint32_t  bayer_pttn,
+										struct isp_bayer_ptn_stat_t *stat_param
+										);
 #ifdef	 __cplusplus
 }
 #endif

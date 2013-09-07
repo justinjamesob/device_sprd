@@ -414,6 +414,23 @@ static int32_t utest_dcam_save_raw_data(void)
 	return rtn;
 }
 
+static int32_t utest_save_raw_data(char* file_name, void* buf, uint32_t len)
+{
+	int32_t rtn = 0;
+	FILE* fp = 0;
+
+	fp = fopen(file_name, "wb");
+	if (fp != NULL) {
+		fwrite((void *)buf, 1, len, fp);
+		fclose(fp);
+	} else {
+		ERR("utest_save_raw_data: failed to open save_file.\n");
+		rtn = -1;
+	}
+
+	return rtn;
+}
+
 static int32_t utest_dcam_save_jpg(void)
 {
 	int32_t rtn = 0;
@@ -486,6 +503,7 @@ static int32_t utest_dcam_awb(uint8_t sub_cmd)
 #if 0
 	uint32_t *dst_temp_addr = NULL;
 #endif
+	uint32_t *img_blc_addr = NULL;
 	uint32_t *img_tmp_addr = NULL;
 	uint16_t *len_tab_addr = NULL;
 	uint32_t len_tab_size = 0;
@@ -520,9 +538,50 @@ static int32_t utest_dcam_awb(uint8_t sub_cmd)
 		return -1;
 	}
 #else
-	tmp_addr.y_addr = img_addr.y_addr;
-	tmp_addr.uv_addr = img_addr.uv_addr;
-	tmp_addr.v_addr = img_addr.v_addr;
+	if (0 == (sensor_ptr->raw_info_ptr->tune_ptr->blc_bypass)) {
+		uint32_t bayer_mod;
+		struct isp_rect_t blc_rect = { 0, 0, 0, 0};
+		struct isp_size_t blc_size = {0, 0};
+		struct isp_bayer_ptn_stat_t blc_stat = {0, 0, 0, 0};
+		struct sensor_blc_param *blc_ptr = NULL;
+		char file_name1[64] = "/data/sensor_before_blc.raw";
+
+		img_blc_addr = (uint32_t *)malloc(cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+		if(img_blc_addr) {
+
+			memset((void*)img_blc_addr, 0x00, cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+
+			blc_size.width= cmr_cxt_ptr->capture_width;
+			blc_size.height = cmr_cxt_ptr->capture_height;
+			blc_rect.x = 0;
+			blc_rect.y = 0;
+			blc_rect.width = cmr_cxt_ptr->capture_width;
+			blc_rect.height = cmr_cxt_ptr->capture_height;
+			bayer_mod = sensor_ptr->image_pattern;
+			tmp_addr.y_addr = (uint32_t)img_blc_addr;
+			blc_ptr = &(sensor_ptr->raw_info_ptr->tune_ptr->blc);
+			blc_stat.r_stat = blc_ptr->offset[0].r;
+			blc_stat.b_stat = blc_ptr->offset[0].b;
+			blc_stat.gr_stat = blc_ptr->offset[0].gr;
+			blc_stat.gb_stat = blc_ptr->offset[0].gb;
+			rtn = ISP_Cali_BlackLevelCorrection(&img_addr,
+												&tmp_addr,
+												&blc_rect,
+												&blc_size,
+												bayer_mod,
+												&blc_stat);
+
+		} else {
+			ERR("utest_dcam_awb: failed to alloc buffer.\n");
+			rtn = -1;
+			goto awb_exit;
+		}
+	} else {
+		tmp_addr.y_addr = img_addr.y_addr;
+		tmp_addr.uv_addr = img_addr.uv_addr;
+		tmp_addr.v_addr = img_addr.v_addr;
+	}
+
 #endif
 
 	ISP_Cali_GetLensTabSize(img_size, lsc_grid, &len_tab_size);
@@ -622,12 +681,19 @@ awb_exit:
 	}
 #endif
 
+	if (img_blc_addr) {
+		free(img_blc_addr);
+		img_blc_addr = NULL;
+	}
+
 	if (img_tmp_addr) {
 		free(img_tmp_addr);
+		img_tmp_addr = NULL;
 	}
 
 	if (len_tab_addr) {
 		free(len_tab_addr);
+		len_tab_addr = NULL;
 	}
 
 	return rtn;
@@ -649,6 +715,7 @@ static int32_t utest_dcam_flashlight(uint8_t sub_cmd)
 #if 0
 	uint32_t *dst_temp_addr = NULL;
 #endif
+	uint32_t *img_blc_addr = NULL;
 	uint32_t *img_tmp_addr = NULL;
 	uint16_t *len_tab_addr = NULL;
 	uint32_t len_tab_size = 0;
@@ -684,9 +751,48 @@ static int32_t utest_dcam_flashlight(uint8_t sub_cmd)
 		return -1;
 	}
 #else
-	tmp_addr.y_addr = img_addr.y_addr;
-	tmp_addr.uv_addr = img_addr.uv_addr;
-	tmp_addr.v_addr = img_addr.v_addr;
+	if (0 == (sensor_ptr->raw_info_ptr->tune_ptr->blc_bypass)) {
+		uint32_t bayer_mod;
+		struct isp_rect_t blc_rect = {0, 0, 0, 0};
+		struct isp_size_t blc_size = {0, 0};
+		struct isp_bayer_ptn_stat_t blc_stat = {0, 0, 0, 0};
+		struct sensor_blc_param *blc_ptr = NULL;
+
+		img_blc_addr = (uint32_t *)malloc(cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+		if(img_blc_addr) {
+
+			memset((void*)img_blc_addr, 0x00, cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+
+			blc_size.width= cmr_cxt_ptr->capture_width;
+			blc_size.height = cmr_cxt_ptr->capture_height;
+			blc_rect.x = 0;
+			blc_rect.y = 0;
+			blc_rect.width = cmr_cxt_ptr->capture_width;
+			blc_rect.height = cmr_cxt_ptr->capture_height;
+			bayer_mod = sensor_ptr->image_pattern;
+			tmp_addr.y_addr = (uint32_t)img_blc_addr;
+			blc_ptr = &(sensor_ptr->raw_info_ptr->tune_ptr->blc);
+			blc_stat.r_stat = blc_ptr->offset[0].r;
+			blc_stat.b_stat = blc_ptr->offset[0].b;
+			blc_stat.gr_stat = blc_ptr->offset[0].gr;
+			blc_stat.gb_stat = blc_ptr->offset[0].gb;
+			rtn = ISP_Cali_BlackLevelCorrection(&img_addr,
+												&tmp_addr,
+												&blc_rect,
+												&blc_size,
+												bayer_mod,
+												&blc_stat);
+
+		} else {
+			ERR("utest_dcam_flashlight: failed to alloc buffer.\n");
+			rtn = -1;
+			goto flashlight_exit;
+		}
+	} else {
+		tmp_addr.y_addr = img_addr.y_addr;
+		tmp_addr.uv_addr = img_addr.uv_addr;
+		tmp_addr.v_addr = img_addr.v_addr;
+	}
 #endif
 
 ISP_Cali_GetLensTabSize(img_size, lsc_grid, &len_tab_size);
@@ -785,12 +891,19 @@ flashlight_exit:
 	}
 #endif
 
+	if (img_blc_addr) {
+		free (img_blc_addr);
+		img_blc_addr = NULL;
+	}
+
 	if (img_tmp_addr) {
 		free(img_tmp_addr);
+		img_tmp_addr = NULL;
 	}
 
 	if (len_tab_addr) {
 		free(len_tab_addr);
+		len_tab_addr = NULL;
 	}
 
 	return rtn;
@@ -807,6 +920,7 @@ static int32_t utest_dcam_lsc(uint8_t sub_cmd)
 #if 0
 	uint32_t *dst_temp_addr = NULL;
 #endif
+	uint32_t *img_blc_addr = NULL;
 	uint32_t *len_tab_addr = NULL;
 	uint32_t len_tab_size = 0;
 	int32_t rtn = 0;
@@ -848,9 +962,47 @@ static int32_t utest_dcam_lsc(uint8_t sub_cmd)
 		goto lsc_exit;
 	}
 #else
-	dst_addr.y_addr = img_addr.y_addr;
-	dst_addr.uv_addr = img_addr.uv_addr;
-	dst_addr.v_addr = img_addr.v_addr;
+	if (0 == (sensor_ptr->raw_info_ptr->tune_ptr->blc_bypass)) {
+		uint32_t bayer_mod;
+		struct isp_rect_t blc_rect = {0, 0, 0, 0};
+		struct isp_size_t blc_size = {0, 0};
+		struct isp_bayer_ptn_stat_t blc_stat = {0, 0, 0, 0};
+		struct sensor_blc_param *blc_ptr = NULL;
+
+		img_blc_addr = (uint32_t *)malloc(cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+		if(img_blc_addr) {
+
+			memset((void*)img_blc_addr, 0x00, cmr_cxt_ptr->capture_width * cmr_cxt_ptr->capture_height * 2);
+
+			blc_size.width= cmr_cxt_ptr->capture_width;
+			blc_size.height = cmr_cxt_ptr->capture_height;
+			blc_rect.x = 0;
+			blc_rect.y = 0;
+			blc_rect.width = cmr_cxt_ptr->capture_width;
+			blc_rect.height = cmr_cxt_ptr->capture_height;
+			bayer_mod = sensor_ptr->image_pattern;
+			dst_addr.y_addr = (uint32_t)img_blc_addr;
+			blc_ptr = &(sensor_ptr->raw_info_ptr->tune_ptr->blc);
+			blc_stat.r_stat = blc_ptr->offset[0].r;
+			blc_stat.b_stat = blc_ptr->offset[0].b;
+			blc_stat.gr_stat = blc_ptr->offset[0].gr;
+			blc_stat.gb_stat = blc_ptr->offset[0].gb;
+			rtn = ISP_Cali_BlackLevelCorrection(&img_addr,
+												&dst_addr,
+												&blc_rect,
+												&blc_size,
+												bayer_mod,
+												&blc_stat);
+		} else {
+			ERR("utest_dcam_flashlight: failed to alloc buffer.\n");
+			rtn = -1;
+			goto lsc_exit;
+		}
+	} else {
+		dst_addr.y_addr = img_addr.y_addr;
+		dst_addr.uv_addr = img_addr.uv_addr;
+		dst_addr.v_addr = img_addr.v_addr;
+	}
 #endif
 
 	index = utest_dcam_find_param_index(cmr_cxt_ptr);
@@ -895,8 +1047,16 @@ static int32_t utest_dcam_lsc(uint8_t sub_cmd)
 			goto lsc_exit;
 
 lsc_exit:
-	if (len_tab_addr)
+	if (len_tab_addr) {
 		free(len_tab_addr);
+		len_tab_addr = NULL;
+	}
+
+	if (img_blc_addr) {
+		free (img_blc_addr);
+		img_blc_addr = NULL;
+	}
+
 #if 0
 	if (dst_temp_addr)
 		free(dst_temp_addr);

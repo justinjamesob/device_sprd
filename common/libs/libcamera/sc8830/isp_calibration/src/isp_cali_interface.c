@@ -290,3 +290,22 @@ UnCompressedPacket_Exit:
 
 	return rtn ;
 }
+
+int32_t ISP_Cali_BlackLevelCorrection(struct isp_addr_t *in_img_addr,
+										struct isp_addr_t *out_img_addr,
+										struct isp_rect_t *rect,
+										struct isp_size_t *img_size,
+										uint32_t  bayer_pttn,
+										struct isp_bayer_ptn_stat_t *stat_param
+										)
+{
+	int32_t rtn = ISP_CALI_RTN_SUCCESS;
+
+	ISP_CALI_LOG("ISP_Cali_BlackLevelCorrection: rect (%d, %d, %d, %d), image size: (%d, %d), bayer mode: %d, blc stat:(r:%d, b:%d, gr:%d, gb: %d)\n", \
+	rect->x,rect->y, rect->width, rect->height, img_size->width, img_size->height, bayer_pttn, stat_param->r_stat, stat_param->b_stat, \
+	stat_param->gr_stat, stat_param->gb_stat);
+
+	rtn = ISP_Cali_BLCorrecton( in_img_addr, out_img_addr, rect, img_size, bayer_pttn, stat_param);
+
+	return rtn;
+}
