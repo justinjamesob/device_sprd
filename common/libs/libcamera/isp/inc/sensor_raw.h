@@ -148,7 +148,7 @@ struct sensor_ae_param{
 	uint8_t smart;
 	uint8_t smart_rotio;
 	uint8_t quick_mode;
-	uint8_t smart_mode;
+	uint8_t min_exposure;
 	int8_t ev[16];
 	uint16_t smart_base_gain;
 	uint16_t smart_wave_min;
@@ -159,7 +159,11 @@ struct sensor_ae_param{
 	uint8_t smart_denoise_max_index;
 	uint8_t smart_edge_min_index;
 	uint8_t smart_edge_max_index;
-	uint32_t reserved[37];
+	uint8_t smart_mode;
+	uint8_t smart_sta_low_thr;
+	uint8_t smart_sta_high_thr;
+	uint8_t smart_sta_rotio;
+	uint32_t reserved[36];
 };
 
 struct sensor_ae_tab{

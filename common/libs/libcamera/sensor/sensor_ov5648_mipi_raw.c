@@ -1321,7 +1321,7 @@ LOCAL uint32_t _ov5648_write_af(uint32_t param)
 	cmd_len = 2;
 	ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
 
-	SENSOR_PRINT("SENSOR_OV5647: _write_af, ret =  %d, MSL:%x, LSL:%x\n", ret_value, cmd_val[0], cmd_val[1]);
+	SENSOR_PRINT("SENSOR_OV5648: _write_af, ret =  %d, MSL:%x, LSL:%x\n", ret_value, cmd_val[0], cmd_val[1]);
 
 	return ret_value;
 }
