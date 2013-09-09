@@ -641,7 +641,11 @@ status_t SprdCameraHardware::autoFocus()
 
 status_t SprdCameraHardware::cancelAutoFocus()
 {
-	return camera_cancel_autofocus();
+	bool ret = 0;
+	Mutex::Autolock l(&mLock);
+	ret = camera_cancel_autofocus();
+	WaitForFocusCancelDone();
+	return ret;
 }
 
 void SprdCameraHardware::setCaptureRawMode(bool mode)
@@ -669,7 +673,7 @@ status_t SprdCameraHardware::checkSetParametersEnvironment( )
 
 	/*check preview status*/
 	if ((SPRD_IDLE != getPreviewState()) && (SPRD_PREVIEW_IN_PROGRESS != getPreviewState())) {
-		LOGE("camera HAL in preview changing process, not allov to setParameter");
+		LOGE("camera HAL in preview changing process, not allow to setParameter");
 		return PERMISSION_DENIED;
 	}
 
@@ -1274,6 +1278,19 @@ bool SprdCameraHardware::WaitForCaptureDone()
 	}
 
 	return SPRD_IDLE == mCameraState.capture_state;
+}
+
+bool SprdCameraHardware::WaitForFocusCancelDone()
+{
+	Mutex::Autolock stateLock(&mStateLock);
+	while (SPRD_IDLE != mCameraState.focus_state
+		 && SPRD_ERROR != mCameraState.focus_state) {
+		LOGV("WaitForFocusCancelDone: waiting for SPRD_IDLE");
+		mStateWait.wait(mStateLock);
+		LOGV("WaitForFocusCancelDone: woke up");
+	}
+
+	return SPRD_IDLE == mCameraState.focus_state;
 }
 
 // Called with mLock held!
@@ -3419,7 +3436,12 @@ void SprdCameraHardware::HandleFocus(camera_cb_type cb,
 			mNotify_cb(CAMERA_MSG_FOCUS, 0, 0, mUser);
 		break;
 	}
-	setCameraState(SPRD_IDLE, STATE_FOCUS);
+
+	if (CAMERA_EXIT_CB_ABORT != cb) {
+		setCameraState(SPRD_IDLE, STATE_FOCUS);
+	} else {
+		transitionState(getFocusState(), SPRD_IDLE, STATE_FOCUS);
+	}
 
 	LOGV("HandleFocus out, state = %s", getCameraStateStr(getCaptureState()));
 }

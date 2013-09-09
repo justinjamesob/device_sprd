@@ -243,6 +243,7 @@ private:
 	bool                            WaitForCaptureDone();
 	bool                            WaitForCameraStart();
 	bool                            WaitForCameraStop();
+	bool                            WaitForFocusCancelDone();
 	bool                            isRecordingMode();
 	void                            setRecordingMode(bool enable);
 	bool                            startCameraIfNecessary();

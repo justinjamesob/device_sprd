@@ -1470,7 +1470,15 @@ int camera_autofocus_start(void)
 			if (CAMERA_SUCCESS != ret) {
 				CMR_LOGE("ISP_AE_BYPASS error.");
 			}
-			sem_wait(&cxt->cmr_set.isp_alg_sem);
+
+			while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
+				if (camera_autofocus_need_exit()) {
+					ret = CAMERA_INVALID_STATE;
+					CMR_RTN_IF_ERR(ret);
+				}
+				usleep(10*1000);
+			}
+
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
 			flash_param.mode=ISP_ALG_FAST;
 			flash_param.flash_eb=0x01;
@@ -1486,7 +1494,13 @@ int camera_autofocus_start(void)
 		}
 		if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 			if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-				sem_wait(&cxt->cmr_set.isp_alg_sem);
+				while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
+					if (camera_autofocus_need_exit()) {
+						ret = CAMERA_INVALID_STATE;
+						CMR_RTN_IF_ERR(ret);
+					}
+					usleep(10*1000);
+				}
 			}
 			camera_set_flashdevice((uint32_t)FLASH_CLOSE_AFTER_OPEN);
 		}
