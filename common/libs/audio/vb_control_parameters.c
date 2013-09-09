@@ -1284,6 +1284,18 @@ void *vbc_ctrl_thread_routine(void *arg)
     struct tiny_audio_device *adev;
     parameters_head_t read_common_head;
     parameters_head_t write_common_head;
+
+    pthread_attr_t attr;
+    struct sched_param m_param;
+    int newprio=39;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
+    pthread_attr_setschedpolicy(&attr,SCHED_FIFO);
+    pthread_attr_getschedparam(&attr,&m_param);
+    m_param.sched_priority=newprio;
+    pthread_attr_setschedparam(&attr,&m_param);
+
     para = (vbc_ctrl_thread_para_t *)arg;
     adev = (struct tiny_audio_device *)(para->adev);
 
