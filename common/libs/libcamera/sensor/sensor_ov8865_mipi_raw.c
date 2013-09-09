@@ -120,7 +120,7 @@ LOCAL const SENSOR_REG_T ov8865_common_init[] = {
 	{0x3500,0x00}, // exposurre HH
 	{0x3501,0x4c}, // expouere H
 	{0x3502,0x00}, // exposure L
-	{0x3503,0x00}, // gain delay 1 frame, exposure delay 1 frame
+	{0x3503,0x04}, // gain delay 1 frame, exposure delay 1 frame
 	{0x3508,0x02}, // gain H
 	{0x3509,0x00}, // gain L
 	{0x3700,0x18}, // sensor control
@@ -1044,33 +1044,6 @@ LOCAL uint32_t Sensor_ov8865_InitRawTuneInfo(void)
 	struct sensor_raw_tune_info* sensor_ptr=raw_sensor_ptr->tune_ptr;
 	struct sensor_raw_cali_info* cali_ptr=raw_sensor_ptr->cali_ptr;
 
-	sensor_ptr->version_id=0x00010000;
-	sensor_ptr->blc_bypass=0x00;
-	sensor_ptr->nlc_bypass=0x01;
-	sensor_ptr->lnc_bypass=0x01;
-	sensor_ptr->ae_bypass=0x00;
-	sensor_ptr->awb_bypass=0x00;
-	sensor_ptr->bpc_bypass=0x01;
-	sensor_ptr->denoise_bypass=0x01;
-	sensor_ptr->grgb_bypass=0x01;
-	sensor_ptr->cmc_bypass=0x01;
-	sensor_ptr->gamma_bypass=0x01;
-	sensor_ptr->uvdiv_bypass=0x01;
-	sensor_ptr->pref_bypass=0x01;
-	sensor_ptr->bright_bypass=0x01;
-	sensor_ptr->contrast_bypass=0x01;
-	sensor_ptr->hist_bypass=0x01;
-	sensor_ptr->auto_contrast_bypass=0x01;
-	sensor_ptr->af_bypass=0x00;
-	sensor_ptr->edge_bypass=0x01;
-	sensor_ptr->fcs_bypass=0x01;
-	sensor_ptr->css_bypass=0x01;
-	sensor_ptr->saturation_bypass=0x01;
-	sensor_ptr->hdr_bypass=0x01;
-	sensor_ptr->glb_gain_bypass=0x01;
-	sensor_ptr->chn_gain_bypass=0x01;
-	sensor_ptr->ae.target_lum = 120;
-
 	sensor_ptr->ae.smart=0x00;// bit0: denoise bit1: edge bit2: startion
 	sensor_ptr->ae.smart_rotio=255;
 	sensor_ptr->ae.smart_mode=0; // 0: gain 1: lum
@@ -1422,30 +1395,22 @@ LOCAL uint32_t _ov8865_write_exposure(uint32_t param)
 	return ret_value;
 }
 
+#define HAIT_DEBUG 1
+
 LOCAL uint32_t _ov8865_write_gain(uint32_t param)
 {
 	uint32_t ret_value = SENSOR_SUCCESS;
 	uint16_t gain128 =0x00, tmp_val = 0;
-	uint32_t real_gain = 0x00;
 
 	SENSOR_PRINT("SENSOR_ov8865: write_gain:0x%x", param);
 
-	real_gain = ((param&0xf)+16)*(((param>>4)&0x01)+1)*(((param>>5)&0x01)+1)*(((param>>6)&0x01)+1)*(((param>>7)&0x01)+1);
-	real_gain = real_gain*(((param>>8)&0x01)+1)*(((param>>9)&0x01)+1)*(((param>>10)&0x01)+1)*(((param>>11)&0x01)+1) * (((param>>12)&0x01)+1);
+	gain128 = 0x80|((param&0xf)<<3)|((param&0x1f0)<<4);
 
-	gain128 = real_gain * 8;
-
-	if (gain128 > 7808) {
-		gain128 = 7808;
-	}
-
-	gain128 = gain128 & 0x3fff;
-
-	tmp_val = gain128&0xff;
-	ret_value = Sensor_WriteReg(0x3509, tmp_val);
-
-	tmp_val = gain128>>0x08;
+	tmp_val = gain128>>8;
 	ret_value = Sensor_WriteReg(0x3508, tmp_val);
+
+	tmp_val =  gain128 & 0xff;
+	ret_value = Sensor_WriteReg(0x3509, tmp_val);
 
 	return ret_value;
 }
@@ -1607,10 +1572,12 @@ LOCAL uint32_t _ov8865_set_shutter(uint32_t shutter)
 LOCAL uint32_t _ov8865_get_gain128(void)
 {
 	// read gain, 128 = 1x
-	uint32_t gain128;
+	uint32_t gain128, value;
 
-	gain128 = Sensor_ReadReg(0x3508) & 0x03f;
-	gain128 = (gain128<<8) + Sensor_ReadReg(0x3509);
+	value = Sensor_ReadReg(0x3509);
+	gain128 = value&0xff;
+	value = Sensor_ReadReg(0x3508);
+	gain128 |= (value<<0x08)&0x1f;
 
 	return gain128;
 }
@@ -1618,13 +1585,14 @@ LOCAL uint32_t _ov8865_get_gain128(void)
 LOCAL uint32_t _ov8865_set_gain128(uint32_t gain128)
 {
 	// write gain, 128 = 1x
-	uint32_t temp;
-	gain128 = gain128 & 0x3fff;
+	uint32_t ret_value = 0x00;
+	uint32_t gain_128 = 0x00, temp= 0x00;
 
-	temp = gain128 & 0xff;
+	gain_128 = gain128 & 0x1ff;
+
+	temp = gain_128 & 0xff;
 	Sensor_WriteReg(0x3509, temp);
-
-	temp = gain128>>8;
+	temp = (gain_128>>8) & 0x1f;
 	Sensor_WriteReg(0x3508, temp);
 
 	return 0;
@@ -1738,14 +1706,14 @@ LOCAL uint32_t _ov8865_set_VTS(uint32_t VTS)
 LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain)
 {
 	uint32_t rtn = SENSOR_SUCCESS;
+	uint32_t gain128, value;
 
-	uint32_t gain128;
-
-	gain128 = Sensor_ReadReg(0x3508) & 0x03f;
-	gain128 = (gain128<<8) + Sensor_ReadReg(0x3509);
+	value = Sensor_ReadReg(0x3509);
+	gain128 = value&0xff;
+	value = Sensor_ReadReg(0x3508);
+	gain128 |= (value<<0x08)&0x1f;
 
 	s_ov8865_realgain_128 = (uint32_t)gain128;
-
 	if (real_gain) {
 		*real_gain = gain128;
 	}
