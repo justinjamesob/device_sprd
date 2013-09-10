@@ -39,7 +39,7 @@
     <storage android:mountPoint="/storage/sdcard0"
             android:storageDescription="@string/storage_sd_card"
             android:primary="true"
-            android:emulated="true"
+            android:emulated="false"
             android:allowMassStorage="true"
             android:mtpReserve="100" />
     <!-- external SD card -->
