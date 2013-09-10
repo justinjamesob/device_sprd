@@ -648,6 +648,7 @@ status_t SprdCameraHardware::cancelAutoFocus()
 	bool ret = 0;
 	Mutex::Autolock l(&mLock);
 	ret = camera_cancel_autofocus();
+
 	WaitForFocusCancelDone();
 	return ret;
 }
@@ -1289,7 +1290,7 @@ bool SprdCameraHardware::WaitForFocusCancelDone()
 	Mutex::Autolock stateLock(&mStateLock);
 	while (SPRD_IDLE != mCameraState.focus_state
 		 && SPRD_ERROR != mCameraState.focus_state) {
-		LOGV("WaitForFocusCancelDone: waiting for SPRD_IDLE");
+		LOGV("WaitForFocusCancelDone: waiting for SPRD_IDLE from %d", getFocusState());
 		mStateWait.wait(mStateLock);
 		LOGV("WaitForFocusCancelDone: woke up");
 	}
@@ -3173,6 +3174,10 @@ SprdCameraHardware::transitionState(SprdCameraHardware::Sprd_camera_state from,
 		which_ptr = &mCameraState.capture_state;
 		break;
 
+	case STATE_FOCUS:
+		which_ptr = &mCameraState.focus_state;
+		break;
+
 	default:
 		LOGV("changeState: error owner");
 		break;
@@ -3463,11 +3468,7 @@ void SprdCameraHardware::HandleFocus(camera_cb_type cb,
 		break;
 	}
 
-	if (CAMERA_EXIT_CB_ABORT != cb) {
-		setCameraState(SPRD_IDLE, STATE_FOCUS);
-	} else {
-		transitionState(getFocusState(), SPRD_IDLE, STATE_FOCUS);
-	}
+	transitionState(getFocusState(), SPRD_IDLE, STATE_FOCUS);
 
 	LOGV("HandleFocus out, state = %s", getCameraStateStr(getCaptureState()));
 }
