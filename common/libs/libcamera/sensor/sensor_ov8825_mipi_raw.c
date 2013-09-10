@@ -1810,6 +1810,53 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->awb.gain_convert[1].g=0x100;
 	sensor_ptr->awb.gain_convert[1].b=0x100;
 
+	//ov8825 awb param
+	sensor_ptr->awb.t_func.a = 274;
+	sensor_ptr->awb.t_func.b = -335;
+	sensor_ptr->awb.t_func.shift = 10;
+
+	sensor_ptr->awb.wp_count_range.min_proportion = 256 / 32;
+	sensor_ptr->awb.wp_count_range.max_proportion = 256 / 4;
+
+	sensor_ptr->awb.g_estimate.num = 4;
+	sensor_ptr->awb.g_estimate.t_thr[0] = 2000;
+	sensor_ptr->awb.g_estimate.g_thr[0][0] = 406;    //0.404
+	sensor_ptr->awb.g_estimate.g_thr[0][1] = 419;    //0.414
+	sensor_ptr->awb.g_estimate.w_thr[0][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[0][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[1] = 3000;
+	sensor_ptr->awb.g_estimate.g_thr[1][0] = 406;    //0.404
+	sensor_ptr->awb.g_estimate.g_thr[1][1] = 419;    //0.414
+	sensor_ptr->awb.g_estimate.w_thr[1][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[1][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[2] = 6500;
+	sensor_ptr->awb.g_estimate.g_thr[2][0] = 445;
+	sensor_ptr->awb.g_estimate.g_thr[2][1] = 478;
+	sensor_ptr->awb.g_estimate.w_thr[2][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[2][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[3] = 20000;
+	sensor_ptr->awb.g_estimate.g_thr[3][0] = 407;
+	sensor_ptr->awb.g_estimate.g_thr[3][1] = 414;
+	sensor_ptr->awb.g_estimate.w_thr[3][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[3][1] = 0;
+
+	sensor_ptr->awb.gain_adjust.num = 5;
+	sensor_ptr->awb.gain_adjust.t_thr[0] = 1600;
+	sensor_ptr->awb.gain_adjust.w_thr[0] = 208;
+	sensor_ptr->awb.gain_adjust.t_thr[1] = 2000;
+	sensor_ptr->awb.gain_adjust.w_thr[1] = 224;
+	sensor_ptr->awb.gain_adjust.t_thr[2] = 2500;
+	sensor_ptr->awb.gain_adjust.w_thr[2] = 255;
+	sensor_ptr->awb.gain_adjust.t_thr[3] = 10000;
+	sensor_ptr->awb.gain_adjust.w_thr[3] = 255;
+	sensor_ptr->awb.gain_adjust.t_thr[4] = 12000;
+	sensor_ptr->awb.gain_adjust.w_thr[4] = 224;
+
+	sensor_ptr->awb.debug_level = 0;
+
 	//bpc
 	sensor_ptr->bpc.flat_thr=80;
 	sensor_ptr->bpc.std_thr=20;

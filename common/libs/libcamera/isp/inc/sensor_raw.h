@@ -43,6 +43,8 @@
 #define SENSOR_AWB_CALI_NUM 0x09
 #define SENSOR_AWB_NUM 0x14
 #define SENSOR_MAP_NUM 0x08
+#define SENSOR_AWB_G_ESTIMATE_NUM 0x6
+#define SENSOR_AWB_GAIN_ADJUST_NUM 0x9
 
 #define RAW_INFO_END_ID 0x71717567
 
@@ -190,6 +192,34 @@ struct sensor_cali_info {
 	uint32_t b_sum;
 };
 
+struct sensor_awb_g_estimate_param
+{
+	uint16_t t_thr[SENSOR_AWB_G_ESTIMATE_NUM];
+	uint16_t g_thr[SENSOR_AWB_G_ESTIMATE_NUM][2];
+	uint16_t w_thr[SENSOR_AWB_G_ESTIMATE_NUM][2];
+	uint32_t num;
+};
+
+struct sensor_awb_linear_func
+{
+	int32_t a;
+	int32_t b;
+	uint32_t shift;
+};
+
+struct sensor_awb_wp_count_range
+{
+	uint16_t min_proportion;//min_proportion / 256
+	uint16_t max_proportion;//max_proportion / 256
+};
+
+struct sensor_awb_gain_adjust
+{
+	uint16_t t_thr[SENSOR_AWB_GAIN_ADJUST_NUM];
+	uint16_t w_thr[SENSOR_AWB_GAIN_ADJUST_NUM];
+	uint32_t num;
+};
+
 struct sensor_awb_param{
 	struct sensor_pos win_start;
 	struct sensor_size win_size;
@@ -208,7 +238,13 @@ struct sensor_awb_param{
 	uint32_t target_zone;
 	uint32_t smart;
 	uint32_t quick_mode;
-	uint32_t reserved[40];
+	struct sensor_awb_wp_count_range wp_count_range;
+	struct sensor_awb_g_estimate_param g_estimate;
+	struct sensor_awb_linear_func t_func;
+	struct sensor_awb_gain_adjust gain_adjust;
+	uint8_t debug_level;
+	uint8_t reserved0[3];
+	uint32_t reserved[9];
 };
 
 struct sensor_bpc_param{
@@ -445,7 +481,7 @@ struct sensor_raw_tune_info{
 	struct sensor_flash_cali_param flash;
 	struct sensor_cce_parm special_effect[16];
 	uint32_t reserved[256];
- };
+};
 
 struct sensor_raw_fix_info{
 	struct sensor_ae_tab ae;
