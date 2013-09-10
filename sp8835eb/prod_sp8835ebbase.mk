@@ -47,7 +47,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.config.hw.camera_support=false \
 	ro.config.hw.search_support=false \
     persist.surpport.oplpnn=true \
-    persist.surpport.cphsfirst=false
+    persist.surpport.cphsfirst=false \
+    persist.support.securetest=1
 
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
