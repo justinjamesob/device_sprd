@@ -32,7 +32,8 @@ PRODUCT_PACKAGES := \
 	calibration_init \
 	nvm_daemon \
 	modemd\
-	engpc
+	engpc \
+        choose_secure
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
 PRODUCT_PACKAGES += \
