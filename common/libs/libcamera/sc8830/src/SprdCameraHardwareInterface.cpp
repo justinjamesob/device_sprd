@@ -206,9 +206,13 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mIsRotCapture(0),
 #endif
 	mTimeCoeff(1),
-	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_DCAM)
+	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS)
 {
 	LOGV("openCameraHardware: E cameraId: %d.", cameraId);
+
+#if defined(CONFIG_BACK_CAMERA_ROTATION) || defined(CONFIG_FRONT_CAMERA_ROTATION)
+	mPreviewBufferUsage = PREVIEW_BUFFER_USAGE_DCAM;
+#endif
 
 	memset(mPreviewHeapArray_phy, 0, sizeof(mPreviewHeapArray_phy));
 	memset(mPreviewHeapArray_vir, 0, sizeof(mPreviewHeapArray_vir));
@@ -1646,11 +1650,17 @@ bool SprdCameraHardware::allocatePreviewMem()
 		buffer_end_id = mPreviewHeapNum;
 	} else {
 		mPreviewDcamAllocBufferCnt = 0;
+		buffer_start_id = kPreviewBufferCount;
+		buffer_end_id   = buffer_start_id;
+
 		if (camera_get_rot_set()) {
 			mPreviewDcamAllocBufferCnt = kPreviewRotBufferCount;
-			buffer_start_id = kPreviewBufferCount;
 			buffer_end_id = kPreviewBufferCount + kPreviewRotBufferCount;
 		}
+
+		/*add one node, specially used for mData_cb when receive preview frame*/
+		mPreviewDcamAllocBufferCnt += 1;
+		buffer_end_id += 1;
 	}
 
 	if (mPreviewDcamAllocBufferCnt > 0) {
@@ -2255,6 +2265,10 @@ status_t SprdCameraHardware::setCameraParameters()
         rotation = 0;
 
     SET_PARM(CAMERA_PARM_SENSOR_ROTATION, rotation);
+    if (0 != rotation) {
+        mPreviewBufferUsage = PREVIEW_BUFFER_USAGE_DCAM;
+    }
+
     SET_PARM(CAMERA_PARM_SHOT_NUM, mParameters.getInt("capture-mode"));
 /*	if (1 == mParameters.getInt("hdr")) {
 		SET_PARM(CAMERA_PARM_SHOT_NUM, HDR_CAP_NUM);
@@ -2662,11 +2676,17 @@ void SprdCameraHardware::receivePreviewFDFrame(camera_frame_type *frame)
     metadata.faces = &face_info[0];
     if(mMsgEnabled&CAMERA_MSG_PREVIEW_METADATA) {
         LOGV("smile capture msg is enabled.");
-        if(camera_get_rot_set()) {
-            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,&metadata,mUser);
-        } else {
-            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[offset]->camera_memory,0,&metadata,mUser);
-        }
+		if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
+	        if(camera_get_rot_set()) {
+	            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,&metadata,mUser);
+	        } else {
+	            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[offset]->camera_memory,0,&metadata,mUser);
+			}
+		} else {
+			uint32_t dataSize = frame->dx * frame->dy * 3 / 2;
+			memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data, frame->buf_Virt_Addr, dataSize);
+			mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory,0,&metadata,mUser);
+		}
     } else {
         LOGV("smile capture msg is disabled.");
     }
@@ -2710,10 +2730,16 @@ void SprdCameraHardware::receivePreviewFrame(camera_frame_type *frame)
 	{
 		LOGV("receivePreviewFrame mMsgEnabled: 0x%x",mMsgEnabled);
 		if (mMsgEnabled & CAMERA_MSG_PREVIEW_FRAME) {
-			if(camera_get_rot_set()) {
-				mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,NULL,mUser);
+			if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
+				if(camera_get_rot_set()) {
+					mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,NULL,mUser);
+				} else {
+					mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[offset]->camera_memory,0,NULL,mUser);
+				}
 			} else {
-				mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[offset]->camera_memory,0,NULL,mUser);
+				uint32_t dataSize = frame->dx * frame->dy * 3 / 2;
+				memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data, frame->buf_Virt_Addr, dataSize);
+				mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory,0,NULL,mUser);
 			}
 		}
 
