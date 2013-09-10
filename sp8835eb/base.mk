@@ -134,6 +134,8 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/scripts/ext_data.sh:system/bin/ext_data.sh \
 	$(BOARDDIR)/scripts/ext_kill.sh:system/bin/ext_kill.sh \
 	$(BOARDDIR)/scripts/ext_chown.sh:system/bin/ext_chown.sh \
+        $(BOARDDIR)/scripts/inputfreq.sh:system/bin/inputfreq.sh \
+        $(BOARDDIR)/scripts/recoveryfreq.sh:system/bin/recoveryfreq.sh \
 	$(BOARDDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
 	$(BOARDDIR)/patch.record:system/patch/patch.record \
 	device/sprd/common/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
