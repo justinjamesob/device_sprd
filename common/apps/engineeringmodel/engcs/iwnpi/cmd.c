@@ -66,11 +66,16 @@ static int npi_ ## name ## _cmd(struct nlnpi_state *state,\
                       int argc, char **argv)		\
 {							\
 	int data;					\
+	char **err = NULL;				\
 							\
 	if (argc != 1 || !argv)				\
 		return 1;				\
 							\
-	sscanf(argv[0], "%d", &data);			\
+	data = strtol(argv[0], err, 10);		\
+	if (err) {					\
+		fprintf(stderr, "Invild data format\n");\
+		return 2;				\
+	}						\
 	NLA_PUT(msg, nl_attr, sizeof(data), &data);	\
 							\
 	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_reply_status, NULL);\
@@ -141,12 +146,17 @@ static int npi_set_reg_cmd(struct nlnpi_state *state,
 	unsigned int start_addr;
 	unsigned char data[9];
 	unsigned int value;
+	char **err = NULL;
 
 	if (argc != 3 || !argv)
 		return 1;
 
 	if (strncmp(argv[0], "mac", 3) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		if (start_addr & 0x3) {
 			printf
 			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
@@ -155,7 +165,11 @@ static int npi_set_reg_cmd(struct nlnpi_state *state,
 		}
 		data[0] = REG_MAC;
 	} else if (strncmp(argv[0], "rf", 2) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		if (start_addr & 0x3) {
 			printf
 			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
@@ -164,17 +178,29 @@ static int npi_set_reg_cmd(struct nlnpi_state *state,
 		}
 		data[0] = REG_RF;
 	} else if (strncmp(argv[0], "phy0", 4) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		data[0] = REG_PHY0;
 	} else if (strncmp(argv[0], "phy1", 4) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		data[0] = REG_PHY1;
 	} else {
 		printf("ret: Invild reg name %s :end\n", argv[0]);
 		return 2;
 	}
 
-	value = strtol(argv[2], NULL, 16);
+	value = strtol(argv[2], err, 16);
+	if (err) {
+		fprintf(stderr, "Invild value format\n");
+		return 2;
+	}
 	memcpy(&(data[1]), &start_addr, 4);
 	memcpy(&(data[5]), &value, 4);
 
@@ -199,6 +225,7 @@ static int npi_set_debug_cmd(struct nlnpi_state *state,
 	unsigned short len;
 	unsigned char data[38];
 	unsigned int value;
+	char **err = NULL;
 
 	if (argc != 2 || !argv)
 		return 1;
@@ -210,7 +237,11 @@ static int npi_set_debug_cmd(struct nlnpi_state *state,
 	}
 	memcpy(data, &len, sizeof(len));
 	sscanf(argv[0], "%s", &(data[2]));
-	value = strtol(argv[1], NULL, 16);
+	value = strtol(argv[1], err, 16);
+	if (err) {
+		fprintf(stderr, "Invild value format\n");
+		return 2;
+	}
 	memcpy(&(data[2 + len]), &value, sizeof(value));
 	NLA_PUT(msg, NLNPI_ATTR_SET_DEBUG, (sizeof(len) + len + sizeof(value)), data);
 
@@ -225,6 +256,51 @@ TOPLEVEL(set_debug, "<value_name> <value>",
          NLNPI_CMD_SET_DEBUG, 0, npi_set_debug_cmd,
          "value should be like 0x12345678 hex type.");
 
+/* data format is len(4 bytes) + count(4 bytes) */
+static int npi_set_get_sblock_cmd(struct nlnpi_state *state,
+                             struct nl_cb *cb,
+                             struct nl_msg *msg, int argc, char **argv)
+{
+	unsigned int len;
+	unsigned int count;
+	unsigned char data[8];
+	char **err = NULL;
+
+	if (argc > 2 || !argv)
+		return 1;
+
+	if (argc == 1)
+		count = 0;
+	if (argc == 2) {
+		count = strtol(argv[1], err, 10);
+		if (err) {
+			fprintf(stderr, "Invild count format\n");
+			return 2;
+		}
+	}
+
+	memcpy(&(data[4]), &count, sizeof(count));
+	len = strtol(argv[0], err, 10);
+	if (err) {
+		fprintf(stderr, "Invild length format\n");
+		return 2;
+	}
+	memcpy(data, &len, sizeof(len));
+	NLA_PUT(msg, NLNPI_ATTR_SBLOCK_ARG, sizeof(data), data);
+
+	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_reply_status, NULL);
+
+	return 0;
+nla_put_failure:
+	return -ENOBUFS;
+}
+
+TOPLEVEL(set_sblock, "<send_len> [count]",
+         NLNPI_CMD_SET_SBLOCK, 0, npi_set_get_sblock_cmd,
+         "count 0 or no count means send forever.");
+TOPLEVEL(get_sblock, "<send_len> [count]",
+         NLNPI_CMD_GET_SBLOCK, 0, npi_set_get_sblock_cmd,
+         "count 0 or no count means send forever.");
 /* ----------------GET CMD WITH INT ARG REPLY-------------------- */
 static int print_reply_rx_count_data(struct nl_msg *msg, void *arg)
 {
@@ -447,11 +523,16 @@ static int npi_get_reg_cmd(struct nlnpi_state *state,
 	unsigned int count = 1;
 	unsigned int start_addr;
 	unsigned char data[6];
+	char **err = NULL;
 
 	if (argc < 2 || argc > 3 || !argv)
 		return 1;
 	if (argc == 3) {
-		sscanf(argv[2], "%d", &count);
+		count = strtol(argv[2], err, 10);
+		if (err) {
+			fprintf(stderr, "Invild count format\n");
+			return 2;
+		}
 		if (count > 255) {
 			printf("ret: Invild count %d, too large :end\n", count);
 			return 2;
@@ -459,7 +540,11 @@ static int npi_get_reg_cmd(struct nlnpi_state *state,
 	}
 
 	if (strncmp(argv[0], "mac", 3) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		if (start_addr & 0x3) {
 			printf
 			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
@@ -468,7 +553,11 @@ static int npi_get_reg_cmd(struct nlnpi_state *state,
 		}
 		data[0] = REG_MAC;
 	} else if (strncmp(argv[0], "rf", 2) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		if (start_addr & 0x3) {
 			printf
 			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
@@ -477,10 +566,18 @@ static int npi_get_reg_cmd(struct nlnpi_state *state,
 		}
 		data[0] = REG_RF;
 	} else if (strncmp(argv[0], "phy0", 4) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		data[0] = REG_PHY0;
 	} else if (strncmp(argv[0], "phy1", 4) == 0) {
-		start_addr = strtol(argv[1], NULL, 16);
+		start_addr = strtol(argv[1], err, 16);
+		if (err) {
+			fprintf(stderr, "Invild start_addr format\n");
+			return 2;
+		}
 		data[0] = REG_PHY1;
 	} else {
 		printf("ret: Invild reg name %s :end\n", argv[0]);
@@ -531,8 +628,6 @@ static int npi_get_debug_cmd(struct nlnpi_state *state,
                            struct nl_msg *msg, int argc, char **argv)
 {
         unsigned int get_len;
-        unsigned int count = 1;
-        unsigned int start_addr;
         unsigned char name[32];
         unsigned int name_len;
 
