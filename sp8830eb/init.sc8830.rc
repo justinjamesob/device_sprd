@@ -38,6 +38,8 @@ on init
     pipe 666 /dev/pipe/mmi.audio.ctrl
     
 on boot
+    mount debugfs debugfs /sys/kernel/debug
+
     chown system system /sys/class/backlight/sprd_backlight/brightness
 
     chmod 660 /proc/cpt/wdtirq
@@ -224,7 +226,6 @@ service glgps /system/bin/glgps -c /system/etc/gpsconfig.xml
     group root
 
 on property:ro.debuggable=1
-    mount debugfs debugfs /sys/kernel/debug
     write /sys/kernel/debug/fatal_dump/enable 1
     setrlimit 4 -1 -1
     mkdir /data/corefile
