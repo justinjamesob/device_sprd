@@ -308,7 +308,7 @@ int SprdCameraParameters::getSaturation()
 
 int SprdCameraParameters::getExposureCompensation()
 {
-	const char *p = get(KEY_CAMERA_ID);
+	const char *p = get(KEY_EXPOSURE_COMPENSATION);
 
 	return lookup(exposure_compensation_map, p, CAMERA_EXPOSURW_COMPENSATION_DEFAULT);
 }
