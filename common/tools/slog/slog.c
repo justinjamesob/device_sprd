@@ -440,6 +440,7 @@ static void init_external_storage()
 {
 	char *p;
 	int type;
+	char value[PROPERTY_VALUE_MAX];
 
 	p = getenv("SECOND_STORAGE_TYPE");
 	if(p){
@@ -461,6 +462,27 @@ static void init_external_storage()
 			exit(0);
 		}
 
+	}
+
+	property_get("persist.storage.type", value, "3");
+	type = atoi(value);
+	if( type == 0 || type == 1 || type == 2) {
+		p = NULL;
+		if(type == 0 || type == 1){
+			p = getenv("EXTERNAL_STORAGE");
+		} else if(type == 2) {
+			p = getenv("SECONDARY_STORAGE");
+		}
+
+		if(p){
+			strcpy(external_path, p);
+			sprintf(external_storage, "%s/slog", p);
+			debug_log("the external storage : %s", external_storage);
+			return;
+		} else {
+			err_log("SECOND_STORAGE_TYPE is %d, but can't find the external storage environment", type);
+			exit(0);
+		}
 	}
 
 	p = getenv("SECONDARY_STORAGE");
