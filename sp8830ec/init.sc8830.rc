@@ -372,6 +372,10 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service refnotify /system/bin/refnotify -t 0
+    class main
+    user root
+
 on boot
     chown system system /dev/iio:device0
     chown system system /sys/bus/iio/devices/trigger0/name
