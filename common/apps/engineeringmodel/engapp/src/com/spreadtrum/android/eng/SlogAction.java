@@ -645,8 +645,17 @@ public class SlogAction {
             }
         } catch (Exception parseError) {
             Log.e("SlogUI","Parsing SECOND_STORAGE_TYPE crashed.\n" + parseError );
-            if (MMC_SUPPORT) {
-                return "SECONDARY_SOTRAGE";
+            switch (SystemProperties.getInt("persist.storage.type", -1)) {
+                case 0:
+                    return "EXTERNAL_STORAGE";
+                case 1:
+                    return "EXTERNAL_STORAGE";
+                case 2:
+                    return "SECONDARY_STORAGE";
+                default:
+                    if (MMC_SUPPORT) {
+                        return "SECONDARY_SOTRAGE";
+                    }
             }
             return "EXTERNAL_STORAGE";
         }
