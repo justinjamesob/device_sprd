@@ -6,6 +6,7 @@
 #include <utils/String16.h>
 #include "IAtChannel.h"
 #include "AtChannel.h"
+#include <cutils/properties.h>
 
 using namespace android;
 
@@ -19,8 +20,17 @@ static int getPhoneId(int modemId, int simId)
 static String16 getServiceName(int modemId, int simId)
 {
     char serviceName[MAX_SERVICE_NAME];
+    char phoneCount[8] = "";
+
     memset(serviceName, 0, sizeof(serviceName));
-    snprintf(serviceName, MAX_SERVICE_NAME - 1, "atchannel%d", getPhoneId(modemId, simId));
+    property_get("persist.msms.phone_count", phoneCount, "1");
+
+    if (atoi(phoneCount) > 1){
+        snprintf(serviceName, MAX_SERVICE_NAME - 1, "atchannel%d", getPhoneId(modemId, simId));
+    } else {
+        strcpy(serviceName,  "atchannel");
+    }
+
     return String16(serviceName);
 }
 
