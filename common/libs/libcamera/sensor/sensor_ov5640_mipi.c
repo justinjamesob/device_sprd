@@ -2444,7 +2444,10 @@ LOCAL uint32_t _ov5640_BeforeSnapshot(uint32_t param)
 
 	param = param&0xffff;
 	SENSOR_PRINT("%d,%d.",cap_mode,param);
-
+	if (cap_mode == param) {
+		SENSOR_PRINT("No need to switch mode");
+		return SENSOR_SUCCESS;
+	}
 	OV5640_capture(param);
 	usleep(15*1000);
 	return SENSOR_SUCCESS;
