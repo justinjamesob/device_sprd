@@ -8,8 +8,6 @@ public class SmsConfig {
 	public int threadCount;
 	public String subject;
 	public boolean isRead = false;
-	public String sim = "0";
 	public boolean isThread = false;
-	public String threadId;
 	public static String boxId;
 }
