@@ -23,7 +23,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Toast;
-
+import java.util.Random;
 import com.android.insertdata.R;
 
 public class AddCallActivity extends Activity {
@@ -343,7 +343,8 @@ public class AddCallActivity extends Activity {
 					pdialog.setMessage(String.valueOf(i) + "/" + count);
 					pdialog.setProgress(i);
 					if (isRandom) {
-						int index = (int) (Math.random() * 3);
+                        // int index = (int) (Math.random() * 3);
+                        int index = new Random().nextInt(3);
 						callLogType = callType[index];
 					}
 					addCall(AddCallActivity.this, phoneNum.toString(),
@@ -369,7 +370,8 @@ public class AddCallActivity extends Activity {
 					pdialog.setMessage(String.valueOf(i) + "/" + count);
 					pdialog.setProgress(i);
 					if (isRandom) {
-						int index = (int) (Math.random() * 3);
+                        // int index = (int) (Math.random() * 3);
+                        int index = new Random().nextInt(3);
 						callLogType = callType[index];
 					}
 					addCall(AddCallActivity.this, phoneNumber, callLogType,
