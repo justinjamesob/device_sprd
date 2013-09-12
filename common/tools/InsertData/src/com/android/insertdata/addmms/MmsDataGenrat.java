@@ -294,8 +294,10 @@ public class MmsDataGenrat {
 		// Log.d(TAG, "===== begin insert! =====");
 		try {
 			// Log.d(TAG, " --- save pdu ---");
-			savePdu(composePdu());
-			Thread.sleep(100);
+            if(composePdu() != null){
+                savePdu(composePdu());
+                Thread.sleep(100);
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
