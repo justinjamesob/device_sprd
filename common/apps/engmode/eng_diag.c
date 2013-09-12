@@ -70,6 +70,7 @@ static int g_index = 0;
 static int cmd_type;
 static int eq_or_tun_type,eq_mode_sel_type;
 static int s_cmd_index = -1;
+static int s_cp_ap_proc = 0;
 
 static int write_productnvdata(char* buffer , int size);
 static int read_productnvdata(char* buffer , int size);
@@ -81,6 +82,7 @@ static int eng_diag_audio(char *buf,int len, char *rsp);
 static int eng_diag_product_ctrl(char *buf,int len, char *rsp, int rsplen);
 static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen);
 int is_audio_at_cmd_need_to_handle(char *buf,int len);
+int is_btwifi_addr_need_to_handle(char *buf,int len);
 int eng_diag_factorymode(char *buf,int len, char *rsp);
 int eng_diag_mmicit_read(char *buf,int len, char *rsp, int rsplen);
 int get_sub_str(char *buf,char **revdata, char a, char b);
@@ -211,6 +213,17 @@ int eng_diag_parse(char *buf,int len)
                 ret = CMD_USER_VER;
             }
             break;
+        case DIAG_CMD_IMEIBTWIFI:
+            ret = is_btwifi_addr_need_to_handle(buf,len);
+            if(ret){
+                if(2 == ret){
+                    s_cp_ap_proc = 1; // This command should send to AP and CP.
+                }
+                ret = CMD_USER_BTWIFI;
+            }else{
+                ret = CMD_COMMON;
+            }
+            break;
         default:
             ENG_LOG("%s: Default\n",__FUNCTION__);
             ret = CMD_COMMON;
@@ -244,6 +257,8 @@ int eng_diag_user_handle(int type, char *buf,int len)
             break;
         case CMD_USER_BTWIFI:
             rlen=eng_diag_btwifi(buf, len, rsp, &extra_len);
+            if(!rlen)
+                return 0;
             break;
         case CMD_USER_FACTORYMODE:
             rlen=eng_diag_factorymode(buf, len, rsp);
@@ -515,7 +530,7 @@ int get_cmd_index(char *buf)
 {
     int index = -1;
     int i;
-    for(i=0;i<=(int)NUM_ELEMS(eut_cmds);i++){
+    for(i=0;i<(int)NUM_ELEMS(eut_cmds);i++){
         if(strstr(buf,eut_cmds[i].name) != NULL)
         {
             index = eut_cmds[i].index;
@@ -600,7 +615,13 @@ write_again:
             }
         }
 
-        ret = 1;
+        if(s_cp_ap_proc){
+            ENG_LOG("%s: This command need to send to CP\n",__FUNCTION__);
+            s_cp_ap_proc = 0;
+            ret = 0;
+        }else{
+            ret = 1;
+        }
     }
 
     ENG_LOG("%s: ret=%d\n",__FUNCTION__, ret);
@@ -768,9 +789,10 @@ int eng_diag_decode7d7e(char *buf,int len)
             memcpy(&buf[j], &buf[j+1],len-j);
             len--;
             ENG_LOG("%s AFTER:",__FUNCTION__);
+            /*
             for(j=0; j<len; j++) {
                 ENG_LOG("%x,",buf[j]);
-            }
+            }*/
         }
     }
 
@@ -809,13 +831,14 @@ int eng_diag_encode7d7e(char *buf, int len,int *extra_len)
 
 int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
 {
-    int rlen,i;
+    int rlen = 0,i;
     int ret=-1;
     unsigned short crc=0;
     unsigned char crc1, crc2, crc3, crc4;
-    char *addr, tmp;
-    char btaddr[32];
-    char wifiaddr[32];
+    char tmp;
+    char btaddr[32]={0};
+    char wifiaddr[32]={0};
+    char *pBtAddr = NULL, *pWifiAddr = NULL;
     REF_NVWriteDirect_T *direct;
     MSG_HEAD_T *head_ptr=NULL;
     head_ptr = (MSG_HEAD_T *)(buf+1);
@@ -835,29 +858,31 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
         if((crc1==crc3)&&(crc2==crc4)){
             //write bt address
             if((head_ptr->subtype&DIAG_CMD_BTBIT)>0) {
-                memset(btaddr, 0, sizeof(btaddr));
                 sprintf(btaddr, "%02x:%02x:%02x:%02x:%02x:%02x",\
                         direct->btaddr[5],direct->btaddr[4],direct->btaddr[3], \
                         direct->btaddr[2],direct->btaddr[1],direct->btaddr[0]);
+                pBtAddr = btaddr;
                 ENG_LOG("%s: BTADDR:%s\n",__func__, btaddr);
             }
 
             //write wifi address
             if((head_ptr->subtype&DIAG_CMD_WIFIBIT)>0) {
-                memset(wifiaddr, 0, sizeof(wifiaddr));
                 sprintf(wifiaddr, "%02x:%02x:%02x:%02x:%02x:%02x",\
                         direct->wifiaddr[0],direct->wifiaddr[1],direct->wifiaddr[2], \
                         direct->wifiaddr[3],direct->wifiaddr[4],direct->wifiaddr[5]);
+                pWifiAddr = wifiaddr;
                 ENG_LOG("%s: WIFIADDR:%s\n",__func__,wifiaddr);
             }
 
-            eng_btwifimac_write(btaddr, wifiaddr);
+            eng_btwifimac_write(pBtAddr, pWifiAddr);
         }
 
-        //alreays write successfully
-        head_ptr->subtype = 0x01;
-        rsp[0]=0x00; rsp[1]=0x00;
-        rlen=2;
+        if(!s_cp_ap_proc){
+            //alreays write successfully
+            head_ptr->subtype = 0x01;
+            rsp[0]=0x00; rsp[1]=0x00;
+            rlen=2;
+        }
     } else {//read command
         direct = (REF_NVWriteDirect_T *)rsp;
 
@@ -865,12 +890,12 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
         if((head_ptr->subtype&DIAG_CMD_BTBIT)>0) {
             ret = eng_btwifimac_read(btaddr, ENG_BT_MAC);
             ENG_LOG("%s: after BTADDR:%s\n",__func__, btaddr);
-            addr = (char *)(direct->btaddr);
+            pBtAddr = (char *)(direct->btaddr);
             if(!ret) {
-                eng_diag_char2hex((unsigned char *)addr, btaddr);
-                tmp=addr[0]; addr[0]=addr[5];addr[5]=tmp;	//converge BT address
-                tmp=addr[1]; addr[1]=addr[4];addr[4]=tmp;
-                tmp=addr[2]; addr[2]=addr[3];addr[3]=tmp;
+                eng_diag_char2hex((unsigned char *)pBtAddr, btaddr);
+                tmp=pBtAddr[0]; pBtAddr[0]=pBtAddr[5];pBtAddr[5]=tmp;	//converge BT address
+                tmp=pBtAddr[1]; pBtAddr[1]=pBtAddr[4];pBtAddr[4]=tmp;
+                tmp=pBtAddr[2]; pBtAddr[2]=pBtAddr[3];pBtAddr[3]=tmp;
             }
         }
 
@@ -878,9 +903,9 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
         if((head_ptr->subtype&DIAG_CMD_WIFIBIT)>0) {
             ret = eng_btwifimac_read(wifiaddr, ENG_WIFI_MAC);
             ENG_LOG("%s: after WIFIADDR:%s\n",__func__, wifiaddr);
-            addr = (char *)(direct->wifiaddr);
+            pWifiAddr = (char *)(direct->wifiaddr);
             if(!ret)
-                eng_diag_char2hex((unsigned char *)addr, wifiaddr);
+                eng_diag_char2hex((unsigned char *)pWifiAddr, wifiaddr);
         }
 
         //response
@@ -896,6 +921,12 @@ int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len)
                 crc, *(rsp+rlen), *(rsp+rlen+1),*extra_len);
         rlen += 2;
     }
+
+    // clear BT/WIFI bit in this diag framer
+    if(s_cp_ap_proc){
+        head_ptr->subtype &= ~(DIAG_CMD_BTBIT|DIAG_CMD_WIFIBIT);
+    }
+
     ENG_LOG("%s: rlen=%d\n",__func__, rlen);
     return rlen;
 }
@@ -1078,10 +1109,10 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
                 ENG_LOG("at_sadm_cmd_to_handle=%d",at_sadm_cmd_to_handle[i]);
                 if ( GET_ARM_VOLUME_MODE_COUNT!=cmd_type ) {
                     ENG_LOG("NOT CMD TO GET COUNT");
-					g_index = atoi(ptr);
-					//g_index -= '0';
+                    g_index = atoi(ptr);
+                    //g_index -= '0';
                     ENG_LOG("index = %d",g_index);
-					if ( g_index>=adev_get_audiomodenum4eng()) {
+                    if ( g_index>=adev_get_audiomodenum4eng()) {
                         return 0;
                     }
                 }
@@ -1107,7 +1138,7 @@ int is_audio_at_cmd_need_to_handle(char *buf,int len){
                 ENG_LOG("at_spenha_cmd_to_handle=%d",at_spenha_cmd_to_handle[i]);
                 if ( GET_AUDIO_ENHA_MODE_COUNT!=cmd_type ) {
                     at_tok_nextint(&ptr,&g_index);
-					if (( g_index>adev_get_audiomodenum4eng())||( g_index<=0)) {
+                    if (( g_index>adev_get_audiomodenum4eng())||( g_index<=0)) {
                         return 0;
                     }
                     g_index--;
@@ -1182,91 +1213,91 @@ void At_cmd_back_sig(void)
 
 static AUDIO_TOTAL_T * eng_regetpara(void)
 {
-	int srcfd;
-	char *filename = NULL;
-	//eng_getparafromnvflash();
-	ALOGW("wangzuo eng_regetpara 1");
+    int srcfd;
+    char *filename = NULL;
+    //eng_getparafromnvflash();
+    ALOGW("wangzuo eng_regetpara 1");
 
-	AUDIO_TOTAL_T * aud_params_ptr;
-	int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
+    AUDIO_TOTAL_T * aud_params_ptr;
+    int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
 
-	aud_params_ptr = calloc(1, len);
+    aud_params_ptr = calloc(1, len);
     if (!aud_params_ptr)
         return 0;
     memset(aud_params_ptr, 0, len);
-	srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
-	filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
-	if(srcfd >= 0)
-	{
-		close(srcfd);
-	}
+    srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
+    filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
+    if(srcfd >= 0)
+    {
+        close(srcfd);
+    }
 
 
     ALOGW("eng_regetpara %s", filename);////done,into
-	stringfile2nvstruct(filename,aud_params_ptr,len);
+    stringfile2nvstruct(filename,aud_params_ptr,len);
 
-	return aud_params_ptr;
+    return aud_params_ptr;
 }
 
 static void eng_setpara(AUDIO_TOTAL_T * ptr)
 {//to do
-	int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
+    int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
 
-	ALOGW("wangzuo eng_setpara 2");
-	nvstruct2stringfile(ENG_AUDIO_PARA_DEBUG, ptr, len);
+    ALOGW("wangzuo eng_setpara 2");
+    nvstruct2stringfile(ENG_AUDIO_PARA_DEBUG, ptr, len);
 }
 static void eng_notify_mediaserver_updatapara(int ram_ops,int index,AUDIO_TOTAL_T *aud_params_ptr)
 {
-	int result = 0;
+    int result = 0;
     int fifo_id = -1;
-	int ret;
+    int ret;
     ALOGE("eng_notify_mediaserver_updatapara E,%d:%d!\n",ram_ops,index);
-	fifo_id = open( AUDFIFO ,O_WRONLY|O_NONBLOCK);
+    fifo_id = open( AUDFIFO ,O_WRONLY|O_NONBLOCK);
     if(fifo_id != -1) {
-	int buff = 1;
-	ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");
+        int buff = 1;
+        ALOGE("eng_notify_mediaserver_updatapara notify buff!\n");
         result = write(fifo_id,&ram_ops,sizeof(int));
         if(ram_ops & ENG_RAM_OPS)
         {
-        	result = write(fifo_id,&index,sizeof(int));
-        	result = write(fifo_id,aud_params_ptr,sizeof(AUDIO_TOTAL_T));
-			ALOGE("eng_notify_mediaserver_updatapara,index:%d,size:%d!\n",index,sizeof(AUDIO_TOTAL_T));
+            result = write(fifo_id,&index,sizeof(int));
+            result = write(fifo_id,aud_params_ptr,sizeof(AUDIO_TOTAL_T));
+            ALOGE("eng_notify_mediaserver_updatapara,index:%d,size:%d!\n",index,sizeof(AUDIO_TOTAL_T));
         }
         close(fifo_id);
     } else {
-       ALOGE("%s open audio FIFO error %s,fifo_id:%d\n",__FUNCTION__,strerror(errno),fifo_id);
+        ALOGE("%s open audio FIFO error %s,fifo_id:%d\n",__FUNCTION__,strerror(errno),fifo_id);
     }
 
-   ALOGE("eng_notify_mediaserver_updatapara X,result:%d!\n",result);
-   return result;
+    ALOGE("eng_notify_mediaserver_updatapara X,result:%d!\n",result);
+    return result;
 }
 
 void * eng_getpara(void)
 {
-	int srcfd;
-	char *filename = NULL;
-	ALOGW("wangzuo eng_getpara 3");////done,into
-	int audio_fd;
-	static int read = 0;
-	int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
-	if(read)
-	{
-		ALOGW("eng_getpara read already.");////done,into
-		return audio_total;
-	}
-	else
-	{
-		read =1;
-	}
+    int srcfd;
+    char *filename = NULL;
+    ALOGW("wangzuo eng_getpara 3");////done,into
+    int audio_fd;
+    static int read = 0;
+    int len = sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng();
+    if(read)
+    {
+        ALOGW("eng_getpara read already.");////done,into
+        return audio_total;
+    }
+    else
+    {
+        read =1;
+    }
     memset(audio_total, 0, len);
-	srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
-	filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
-	if(srcfd >= 0)
-	{
-		close(srcfd);
-	}
-	ALOGW("wangzuo eng_getpara %s", filename);////done,into
-	stringfile2nvstruct(filename, audio_total, len); //get data from audio_hw.txt.
+    srcfd = open((char *)(ENG_AUDIO_PARA_DEBUG), O_RDONLY);
+    filename = (srcfd < 0 )? ( ENG_AUDIO_PARA):(ENG_AUDIO_PARA_DEBUG);
+    if(srcfd >= 0)
+    {
+        close(srcfd);
+    }
+    ALOGW("wangzuo eng_getpara %s", filename);////done,into
+    stringfile2nvstruct(filename, audio_total, len); //get data from audio_hw.txt.
     return  audio_total;
 }
 int eng_diag_audio(char *buf,int len, char *rsp)
@@ -1307,16 +1338,16 @@ int eng_diag_audio(char *buf,int len, char *rsp)
     }
 
     //audio_fd = open(ENG_AUDIO_PARA_DEBUG,O_RDWR);
-	ENG_LOG("Call %s, ptr=%s\n",__FUNCTION__, ptr);
+    ENG_LOG("Call %s, ptr=%s\n",__FUNCTION__, ptr);
 
-	if(g_is_data){
-		ENG_LOG("HEY,DATA HAS COME!!!!");
-		g_is_data = g_is_data;
-		wlen = head_ptr->len - sizeof(MSG_HEAD_T) - 1;
-		ENG_LOG("NOTICE:length is %x,%x,%x,%x",wlen,sizeof(AUDIO_TOTAL_T),sizeof(AUDIO_NV_ARM_MODE_INFO_T),sizeof(AUDIO_ENHA_EQ_STRUCT_T));
+    if(g_is_data){
+        ENG_LOG("HEY,DATA HAS COME!!!!");
+        g_is_data = g_is_data;
+        wlen = head_ptr->len - sizeof(MSG_HEAD_T) - 1;
+        ENG_LOG("NOTICE:length is %x,%x,%x,%x",wlen,sizeof(AUDIO_TOTAL_T),sizeof(AUDIO_NV_ARM_MODE_INFO_T),sizeof(AUDIO_ENHA_EQ_STRUCT_T));
 
-		audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//audio_ptr = (AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
-		if ((AUDIO_TOTAL_T *)(-1) == audio_ptr || (AUDIO_TOTAL_T *)(0) == audio_ptr ) {
+        audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//audio_ptr = (AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
+        if ((AUDIO_TOTAL_T *)(-1) == audio_ptr || (AUDIO_TOTAL_T *)(0) == audio_ptr ) {
             ALOGE("mmap failed %s",strerror(errno));
             goto out;
         }
@@ -1329,8 +1360,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
             ascii2bin((unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),(unsigned char *)ptr,wlen);
         }
         if ( g_is_data&AUDIO_NV_ARM_DATA_FLASH){
-	     ram_ofs |=ENG_FLASH_OPS;
-	     g_is_data &= (~AUDIO_NV_ARM_DATA_FLASH);
+            ram_ofs |=ENG_FLASH_OPS;
+            g_is_data &= (~AUDIO_NV_ARM_DATA_FLASH);
             g_indicator |= AUDIO_NV_ARM_INDI_FLAG;
             ascii2bin((unsigned char *)(&audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct),(unsigned char *)ptr,wlen);
             audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
@@ -1357,21 +1388,21 @@ int eng_diag_audio(char *buf,int len, char *rsp)
         ENG_LOG("g_indicator = 0x%x,%x\n",g_indicator,AUDIO_DATA_READY_INDI_FLAG);
 
         if ( audio_ptr ) {
-		if(ram_ofs & ENG_FLASH_OPS)
-		{
-			eng_setpara(audio_ptr);
-		}
+            if(ram_ofs & ENG_FLASH_OPS)
+            {
+                eng_setpara(audio_ptr);
+            }
 
-		if(g_indicator)
-		{
-			ram_ofs |= ENG_PGA_OPS;
-		}
-		eng_notify_mediaserver_updatapara(ram_ofs,g_index,&audio_total[g_index]);
-		free(audio_ptr);
+            if(g_indicator)
+            {
+                ram_ofs |= ENG_PGA_OPS;
+            }
+            eng_notify_mediaserver_updatapara(ram_ofs,g_index,&audio_total[g_index]);
+            free(audio_ptr);
         }
 
         if ( g_indicator ) {
-			ENG_LOG("data is ready!g_indicator = 0x%x,g_index:%d\n",g_indicator,g_index);
+            ENG_LOG("data is ready!g_indicator = 0x%x,g_index:%d\n",g_indicator,g_index);
             g_indicator = 0;
             parse_vb_effect_params((void *)audio_total, adev_get_audiomodenum4eng()*sizeof(AUDIO_TOTAL_T));
         }
@@ -1407,10 +1438,10 @@ int eng_diag_audio(char *buf,int len, char *rsp)
             case GET_ARM_VOLUME_DATA_FROM_FLASH:
                 audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();//(AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
                 if (((AUDIO_TOTAL_T *)( -1 )!= audio_ptr) && ((AUDIO_TOTAL_T *)( 0 )!= audio_ptr) ) {
-                	//audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
-                	//munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
-                	audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
-                	free(audio_ptr);
+                    //audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
+                    //munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
+                    audio_total[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct=audio_ptr[g_index].audio_nv_arm_mode_info.tAudioNvArmModeStruct;
+                    free(audio_ptr);
                 }
                 //there is no break in this case,'cause it will share the code with the following case
             case GET_ARM_VOLUME_DATA_FROM_RAM:
@@ -1470,8 +1501,8 @@ int eng_diag_audio(char *buf,int len, char *rsp)
                 case GET_AUDIO_ENHA_DATA_FROM_FLASH:
                     audio_ptr = (AUDIO_TOTAL_T *)eng_regetpara();// (AUDIO_TOTAL_T *)mmap(0,4*sizeof(AUDIO_TOTAL_T),PROT_READ|PROT_WRITE,MAP_SHARED,audio_fd,0);
                     if ( NULL != audio_ptr ) {
-                    	audio_total[g_index].audio_enha_eq=audio_ptr[g_index].audio_enha_eq;
-                    	free(audio_ptr);//munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
+                        audio_total[g_index].audio_enha_eq=audio_ptr[g_index].audio_enha_eq;
+                        free(audio_ptr);//munmap((void *)audio_ptr,4*sizeof(AUDIO_TOTAL_T));
                     }
                     //there is no break in this case,'cause it will share the code with the following case
                 case GET_AUDIO_ENHA_DATA_FROM_MEMORY:
@@ -1487,9 +1518,9 @@ int eng_diag_audio(char *buf,int len, char *rsp)
 
 out:
     //if (audio_fd >=0)
-        //close(audio_fd);
+    //close(audio_fd);
 
-	return rsp != NULL ? strlen(rsp):0;
+    return rsp != NULL ? strlen(rsp):0;
 }
 
 static int eng_diag_product_ctrl(char *buf, int len, char *rsp, int rsplen)
@@ -1707,4 +1738,48 @@ int eng_diag_mmicit_read(char *buf,int len, char *rsp, int rsplen)
     free(rspdata);
 
     return rsplen;
+}
+
+int is_btwifi_addr_need_to_handle(char *buf,int len)
+{
+    int crc = 0;
+    int recv_crc = 0;
+    int cmd_mask;
+    MSG_HEAD_T* msg_head = (MSG_HEAD_T*)(buf + 1);
+
+    // Check CRC
+    recv_crc = *(unsigned short*)&(buf[msg_head->len - sizeof(unsigned short) + 1]);
+    crc = crc16(0,(unsigned char*)(msg_head + 1), msg_head->len - sizeof(MSG_HEAD_T) - sizeof(unsigned short));
+
+    if(recv_crc != crc) {
+        ENG_LOG("%s: CRC Error! recv_crc: %d, crc16: %d\n", __FUNCTION__, recv_crc, crc);
+        return 0;// send to CP
+    }
+
+    if((msg_head->subtype & RW_MASK) == WRITE_MODE){
+        ENG_LOG("%s: Write mode !\n", __FUNCTION__);
+        if((msg_head->subtype & RM_VALID_CMD_MASK) == 0){
+            ENG_LOG("%s: not valid cmd\n", __FUNCTION__);
+            return 0;
+        }
+    }else{
+        ENG_LOG("%s: Read mode !\n", __FUNCTION__);
+    }
+
+    if(0 != (cmd_mask = (msg_head->subtype & 0x7f))){
+        ENG_LOG("%s: cmd_mask: %d, subtype: %d\n", __FUNCTION__, cmd_mask, msg_head->subtype);
+
+        if((cmd_mask & DIAG_CMD_BTBIT) || (cmd_mask & DIAG_CMD_WIFIBIT)){
+            ENG_LOG("%s: Get BT/WIFI Mac addr req !\n", __FUNCTION__);
+            if((cmd_mask & (~(DIAG_CMD_BTBIT|DIAG_CMD_WIFIBIT)))){
+                ENG_LOG("%s: Have other commands !\n", __FUNCTION__);
+                return 2;
+            }else{
+                ENG_LOG("%s: No other commands !\n", __FUNCTION__);
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
