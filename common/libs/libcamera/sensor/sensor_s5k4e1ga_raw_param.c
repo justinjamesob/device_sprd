@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2012 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 static const uint16_t s_s5k4e1ga_lnc_00[]=
 {
 	641, 613, 579, 531, 603, 547, 530, 494, 558, 520, 505, 473, 531, 493, 477, 453, 508, 465, 453, 426, 475, 445, 435, 405, 458, 430, 422, 397, 444, 414, 407, 384, 431, 404, 398, 380, 422, 394, 393, 372, 426, 393, 396, 376, 421, 390, 397, 379, 426, 397, 407, 384, 435, 406, 414, 396, 450, 422, 434, 411, 477, 438, 454, 429, 498, 457, 477, 448, 532, 489, 495, 473, 558, 514, 533, 510, 618, 561, 577, 547, 733, 696, 691, 647,
@@ -1013,6 +1028,7 @@ static struct sensor_raw_fix_info s_s5k4e1ga_fix_info = {
 				(uint16_t*)s_s5k4e1ga_lnc_04,
 				sizeof(s_s5k4e1ga_lnc_04),
 			},
+
 			{
 				0x00,
 				(uint16_t*)s_s5k4e1ga_lnc_05,
