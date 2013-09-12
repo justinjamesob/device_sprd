@@ -73,6 +73,7 @@ PRODUCT_PACKAGES := \
     Settings \
     MsmsStk \
     Stk1 \
+    SprdDM \
     framework2
 
 # prebuild files
