@@ -30,23 +30,20 @@ LOCAL_LDLIBS        += -Idl
 
 #LOCAL_CFLAGS += -DENG_API_LOG
 
-LOCAL_SHARED_LIBRARIES := libcutils libbinder libutils
+LOCAL_SHARED_LIBRARIES := libcutils
 
 LOCAL_C_INCLUDES  += engopt.h \
 					engapi.h
 
 LOCAL_SRC_FILES     :=   engopt.c \
-                         engapi.c \
-                         eng_attok.c \
-                         engparcel.c \
-                         engclient.c \
-                         eng_common.c \
-                         eng_modemclient.c \
-                         engphasecheck.c \
-                         eng_appclient.c \
-                         IAtChannel.cpp \
-                         AtChannel.cpp
-
+		       	          engapi.c \
+       				   eng_attok.c \
+	      				   engparcel.c \
+	      				   engclient.c \
+				  eng_common.c \
+		       	          eng_modemclient.c \
+                          engphasecheck.c \
+		       	          eng_appclient.c
 
 LOCAL_MODULE:= libengclient
 LOCAL_MODULE_TAGS := optional
