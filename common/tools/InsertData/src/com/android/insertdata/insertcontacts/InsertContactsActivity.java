@@ -154,7 +154,8 @@ public class InsertContactsActivity extends Activity {
 					name = getSubString(enName);
 					break;
 				case INSERT_RANDOM_TYPE:
-					int type = (int) (Math.random() * 2) + 1;
+                    // int type = (int) (Math.random() * 2) + 1;
+                    int type = new Random().nextInt(2) + 1;
 
 					if (type == 1) {
 						name = f + l + la;
@@ -411,15 +412,16 @@ public class InsertContactsActivity extends Activity {
 		return index;
 	}
 
-	public String getSubString(String enName) {
-		StringBuffer sb = new StringBuffer();
-		Random random = new Random();
+    public String getSubString(String enName) {
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
 
-		for (int i = 0; i < (int) (Math.random() * 20) + 1; i++) {
-			sb.append(enName.charAt(random.nextInt(enName.length())));
-		}
-		return sb.toString();
-	}
+        for (int i = 0; i < /* (int) (Math.random() * 20) */new Random()
+                .nextInt(20) + 1; i++) {
+            sb.append(enName.charAt(random.nextInt(enName.length())));
+        }
+        return sb.toString();
+    }
 
 	private void showProgressDialog() {
 		StringBuffer msg = new StringBuffer();
