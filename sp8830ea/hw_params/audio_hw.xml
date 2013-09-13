@@ -20,6 +20,12 @@
 	<item name="Handsfree" index="3" />
 </audiomode>
 
+<debug enable="1">
+<debuginfo sleepdeltatimegate="2000" />
+<debuginfo pcmwritetimegate="200000" />
+<debuginfo lastthiswritetimegate="200000" />
+</debug>
+
 <dumpmusic  num="16"  dump_switch = "0x0" dump_path="/data/" total_switch="ON">
 	<dump_play  index="0" item_name ="music.dump0"  dump_file_name ="dump0.pcm"  switch="0" />
 	<dump_play  index="1" item_name ="music.dump1"  dump_file_name ="dump1.pcm"  switch="0" />

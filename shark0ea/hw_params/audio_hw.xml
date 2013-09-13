@@ -12,6 +12,12 @@
 <voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="1" />
 <voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="1" />
 
+<debug enable="1">
+<debuginfo sleepdeltatimegate="2000" />
+<debuginfo pcmwritetimegate="200000" />
+<debuginfo lastthiswritetimegate="200000" />
+</debug>
+
 <audiomode num="4">
 	<item name="Headset" index="0" />
 	<item name="Headfree" index="1" />
