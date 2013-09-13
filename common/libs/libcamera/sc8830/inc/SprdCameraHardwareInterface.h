@@ -356,6 +356,7 @@ private:
 	bool                            mIsRotCapture;
 	uint32_t                        mTimeCoeff;
 	uint32_t                        mPreviewBufferUsage;
+	int                             mSetFreqCount;
 };
 
 }; // namespace android

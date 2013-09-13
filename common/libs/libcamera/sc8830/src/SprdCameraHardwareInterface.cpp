@@ -206,7 +206,8 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mIsRotCapture(0),
 #endif
 	mTimeCoeff(1),
-	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS)
+	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS),
+	mSetFreqCount(0)
 {
 	LOGV("openCameraHardware: E cameraId: %d.", cameraId);
 
@@ -256,14 +257,19 @@ void SprdCameraHardware::release()
 		getCameraStateStr(getCameraState()), getCameraStateStr(getPreviewState()),
 		getCameraStateStr(getCaptureState()));
 
-    if (isCapturing()) {
+	if (isCapturing()) {
 		cancelPictureInternal();
-    }
+	}
 
-    if (isPreviewing()) {
+	while (0 < mSetFreqCount) {
+		set_ddr_freq("0");
+		mSetFreqCount--;
+	}
+
+	if (isPreviewing()) {
 		camera_set_stop_preview_mode(1);
 		stopPreviewInternal();
-    }
+	}
 
 	if (isCameraInit()) {
 		// When libqcamera detects an error, it calls camera_cb from the
@@ -2035,8 +2041,11 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 	}
 	if (iSZslMode()) {
 		set_ddr_freq("500000");
+		mSetFreqCount++;
 		if (!initCapture(mData_cb != NULL)) {
 			deinitCapture();
+			set_ddr_freq("0");
+			mSetFreqCount--;
 			LOGE("initCapture failed. Not taking picture.");
 			return UNKNOWN_ERROR;
 		}
@@ -2049,6 +2058,10 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 		LOGE("startPreview failed: sensor error.");
 		setCameraState(SPRD_ERROR, STATE_PREVIEW);
 		deinitPreview();
+		if (iSZslMode()) {
+			set_ddr_freq("0");
+			mSetFreqCount--;
+		}
 		return UNKNOWN_ERROR;
 	}
 
@@ -2076,6 +2089,13 @@ void SprdCameraHardware::stopPreviewInternal()
 		cancelPictureInternal();
 	}
 
+	if (iSZslMode()) {
+		while (0 < mSetFreqCount) {
+			set_ddr_freq("0");
+			mSetFreqCount--;
+		}
+	}
+
 	if(CAMERA_SUCCESS != camera_stop_preview()) {
 		setCameraState(SPRD_ERROR, STATE_PREVIEW);
 		deinitPreview();
@@ -2090,10 +2110,6 @@ void SprdCameraHardware::stopPreviewInternal()
 		WaitForCaptureDone();
 	}
 	deinitCapture();
-
-	if (iSZslMode()) {
-		set_ddr_freq("0");
-	}
 
 	end_timestamp = systemTime();
 	LOGE("Stop Preview Time:%lld(ms).",(end_timestamp - start_timestamp)/1000000);
