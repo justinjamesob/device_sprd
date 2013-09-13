@@ -61,7 +61,7 @@ enum scale_data_endian {
 	SCALE_ENDIAN_LITTLE,
 	SCALE_ENDIAN_HALFBIG,
 	SCALE_ENDIAN_HALFLITTLE,
-	SCALE_ENDIAN_MAX        
+	SCALE_ENDIAN_MAX
 };
 
 enum scle_mode {

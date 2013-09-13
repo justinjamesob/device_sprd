@@ -253,7 +253,7 @@ typedef enum {
 	SENSOR_INTERFACE_CSI2_2LANES,
 	SENSOR_INTERFACE_CSI2_3LANES,
 	SENSOR_INTERFACE_CSI2_4LANES,
-	
+
 	SENSOR_INTERFACE_MAX
 } SENSOR_INTERFACE_E;
 */
@@ -263,7 +263,7 @@ typedef enum {
 	SENSOR_INTERFACE_TYPE_SPI,
 	SENSOR_INTERFACE_TYPE_SPI_BE,
 	SENSOR_INTERFACE_TYPE_CSI2,
-	
+
 	SENSOR_INTERFACE_TYPE_MAX
 } SENSOR_INF_TYPE_E;
 
@@ -285,7 +285,7 @@ MIPI CSI2 and Lane3
 typedef struct{
 
 	SENSOR_INF_TYPE_E  type;
-	uint32_t bus_width;//lane number or bit-width 
+	uint32_t bus_width;//lane number or bit-width
 	uint32_t pixel_width; //bits per pixel
 	uint32_t is_loose; //0 packet, 1 half word per pixel
 }SENSOR_INF_T;

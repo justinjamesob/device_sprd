@@ -98,7 +98,7 @@ int cmr_v4l2_init(void)
 	if (-1 == fd) {
 		CMR_LOGE("Failed to open dcam device.errno : %d", errno);
 		fprintf(stderr, "Cannot open '%s': %d, %s\n", dev_name, errno,  strerror(errno));
-		exit(EXIT_FAILURE);   
+		exit(EXIT_FAILURE);
 	} else {
 		CMR_LOGV("OK to open device.");
 	}
@@ -106,7 +106,7 @@ int cmr_v4l2_init(void)
 	ret = pthread_mutex_init(&cb_mutex, NULL);
 	if (ret) {
 		CMR_LOGE("Failed to init mutex : %d", errno);
-		exit(EXIT_FAILURE);   
+		exit(EXIT_FAILURE);
 	}
 
 	ret = pthread_mutex_init(&status_mutex, NULL);
@@ -288,7 +288,7 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 	uint32_t                 cfg_id = 0;
 	enum v4l2_buf_type       buf_type;
 	struct v4l2_streamparm   stream_parm;
-	
+
 	CMR_CHECK_FD;
 
 	if (NULL == config)
@@ -374,7 +374,7 @@ int cmr_v4l2_buff_cfg (struct buffer_cfg *buf_cfg)
 	struct v4l2_streamparm   stream_parm;
 
 	CMR_CHECK_FD;
-	
+
 	if (NULL == buf_cfg || buf_cfg->count > V4L2_BUF_MAX)
 		return -1;
 
@@ -424,7 +424,7 @@ int cmr_v4l2_cap_start(uint32_t skip_num)
 	CMR_CHECK_FD;
 
 	stream_parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	stream_parm.parm.capture.capability = CAPTURE_SKIP_NUM;	
+	stream_parm.parm.capture.capability = CAPTURE_SKIP_NUM;
 	stream_parm.parm.capture.reserved[0] = skip_num; /* just modify the skip number parameter */
 	ret = ioctl(fd, VIDIOC_S_PARM, &stream_parm);
 	CMR_RTN_IF_ERR(ret);
@@ -462,7 +462,7 @@ exit:
 
 /*
 parameters for v4l2_ext_controls
- ctrl_class,     should be reserved by V4L2, can be V4L2_CTRL_CLASS_USER or 
+ ctrl_class,     should be reserved by V4L2, can be V4L2_CTRL_CLASS_USER or
                        V4L2_CTRL_CLASS_CAMERA, etc;
  count,          pause/resume control , 0 means pause, 1 means resume;
  error_idx,      channel id;
@@ -474,7 +474,7 @@ int cmr_v4l2_cap_resume(uint32_t channel_id, uint32_t skip_number, uint32_t deci
 {
 	int                      ret = 0;
 	struct v4l2_streamparm   stream_parm;
-	
+
 	CMR_CHECK_FD;
 
 	CMR_LOGV("channel_id %d, frm_num %d", channel_id,frm_num);
@@ -501,7 +501,7 @@ int cmr_v4l2_cap_pause(uint32_t channel_id, uint32_t reconfig_flag)
 {
 	int                      ret = 0;
 	struct v4l2_streamparm   stream_parm;
-	
+
 	CMR_CHECK_FD;
 
 	CMR_LOGV("channel_id %d,reconfig_flag %d.", channel_id,reconfig_flag);

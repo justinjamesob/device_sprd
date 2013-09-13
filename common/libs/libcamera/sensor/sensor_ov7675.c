@@ -27,7 +27,7 @@
 #define OV7675_COM11 0x3b
 #define OV7675_REGCF 0xcf
 #define PLL_ADDR    0x11
-#define AE_ENABLE 0x13 
+#define AE_ENABLE 0x13
 /**---------------------------------------------------------------------------*
  ** 					Local Function Prototypes							  *
  **---------------------------------------------------------------------------*/
@@ -71,28 +71,28 @@ LOCAL EXIF_SPEC_PIC_TAKING_COND_T s_ov7675_exif;
         FLICKER_MAX
 }FLICKER_E;
  LOCAL const SENSOR_REG_T ov7675_YUV_640X480[]= {
-    //Input clock 24Mhz, 25fps                     
-    //SCCB_salve_Address = 0x42;                   
-    {0x12, 0x80},                                  
-    {SENSOR_WRITE_DELAY, 0x0A},//delay 100ms     
-    {0x11, 0x80}, 
-       
-    {0x3a, 0x04},                                  
-    {0x12, 0x00},                                  
-    {0x17, 0x13},                                  
-    {0x18, 0x01},                                  
-    {0x32, 0xb6},                                  
-    {0x19, 0x03},                                  
-    {0x1a, 0x7b},                                  
-    {0x03, 0x0a},                                  
-    {0x0c, 0x00},                                  
-    {0x3e, 0x00},                                  
-    {0x70, 0x3a},                                  
-    {0x71, 0x35},                                  
-    {0x72, 0x11},                                  
-    {0x73, 0xf0},                                  
-    {0xa2, 0x02},     
-    
+    //Input clock 24Mhz, 25fps
+    //SCCB_salve_Address = 0x42;
+    {0x12, 0x80},
+    {SENSOR_WRITE_DELAY, 0x0A},//delay 100ms
+    {0x11, 0x80},
+
+    {0x3a, 0x04},
+    {0x12, 0x00},
+    {0x17, 0x13},
+    {0x18, 0x01},
+    {0x32, 0xb6},
+    {0x19, 0x03},
+    {0x1a, 0x7b},
+    {0x03, 0x0a},
+    {0x0c, 0x00},
+    {0x3e, 0x00},
+    {0x70, 0x3a},
+    {0x71, 0x35},
+    {0x72, 0x11},
+    {0x73, 0xf0},
+    {0xa2, 0x02},
+
     {0x7a, 0x18},
     {0x7b, 0x04},
     {0x7c, 0x09},
@@ -108,147 +108,147 @@ LOCAL EXIF_SPEC_PIC_TAKING_COND_T s_ov7675_exif;
     {0x86, 0xA9},
     {0x87, 0xC4},
     {0x88, 0xDb},
-    {0x89, 0xEe},  
-    
-    {0x13, 0xe0},                                
-    {0x01, 0x50},                                  
-    {0x02, 0x68},                                  
-    {0x00, 0x00},                                  
-    {0x10, 0x00},                                  
-    {0x0d, 0x40},                                  
-    {0x14, 0x38},                                  
-    {0xa5, 0x07},                                  
-    {0xab, 0x08},                                  
-    {0x24, 0x60},    
-    {0x25, 0x50},                           
-    {0x26, 0xe3},                                
-    {0x9f, 0x78},                                  
-    {0xa0, 0x68},  
-    
-                                    
-    {0xa1, 0x03},                                
-    {0xa6, 0xd8},                                  
-    {0xa7, 0xd8},                                  
-    {0xa8, 0xf0},                                  
-    {0xa9, 0x90},                                  
-    {0xaa, 0x14},                                  
-    {0x13, 0xe5},                                  
-    {0x0e, 0x61},                                
-    {0x0f, 0x4b},                                  
-    {0x16, 0x02},                                  
+    {0x89, 0xEe},
+
+    {0x13, 0xe0},
+    {0x01, 0x50},
+    {0x02, 0x68},
+    {0x00, 0x00},
+    {0x10, 0x00},
+    {0x0d, 0x40},
+    {0x14, 0x38},
+    {0xa5, 0x07},
+    {0xab, 0x08},
+    {0x24, 0x60},
+    {0x25, 0x50},
+    {0x26, 0xe3},
+    {0x9f, 0x78},
+    {0xa0, 0x68},
+
+
+    {0xa1, 0x03},
+    {0xa6, 0xd8},
+    {0xa7, 0xd8},
+    {0xa8, 0xf0},
+    {0xa9, 0x90},
+    {0xaa, 0x14},
+    {0x13, 0xe5},
+    {0x0e, 0x61},
+    {0x0f, 0x4b},
+    {0x16, 0x02},
     {0x1e, 0x07},
-    {0x21, 0x02},                                  
-    {0x22, 0x91},                                  
-    {0x29, 0x07},                                  
-    {0x33, 0x0b},                                  
-    {0x35, 0x0b},                                  
-    {0x37, 0x1d},                                  
-    {0x38, 0x71},                                  
-    {0x39, 0x2a},                                  
-    {0x3c, 0x78},                                  
-    {0x4d, 0x40},                                  
-    {0x4e, 0x20},                                  
-    {0x69, 0x00},                                  
-    {0x6b, 0x0a},                                  
-    {0x74, 0x10},                                  
-    {0x8d, 0x4f},                                  
-    {0x8e, 0x00},                                  
-    {0x8f, 0x00},                                  
-    {0x90, 0x00},                                  
-    {0x91, 0x00},                                  
-    {0x92, 0x66},                                  
-    {0x96, 0x00},                                  
-    {0x9a, 0x80},                                  
-    {0xb0, 0x84},                                  
-    {0xb1, 0x0c},                                  
-    {0xb2, 0x0e},                                  
-    {0xb3, 0x82},                                  
-    {0xb8, 0x0a}, 
-    
-    {0x43, 0x14},                                
-    {0x44, 0xf0},                                  
-    {0x45, 0x41},                                  
-    {0x46, 0x66},                                  
-    {0x47, 0x2a},                                  
-    {0x48, 0x3e},                                  
-    {0x59, 0x8d},                                  
-    {0x5a, 0x8e},                                  
-    {0x5b, 0x53},                                  
-    {0x5c, 0x83},                                  
-    {0x5d, 0x4f},                                  
-    {0x5e, 0x0e},                                  
-    {0x6c, 0x0a},                                  
-    {0x6d, 0x55},                                  
-    {0x6e, 0x11},                                  
-    {0x6f, 0x9e}, 
-    {0x62, 0x90},                                
+    {0x21, 0x02},
+    {0x22, 0x91},
+    {0x29, 0x07},
+    {0x33, 0x0b},
+    {0x35, 0x0b},
+    {0x37, 0x1d},
+    {0x38, 0x71},
+    {0x39, 0x2a},
+    {0x3c, 0x78},
+    {0x4d, 0x40},
+    {0x4e, 0x20},
+    {0x69, 0x00},
+    {0x6b, 0x0a},
+    {0x74, 0x10},
+    {0x8d, 0x4f},
+    {0x8e, 0x00},
+    {0x8f, 0x00},
+    {0x90, 0x00},
+    {0x91, 0x00},
+    {0x92, 0x66},
+    {0x96, 0x00},
+    {0x9a, 0x80},
+    {0xb0, 0x84},
+    {0xb1, 0x0c},
+    {0xb2, 0x0e},
+    {0xb3, 0x82},
+    {0xb8, 0x0a},
+
+    {0x43, 0x14},
+    {0x44, 0xf0},
+    {0x45, 0x41},
+    {0x46, 0x66},
+    {0x47, 0x2a},
+    {0x48, 0x3e},
+    {0x59, 0x8d},
+    {0x5a, 0x8e},
+    {0x5b, 0x53},
+    {0x5c, 0x83},
+    {0x5d, 0x4f},
+    {0x5e, 0x0e},
+    {0x6c, 0x0a},
+    {0x6d, 0x55},
+    {0x6e, 0x11},
+    {0x6f, 0x9e},
+    {0x62, 0x90},
     {0x63, 0x30},
     {0x64, 0x11},
-    {0x65, 0x00},                                  
-    {0x66, 0x05},  
-    {0x94, 0x11},    
-    {0x95, 0x18},  //18 
-    {0x6a, 0x40},                                
-    {0x01, 0x40},                                  
-    {0x02, 0x40}, 
-    
-    {0x13, 0xe7},                                  
-    {0x4f, 0x80},                                
-    {0x50, 0x80},                                  
-    {0x51, 0x00},                                  
-    {0x52, 0x22},                                  
-    {0x53, 0x5e},                                  
-    {0x54, 0x80},                                  
-    {0x58, 0x9e},                                  
-    {0x41, 0x08},                                
-    {0x3f, 0x00},                                  
-    {0x75, 0x03},                                  
-    {0x76, 0xe1},                                  
-    {0x4c, 0x00},                                  
-    {0x77, 0x00},                                  
-    {0x3d, 0xc2},                                  
-    {0x4b, 0x09},                                  
-    {0xc9, 0x60},                                  
-    {0x41, 0x38},                                  
-    {0x56, 0x40},                                  
-    {0x34, 0x11},                                
-    {0x3b, 0x0a},                                  
-    {0xa4, 0x88},                                  
-    {0x96, 0x00},                                  
-    {0x97, 0x30},                                  
-    {0x98, 0x20},                                  
-    {0x99, 0x30},                                  
-    {0x9a, 0x84},                                  
-    {0x9b, 0x29},                                  
-    {0x9c, 0x03},                                  
-    {0x9d, 0x98},                                
-    {0x9e, 0x3f},                                  
-    {0x78, 0x04},                                  
-    {0x79, 0x01},                                
-    {0xc8, 0xf0},                                  
-    {0x79, 0x0f},                                  
-    {0xc8, 0x00},                                  
-    {0x79, 0x10},                                  
-    {0xc8, 0x7e},                                  
-    {0x79, 0x0a},                                  
-    {0xc8, 0x80},                                  
-    {0x79, 0x0b},                                  
-    {0xc8, 0x01},                                  
-    {0x79, 0x0c},                                  
-    {0xc8, 0x0f},                                  
-    {0x79, 0x0d},                                  
-    {0xc8, 0x20},                                  
-    {0x79, 0x09},                                  
-    {0xc8, 0x80},                                  
-    {0x79, 0x02},                                  
-    {0xc8, 0xc0},                                  
-    {0x79, 0x03},                                  
-    {0xc8, 0x40},                                  
-    {0x79, 0x05},                                  
-    {0xc8, 0x30},                                  
-    {0x79, 0x26},                                  
-    {0x2d, 0x00},                                  
-    {0x2e, 0x00}, 
+    {0x65, 0x00},
+    {0x66, 0x05},
+    {0x94, 0x11},
+    {0x95, 0x18},  //18
+    {0x6a, 0x40},
+    {0x01, 0x40},
+    {0x02, 0x40},
+
+    {0x13, 0xe7},
+    {0x4f, 0x80},
+    {0x50, 0x80},
+    {0x51, 0x00},
+    {0x52, 0x22},
+    {0x53, 0x5e},
+    {0x54, 0x80},
+    {0x58, 0x9e},
+    {0x41, 0x08},
+    {0x3f, 0x00},
+    {0x75, 0x03},
+    {0x76, 0xe1},
+    {0x4c, 0x00},
+    {0x77, 0x00},
+    {0x3d, 0xc2},
+    {0x4b, 0x09},
+    {0xc9, 0x60},
+    {0x41, 0x38},
+    {0x56, 0x40},
+    {0x34, 0x11},
+    {0x3b, 0x0a},
+    {0xa4, 0x88},
+    {0x96, 0x00},
+    {0x97, 0x30},
+    {0x98, 0x20},
+    {0x99, 0x30},
+    {0x9a, 0x84},
+    {0x9b, 0x29},
+    {0x9c, 0x03},
+    {0x9d, 0x98},
+    {0x9e, 0x3f},
+    {0x78, 0x04},
+    {0x79, 0x01},
+    {0xc8, 0xf0},
+    {0x79, 0x0f},
+    {0xc8, 0x00},
+    {0x79, 0x10},
+    {0xc8, 0x7e},
+    {0x79, 0x0a},
+    {0xc8, 0x80},
+    {0x79, 0x0b},
+    {0xc8, 0x01},
+    {0x79, 0x0c},
+    {0xc8, 0x0f},
+    {0x79, 0x0d},
+    {0xc8, 0x20},
+    {0x79, 0x09},
+    {0xc8, 0x80},
+    {0x79, 0x02},
+    {0xc8, 0xc0},
+    {0x79, 0x03},
+    {0xc8, 0x40},
+    {0x79, 0x05},
+    {0xc8, 0x30},
+    {0x79, 0x26},
+    {0x2d, 0x00},
+    {0x2e, 0x00},
 };
 
  LOCAL const SENSOR_REG_T ov7675_YUV_MOTION_320X240[]=
@@ -473,33 +473,33 @@ LOCAL EXIF_SPEC_PIC_TAKING_COND_T s_ov7675_exif;
     {0x09, 0x00}
 };
 LOCAL SENSOR_REG_TAB_INFO_T s_OV7675_resolution_Tab_YUV[]=
-{		
+{
         // COMMON INIT
         {ADDR_AND_LEN_OF_ARRAY(ov7675_YUV_640X480), 640, 480, 24, SENSOR_IMAGE_FORMAT_YUV422},
 
-        // YUV422 PREVIEW 1	
+        // YUV422 PREVIEW 1
         {PNULL, 0, 640, 480,24, SENSOR_IMAGE_FORMAT_YUV422},
         {PNULL, 0, 0, 0, 0, 0},
         {PNULL, 0, 0, 0, 0, 0},
         {PNULL, 0, 0, 0, 0, 0},
 
-        // YUV422 PREVIEW 2 
+        // YUV422 PREVIEW 2
         {PNULL, 0, 0, 0, 0, 0},
         {PNULL, 0, 0, 0, 0, 0},
         {PNULL, 0, 0, 0, 0, 0},
         {PNULL, 0, 0, 0, 0, 0}
 };
 
-LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab = 
+LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab =
 {
-        // Internal 
+        // Internal
         PNULL,
         _ov7675_PowerOn,
         PNULL,
         OV7675_Identify,
 
         PNULL,			// write register
-        PNULL,			// read  register	
+        PNULL,			// read  register
         PNULL,
         PNULL,
 
@@ -513,10 +513,10 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab =
         set_sharpness,
         set_saturation,
 
-        set_preview_mode,	
+        set_preview_mode,
         set_image_effect,
 
-        PNULL,//OV7675_BeforeSnapshot, 
+        PNULL,//OV7675_BeforeSnapshot,
         PNULL, //OV7675_After_Snapshot,
 
         PNULL,
@@ -526,7 +526,7 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab =
         read_gain_value,
         write_gain_value,
         read_gain_scale,
-        set_frame_rate,	
+        set_frame_rate,
         PNULL,
         PNULL,
         set_ov7675_awb,
@@ -561,12 +561,12 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab =
         SENSOR_HW_SIGNAL_HSYNC_P,		// bit0: 0:negative; 1:positive -> polarily of pixel clock
         							// bit2: 0:negative; 1:positive -> polarily of horizontal synchronization signal
         							// bit4: 0:negative; 1:positive -> polarily of vertical synchronization signal
-        							// other bit: reseved											
-        									
+									// other bit: reseved
+
         // preview mode
         SENSOR_ENVIROMENT_NORMAL|\
         SENSOR_ENVIROMENT_NIGHT|\
-        SENSOR_ENVIROMENT_SUNNY,		
+        SENSOR_ENVIROMENT_SUNNY,
 
         // image effect
         SENSOR_IMAGE_EFFECT_NORMAL|\
@@ -591,32 +591,32 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_OV7675_ioctl_func_tab =
 
         1,								// count of identify code
         {{0x0A, 0x76},						// supply two code to identify sensor.
-        {0x0B, 0x73}},						// for Example: index = 0-> Device id, index = 1 -> version id	
-        							
-        SENSOR_AVDD_2800MV,				// voltage of avdd	
+        {0x0B, 0x73}},						// for Example: index = 0-> Device id, index = 1 -> version id
+
+        SENSOR_AVDD_2800MV,				// voltage of avdd
 
         640,							// max width of source image
         480,							// max height of source image
-        "OV7675",						// name of sensor												
+        "OV7675",						// name of sensor
 
         SENSOR_IMAGE_FORMAT_YUV422,		// define in SENSOR_IMAGE_FORMAT_E enum,
         							// if set to SENSOR_IMAGE_FORMAT_MAX here, image format depent on SENSOR_REG_TAB_INFO_T
-        SENSOR_IMAGE_PATTERN_YUV422_YUYV,	// pattern of input image form sensor;			
+        SENSOR_IMAGE_PATTERN_YUV422_YUYV,	// pattern of input image form sensor;
 
         s_OV7675_resolution_Tab_YUV,	// point to resolution table information structure
         &s_OV7675_ioctl_func_tab,		// point to ioctl function table
-        	
+
         PNULL,							// information and table about Rawrgb sensor
-        PNULL,							// extend information about sensor	
+        PNULL,							// extend information about sensor
         SENSOR_AVDD_1800MV,                     // iovdd
         SENSOR_AVDD_1800MV,                      // dvdd
-        3,                     // skip frame num before preview 
+        3,                     // skip frame num before preview
         1,                      // skip frame num before capture
-        1,                      // deci frame num during preview	
+        1,                      // deci frame num during preview
         1,                      // deci frame num during video preview
-        0,                     // threshold enable(only analog TV)	
-        0,                     // atv output mode 0 fix mode 1 auto mode	
-        0,                    // atv output start postion	
+        0,                     // threshold enable(only analog TV)
+        0,                     // atv output mode 0 fix mode 1 auto mode
+        0,                    // atv output start postion
         0,                     // atv output end postion
         0,
 		{SENSOR_INTERFACE_TYPE_CCIR601, 8, 16, 1},
@@ -672,10 +672,10 @@ LOCAL uint32_t _ov7675_PowerOn(uint32_t power_on)
 }
 LOCAL uint32_t OV7675_Identify(uint32_t param)
 {
-#define OV7675_PID_VALUE	0x76	
+#define OV7675_PID_VALUE	0x76
 #define OV7675_PID_ADDR	0x0A
-#define OV7675_VER_VALUE	0x73	
-#define OV7675_VER_ADDR		0x0B	
+#define OV7675_VER_VALUE	0x73
+#define OV7675_VER_ADDR		0x0B
 
         uint32_t i;
         uint32_t nLoop;
@@ -711,7 +711,7 @@ LOCAL uint32_t OV7675_Identify(uint32_t param)
 }
 /******************************************************************************/
 // Description: Intialize Exif information
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
 /******************************************************************************/
@@ -726,27 +726,27 @@ LOCAL uint32_t _ov7675_InitExifInfo(void)
     exif_ptr->valid.FNumber = 1;
     exif_ptr->FNumber.numerator = 14;
     exif_ptr->FNumber.denominator = 5;
-    
+
     exif_ptr->valid.ExposureProgram = 1;
     exif_ptr->ExposureProgram = 0x04;
 
-    //exif_ptr->SpectralSensitivity[MAX_ASCII_STR_SIZE];	
+    //exif_ptr->SpectralSensitivity[MAX_ASCII_STR_SIZE];
     //exif_ptr->ISOSpeedRatings;
     //exif_ptr->OECF;
-    
+
     //exif_ptr->ShutterSpeedValue;
-    
+
     exif_ptr->valid.ApertureValue=1;
     exif_ptr->ApertureValue.numerator=14;
     exif_ptr->ApertureValue.denominator=5;
-    
+
     //exif_ptr->BrightnessValue;
     //exif_ptr->ExposureBiasValue;
 
     exif_ptr->valid.MaxApertureValue=1;
     exif_ptr->MaxApertureValue.numerator=14;
     exif_ptr->MaxApertureValue.denominator=5;
-    
+
     //exif_ptr->SubjectDistance;
     //exif_ptr->MeteringMode;
     //exif_ptr->LightSource;
@@ -755,7 +755,7 @@ LOCAL uint32_t _ov7675_InitExifInfo(void)
     exif_ptr->valid.FocalLength=1;
     exif_ptr->FocalLength.numerator=289;
     exif_ptr->FocalLength.denominator=100;
-    
+
     //exif_ptr->SubjectArea;
     //exif_ptr->FlashEnergy;
     //exif_ptr->SpatialFrequencyResponse;
@@ -778,10 +778,10 @@ LOCAL uint32_t _ov7675_InitExifInfo(void)
 
     exif_ptr->valid.WhiteBalance=1;
     exif_ptr->WhiteBalance=0x00;
-    
+
     //exif_ptr->DigitalZoomRatio;
     //exif_ptr->FocalLengthIn35mmFilm;
-    //exif_ptr->SceneCaptureType;	
+    //exif_ptr->SceneCaptureType;
     //exif_ptr->GainControl;
     //exif_ptr->Contrast;
     //exif_ptr->Saturation;
@@ -791,16 +791,16 @@ LOCAL uint32_t _ov7675_InitExifInfo(void)
 #endif
     return 0;
 }
-#if 0 
+#if 0
 LOCAL uint32_t _ov7675_Power_On(uint32_t power_on)
 {
     SENSOR_AVDD_VAL_E		dvdd_val=g_OV7675_yuv_info.dvdd_val;
     SENSOR_AVDD_VAL_E		avdd_val=g_OV7675_yuv_info.avdd_val;
-    SENSOR_AVDD_VAL_E		iovdd_val=g_OV7675_yuv_info.iovdd_val;  
-//    BOOLEAN 				power_down=g_OV7675_yuv_info.power_down_level;	    
+    SENSOR_AVDD_VAL_E		iovdd_val=g_OV7675_yuv_info.iovdd_val;
+//    BOOLEAN 				power_down=g_OV7675_yuv_info.power_down_level;
     BOOLEAN 				reset_level=g_OV7675_yuv_info.reset_pulse_level;
-    uint32_t 				reset_width=g_OV7675_yuv_info.reset_pulse_width;	    
-    
+    uint32_t 				reset_width=g_OV7675_yuv_info.reset_pulse_width;
+
     if(1==power_on)
     {
         Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
@@ -808,8 +808,8 @@ LOCAL uint32_t _ov7675_Power_On(uint32_t power_on)
   //      GPIO_SetFrontSensorPwdn((BOOLEAN)!power_down);
 
         // Open Mclk in default frequency
-        Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);   
-        
+        Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
+
         SENSOR_Sleep(20);
         Sensor_SetResetLevel(reset_level);
         SENSOR_Sleep(reset_width);
@@ -820,13 +820,13 @@ LOCAL uint32_t _ov7675_Power_On(uint32_t power_on)
     {
 //        GPIO_SetFrontSensorPwdn(power_down);
 
-        Sensor_SetMCLK(SENSOR_DISABLE_MCLK);           
+        Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
 //        GPIO_SetSensorPower(FALSE);
-        Sensor_SetVoltage(SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED);        
+        Sensor_SetVoltage(SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED);
     }
-    
-    SENSOR_TRACE("SENSOR: _ov7675_Power_On(1:on, 0:off): %d", power_on);    
-    
+
+    SENSOR_TRACE("SENSOR: _ov7675_Power_On(1:on, 0:off): %d", power_on);
+
     return 0;
 }
 #endif
@@ -870,7 +870,7 @@ LOCAL uint32_t set_ov7675_ae_awb_enable(uint32_t ae_enable, uint32_t awb_enable)
         else if(0x01==awb_enable)
         {
             ae_value|=0x02;
-        }        
+        }
 
         OV7675_WriteReg(AE_ENABLE,ae_value);
 
@@ -882,7 +882,7 @@ LOCAL uint32_t set_ov7675_ae_awb_enable(uint32_t ae_enable, uint32_t awb_enable)
 #endif
 LOCAL uint32_t set_hmirror_enable(uint32_t enable)
 {
-        uint8_t value = 0;	
+        uint8_t value = 0;
         value = OV7675_ReadReg(0x1e);
         value = (value & 0xDF) | ((enable & 0x1) << 5); //landscape
         SENSOR_TRACE("set_hmirror_enable: enable = %d, 0x1e: 0x%x.\n", enable, value);
@@ -891,7 +891,7 @@ LOCAL uint32_t set_hmirror_enable(uint32_t enable)
 }
 LOCAL uint32_t set_vmirror_enable(uint32_t enable)
 {
-        uint8_t value = 0;	
+        uint8_t value = 0;
         value = OV7675_ReadReg(0x1e);
         value = (value & 0xEF) | (((enable == 1 ? 0 : 1)) << 4); //portrait
         SENSOR_TRACE("set_vmirror_enable: enable = %d, 0x1e: 0x%x.\n", enable, value);
@@ -900,19 +900,19 @@ LOCAL uint32_t set_vmirror_enable(uint32_t enable)
 }
 
  LOCAL const SENSOR_REG_T ov7675_ev_tab[][4]=
-{ 
-        {{0x24, 0x40}, {0x25, 0x30}, {0x26, 0xb2}, {0xff, 0xff}},            
-        {{0x24, 0x50}, {0x25, 0x40}, {0x26, 0xc2}, {0xff, 0xff}},            
-        {{0x24, 0x60}, {0x25, 0x50}, {0x26, 0xc2}, {0xff, 0xff}},            
-        {{0x24, 0x70}, {0x25, 0x60}, {0x26, 0xc2}, {0xff, 0xff}},            
-        {{0x24, 0x80}, {0x25, 0x70}, {0x26, 0xd4}, {0xff, 0xff}},            
+{
+        {{0x24, 0x40}, {0x25, 0x30}, {0x26, 0xb2}, {0xff, 0xff}},
+        {{0x24, 0x50}, {0x25, 0x40}, {0x26, 0xc2}, {0xff, 0xff}},
+        {{0x24, 0x60}, {0x25, 0x50}, {0x26, 0xc2}, {0xff, 0xff}},
+        {{0x24, 0x70}, {0x25, 0x60}, {0x26, 0xc2}, {0xff, 0xff}},
+        {{0x24, 0x80}, {0x25, 0x70}, {0x26, 0xd4}, {0xff, 0xff}},
         {{0x24, 0x90}, {0x25, 0x80}, {0x26, 0xd5}, {0xff, 0xff}},
-        {{0x24, 0xa0}, {0x25, 0x90}, {0x26, 0xe6}, {0xff, 0xff}}   
+        {{0x24, 0xa0}, {0x25, 0x90}, {0x26, 0xe6}, {0xff, 0xff}}
 };
 
 LOCAL uint32_t set_ov7675_ev(uint32_t level)
 {
-        uint16_t i;    
+        uint16_t i;
         SENSOR_REG_T* sensor_reg_ptr = (SENSOR_REG_T*)ov7675_ev_tab[level];
 
         if(level>6)
@@ -926,7 +926,7 @@ LOCAL uint32_t set_ov7675_ev(uint32_t level)
 }
 /******************************************************************************/
 // Description: anti 50/60 hz banding flicker
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
 //		level  must smaller than 8
@@ -939,11 +939,11 @@ LOCAL uint32_t set_ov7675_anti_flicker(uint32_t mode)
         switch(mode) {
         case FLICKER_50HZ:
                 data|=0x08;
-                OV7675_WriteReg(OV7675_COM11,data);                    
+                OV7675_WriteReg(OV7675_COM11,data);
                 break;
         case FLICKER_60HZ:
                 data&=0xf7;
-                OV7675_WriteReg(OV7675_COM11,data);                      
+                OV7675_WriteReg(OV7675_COM11,data);
                 break;
         default:
                 break;
@@ -953,38 +953,38 @@ LOCAL uint32_t set_ov7675_anti_flicker(uint32_t mode)
 }
 /******************************************************************************/
 // Description: set video mode
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
-//		 
+//
 /******************************************************************************/
  LOCAL const SENSOR_REG_T ov7675_video_mode_nand_tab[][4]=
 {
         // normal mode
         {
         {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xff, 0xff}
-        },    
+        },
         //vodeo mode
         {
-        {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xff, 0xff}      
+        {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xff, 0xff}
         }
 };
 /******************************************************************************/
 // Description: set video mode
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
-//		 
+//
 /******************************************************************************/
  LOCAL const SENSOR_REG_T ov7675_video_mode_nor_tab[][7]=
 {
         // normal mode
         {
         {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0x92, 0xfb}, {0x93, 0x01}, {0xa5, 0x05},{0xff, 0xff}
-        }, 
+        },
         {
-        {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38}, {0x92, 0x68}, {0x93, 0x01}, {0xff, 0xff}, {0xff, 0xff}       
-        } 
+        {0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38}, {0x92, 0x68}, {0x93, 0x01}, {0xff, 0xff}, {0xff, 0xff}
+        }
 };
 LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
 {
@@ -994,7 +994,7 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         SENSOR_REG_T* sensor_reg_ptr = PNULL;
         if(mode>1)
                 return 0;
-        
+
         sensor_reg_ptr = (SENSOR_REG_T*)ov7675_video_mode_nand_tab[mode];
 
         if(PNULL == sensor_reg_ptr){
@@ -1003,23 +1003,23 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         }
 
         data=OV7675_ReadReg(OV7675_COM11);
-        data&=0x0f; 
-        OV7675_WriteReg(OV7675_COM11,data);      
+        data&=0x0f;
+        OV7675_WriteReg(OV7675_COM11,data);
 
         data1=OV7675_ReadReg(OV7675_REGCF);
         data1&= 0xf7 ;
-        OV7675_WriteReg(OV7675_COM11,data1); 
-    
+        OV7675_WriteReg(OV7675_COM11,data1);
+
         switch(mode) {
         case 0: //DCAMERA_NORMAL_MODE:
-                OV7675_WriteReg(PLL_ADDR,0x81);                  
+                OV7675_WriteReg(PLL_ADDR,0x81);
                 break;
-        case 1: //DCAMERA_VIDEO_MODE:     
-                OV7675_WriteReg(PLL_ADDR,0x80);      
+        case 1: //DCAMERA_VIDEO_MODE:
+                OV7675_WriteReg(PLL_ADDR,0x80);
                 break;
         default :
                 break;
-        }    
+        }
 
         for(i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) || (0xFF != sensor_reg_ptr[i].reg_value); i++) {
                 OV7675_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
@@ -1028,11 +1028,11 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         return 0;
 }
 /******************************************************************************/
-// Description: set wb mode 
-// Global resource dependence: 
+// Description: set wb mode
+// Global resource dependence:
 // Author:
 // Note:
-//		
+//
 /******************************************************************************/
  LOCAL const SENSOR_REG_T ov7675_awb_tab[][7]=
 {
@@ -1044,8 +1044,8 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0xff, 0xff},
         {0xff, 0xff},
         {0xff, 0xff},
-        {0xff, 0xff}            
-        },    
+        {0xff, 0xff}
+        },
         //INCANDESCENCE:
         {
         {0x13, 0xe5},
@@ -1054,7 +1054,7 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0x6a, 0x40},
         {0x2d, 0x00},
         {0x2e, 0x00},
-        {0xff, 0xff}         
+        {0xff, 0xff}
         },
         //U30
         {
@@ -1064,8 +1064,8 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0xff, 0xff},
         {0xff, 0xff},
         {0xff, 0xff},
-        {0xff, 0xff}            
-        },  
+        {0xff, 0xff}
+        },
         //CWF
         {
         {0x13, 0xe7},
@@ -1074,8 +1074,8 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0xff, 0xff},
         {0xff, 0xff},
         {0xff, 0xff},
-        {0xff, 0xff}            
-        },    
+        {0xff, 0xff}
+        },
         //FLUORESCENT:
         {
         {0x13, 0xe5},
@@ -1084,7 +1084,7 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0x6a, 0x4a},
         {0x2d, 0x00},
         {0x2e, 0x00},
-        {0xff, 0xff}           
+        {0xff, 0xff}
         },
         //SUN:
         {
@@ -1094,7 +1094,7 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0x6a, 0x42},
         {0x2d, 0x00},
         {0x2e, 0x00},
-        {0xff, 0xff}            
+        {0xff, 0xff}
         },
         //CLOUD:
         {
@@ -1104,7 +1104,7 @@ LOCAL uint32_t set_ov7675_video_mode(uint32_t mode)
         {0x6a, 0x40},
         {0x2d, 0x00},
         {0x2e, 0x00},
-        {0xff, 0xff}            
+        {0xff, 0xff}
         },
 };
 
@@ -1113,9 +1113,9 @@ LOCAL uint32_t set_ov7675_awb(uint32_t mode)
         uint16_t i;
         SENSOR_REG_T* sensor_reg_ptr = (SENSOR_REG_T*)ov7675_awb_tab[mode];
 
-        if(mode > 6) 
+        if(mode > 6)
                 return 0;
-	
+
         for(i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) && (0xFF != sensor_reg_ptr[i].reg_value); i++) {
                 OV7675_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
         }
@@ -1124,8 +1124,8 @@ LOCAL uint32_t set_ov7675_awb(uint32_t mode)
         return 0;
 }
 /******************************************************************************/
-// Description: set brightness 
-// Global resource dependence: 
+// Description: set brightness
+// Global resource dependence:
 // Author:
 // Note:
 //		level  must smaller than 8
@@ -1161,7 +1161,7 @@ LOCAL uint32_t set_brightness(uint32_t level)
 {
         {{0x56, 0x20},{0xff,0xff}},
         {{0x56, 0x30},{0xff,0xff}},
-        {{0x56, 0x40},{0xff,0xff}},	
+        {{0x56, 0x40},{0xff,0xff}},
         {{0x56, 0x50},{0xff,0xff}},
         {{0x56, 0x60},{0xff,0xff}},
         {{0x56, 0x70},{0xff,0xff}},
@@ -1187,7 +1187,7 @@ LOCAL uint32_t set_contrast(uint32_t level)
         return 0;
 }
 LOCAL uint32_t set_sharpness(uint32_t level)
-{	
+{
         return 0;
 }
 LOCAL uint32_t set_saturation(uint32_t level)
@@ -1195,8 +1195,8 @@ LOCAL uint32_t set_saturation(uint32_t level)
         return 0;
 }
 /******************************************************************************/
-// Description: set brightness 
-// Global resource dependence: 
+// Description: set brightness
+// Global resource dependence:
 // Author:
 // Note:
 //		level  must smaller than 8
@@ -1206,9 +1206,9 @@ LOCAL uint32_t set_preview_mode(uint32_t preview_mode)
         SENSOR_TRACE("SENSOR: set_preview_mode: preview_mode = %d", preview_mode);
 
         s_preview_mode = preview_mode;
-	
+
         switch (preview_mode) {
-        case DCAMERA_ENVIRONMENT_NORMAL: 
+        case DCAMERA_ENVIRONMENT_NORMAL:
                 OV7675_set_work_mode(0);
                 break;
         case DCAMERA_ENVIRONMENT_NIGHT:
@@ -1224,10 +1224,10 @@ LOCAL uint32_t set_preview_mode(uint32_t preview_mode)
 }
 /******************************************************************************/
 // Description:
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
-//		
+//
 /******************************************************************************/
  LOCAL const SENSOR_REG_T ov7675_image_effect_tab[][4]=
 {
@@ -1254,21 +1254,21 @@ LOCAL uint32_t set_preview_mode(uint32_t preview_mode)
         // effect  YELLOW
         {
         {0x3a, 0x14},{0x67, 0x90},{0x68, 0x20},{0xff, 0xff}
-        },  
+        },
         // effect NEGATIVE
-        {	     
+        {
         {0x3a, 0x24}, {0x67, 0x80},{0x68, 0x80},{0xff, 0xff}
-        },    
+        },
         //effect ANTIQUE
         {
         {0x3a, 0x14}, {0x67, 0xa0},{0x68 , 0x40},{0xff, 0xff}
         },
-};	
+};
 LOCAL uint32_t set_image_effect(uint32_t effect_type)
 {
         uint16_t i;
         SENSOR_REG_T* sensor_reg_ptr = (SENSOR_REG_T*)ov7675_image_effect_tab[effect_type];
-   
+
         for(i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) && (0xFF != sensor_reg_ptr[i].reg_value) ; i++) {
                 OV7675_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
         }
@@ -1282,7 +1282,7 @@ LOCAL uint32_t read_ev_value(uint32_t value)
 }
 LOCAL uint32_t write_ev_value(uint32_t exposure_value)
 {
-        return 0;	
+        return 0;
 }
 LOCAL uint32_t read_gain_value(uint32_t value)
 {
@@ -1296,22 +1296,22 @@ LOCAL uint32_t read_gain_scale(uint32_t value)
 {
         return SENSOR_GAIN_SCALE;
 }
-LOCAL uint32_t set_frame_rate(uint32_t param)    
+LOCAL uint32_t set_frame_rate(uint32_t param)
 {
         return 0;
 }
 /******************************************************************************/
 // Description:
-// Global resource dependence: 
+// Global resource dependence:
 // Author:
 // Note:
-//		mode 0:normal;	 1:night 
+//		mode 0:normal;	 1:night
 /******************************************************************************/
 LOCAL const SENSOR_REG_T ov7675_mode_tab[][5]=
 {
         // 30 fps
         {{0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xa5, 02}, {0xff,0xff}}, // normal
-        {{0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xa5, 06}, {0xff,0xff}} // night  
+        {{0x2d, 0x00},{0x2e, 0x00},{0x14, 0x38},{0xa5, 06}, {0xff,0xff}} // night
 };
 
 LOCAL uint32_t OV7675_set_work_mode(uint32_t mode)
@@ -1325,12 +1325,12 @@ LOCAL uint32_t OV7675_set_work_mode(uint32_t mode)
         if(mode>1)
                 return 0;
 
-        data=OV7675_ReadReg(OV7675_COM11);    
+        data=OV7675_ReadReg(OV7675_COM11);
         data&=0x0f;
 
         data1=OV7675_ReadReg(OV7675_REGCF);
         data1&= 0xf7 ;
-    
+
         switch(mode) {
         case DCAMERA_ENVIRONMENT_NORMAL:
                 OV7675_WriteReg(OV7675_COM11,data);
@@ -1343,7 +1343,7 @@ LOCAL uint32_t OV7675_set_work_mode(uint32_t mode)
                 break;
         default :
                 break;
-        }    
+        }
 
         for(i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) || (0xFF != sensor_reg_ptr[i].reg_value); i++) {
                 OV7675_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);

@@ -60,7 +60,7 @@ class SprdCameraHardware : public virtual RefBase {
 public:
 	SprdCameraHardware(int cameraId);
 	virtual                      ~SprdCameraHardware();
-	inline int                   getCameraId() const; 
+	inline int                   getCameraId() const;
 	virtual void                 release();
 	virtual status_t             startPreview();
 	virtual void                 stopPreview();
@@ -110,7 +110,7 @@ public:
 	static int                   getCameraInfo(int cameraId, struct camera_info *cameraInfo);
 	static const CameraInfo      kCameraInfo[];
 	static const CameraInfo      kCameraInfo3[];
-	
+
 private:
 	inline void                  print_time();
 
@@ -122,12 +122,12 @@ private:
 					int frame_offset, const char *name);
 		virtual ~MemPool() = 0;
 		void     completeInitialization();
-		bool     initialized() const { 
+		bool     initialized() const {
 			if (mHeap != NULL) {
 				if(MAP_FAILED != mHeap->base())
 					return true;
 				else
-					return false;	
+					return false;
 			} else {
 				return false;
 			}
@@ -149,11 +149,11 @@ private:
 
 	static int Callback_AllocCapturePmem(void* handle, unsigned int size, unsigned int *addr_phy, unsigned int *addr_vir);
 	static int Callback_FreeCapturePmem(void* handle);
-	
+
 	void                  FreeCameraMem(void);
 	sprd_camera_memory_t* GetPmem(int buf_size, int num_bufs);
 	void                  FreePmem(sprd_camera_memory_t* camera_memory);
-	void                  setFdmem(uint32_t size);	
+	void                  setFdmem(uint32_t size);
 	void                  FreeFdmem(void);
 	uint32_t              getPreviewBufferID(buffer_handle_t *buffer_handle);
 	void                  canclePreviewMem();
@@ -162,7 +162,7 @@ private:
 	bool                  allocatePreviewMem();
 	void                  freePreviewMem();
 	bool                  allocateCaptureMem(bool initJpegHeap);
-	void                  freeCaptureMem();	
+	void                  freeCaptureMem();
 	uint32_t              getRedisplayMem();
 	void                  FreeReDisplayMem();
 	static void           camera_cb(camera_cb_type cb,
@@ -176,7 +176,7 @@ private:
 	void                  receiveRawPicture(camera_frame_type *frame);
 	void                  receiveJpegPicture(JPEGENC_CBrtnType *encInfo);
 	void                  receivePreviewFrame(camera_frame_type *frame);
-	void                  receivePreviewFDFrame(camera_frame_type *frame);	
+	void                  receivePreviewFDFrame(camera_frame_type *frame);
 	void                  receiveCameraExitError(void);
 	void                  receiveTakePictureError(void);
 	void                  receiveJpegPictureError(void);
@@ -191,14 +191,14 @@ private:
 
 	enum Sprd_camera_state {
 		SPRD_INIT,
-		SPRD_IDLE,     
+		SPRD_IDLE,
 		SPRD_ERROR,
 		SPRD_PREVIEW_IN_PROGRESS,
 		SPRD_FOCUS_IN_PROGRESS,
 		SPRD_WAITING_RAW,
 		SPRD_WAITING_JPEG,
 
-		// internal states 
+		// internal states
 		SPRD_INTERNAL_PREVIEW_STOPPING,
 		SPRD_INTERNAL_CAPTURE_STOPPING,
 		SPRD_INTERNAL_PREVIEW_REQUESTED,
@@ -226,7 +226,7 @@ private:
 						Sprd_camera_state to,
 						state_owner owner,
 						bool lock = true);
-	void                            setCameraState(Sprd_camera_state state, 
+	void                            setCameraState(Sprd_camera_state state,
 								state_owner owner = STATE_CAMERA);
 	inline Sprd_camera_state        getCameraState();
 	inline Sprd_camera_state        getPreviewState();
@@ -261,13 +261,13 @@ private:
 	status_t                        setCameraParameters();
 	status_t                        checkSetParametersEnvironment();
 	status_t                        checkSetParameters(const SprdCameraParameters& params);
-	bool                            setCameraDimensions();	
+	bool                            setCameraDimensions();
 	void                            setCameraPreviewMode();
 	void                            changeEmcFreq(char flag);
 	void                            setPreviewFreq();
 	void                            set_ddr_freq(const char* freq_in_khz);
 	void                            restoreFreq();
-	bool                            displayOneFrame(uint32_t width, 
+	bool                            displayOneFrame(uint32_t width,
 							          uint32_t height,
 							          uint32_t phy_addr, char *frame_addr,
 							          uint32_t id);
@@ -286,7 +286,7 @@ private:
 	static const int                kPreviewRotBufferCount = 4;
 	static const int                kRawBufferCount        = 1;
 	static const int                kJpegBufferCount       = 1;
-	static const int                kRawFrameHeaderSize    = 0x0;	
+	static const int                kRawFrameHeaderSize    = 0x0;
 	Mutex                           mLock; // API lock -- all public methods
 	Mutex                           mCallbackLock;
 	Mutex                           mPreviewCbLock;
@@ -327,7 +327,7 @@ private:
 	int                             mRawHeight;
 	int                             mRawWidth;
 	int                             mPreviewFormat;//0:YUV422;1:YUV420;2:RGB
-	int                             mPictureFormat;//0:YUV422;1:YUV420;2:RGB;3:JPEG  
+	int                             mPictureFormat;//0:YUV422;1:YUV420;2:RGB;3:JPEG
 	int                             mPreviewStartFlag;
 
 	bool                            mRecordingMode;

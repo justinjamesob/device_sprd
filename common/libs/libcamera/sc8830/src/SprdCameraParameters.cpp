@@ -162,7 +162,7 @@ void SprdCameraParameters::getFocusAreas(int *area, int *count, Size *preview_si
 	if(area_count > 0) {
 		int ret = coordinate_convert(&focus_area[0], area_count, orientation, mirror,
 								preview_size, preview_rect);
-		
+
 		if(ret) {
 			area_count = 0;
 			LOGV("error: coordinate_convert error, ignore focus \n");
@@ -604,7 +604,7 @@ static int coordinate_convert(int *rect_arr,int arr_size,int angle,int is_mirror
 	{
 		int point_x, point_y;
 
-		LOGV("coordinate_convert %d: org: %d, %d, %d, %d.\n",i,rect_arr[i*4],rect_arr[i*4+1],rect_arr[i*4+2],rect_arr[i*4+3]);			
+		LOGV("coordinate_convert %d: org: %d, %d, %d, %d.\n",i,rect_arr[i*4],rect_arr[i*4+1],rect_arr[i*4+2],rect_arr[i*4+3]);
 
 		// only for angle 90/270
 		// calculate the centre point

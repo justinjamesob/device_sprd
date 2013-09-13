@@ -704,7 +704,7 @@ int camera_save_to_file(uint32_t index, uint32_t img_fmt,
 			CMR_LOGV("can not open file: %s \n", file_name);
 			return 0;
 		}
-			
+
 		fwrite((void*)addr->addr_y, 1, width * height, fp);
 	        fclose(fp);
 

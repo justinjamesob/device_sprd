@@ -96,7 +96,7 @@ static int camera_param_to_isp(uint32_t cmd, uint32_t in_param, uint32_t *ptr_ou
 
 	case ISP_CTRL_AWB_MODE:
 	{
-		switch (in_param) 
+		switch (in_param)
 		{
 			case 0:
 			{
@@ -600,7 +600,7 @@ int camera_flash_process(uint32_t on_off)
 	} else if (FLASH_TORCH == cxt->cmr_set.flash) {
 		camera_set_flashdevice(status);
 	}
-	
+
 	return CAMERA_SUCCESS;
 }
 
@@ -924,7 +924,7 @@ int camera_set_ctrl(camera_parm_type id,
 		return ret;
 	}
 
-	CMR_LOGI("ID %d or parm %d . camera preview_status %d, capture_status=%d", 
+	CMR_LOGI("ID %d or parm %d . camera preview_status %d, capture_status=%d",
 		id, parm, cxt->preview_status, cxt->capture_status);
 
 	if (id >= CAMERA_PARM_MAX || INVALID_SET_WORD == parm) {
@@ -1019,7 +1019,7 @@ int camera_set_ctrl(camera_parm_type id,
 			cxt->cmr_set.expo_compen = parm;
 		}
 		break;
-		
+
 	case CAMERA_PARM_ENCODE_ROTATION: /* 0, 90, 180, 270 degrees */
 		if (cxt->is_cfg_rot_cap) {
 			uint32_t orientation;
@@ -1083,11 +1083,11 @@ int camera_set_ctrl(camera_parm_type id,
 			cxt->cap_rot_backup = cxt->cap_rot;
 		}
 		break;
-		
-	case CAMERA_PARM_FOCAL_LENGTH: 
+
+	case CAMERA_PARM_FOCAL_LENGTH:
 		cxt->cmr_set.focal_len = (uint32_t)parm;
-		break;	
-		
+		break;
+
 	case CAMERA_PARM_CONTRAST:    /* contrast */
 		if (parm != cxt->cmr_set.contrast) {
 			if (CMR_PREVIEW == cxt->preview_status) {
@@ -1105,7 +1105,7 @@ int camera_set_ctrl(camera_parm_type id,
 			cxt->cmr_set.contrast = parm;
 		}
 		break;
-		
+
 	case CAMERA_PARM_BRIGHTNESS:/* brightness */
 		if (parm != cxt->cmr_set.brightness) {
 			if (CMR_PREVIEW == cxt->preview_status) {
@@ -1123,7 +1123,7 @@ int camera_set_ctrl(camera_parm_type id,
 			cxt->cmr_set.brightness = parm;
 		}
 		break;
-		
+
 	case CAMERA_PARM_WB:              /* use camera_wb_type */
 		if (parm != cxt->cmr_set.wb_mode) {
 			if (CMR_PREVIEW == cxt->preview_status) {
@@ -1173,7 +1173,7 @@ int camera_set_ctrl(camera_parm_type id,
 					ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
 					CMR_RTN_IF_ERR(ret);
 				}
-			} 
+			}
 			cxt->cmr_set.scene_mode = parm;
 		}
 		break;
@@ -1245,7 +1245,7 @@ int camera_set_ctrl(camera_parm_type id,
 					ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
 					CMR_RTN_IF_ERR(ret);
 				}
-			} 
+			}
 			cxt->cmr_set.flicker_mode = parm;
 		}
 		break;
@@ -1257,7 +1257,7 @@ int camera_set_ctrl(camera_parm_type id,
 	case CAMERA_PARM_AF_MODE:
 		CMR_LOGV("Set AF Mode %d", parm);
 		if (CMR_PREVIEW == cxt->preview_status) {
-			
+
 		}
 		cxt->cmr_set.af_mode = (uint32_t)parm;
 		break;
@@ -1275,7 +1275,7 @@ int camera_set_ctrl(camera_parm_type id,
 					ret = (*after_set)(RESTART_LIGHTLY, skip_mode, skip_number);
 					CMR_RTN_IF_ERR(ret);
 				}
-				
+
 			}
 			cxt->cmr_set.iso = parm;
 		}

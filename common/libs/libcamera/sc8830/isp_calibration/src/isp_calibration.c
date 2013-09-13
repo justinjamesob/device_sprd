@@ -260,7 +260,7 @@ int32_t _isp_Cali_LNCResAlloc(void *in_ptr, void *cali_ptr, void* gain_ptr)
 	gain_param_ptr->chn_11 = (uint16_t*)ISP_Alloc(length);
 
 	return ISP_CALI_RTN_SUCCESS;
-	
+
 }
 
 void _isp_Cali_LNCResFree(struct isp_lnc_cali_info *param_ptr, struct isp_lnc_cali_gain *gain_ptr)
@@ -283,7 +283,7 @@ void _isp_Cali_LNCResFree(struct isp_lnc_cali_info *param_ptr, struct isp_lnc_ca
 	ISP_Free((void**)&gain_ptr->chn_10);
 	ISP_Free((void**)&gain_ptr->chn_11);
 	return;
-	
+
 }
 
 
@@ -503,14 +503,14 @@ int32_t _isp_Cali_LNC_GainCalc(uint32_t base_gain,
 	}
 
 	return rtn;
-	
+
 }
 
 int32_t _isp_Cali_LNCTabMerge(struct isp_lnc_cali_gain *gain_ptr, uint32_t grid_num, uint16_t *lnc_tab)
 {
 	uint32_t i = 0;
 	uint32_t inx = 0;
-	
+
 	for(i = 0; i < grid_num; i++) {
 		lnc_tab[inx++] = gain_ptr->chn_01[i];
 		lnc_tab[inx++] = gain_ptr->chn_00[i];
@@ -612,7 +612,7 @@ int32_t ISP_Cali_LNC_Calc(void *in_ptr, void *rtn_ptr)
 		rtn = ISP_CALI_RTN_PT_NULL;
 		return rtn;
 	}
-	
+
 	map_img_ptr = (uint16_t*)ISP_Alloc(map_img_len);
 	if (0x00 == map_img_ptr) {
 		ISP_CALI_LOG("ISP_Cali_LNC_Calc:\n");
@@ -626,7 +626,7 @@ int32_t ISP_Cali_LNC_Calc(void *in_ptr, void *rtn_ptr)
 	dst_img_ptr = temp_map_img_ptr;
 
 	memcpy((void*)dst_img_ptr, (void*)src_img_ptr, width * lnc_grid * 2);
-	
+
 	dst_img_ptr += width * lnc_grid;
 	memcpy((void*)dst_img_ptr, (void*)src_img_ptr, width * height * 2);
 
@@ -637,24 +637,24 @@ int32_t ISP_Cali_LNC_Calc(void *in_ptr, void *rtn_ptr)
 	/* add left right*/
 	src_img_ptr = temp_map_img_ptr;
 	dst_img_ptr = map_img_ptr;
-	
+
 	for (y = 0x00; y < map_height; y++) {
 		memcpy((void*)dst_img_ptr, (void*)src_img_ptr, lnc_grid * 2);
-		
+
 		dst_img_ptr += lnc_grid;
 		memcpy((void*)dst_img_ptr, (void*)src_img_ptr, width * 2);
 
 		src_img_ptr += (width -add_right);
 		dst_img_ptr += width;
 		memcpy((void*)dst_img_ptr, (void*)src_img_ptr, add_right * 2);
-	
+
 		src_img_ptr += add_right;
 		dst_img_ptr += add_right;
 	}
 
 	/*stat rgb*/
 	rtn_param_ptr->num = grid_num;
-	
+
 	grid_num <<= 0x02;
 	rtn_param_ptr->chn_00.stat_ptr = (uint16_t*)ISP_Alloc(grid_num);
 	if (0x00 == rtn_param_ptr->chn_00.stat_ptr) {
@@ -691,7 +691,7 @@ int32_t ISP_Cali_LNC_Calc(void *in_ptr, void *rtn_ptr)
 		stat_y = y / lnc_grid;
 		for (x = 0x00; x < map_width; x++) {
 			stat_x = x / lnc_grid;
-			
+
 			if ((0x00 == (0x01 & y)) && (0x00 == (0x01 & x))) {
 				rtn_param_ptr->chn_00.stat_ptr[grid_x * stat_y + stat_x] += *src_img_ptr++;
 			}
@@ -726,12 +726,12 @@ int32_t ISP_Cali_LNC_Calc(void *in_ptr, void *rtn_ptr)
 			rtn_param_ptr->chn_11.max_stat = rtn_param_ptr->chn_11.stat_ptr[x];
 		}
 	}
-	
+
 	ISP_Free(&map_img_ptr);
 	ISP_Free(&temp_map_img_ptr);
 
 	return rtn;
-	
+
 }
 
 int32_t ISP_Cali_LNC_GainCalc(uint32_t base_gain,
@@ -820,7 +820,7 @@ int32_t ISP_Cali_LNC_GainCalc(uint32_t base_gain,
 		map_gain -= std_gain;
 		map_gain *= prc_11;
 		map_gain >>= shf_bit;
-		rtn_param_ptr->chn_11[x] = std_gain + map_gain;		
+		rtn_param_ptr->chn_11[x] = std_gain + map_gain;
 	}
 
 	return rtn;
@@ -847,7 +847,7 @@ int32_t ISP_Cali_LNCTaleCalc(struct isp_addr_t img_addr, uint32_t bayer_pttn, st
 	cali_in_param.img_ptr = (uint16_t*)img_addr.y_addr;
 
 	ISP_Cali_LNC_Calc(&cali_in_param, &cali_info_param);
-	
+
 	_isp_Cali_LNC_GainCalc(255, 8, bayer_pttn, 256, 256, 256, (void*)&cali_info_param, (void*)&cali_gain_param);
 	_isp_Cali_LNCTabMerge(&cali_gain_param, grid, lnc_tab);
 

@@ -37,7 +37,7 @@
 #define LENGTH_TEXT_PDATETIMEDIGITILIZED	((uint32) 0x00000050)
 
 /*
- * Data Type struct 
+ * Data Type struct
  */
 
 /**---------------------------------------------------------------------------*
@@ -46,7 +46,7 @@
 typedef enum
 {
     EXIF_BYTE            = 1,
-    EXIF_ASCII           = 2,    
+    EXIF_ASCII           = 2,
     EXIF_SHORT           = 3,
     EXIF_LONG            = 4,
     EXIF_RATIONAL        = 5,
@@ -62,7 +62,7 @@ typedef uint32_t	EXIF_LONG_T;
 typedef uint8_t	EXIF_UNDEFINED_T;
 typedef int32_t	EXIF_SLONG_T;
 
-typedef struct 
+typedef struct
 {
 	uint32_t		numerator;
 	uint32_t		denominator;
@@ -75,7 +75,7 @@ typedef struct
 }EXIF_SRATIONAL_T;
 
 typedef struct
-{   
+{
     EXIF_TYPE_E	type;       //type of the content
 	//void 		*ptr;       //content buffer
 	char			ptr[256];
@@ -106,11 +106,11 @@ typedef struct exif_pri_data_struct_valid_tag
 }EXIF_PRI_DATA_STRUCT_VALID_T;
 
 typedef struct exif_pri_data_struct_tag
-{                  
+{
     EXIF_PRI_DATA_STRUCT_VALID_T    valid;
-    
+
     EXIF_SHORT_T                    Orientation;
-    EXIF_SHORT_T                    Reserved;                   //reserved. ignore    
+    EXIF_SHORT_T                    Reserved;                   //reserved. ignore
 }EXIF_PRI_DATA_STRUCT_T;
 
 //Tags relating to image data characteristics. Optional
@@ -149,7 +149,7 @@ typedef struct exif_pri_desc_valid_tag
 typedef struct exif_pri_desc_tag
 {
     EXIF_PRI_DESC_VALID_T   valid;
-    
+
     EXIF_ASCII_T        DateTime[20];
     EXIF_ASCII_T        ImageDescription[MAX_ASCII_STR_SIZE];
     EXIF_ASCII_T        Make[MAX_ASCII_STR_SIZE];
@@ -160,7 +160,7 @@ typedef struct exif_pri_desc_tag
 }EXIF_PRI_DESC_T;
 
 typedef struct exif_primary_tag
-{    
+{
     EXIF_PRI_BASIC_T                basic;                         //Mandatory
     EXIF_PRI_DATA_STRUCT_T          *data_struct_ptr;              //Optional. Set NULL to ignore it
     EXIF_PRI_DATA_CHAR_T            *data_char_ptr;                //Optional. Set NULL to ignore it
@@ -170,9 +170,9 @@ typedef struct exif_primary_tag
 
 //Tags relating to image data characteristics and image configuration. Mandatory
 typedef struct exif_spec_basic_tag
-{       
+{
     EXIF_SHORT_T        ColorSpace;
-    EXIF_UNDEFINED_T    ComponentsConfiguration[4];   
+    EXIF_UNDEFINED_T    ComponentsConfiguration[4];
     EXIF_LONG_T         PixelXDimension;
     EXIF_LONG_T         PixelYDimension;
 }EXIF_SPEC_BASIC_T;
@@ -181,7 +181,7 @@ typedef struct exif_spec_basic_tag
 typedef struct exif_spec_version_tag
 {
     EXIF_UNDEFINED_T    ExifVersion[4];
-    EXIF_UNDEFINED_T    FlashpixVersion[4]; 
+    EXIF_UNDEFINED_T    FlashpixVersion[4];
 }EXIF_SPEC_VERSION_T;
 
 //Tags relating to image configuration. Optional
@@ -193,7 +193,7 @@ typedef struct exif_spec_img_config_valid_tag
 typedef struct exif_spec_img_config_tag
 {
     EXIF_SPEC_IMG_CONFIG_VALID_T    valid;
-    EXIF_RATIONAL_T                 CompressedBitsPerPixel;    
+    EXIF_RATIONAL_T                 CompressedBitsPerPixel;
 }EXIF_SPEC_IMG_CONFIG_T;
 
 //Tags relating to user information. Optional
@@ -205,10 +205,10 @@ typedef struct exif_spec_user_valid_tag
 
 typedef struct exif_spec_user_tag
 {
-    EXIF_SPEC_USER_VALID_T  	valid;  
+    EXIF_SPEC_USER_VALID_T  	valid;
 
     EXIF_CUSTOM_T            	MakerNote;
-    EXIF_CUSTOM_T            	UserComment;  
+    EXIF_CUSTOM_T            	UserComment;
 }EXIF_SPEC_USER_T;
 
 //Tags relating to related file information. Optional
@@ -218,8 +218,8 @@ typedef struct exif_spec_related_file_valid_tag
 }EXIF_SPEC_RELATED_FILE_VALID_T;
 
 typedef struct exif_spec_related_file_tag
-{   
-    EXIF_SPEC_RELATED_FILE_VALID_T		valid;    
+{
+    EXIF_SPEC_RELATED_FILE_VALID_T		valid;
     EXIF_ASCII_T						RelatedSoundFile[13];
 }EXIF_SPEC_RELATED_FILE_T;
 
@@ -236,7 +236,7 @@ typedef struct exif_spec_date_time_valid_tag
 typedef struct exif_spec_date_time_tag
 {
     EXIF_SPEC_DATE_TIME_VALID_T     valid;
-    
+
     EXIF_ASCII_T        DateTimeOriginal[20];
     EXIF_ASCII_T        DateTimeDigitized[20];
     EXIF_ASCII_T        SubSecTime[MAX_ASCII_STR_SIZE];
@@ -253,20 +253,20 @@ typedef struct exif_spec_pic_taking_cond_valid_0_tag
     uint32_t              SpectralSensitivity     :1;
     uint32_t              ISOSpeedRatings         :1;
 
-    uint32_t				OECF                    :1;	
+    uint32_t				OECF                    :1;
     uint32_t		        ShutterSpeedValue       :1;
 	uint32_t			    ApertureValue           :1;
 	uint32_t		        BrightnessValue         :1;
-	uint32_t		        ExposureBiasValue       :1;     
+	uint32_t		        ExposureBiasValue       :1;
 
 	uint32_t			    MaxApertureValue        :1;
 	uint32_t			    SubjectDistance         :1;
 	uint32_t			    MeteringMode            :1;
-	uint32_t			    LightSource             :1;	
+	uint32_t			    LightSource             :1;
 	uint32_t			    Flash                   :1;
 
 	uint32_t			    FocalLength             :1;
-	uint32_t			    SubjectArea             :1;			
+	uint32_t			    SubjectArea             :1;
 	uint32_t			    FlashEnergy             :1;
 	uint32_t				SpatialFrequencyResponse:1;
 	uint32_t			    FocalPlaneXResolution   :1;
@@ -285,7 +285,7 @@ typedef struct exif_spec_pic_taking_cond_valid_0_tag
 	uint32_t			    WhiteBalance                :1;
 	uint32_t			    DigitalZoomRatio            :1;
 	uint32_t			    FocalLengthIn35mmFilm       :1;
-	uint32_t			    SceneCaptureType            :1;	
+	uint32_t			    SceneCaptureType            :1;
 	uint32_t			    GainControl                 :1;
 
 	uint32_t			    Contrast                    :1;
@@ -297,15 +297,15 @@ typedef struct exif_spec_pic_taking_cond_valid_0_tag
 
 typedef struct exif_spec_pic_taking_cond_tag
 {
-    EXIF_SPEC_PIC_TAKING_COND_VALID_T     valid;        
-           
+    EXIF_SPEC_PIC_TAKING_COND_VALID_T     valid;
+
 	EXIF_RATIONAL_T			ExposureTime;
 	EXIF_RATIONAL_T			FNumber;
-	EXIF_SHORT_T			ExposureProgram;	
-	EXIF_ASCII_T			SpectralSensitivity[MAX_ASCII_STR_SIZE];	
+	EXIF_SHORT_T			ExposureProgram;
+	EXIF_ASCII_T			SpectralSensitivity[MAX_ASCII_STR_SIZE];
 	EXIF_CUSTOM_T				ISOSpeedRatings;	//Modified
 
-	EXIF_CUSTOM_T				OECF;	
+	EXIF_CUSTOM_T				OECF;
 	EXIF_SRATIONAL_T		ShutterSpeedValue;
 	EXIF_RATIONAL_T			ApertureValue;
 	EXIF_SRATIONAL_T		BrightnessValue;
@@ -314,7 +314,7 @@ typedef struct exif_spec_pic_taking_cond_tag
 	EXIF_RATIONAL_T			MaxApertureValue;
 	EXIF_RATIONAL_T			SubjectDistance;
 	EXIF_SHORT_T			MeteringMode;
-	EXIF_SHORT_T			LightSource;	
+	EXIF_SHORT_T			LightSource;
 	EXIF_SHORT_T			Flash;
 
 	EXIF_RATIONAL_T			FocalLength;
@@ -338,9 +338,9 @@ typedef struct exif_spec_pic_taking_cond_tag
 	EXIF_SHORT_T			WhiteBalance;
 	EXIF_RATIONAL_T			DigitalZoomRatio;
 	EXIF_SHORT_T			FocalLengthIn35mmFilm;
-	EXIF_SHORT_T			SceneCaptureType;	
+	EXIF_SHORT_T			SceneCaptureType;
 	EXIF_SHORT_T			GainControl;
-    
+
 	EXIF_SHORT_T			Contrast;
 	EXIF_SHORT_T			Saturation;
 	EXIF_SHORT_T			Sharpness;
@@ -378,36 +378,36 @@ typedef struct exif_specific_info_tag
 typedef struct exif_gps_valid_tag
 {
 	uint32_t			        GPSVersionID            :1;							//read only
-	uint32_t	            	GPSLatitudeRef          :1;							
+	uint32_t	            	GPSLatitudeRef          :1;
 	uint32_t		            GPSLatitude             :1;
 	uint32_t		            GPSLongitudeRef         :1;
 	uint32_t		            GPSLongitude            :1;
 	uint32_t			        GPSAltitudeRef          :1;
 	uint32_t		            GPSAltitude             :1;
 	uint32_t		            GPSTimeStamp            :1;
-	uint32_t		            GPSSatellites           :1;	
-	uint32_t		            GPSStatus               :1;								
+	uint32_t		            GPSSatellites           :1;
+	uint32_t		            GPSStatus               :1;
 	uint32_t		            GPSMeasureMode          :1;
-	uint32_t		            GPSDOP                  :1;										
-	uint32_t		            GPSSpeedRef             :1;								
-	uint32_t		            GPSSpeed                :1;									
-	uint32_t		            GPSTrackRef             :1;								
-	uint32_t		            GPSTrack                :1;										
+	uint32_t		            GPSDOP                  :1;
+	uint32_t		            GPSSpeedRef             :1;
+	uint32_t		            GPSSpeed                :1;
+	uint32_t		            GPSTrackRef             :1;
+	uint32_t		            GPSTrack                :1;
 	uint32_t		            GPSImgDirectionRef      :1;
 	uint32_t		            GPSImgDirection         :1;
 	uint32_t		            GPSMapDatum             :1;
-	uint32_t		            GPSDestLatitudeRef      :1;						
-	uint32_t		            GPSDestLatitude         :1;							
-	uint32_t		            GPSDestLongitudeRef     :1;						
-	uint32_t		            GPSDestLongitude        :1;						
-	uint32_t		            GPSDestBearingRef       :1;						
-	uint32_t		            GPSDestBearing          :1;								
-	uint32_t		            GPSDestDistanceRef      :1;						
-	uint32_t		            GPSDestDistance         :1;							
-	uint32_t	                GPSProcessingMethod     :1;	
-	uint32_t			        GPSAreaInformation      :1;							
-	uint32_t		            GPSDateStamp            :1;							
-	uint32_t		            GPSDifferential         :1;        
+	uint32_t		            GPSDestLatitudeRef      :1;
+	uint32_t		            GPSDestLatitude         :1;
+	uint32_t		            GPSDestLongitudeRef     :1;
+	uint32_t		            GPSDestLongitude        :1;
+	uint32_t		            GPSDestBearingRef       :1;
+	uint32_t		            GPSDestBearing          :1;
+	uint32_t		            GPSDestDistanceRef      :1;
+	uint32_t		            GPSDestDistance         :1;
+	uint32_t	                GPSProcessingMethod     :1;
+	uint32_t			        GPSAreaInformation      :1;
+	uint32_t		            GPSDateStamp            :1;
+	uint32_t		            GPSDifferential         :1;
 }EXIF_GPS_VALID_T;
 
 typedef struct exif_gps_tag
@@ -415,36 +415,36 @@ typedef struct exif_gps_tag
     EXIF_GPS_VALID_T                valid;
 
 	EXIF_BYTE_T			            GPSVersionID[4];							//read only
-	EXIF_ASCII_T	            	GPSLatitudeRef[2];							
+	EXIF_ASCII_T	            	GPSLatitudeRef[2];
 	EXIF_RATIONAL_T		            GPSLatitude[3];
 	EXIF_ASCII_T		            GPSLongitudeRef[2];
 	EXIF_RATIONAL_T		            GPSLongitude[3];
 	EXIF_BYTE_T			            GPSAltitudeRef;
 	EXIF_RATIONAL_T		            GPSAltitude;
 	EXIF_RATIONAL_T		            GPSTimeStamp[3];
-	EXIF_ASCII_T		            GPSSatellites[MAX_ASCII_STR_SIZE];	
-	EXIF_ASCII_T		            GPSStatus[2];								
+	EXIF_ASCII_T		            GPSSatellites[MAX_ASCII_STR_SIZE];
+	EXIF_ASCII_T		            GPSStatus[2];
 	EXIF_ASCII_T		            GPSMeasureMode[2];
-	EXIF_RATIONAL_T		            GPSDOP;										
-	EXIF_ASCII_T		            GPSSpeedRef[2];								
-	EXIF_RATIONAL_T		            GPSSpeed;									
-	EXIF_ASCII_T		            GPSTrackRef[2];								
-	EXIF_RATIONAL_T		            GPSTrack;										
+	EXIF_RATIONAL_T		            GPSDOP;
+	EXIF_ASCII_T		            GPSSpeedRef[2];
+	EXIF_RATIONAL_T		            GPSSpeed;
+	EXIF_ASCII_T		            GPSTrackRef[2];
+	EXIF_RATIONAL_T		            GPSTrack;
 	EXIF_ASCII_T		            GPSImgDirectionRef[2];
 	EXIF_RATIONAL_T		            GPSImgDirection;
 	EXIF_ASCII_T		            GPSMapDatum[MAX_ASCII_STR_SIZE];
-	EXIF_ASCII_T		            GPSDestLatitudeRef[2];						
-	EXIF_RATIONAL_T		            GPSDestLatitude[3];							
-	EXIF_ASCII_T		            GPSDestLongitudeRef[2];						
-	EXIF_RATIONAL_T		            GPSDestLongitude[3];						
-	EXIF_ASCII_T		            GPSDestBearingRef[2];						
-	EXIF_RATIONAL_T		            GPSDestBearing;								
-	EXIF_ASCII_T		            GPSDestDistanceRef[2];						
-	EXIF_RATIONAL_T		            GPSDestDistance;							
+	EXIF_ASCII_T		            GPSDestLatitudeRef[2];
+	EXIF_RATIONAL_T		            GPSDestLatitude[3];
+	EXIF_ASCII_T		            GPSDestLongitudeRef[2];
+	EXIF_RATIONAL_T		            GPSDestLongitude[3];
+	EXIF_ASCII_T		            GPSDestBearingRef[2];
+	EXIF_RATIONAL_T		            GPSDestBearing;
+	EXIF_ASCII_T		            GPSDestDistanceRef[2];
+	EXIF_RATIONAL_T		            GPSDestDistance;
     EXIF_CUSTOM_T                      GPSProcessingMethod;
-	EXIF_CUSTOM_T			            GPSAreaInformation;							
-	EXIF_ASCII_T		            GPSDateStamp[11];							
-	EXIF_SHORT_T		            GPSDifferential;								    
+	EXIF_CUSTOM_T			            GPSAreaInformation;
+	EXIF_ASCII_T		            GPSDateStamp[11];
+	EXIF_SHORT_T		            GPSDifferential;
 }EXIF_GPS_INFO_T;
 
 typedef struct exif_interoperability_valid_tag
@@ -455,7 +455,7 @@ typedef struct exif_interoperability_valid_tag
 typedef struct exif_interoperability_info_t
 {
 	EXIF_INTEROPERABILITY_VALID_T 			valid;
-	
+
 	EXIF_CUSTOM_T							InteroperabilityIndex;
 }EXIF_INTEROPERABILITY_INFO_T;
 
@@ -469,7 +469,7 @@ typedef struct exif_info_tag
 }JINF_EXIF_INFO_T;
 
 /**---------------------------------------------------------------------------*
- **                         Function Prototypes                               
+ **                         Function Prototypes
  **---------------------------------------------------------------------------*/
 
 

@@ -1062,7 +1062,7 @@ LOCAL uint32_t _ov5640_Identify(uint32_t param)
 	} else {
 		SENSOR_PRINT("SENSOR_OV5640: identify fail,pid_value=%d", pid_value);
 	}
-	
+
 	return ret_value;
 }
 
@@ -1188,7 +1188,7 @@ LOCAL uint32_t _ov5640_BeforeSnapshot(uint32_t param)
 	uint32_t capture_maxline, preview_exposure;
 	uint32_t prv_linetime=s_ov5640_Resolution_Trim_Tab[SENSOR_MODE_PREVIEW_ONE].line_time;
 	uint32_t cap_linetime;
-	
+
 	param = param&0xffff;
 	SENSOR_PRINT("%d,%d.",cap_mode,param);
 	cap_linetime = s_ov5640_Resolution_Trim_Tab[param].line_time;

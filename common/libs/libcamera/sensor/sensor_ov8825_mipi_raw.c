@@ -1926,11 +1926,11 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	//GrGb
 	sensor_ptr->grgb.edge_thr=26;
 	sensor_ptr->grgb.diff_thr=80;
-	
+
 	//cfa
 	sensor_ptr->cfa.edge_thr=0x1a;
 	sensor_ptr->cfa.diff_thr=0x00;
-	
+
 	//cmc
 	sensor_ptr->cmc.matrix[0][0]=0x6f3;
 	sensor_ptr->cmc.matrix[0][1]=0x3e0a;
@@ -2281,7 +2281,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->pref.y_thr=0x04;
 	sensor_ptr->pref.u_thr=0x04;
 	sensor_ptr->pref.v_thr=0x04;
-	
+
 	//bright
 	sensor_ptr->bright.factor[0]=0xd0;
 	sensor_ptr->bright.factor[1]=0xe0;
@@ -2299,7 +2299,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->bright.factor[13]=0x00;
 	sensor_ptr->bright.factor[14]=0x00;
 	sensor_ptr->bright.factor[15]=0x00;
-	
+
 	//contrast
 	sensor_ptr->contrast.factor[0]=0x10;
 	sensor_ptr->contrast.factor[1]=0x20;
@@ -2317,15 +2317,15 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->contrast.factor[13]=0x40;
 	sensor_ptr->contrast.factor[14]=0x40;
 	sensor_ptr->contrast.factor[15]=0x40;
-	
+
 	//hist
 	sensor_ptr->hist.mode;
 	sensor_ptr->hist.low_ratio;
 	sensor_ptr->hist.high_ratio;
-	
+
 	//auto contrast
 	sensor_ptr->auto_contrast.mode;
-	
+
 	//saturation
 	sensor_ptr->saturation.factor[0]=0x28;
 	sensor_ptr->saturation.factor[1]=0x30;
@@ -2411,10 +2411,10 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 
 	//emboss
 	sensor_ptr->emboss.step=0x02;
-	
+
 	//global gain
 	sensor_ptr->global.gain=0x40;
-	
+
 	//chn gain
 	sensor_ptr->chn.r_gain=0x40;
 	sensor_ptr->chn.g_gain=0x40;

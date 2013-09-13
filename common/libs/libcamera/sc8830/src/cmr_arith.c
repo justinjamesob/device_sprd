@@ -200,7 +200,7 @@ int arithmetic_fd_init(void)
 	} else {
 		CMR_LOGI("FaceSolid_Init done.");
 	}
-	
+
 	if (!ret) {
 		ret = cmr_msg_queue_create(CAMERA_FD_MSG_QUEUE_SIZE, &s_arith_cxt->fd_msg_que_handle);
 		if (ret) {
@@ -223,7 +223,7 @@ int arithmetic_fd_deinit(void)
 	CMR_MSG_INIT(message);
 	int                    ret = ARITH_SUCCESS;
 	struct camera_context  *cxt = camera_get_cxt();
-		
+
 	CMR_LOGI("s.");
 	CMR_PRINT_TIME;
 	if (1 == cxt->arithmetic_cxt.fd_inited) {

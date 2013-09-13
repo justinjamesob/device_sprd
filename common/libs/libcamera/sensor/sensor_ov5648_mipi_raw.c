@@ -282,14 +282,14 @@ LOCAL const SENSOR_REG_T ov5648_2592X1944_mipi_raw[] = {
 	{0x4004, 0x04}, // black line number
 	{0x4005, 0x1a}, // blc always update
 	{0x350b, 0x40}, // gain = 4x
-	{0x4837, 0x0a}, // MIPI global timing	
+	{0x4837, 0x0a}, // MIPI global timing
 };
 
 LOCAL SENSOR_REG_TAB_INFO_T s_ov5648_resolution_Tab_RAW[] = {
 	{ADDR_AND_LEN_OF_ARRAY(ov5648_com_mipi_raw), 0, 0, 24, SENSOR_IMAGE_FORMAT_RAW},
 	{ADDR_AND_LEN_OF_ARRAY(ov5648_1296X972_mipi_raw), 1296, 972, 24, SENSOR_IMAGE_FORMAT_RAW},
 	{ADDR_AND_LEN_OF_ARRAY(ov5648_2592X1944_mipi_raw), 2592, 1944, 24, SENSOR_IMAGE_FORMAT_RAW},
-	
+
 	{PNULL, 0, 0, 0, 0, 0},
 	{PNULL, 0, 0, 0, 0, 0},
 	{PNULL, 0, 0, 0, 0, 0},
@@ -1244,7 +1244,7 @@ LOCAL uint32_t _ov5648_Identify(uint32_t param)
 	} else {
 		SENSOR_PRINT("SENSOR_OV5648: identify fail,pid_value=%d", pid_value);
 	}
-	
+
 	return ret_value;
 }
 
@@ -1317,7 +1317,7 @@ LOCAL uint32_t _ov5648_write_af(uint32_t param)
 	uint16_t cmd_len = 0;
 
 	SENSOR_PRINT("SENSOR_OV5648: _write_af %d", param);
-	
+
 	slave_addr = DW9714_VCM_SLAVE_ADDR;
 	cmd_val[0] = (param&0xfff0)>>4;
 	cmd_val[1] = ((param&0x0f)<<4)|0x09;
@@ -1395,7 +1395,7 @@ LOCAL uint32_t _ov5648_PreBeforeSnapshot(uint32_t param)
 	uint32_t gain = 0, value = 0;
 	uint32_t prv_linetime=s_ov5648_Resolution_Trim_Tab[SENSOR_MODE_PREVIEW_ONE].line_time;
 	uint32_t cap_linetime = s_ov5648_Resolution_Trim_Tab[param].line_time;
-	
+
 	SENSOR_PRINT("SENSOR_OV5648: BeforeSnapshot moe: %d",param);
 
 	if (SENSOR_MODE_PREVIEW_ONE >= param){
@@ -1427,7 +1427,7 @@ LOCAL uint32_t _ov5648_PreBeforeSnapshot(uint32_t param)
 	if (0 == capture_exposure) {
 		capture_exposure = 1;
 	}
-	
+
 	while(gain >= 0x20){
 		if(capture_exposure * 2 > capture_maxline)
 			break;
@@ -1435,7 +1435,7 @@ LOCAL uint32_t _ov5648_PreBeforeSnapshot(uint32_t param)
 		gain=gain / 2;
 
 	}
-	
+
 	gain=gain * 320/300;
 
 	if(capture_exposure > (capture_maxline - 4)){
@@ -1509,30 +1509,30 @@ LOCAL uint32_t _dw9174_SRCInit(uint32_t mode)
 	uint8_t cmd_val[6] = {0x00};
 	uint16_t  slave_addr = 0;
 	uint16_t cmd_len = 0;
-	uint32_t ret_value = SENSOR_SUCCESS;	
-	
+	uint32_t ret_value = SENSOR_SUCCESS;
+
 	slave_addr = DW9714_VCM_SLAVE_ADDR;
-	
+
 	switch (mode) {
 		case 1:
 		break;
-		
+
 		case 2:
-		{			
+		{
 			cmd_val[0] = 0xec;
 			cmd_val[1] = 0xa3;
 			cmd_val[2] = 0xf2;
 			cmd_val[3] = 0x00;
 			cmd_val[4] = 0xdc;
-			cmd_val[5] = 0x51;			
+			cmd_val[5] = 0x51;
 			cmd_len = 6;
-			Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);			
+			Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
 		}
 		break;
-		
+
 		case 3:
 		break;
-		
+
 	}
 
 	return ret_value;

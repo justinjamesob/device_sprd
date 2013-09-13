@@ -1542,7 +1542,7 @@ void *camera_cap_thread_proc(void *data)
 		default:
 			break;
 		}
-		
+
 		if (1 == message.alloc_flag) {
 			if (message.data) {
 				free(message.data);
@@ -2486,9 +2486,9 @@ camera_ret_code_type camera_start_preview(camera_cb_f_type callback,
 int camera_stop_capture_raw_internal(void)
 {
 	int                      ret = CAMERA_SUCCESS;
-	uint32_t		  autoflash = 0; 
+	uint32_t		  autoflash = 0;
 
-	CMR_LOGV("preview_status=%d, cap_status=%d,  cap_raw_status=%d \n", 
+	CMR_LOGV("preview_status=%d, cap_status=%d,  cap_raw_status=%d \n",
 		g_cxt->preview_status, g_cxt->capture_status, g_cxt->capture_raw_status);
 
 	if (CMR_IDLE == g_cxt->capture_raw_status) {
@@ -2553,7 +2553,7 @@ int camera_stop_preview_internal(void)
 		CMR_LOGE("Not in preview, %d", g_cxt->preview_status);
 		return ret;
 	}
-	CMR_LOGV("preview_status=%d, cap_status=%d \n", 
+	CMR_LOGV("preview_status=%d, cap_status=%d \n",
 		g_cxt->preview_status, g_cxt->capture_status);
 
 	pthread_mutex_lock(&g_cxt->prev_mutex);
@@ -2730,7 +2730,7 @@ int camera_capture_init_internal(takepicture_mode cap_mode)
 	int                      ret = CAMERA_SUCCESS;
 
 	if (CMR_IDLE != g_cxt->capture_status) {
-		CMR_LOGV("capture_status=%d is not idle, no need to prepare capture \n", 
+		CMR_LOGV("capture_status=%d is not idle, no need to prepare capture \n",
 					g_cxt->capture_status);
 		return ret;
 	}
@@ -2894,7 +2894,7 @@ int camera_take_picture_internal_raw(takepicture_mode cap_mode)
 	uint32_t                 sensor_mode = 0;
 
 	if (CMR_IDLE != g_cxt->capture_raw_status) {
-		CMR_LOGV("capture_raw_status=%d is not idle, no need to take capture \n", 
+		CMR_LOGV("capture_raw_status=%d is not idle, no need to take capture \n",
 					g_cxt->capture_raw_status);
 		return ret;
 	}
@@ -2987,7 +2987,7 @@ int camera_set_take_picture(int set_val)
 
 int camera_set_take_picture_cap_mode(takepicture_mode cap_mode)
 {
-	pthread_mutex_lock(&g_cxt->take_mutex);	
+	pthread_mutex_lock(&g_cxt->take_mutex);
 	g_cxt->cap_mode = cap_mode;/*CAMERA_NORMAL_MODE;*/
 	g_cxt->hdr_cnt = 0;
 	g_cxt->cap_cnt = 0;
@@ -3000,11 +3000,11 @@ int camera_set_take_picture_cap_mode(takepicture_mode cap_mode)
 int camera_get_take_picture(void)
 {
 	int                      ret = 0;
- 
+
 	pthread_mutex_lock(&g_cxt->take_mutex);
 	ret = g_cxt->is_take_picture;
 	pthread_mutex_unlock(&g_cxt->take_mutex);
- 
+
 	return ret;
 }
 
@@ -4708,7 +4708,7 @@ int camera_preview_init(int format_mode)
 	g_cxt->preview_rect.start_y = v4l2_cfg.cfg.src_img_rect.start_y;
 	g_cxt->preview_rect.width   = v4l2_cfg.cfg.src_img_rect.width;
 	g_cxt->preview_rect.height  = v4l2_cfg.cfg.src_img_rect.height;
-	
+
 	v4l2_cfg.cfg.dst_img_fmt = camera_get_img_type(format_mode);
 	v4l2_cfg.frm_num = -1;
 	ret = cmr_v4l2_cap_cfg(&v4l2_cfg);
@@ -5109,7 +5109,7 @@ int camera_capture_init_raw(void)
 	g_cxt->chn_0_status = CHN_BUSY;
 
 exit:
-	
+
 	return ret;
 }
 
@@ -6096,7 +6096,7 @@ int camera_v4l2_capture_handle(struct frm_info *data)
 		break;
 	default:
 		break;
-	}	
+	}
 
 	return ret;
 }

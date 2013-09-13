@@ -163,13 +163,13 @@ LOCAL int   _Sensor_CreateMonitorThread(void);
 LOCAL int   _Sensor_KillMonitorThread(void);
 LOCAL int _Sensor_AutoFocusInit(void);
 
-static int xioctl(int fd, int request, void * arg) {   
-    int r;   
-    //do   
-        r = ioctl(fd, request, arg);   
-    //while (-1 == r && EINTR == errno);   
-    return r;   
-} 
+static int xioctl(int fd, int request, void * arg) {
+    int r;
+    //do
+        r = ioctl(fd, request, arg);
+    //while (-1 == r && EINTR == errno);
+    return r;
+}
 
 
 /* This function is to set power down */
@@ -178,7 +178,7 @@ LOCAL int _Sensor_Device_PowerDown(BOOLEAN power_level)
 	int ret = SENSOR_SUCCESS;
 
 	ret = xioctl(g_fd_sensor, SENSOR_IO_PD, &power_level);
-	
+
 	if (0 != ret)
 	{
 		SENSOR_PRINT_ERR("_Sensor_Device_PowerDown failed,  power_level = %d, ret=%d \n", power_level, ret);
@@ -275,7 +275,7 @@ LOCAL int _Sensor_Device_SetMCLK(uint32_t mclk)
 	int ret = SENSOR_SUCCESS;
 
 	ret = xioctl(g_fd_sensor, SENSOR_IO_SET_MCLK, &mclk);
-	
+
 	if (0 != ret)
 	{
 		SENSOR_PRINT_ERR("_Sensor_Device_SetMCLK failed,  mclk = %d, ret = %d  \n", mclk, ret);
@@ -409,7 +409,7 @@ int _Sensor_Device_WriteRegTab(SENSOR_REG_TAB_PTR reg_tab)
 	{
 		SENSOR_PRINT_ERR("_Sensor_Device_SetRegTab failed,  ptr=%x, count=%d, bits=%d, burst=%d \n",
 			(uint32_t)reg_tab->sensor_reg_tab_ptr, reg_tab->reg_count, reg_tab->reg_bits, reg_tab->burst_mode);
-		
+
 		ret = -1;
 	}
 
@@ -435,7 +435,7 @@ LOCAL int Sensor_SetI2CClock(void)
 	uint32_t freq;
 	uint32_t clock;
 	int ret;
-	
+
 	if(NULL == s_sensor_info_ptr){
 		SENSOR_PRINT("Sensor_SetI2CClock: No sensor info \n");
 		return -1;
@@ -583,11 +583,11 @@ int Sensor_SetMCLK(uint32_t mclk)
 	int ret;
 
 	SENSOR_PRINT_HIGH("Sensor_SetMCLK mclk = %d \n", mclk);
-	
+
 	ret = _Sensor_Device_SetMCLK(mclk);
 
 	SENSOR_PRINT_HIGH("Sensor_SetMCLK Done mclk = %d, ret = %d \n", mclk, ret );
-	
+
 	return ret;
 }
 
@@ -600,7 +600,7 @@ int Sensor_SetVoltage(SENSOR_AVDD_VAL_E dvdd_val, SENSOR_AVDD_VAL_E avdd_val,
 	err = _Sensor_Device_SetVoltageAVDD((uint32_t)avdd_val);
 	if(SENSOR_SUCCESS != err)
 		return err;
-	
+
 	err = _Sensor_Device_SetVoltageDVDD((uint32_t)dvdd_val);
 	if(SENSOR_SUCCESS != err)
 		return err;
@@ -681,7 +681,7 @@ LOCAL void Sensor_PowerOn(BOOLEAN power_on)
 			Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
 			SENSOR_Sleep(10);
 			Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
-			SENSOR_Sleep(5); 
+			SENSOR_Sleep(5);
 			Sensor_PowerDown(!power_down);
 			Sensor_Reset(rst_lvl);
 		} else {
@@ -726,7 +726,7 @@ LOCAL void Sensor_PowerOn_Ex(uint32_t sensor_id)
 			SENSOR_Sleep(10);
 			Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
 			SENSOR_Sleep(5);
-		
+
 	}
 }
 
@@ -940,7 +940,7 @@ uint16_t Sensor_ReadReg(uint16_t reg_addr)
 		if(SENSOR_SUCCESS == ret){
 			ret_val = reg.reg_value;
 		}
-		
+
 	}
 
 	return ret_val;
@@ -1012,7 +1012,7 @@ ERR_SENSOR_E Sensor_SendRegTabToSensor(SENSOR_REG_TAB_INFO_T *
 		regTab.reg_bits				= s_sensor_info_ptr->reg_addr_value_bits;
 		regTab.burst_mode			= 0;
 		regTab.sensor_reg_tab_ptr 	= sensor_reg_tab_info_ptr->sensor_reg_tab_ptr;
-		
+
 		ret = _Sensor_Device_WriteRegTab(&regTab);
 #else
 		for(i = 0; i < sensor_reg_tab_info_ptr->reg_count; i++)
@@ -1048,7 +1048,7 @@ LOCAL int _Sensor_SetId(SENSOR_ID_E sensor_id)
 	    s_sensor_register_info_ptr;
 
 	sensor_register_info_ptr->cur_id = sensor_id;
-	
+
 	SENSOR_PRINT_HIGH
 	    ("_Sensor_SetId:sensor_id=%d,g_is_register_sensor=%d,g_is_main_sensor=%d \n",
 	     sensor_id, g_is_register_sensor, g_is_main_sensor);
@@ -1146,7 +1146,7 @@ LOCAL void _Sensor_I2CInit(SENSOR_ID_E sensor_id)
 					{
 						if(SENSOR_I2C_FREQ_400 == set_i2c_clock)
 						{
-							sc8810_i2c_set_clk(SENSOR_I2C_ID,400000);					
+							sc8810_i2c_set_clk(SENSOR_I2C_ID,400000);
 						}
 						else if(SENSOR_I2C_FREQ_200 == set_i2c_clock)
 						{
@@ -1222,7 +1222,7 @@ LOCAL BOOLEAN _Sensor_Identify(SENSOR_ID_E sensor_id)
 			Sensor_PowerOn(SCI_TRUE);
 			if(PNULL!=sensor_info_ptr->ioctl_func_tab_ptr->identify)
 			{
-				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF); 
+				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF);
 				_Sensor_Device_SetI2cAddr(g_i2c_addr);
 
 				SENSOR_PRINT_HIGH("SENSOR:identify  Sensor 01\n");
@@ -1254,10 +1254,10 @@ IDENTIFY_SEARCH:
 	sensor_info_tab_ptr=(SENSOR_INFO_T**)Sensor_GetInforTab(sensor_id);
 	valid_tab_index_max=Sensor_GetInforTabLenght(sensor_id)-SENSOR_ONE_I2C;
 	_Sensor_I2CInit(sensor_id);
-		  
+
           //search the sensor in the table
 	for(sensor_index=0x00; sensor_index<valid_tab_index_max;sensor_index++)
-	{  
+	{
 		sensor_info_ptr = sensor_info_tab_ptr[sensor_index];
 
 		if(NULL==sensor_info_ptr)
@@ -1265,7 +1265,7 @@ IDENTIFY_SEARCH:
 			SENSOR_PRINT_ERR("SENSOR: %d info of Sensor_Init table %d is null", sensor_index, (uint)sensor_id);
 			continue ;
 		}
-		s_sensor_info_ptr = sensor_info_ptr;		
+		s_sensor_info_ptr = sensor_info_ptr;
 		Sensor_PowerOn(SCI_TRUE);
 /*		SENSOR_PRINT_ERR("SENSOR: Sensor_PowerOn done,this_client=0x%x\n",(uint32_t)this_client);
 		SENSOR_PRINT_ERR("SENSOR: identify ptr =0x%x\n",(uint32_t)sensor_info_ptr->ioctl_func_tab_ptr->identify);*/
@@ -1274,25 +1274,25 @@ IDENTIFY_SEARCH:
 		{
 /*			SENSOR_PRINT_HIGH("SENSOR:identify  Sensor 00:this_client=0x%x,this_client->addr=0x%x,0x%x\n",(uint32_t)this_client,(uint32_t)&this_client->addr,this_client->addr);*/
 			if(5 != Sensor_GetCurId()){//test by wang bonnie
-				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF); 
+				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF);
 				_Sensor_Device_SetI2cAddr(g_i2c_addr);
 			}
 			SENSOR_PRINT_HIGH("SENSOR:identify  Sensor 01\n");
 			if(SENSOR_SUCCESS==sensor_info_ptr->ioctl_func_tab_ptr->identify(SENSOR_ZERO_I2C))
-			{			         
-				s_sensor_list_ptr[sensor_id]=sensor_info_ptr; 
+			{
+				s_sensor_list_ptr[sensor_id]=sensor_info_ptr;
 				s_sensor_register_info_ptr->is_register[sensor_id]=SCI_TRUE;
 				if(5 != Sensor_GetCurId())//test by wang bonnie
 					s_sensor_index[sensor_id] = sensor_index;
 				s_sensor_register_info_ptr->img_sensor_num++;
-				Sensor_PowerOn(SCI_FALSE);	
+				Sensor_PowerOn(SCI_FALSE);
 				retValue = SCI_TRUE;
 				SENSOR_PRINT_HIGH("_Sensor_Identify:sensor_id :%d,img_sensor_num=%d\n",
 					                                     sensor_id,s_sensor_register_info_ptr->img_sensor_num);
 				break ;
 			}
 		}
-		Sensor_PowerOn(SCI_FALSE);	
+		Sensor_PowerOn(SCI_FALSE);
 	}
          _Sensor_I2CDeInit(sensor_id);
 	if(SCI_TRUE == s_sensor_register_info_ptr->is_register[sensor_id])
@@ -1323,7 +1323,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 			_Sensor_SetId(i);
 			s_sensor_info_ptr = s_sensor_list_ptr[i];
 			if (5 != Sensor_GetCurId()){
-				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF); 
+				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF);
 				_Sensor_Device_SetI2cAddr(g_i2c_addr);
 			}
 
@@ -1353,7 +1353,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 			_Sensor_SetId(i);
 			s_sensor_info_ptr=s_sensor_list_ptr[i];
 			if (5 != Sensor_GetCurId()){
-				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF); 
+				g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF);
 				_Sensor_Device_SetI2cAddr(g_i2c_addr);
 			}
 			Sensor_PowerDown((BOOLEAN)s_sensor_info_ptr->power_down_level);
@@ -1365,7 +1365,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 	/*For dual sensor solution, the dual sensor should share all the power*/
 
 	SENSOR_PRINT("_Sensor_SetStatus: 1_1");
-	
+
 	Sensor_PowerOn_Ex(sensor_id);
 
 	SENSOR_PRINT("_Sensor_SetStatus: 2");
@@ -1377,7 +1377,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 			continue;
 		}
 		if (SENSOR_TRUE == s_sensor_register_info_ptr->is_register[i]) {
-			
+
 			_Sensor_SetId(i);
 			s_sensor_info_ptr = s_sensor_list_ptr[i];
 			rst_lvl = s_sensor_info_ptr->reset_pulse_level;
@@ -1392,7 +1392,7 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 			Sensor_PowerDown((BOOLEAN)!s_sensor_info_ptr->power_down_level);
 			Sensor_QReset(rst_lvl);
 			Sensor_PowerDown((BOOLEAN)s_sensor_info_ptr->power_down_level);
-			
+
 			SENSOR_PRINT_HIGH("SENSOR: Sensor_sleep of id %d", i);
 		}
 	}
@@ -1412,16 +1412,16 @@ LOCAL void _Sensor_SetStatus(SENSOR_ID_E sensor_id)
 LOCAL int _Sensor_DeviceInit()
 {
 	int                      ret = 0;
-	
+
 	SENSOR_PRINT_HIGH("To open sensor device.");
 
 	if(-1 == g_fd_sensor){
 		g_fd_sensor = open(dev_name, O_RDWR, 0);
 		if (-1 == g_fd_sensor) {
 			SENSOR_PRINT_ERR("Failed to open sensor device.errno : %d", errno);
-			fprintf(stderr, "Cannot open '%s': %d, %s\n", dev_name, errno,  strerror(errno));   
+			fprintf(stderr, "Cannot open '%s': %d, %s\n", dev_name, errno,  strerror(errno));
 		} else {
-			SENSOR_PRINT_HIGH("OK to open device.");       
+			SENSOR_PRINT_HIGH("OK to open device.");
 		}
 	}
 
@@ -1481,7 +1481,7 @@ LOCAL uint32_t _Sensor_Register(SENSOR_ID_E sensor_id)
 				SENSOR_PRINT_ERR("SENSOR: _Sensor_Register saved index is larger than sensor sum.\n");
 				return SENSOR_FAIL;
 			}
-			
+
 			sensor_info_tab_ptr=(SENSOR_INFO_T**)Sensor_GetInforTab(sensor_id);
 			sensor_info_ptr = sensor_info_tab_ptr[sensor_index];
 			if(NULL==sensor_info_ptr)
@@ -1497,9 +1497,9 @@ LOCAL uint32_t _Sensor_Register(SENSOR_ID_E sensor_id)
 		}
 
 	}
-	
+
 	return SENSOR_SUCCESS;
-	
+
 }
 
 
@@ -1664,7 +1664,7 @@ static int _sensor_cali_lnc_param_update(char *cfg_file_dir,SENSOR_INFO_T *senso
 		fclose(fp);
 
 		if (file_size != raw_fix_info_ptr->lnc.map[i-1][0].len) {
-			SENSOR_PRINT("_sensor_cali_param_update: file size dis-match, do not replace, w:%d, h:%d, ori: %d, now:%d/n", 
+			SENSOR_PRINT("_sensor_cali_param_update: file size dis-match, do not replace, w:%d, h:%d, ori: %d, now:%d/n",
 				width, height, raw_fix_info_ptr->lnc.map[i-1][0].len, file_size);
 		} else {
 			if (s_lnc_addr_bakup[index][1]) {
@@ -2068,7 +2068,7 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 			if (ret_val != SENSOR_SUCCESS ) {
 				Sensor_PowerOn(SENSOR_FALSE);
 			}
-			
+
 		}
 		if (ret_val != SENSOR_SUCCESS ) {
 			sensor_num = 0;
@@ -2122,7 +2122,7 @@ int Sensor_Open(uint32_t sensor_id)
 	SENSOR_REGISTER_INFO_T_PTR sensor_register_info_ptr =
 	    s_sensor_register_info_ptr;
 
-	
+
 	if (SENSOR_TRUE == sensor_register_info_ptr->is_register[sensor_id]) {
 		SENSOR_PRINT("Sensor_Open: 1");
 		_Sensor_SetStatus(sensor_id);
@@ -2134,14 +2134,14 @@ int Sensor_Open(uint32_t sensor_id)
 		//Sensor_PowerOn(SENSOR_TRUE);
 
 		if (5 != Sensor_GetCurId()){
-			g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF); 
+			g_i2c_addr =  (s_sensor_info_ptr->salve_i2c_addr_w & 0xFF);
 			_Sensor_Device_SetI2cAddr(g_i2c_addr);
 		}
 
 		SENSOR_PRINT("Sensor_Open: 3");
 
 		SENSOR_PRINT_HIGH("Sensor_Init:sensor_id :%d,addr=0x%x", sensor_id, g_i2c_addr);
-		
+
 		Sensor_SetI2CClock();
 
 		//confirm camera identify OK
@@ -2799,7 +2799,7 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 		break;
 	case SENSOR_EXIF_CTRL_EXPOSUREMODE:
 		break;
-		
+
 	case SENSOR_EXIF_CTRL_WHITEBALANCE:
 		sensor_exif_info_ptr->valid.WhiteBalance = 1;
 		if(param)
@@ -2807,7 +2807,7 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 		else
 			sensor_exif_info_ptr->WhiteBalance = 0;
 		break;
-		
+
 	case SENSOR_EXIF_CTRL_DIGITALZOOMRATIO:
 		break;
 	case SENSOR_EXIF_CTRL_FOCALLENGTHIN35MMFILM:
@@ -2969,7 +2969,7 @@ int Sensor_WriteData(uint8_t *regPtr, uint32_t length)
 {
 	int ret;
 	ret = _Sensor_Device_Write(regPtr, length);
-	
+
 	return ret;
 }
 
@@ -3015,7 +3015,7 @@ LOCAL int   _Sensor_CreateThread(void)
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	ret = pthread_create(&s_sensor_thread, &attr, _Sensor_ThreadProc, NULL);
 	pthread_attr_destroy(&attr);
-	
+
 	message.msg_type = SENSOR_EVT_INIT;
 	ret = cmr_msg_post(s_queue_handle, &message);
 	if (ret) {
@@ -3122,7 +3122,7 @@ LOCAL void* _Sensor_ThreadProc(void* data)
 		default:
 			CMR_LOGE("Unsupported MSG");
 			break;
-		}	
+		}
 
 		if (message.alloc_flag) {
 			free(message.data);

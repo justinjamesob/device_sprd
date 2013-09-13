@@ -70,7 +70,7 @@ const SENSOR_INFO_T* main_sensor_infor_tab[]=
 	&g_ov5640_mipi_yuv_info,
 	&g_imx179_mipi_raw_info,
 	&g_ov8865_mipi_raw_info,
-	//&g_ov5640_mipi_raw_info, // aiden tmp 
+	//&g_ov5640_mipi_raw_info, // aiden tmp
 	//&g_s5k5ccgx_yuv_info_mipi,
 	//&g_s5k4e1ga_mipi_raw_info,
 	//&g_hi351_mipi_yuv_info,
@@ -107,9 +107,9 @@ const SENSOR_INFO_T* atv_infor_tab[]=
 };
 
 /*****************************************************************************/
-//  Description:    This function is used to get sensor information table    
+//  Description:    This function is used to get sensor information table
 //  Author:         Liangwen.Zhen
-//  Note:           
+//  Note:
 /*****************************************************************************/
 SENSOR_INFO_T ** Sensor_GetInforTab(SENSOR_ID_E sensor_id)
 {
@@ -127,7 +127,7 @@ SENSOR_INFO_T ** Sensor_GetInforTab(SENSOR_ID_E sensor_id)
 			sensor_infor_tab_ptr=(SENSOR_INFO_T*)&sub_sensor_infor_tab;
 			break;
 		}
-		case SENSOR_ATV: 
+		case SENSOR_ATV:
 		{
 			sensor_infor_tab_ptr=(SENSOR_INFO_T*)&atv_infor_tab;
 			break;
@@ -140,9 +140,9 @@ SENSOR_INFO_T ** Sensor_GetInforTab(SENSOR_ID_E sensor_id)
 }
 
 /*****************************************************************************/
-//  Description:    This function is used to get sensor information table    
+//  Description:    This function is used to get sensor information table
 //  Author:         Liangwen.Zhen
-//  Note:           
+//  Note:
 /*****************************************************************************/
 uint32_t Sensor_GetInforTabLenght(SENSOR_ID_E sensor_id)
 {
@@ -160,7 +160,7 @@ uint32_t Sensor_GetInforTabLenght(SENSOR_ID_E sensor_id)
 			tab_lenght=(sizeof(sub_sensor_infor_tab)/sizeof(SENSOR_INFO_T*));
 			break;
 		}
-		case SENSOR_ATV: 
+		case SENSOR_ATV:
 		{
 			tab_lenght=(sizeof(atv_infor_tab)/sizeof(SENSOR_INFO_T*));
 			break;

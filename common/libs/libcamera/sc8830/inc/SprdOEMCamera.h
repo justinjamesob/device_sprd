@@ -154,10 +154,10 @@ typedef struct {
 	uint32_t                 buffer_phy_addr;
 	uint32_t                 thumbnail_phy_addr;
 	uint32_t                 pmem_id;
-	
+
 	uint32_t                 buf_id;
 	int64_t                  timestamp;
-	uint32_t                 buffer_uv_phy_addr;	
+	uint32_t                 buffer_uv_phy_addr;
 	/*face detect*/
 	uint32_t face_num;
 	morpho_FaceRect *face_ptr;
@@ -316,7 +316,7 @@ typedef struct
 	double                   latitude;   /* degrees, WGS ellipsoid */
 	double                   longitude;  /* degrees                */
 	double                   altitude;   /* meters                          */
-	const char               *process_method;	
+	const char               *process_method;
 } camera_position_type;
 
 
@@ -472,14 +472,14 @@ int camera_set_preview_mem(uint32_t phy_addr, uint32_t vir_addr, uint32_t mem_si
 
 int camera_capture_get_buffer_size(uint32_t camera_id,
 						uint32_t width,
-						uint32_t height, 
-						uint32_t *size0, 
+						uint32_t height,
+						uint32_t *size0,
 						uint32_t *size1);
 int camera_set_capture_mem(uint32_t     cap_index,
-						uint32_t phy_addr0, 
-						uint32_t vir_addr0, 
+						uint32_t phy_addr0,
+						uint32_t vir_addr0,
 						uint32_t mem_size0,
-						uint32_t phy_addr1, 
+						uint32_t phy_addr1,
 						uint32_t vir_addr1,
 						uint32_t mem_size1);
 int camera_set_capture_mem2(uint32_t     cap_index,
@@ -494,12 +494,12 @@ int camera_copy_data(uint32_t width,
 				uint32_t in_addr,
 				uint32_t out_addr);
 
-int camera_get_data_redisplay(int output_addr, 
-					int output_width, 
-					int output_height, 
-					int input_addr_y, 
-					int input_addr_uv, 					
-					int input_width, 
+int camera_get_data_redisplay(int output_addr,
+					int output_width,
+					int output_height,
+					int input_addr_y,
+					int input_addr_uv,
+					int input_width,
 					int input_height);
 
 uint32_t camera_get_rot_set(void);

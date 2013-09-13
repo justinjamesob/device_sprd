@@ -59,7 +59,7 @@ typedef enum{
 //if error data is not cared.
 typedef struct{
 
-	
+
   	uint32_t      stream_buf_phy;  //stream buffer
 	uint32_t      stream_buf_vir;
 	uint32_t      stream_size;  //bytes
@@ -72,7 +72,7 @@ typedef struct{
 
 typedef struct{
 
-	
+
   	struct img_frm  *src_img;
 	uint32_t slice_height;
 	uint32_t total_height;  //current total current
@@ -92,7 +92,7 @@ typedef struct
 }JPEG_CAPABLIITY_T;
 
 
-//only support YUV slice, do not support stream slice for simplicity. 
+//only support YUV slice, do not support stream slice for simplicity.
 struct jpeg_enc_in_param{
 
 	uint32_t                            src_fmt;
@@ -103,7 +103,7 @@ struct jpeg_enc_in_param{
 
 	struct img_addr                     src_addr_phy;
 	struct img_addr                     src_addr_vir;
-	
+
 	struct img_data_end                 src_endian;
 
 	//if slice_height == img height, is the frame mode
@@ -115,10 +115,10 @@ struct jpeg_enc_in_param{
 
 	//use by codec
 	uint32_t      temp_buf_phy;
-	uint32_t      temp_buf_vir;	
-	uint32_t      temp_buf_size;  //bytes	
+	uint32_t      temp_buf_vir;
+	uint32_t      temp_buf_size;  //bytes
 
-	
+
 };
 
 
@@ -136,7 +136,7 @@ struct jpeg_enc_next_param{
 
 	struct img_addr                     src_addr_phy;
 	struct img_addr                     src_addr_vir;
-	uint32_t   slice_height;  //the slice_height may be different. 
+	uint32_t   slice_height;  //the slice_height may be different.
 						  //slice height must be 8X
 	uint32_t ready_line_num;
 };
@@ -162,8 +162,8 @@ struct jpeg_dec_in_param{
 
 	//use by codec
 	uint32_t      temp_buf_phy;
-	uint32_t      temp_buf_vir;	
-	uint32_t      temp_buf_size;  //bytes	
+	uint32_t      temp_buf_vir;
+	uint32_t      temp_buf_size;  //bytes
 
 };
 
@@ -180,7 +180,7 @@ struct jpeg_dec_next_param{
 
 	struct img_addr                     dst_addr_phy;
 	struct img_addr                     dst_addr_vir;
-	uint32_t        slice_height; 
+	uint32_t        slice_height;
 };
 
 struct jpeg_enc_exif_param
@@ -191,7 +191,7 @@ struct jpeg_enc_exif_param
 	uint32_t thumbnail_size;
 	uint32_t target_addr_virt;
 	uint32_t target_size;
-	JINF_EXIF_INFO_T *exif_ptr;	
+	JINF_EXIF_INFO_T *exif_ptr;
 };
 
 int jpeg_init(void);

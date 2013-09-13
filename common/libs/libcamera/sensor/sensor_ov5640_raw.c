@@ -34,17 +34,17 @@ LOCAL uint32_t _ov5640_write_exposure(uint32_t param);
 LOCAL uint32_t _ov5640_write_gain(uint32_t param);
 LOCAL uint32_t _ov5640_write_af(uint32_t param);
 
-LOCAL const SENSOR_REG_T ov5640_common_raw_init[] = 
+LOCAL const SENSOR_REG_T ov5640_common_raw_init[] =
 {
 	{0x4202, 0x0f},/*kenxu add 20120207 for stream off*/
 	{SENSOR_WRITE_DELAY, 0x64},
-	{0x3103, 0x11}, 
-	{0x3008, 0x82},//0x;delay 5ms    
+	{0x3103, 0x11},
+	{0x3008, 0x82},//0x;delay 5ms
 	{SENSOR_WRITE_DELAY, 0x20},
 	{0x3008, 0x42},
 	{0x3103, 0x03},
 	{0x3017, 0xff},
-	{0x3018, 0xff},   
+	{0x3018, 0xff},
 	{0x3034, 0x1a},
 	{0x3035, 0x11},
 	{0x3036, 0x46},
@@ -73,7 +73,7 @@ LOCAL const SENSOR_REG_T ov5640_common_raw_init[] =
 	{0x471c, 0x50},
 	{0x3a13, 0x43},
 	{0x3a18, 0x00},
-	{0x3a19, 0xf8}, 
+	{0x3a19, 0xf8},
 	{0x3635, 0x13},
 	{0x3636, 0x03},
 	{0x3634, 0x40},
@@ -151,7 +151,7 @@ LOCAL const SENSOR_REG_T ov5640_common_raw_init[] =
 	{0x3a1e, 0x2c},
 	{0x3a11, 0x70},
 	{0x3a1f, 0x18},
-	{0x3008, 0x02}, 
+	{0x3008, 0x02},
 	{0x3035, 0x21},
 	{0x3400, 0x04},
 	{0x3401, 0x00},
@@ -159,22 +159,22 @@ LOCAL const SENSOR_REG_T ov5640_common_raw_init[] =
 	{0x3403, 0x00},
 	{0x3404, 0x04},
 	{0x3405, 0x00},
-	{0x3406, 0x01},    
-	//{0x3503, 0x03},//disable ae    
-    		    
+	{0x3406, 0x01},
+	//{0x3503, 0x03},//disable ae
+
 	{0x4202, 0x00}		/*kenxu add 20120207 for stream on*/
 };
 
 LOCAL const SENSOR_REG_T ov5640_1280X960_raw[] = {
 	{0x4202, 0x0f},/*kenxu add 20120207 for stream off*/
 	{SENSOR_WRITE_DELAY, 0x64},
-	{0x3103, 0x11}, 
-	{0x3008, 0x82},//0x;delay 5ms    
+	{0x3103, 0x11},
+	{0x3008, 0x82},//0x;delay 5ms
 	{SENSOR_WRITE_DELAY, 0x20},
 	{0x3008, 0x42},
 	{0x3103, 0x03},
 	{0x3017, 0xff},
-	{0x3018, 0xff},   
+	{0x3018, 0xff},
 	{0x3034, 0x1a},
 	{0x3035, 0x11},
 	{0x3036, 0x46},
@@ -203,7 +203,7 @@ LOCAL const SENSOR_REG_T ov5640_1280X960_raw[] = {
 	{0x471c, 0x50},
 	{0x3a13, 0x43},
 	{0x3a18, 0x00},
-	{0x3a19, 0xf8}, 
+	{0x3a19, 0xf8},
 	{0x3635, 0x13},
 	{0x3636, 0x03},
 	{0x3634, 0x40},
@@ -281,7 +281,7 @@ LOCAL const SENSOR_REG_T ov5640_1280X960_raw[] = {
 	{0x3a1e, 0x2c},
 	{0x3a11, 0x70},
 	{0x3a1f, 0x18},
-	{0x3008, 0x02}, 
+	{0x3008, 0x02},
 	{0x3035, 0x21},
 	{0x3400, 0x04},
 	{0x3401, 0x00},
@@ -289,9 +289,9 @@ LOCAL const SENSOR_REG_T ov5640_1280X960_raw[] = {
 	{0x3403, 0x00},
 	{0x3404, 0x04},
 	{0x3405, 0x00},
-	{0x3406, 0x01},    
-	//{0x3503, 0x03},//disable ae    
-    		    
+	{0x3406, 0x01},
+	//{0x3503, 0x03},//disable ae
+
 	{0x4202, 0x00}		/*kenxu add 20120207 for stream on*/
 };
 
@@ -733,7 +733,7 @@ LOCAL uint32_t _ov5640_Identify(uint32_t param)
 		SENSOR_PRINT_ERR("SENSOR:ov5640 identify fail,pid_value=%d .\n",
 			     pid_value);
 	}
-	
+
 	return ret_value;
 }
 
@@ -755,7 +755,7 @@ LOCAL uint32_t _ov5640_write_exposure(uint32_t param)
 	ret_value = Sensor_WriteReg(0x3501, 0x01);
 	value=(expsure_line>>0x0c)&0x0f;
 	ret_value = Sensor_WriteReg(0x3500, 0x01);
-	
+
 	return ret_value;
 }
 
@@ -771,7 +771,7 @@ LOCAL uint32_t _ov5640_write_gain(uint32_t param)
 	value = (param>>0x08)&0x01;
 	ret_value = Sensor_WriteReg(0x350a, value);//8
 
-	
+
 	return ret_value;
 }
 
@@ -783,7 +783,7 @@ LOCAL uint32_t _ov5640_write_af(uint32_t param)
 
 	ret_value = Sensor_WriteReg(0x3406, 0x01);
 	ret_value = Sensor_WriteReg(0x3503, 0x07);
-	
+
 	return ret_value;
 }
 LOCAL uint32_t _ov5640_BeforeSnapshot(uint32_t param)

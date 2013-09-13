@@ -156,7 +156,7 @@ LOCAL const SENSOR_REG_T ov8830_common_init[] = {
 {0x3774 ,0x10},
 {0x3776 ,0x00},
 {0x377f ,0x08},
-// PSRAM    
+// PSRAM
 {0x3780 ,0x22},
 {0x3781 ,0x0c},
 {0x3784 ,0x2c},
@@ -185,8 +185,8 @@ LOCAL const SENSOR_REG_T ov8830_common_init[] = {
 {0x37d1 ,0x01},
 {0x37de ,0x00},
 {0x37df ,0x00},
-// timing    
-{0x3823 ,0x00}, 
+// timing
+{0x3823 ,0x00},
 {0x3824 ,0x00},
 {0x3825 ,0x00},
 {0x3826 ,0x00},
@@ -267,7 +267,7 @@ LOCAL const SENSOR_REG_T ov8830_common_init[] = {
 {0x5e00 ,0x00},//color bar off
 {0x5e10 ,0x0c},
 {0x5000 ,0x06},//lenc off,//bpc on,//wpc on
-// MWB  
+// MWB
 {0x5001 ,0x01},//MWB on
 {0x3400 ,0x04},//red gain h
 {0x3401 ,0x00},//red gain l
@@ -295,7 +295,7 @@ LOCAL const SENSOR_REG_T ov8830_common_init[] = {
 };
 
 
-const unsigned short ov8830_1632x1224_setting[][2] = 
+const unsigned short ov8830_1632x1224_setting[][2] =
 {
 //@@5.1.2.1 Raw 10bit 1632*1224 30fps 4lane 640M bps/lane
 //{0x0100, 0x00}, //software standby
@@ -323,11 +323,11 @@ const unsigned short ov8830_1632x1224_setting[][2] =
 {0x3813, 0x04}, //V OFFSET
 {0x3814, 0x31}, //X INC
 {0x3815, 0x31}, //Y INC
-{0x3820, 0x11}, 
-{0x3821, 0x0f}, 
-{0x3a04, 0x04}, 
-{0x3a05, 0xc9}, 
-{0x4005, 0x1a}, 
+{0x3820, 0x11},
+{0x3821, 0x0f},
+{0x3a04, 0x04},
+{0x3a05, 0xc9},
+{0x4005, 0x1a},
 {0x4512, 0x00}, //vertical average
 {0x3011, 0x41}, //MIPI 4 lane, MIPI enable
 {0x3015, 0x08}, //MIPI 4 lane on, select MIPI
@@ -344,7 +344,7 @@ const unsigned short ov8830_1632x1224_setting[][2] =
 //{0x4837, 0x0d}, //MIPI global timing
 };
 
-const unsigned short ov8830_3264x2448_setting[][2] = 
+const unsigned short ov8830_3264x2448_setting[][2] =
 {
 //5.1.2.2 Raw 10bit 3264*2448 24fps 4lane 640M bps/lane
 {0x0100 ,0x00},//software standby
@@ -969,11 +969,11 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	//GrGb
 	sensor_ptr->grgb.edge_thr=26;
 	sensor_ptr->grgb.diff_thr=80;
-	
+
 	//cfa
 	sensor_ptr->cfa.edge_thr=0x1a;
 	sensor_ptr->cfa.diff_thr=0x00;
-	
+
 	//cmc
 	sensor_ptr->cmc.matrix[0][0]=0x6f3;
 	sensor_ptr->cmc.matrix[0][1]=0x3e0a;
@@ -984,7 +984,7 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->cmc.matrix[0][6]=0x0d;
 	sensor_ptr->cmc.matrix[0][7]=0x3c03;
 	sensor_ptr->cmc.matrix[0][8]=0x7f0;
-	
+
 	//Gamma
 	sensor_ptr->gamma.axis[0][0]=0;
 	sensor_ptr->gamma.axis[0][1]=8;
@@ -1054,7 +1054,7 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->pref.y_thr=0x04;
 	sensor_ptr->pref.u_thr=0x04;
 	sensor_ptr->pref.v_thr=0x04;
-	
+
 	//bright
 	sensor_ptr->bright.factor[0]=0xd0;
 	sensor_ptr->bright.factor[1]=0xe0;
@@ -1072,7 +1072,7 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->bright.factor[13]=0x00;
 	sensor_ptr->bright.factor[14]=0x00;
 	sensor_ptr->bright.factor[15]=0x00;
-	
+
 	//contrast
 	sensor_ptr->contrast.factor[0]=0x10;
 	sensor_ptr->contrast.factor[1]=0x20;
@@ -1090,15 +1090,15 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->contrast.factor[13]=0x40;
 	sensor_ptr->contrast.factor[14]=0x40;
 	sensor_ptr->contrast.factor[15]=0x40;
-	
+
 	//hist
 	sensor_ptr->hist.mode;
 	sensor_ptr->hist.low_ratio;
 	sensor_ptr->hist.high_ratio;
-	
+
 	//auto contrast
 	sensor_ptr->auto_contrast.mode;
-	
+
 	//saturation
 	sensor_ptr->saturation.factor[0]=0x40;
 	sensor_ptr->saturation.factor[1]=0x40;
@@ -1140,13 +1140,13 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->edge.info[5].detail_thr=0x03;
 	sensor_ptr->edge.info[5].smooth_thr=0x05;
 	sensor_ptr->edge.info[5].strength=10;
-	
+
 	//emboss
 	sensor_ptr->emboss.step=0x00;
-	
+
 	//global gain
 	sensor_ptr->global.gain=0x40;
-	
+
 	//chn gain
 	sensor_ptr->chn.r_gain=0x40;
 	sensor_ptr->chn.g_gain=0x40;
@@ -1227,7 +1227,7 @@ LOCAL uint32_t _ov8830_write_exposure(uint32_t param)
 {
 	uint32_t ret_value = SENSOR_SUCCESS;
 	SENSOR_PRINT("SENSOR_ov8830: _ov8830_write_exposure= 0x%x", param);
-	
+
 	return ret_value;
 }
 
@@ -1236,7 +1236,7 @@ LOCAL uint32_t _ov8830_write_gain(uint32_t param)
 	uint32_t ret_value = SENSOR_SUCCESS;
 	uint16_t value=0x00;
 	SENSOR_PRINT("SENSOR_ov8830: _ov8830_write_gain = 0x%x", param);
-	
+
 	return ret_value;
 }
 
@@ -1267,7 +1267,7 @@ LOCAL uint32_t _ov8830_after_snapshot(uint32_t param)
 {
 	SENSOR_PRINT("SENSOR_ov8830: after_snapshot mode:%d", param);
 
-	
+
 	return SENSOR_SUCCESS;
 }
 
@@ -1276,7 +1276,7 @@ LOCAL uint32_t _ov8830_flash(uint32_t param)
 	SENSOR_PRINT("Start:param=%d", param);
 
 	SENSOR_PRINT_HIGH("end");
-	
+
 	return SENSOR_SUCCESS;
 }
 
