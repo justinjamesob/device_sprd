@@ -66,7 +66,7 @@ int camera_snapshot_stop_set(void);
 int camera_autofocus_init(void);
 int camera_autofocus(void);
 int camera_autofocus_start(void);
-int camera_autofocus_stop(void);
+int camera_autofocus_stop(uint32_t is_external);
 int camera_set_ctrl(camera_parm_type id,
 			uint32_t          parm,
 			cmr_before_set_cb before_set,
@@ -81,6 +81,7 @@ int camera_isp_alg_done(void *data);
 int camera_isp_af_stat(void* data);
 int camera_isp_ae_stab(void* data);
 int camera_autofocus_quit(void);
+int camera_autofocus_need_exit(uint32_t *is_external);
 #ifdef __cplusplus
 }
 #endif

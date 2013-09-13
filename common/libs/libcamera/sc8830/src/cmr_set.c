@@ -25,7 +25,7 @@
 	                          (CAMERA_ZSL_CONTINUE_SHOT_MODE == (y))|| \
 	                          (CAMERA_TOOL_RAW_MODE == (y))))
 
-static int camera_autofocus_need_exit(void);
+//static int camera_autofocus_need_exit(uint32_t *is_external);
 static uint32_t camera_flash_mode_to_status(enum cmr_flash_mode f_mode);
 static int camera_set_brightness(uint32_t brightness, uint32_t *skip_mode, uint32_t *skip_num);
 static int camera_set_contrast(uint32_t contrast, uint32_t *skip_mode, uint32_t *skip_num);
@@ -1435,6 +1435,7 @@ int camera_autofocus_start(void)
 	uint32_t                 *ptr = (uint32_t*)&cxt->cmr_set.focus_zone_param[0];
 	uint32_t                 i = 0;
 	uint32_t                 zone_cnt = *ptr++;
+	uint32_t                 af_cancel_is_ext = 0;
 
 	SENSOR_EXT_FUN_PARAM_T   af_param;
 	memset(&af_param,0,sizeof(af_param));
@@ -1442,7 +1443,7 @@ int camera_autofocus_start(void)
 	CMR_LOGV("zone_cnt %d, x y w h, %d %d %d %d", zone_cnt, ptr[0], ptr[1], ptr[2], ptr[3]);
 
 	CMR_PRINT_TIME;
-	if (camera_autofocus_need_exit()) {
+	if (camera_autofocus_need_exit(&af_cancel_is_ext)) {
 		ret = CAMERA_INVALID_STATE;
 		CMR_RTN_IF_ERR(ret);
 	}
@@ -1475,7 +1476,7 @@ int camera_autofocus_start(void)
 			}
 
 			while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
-				if (camera_autofocus_need_exit()) {
+				if (camera_autofocus_need_exit(&af_cancel_is_ext)) {
 					ret = CAMERA_INVALID_STATE;
 					CMR_RTN_IF_ERR(ret);
 				}
@@ -1498,7 +1499,7 @@ int camera_autofocus_start(void)
 		if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 			if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
 				while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
-					if (camera_autofocus_need_exit()) {
+					if (camera_autofocus_need_exit(&af_cancel_is_ext)) {
 						ret = CAMERA_INVALID_STATE;
 						CMR_RTN_IF_ERR(ret);
 					}
@@ -1654,38 +1655,43 @@ int camera_autofocus(void)
 	int                      ret = CAMERA_SUCCESS;
 
 	pthread_mutex_lock(&cxt->cmr_set.set_mutex);
-	cxt->cmr_set.af_cancelled = 0;
+	cxt->cmr_set.af_cancelled = 0x00;
 	pthread_mutex_unlock(&cxt->cmr_set.set_mutex);
 
 	return ret;
 }
 
-int camera_autofocus_stop(void)
+int camera_autofocus_stop(uint32_t is_external)
 {
 	struct camera_context    *cxt = camera_get_cxt();
 	int                      ret = CAMERA_SUCCESS;
 
 
 	pthread_mutex_lock(&cxt->cmr_set.set_mutex);
-	cxt->cmr_set.af_cancelled = 1;
+	cxt->cmr_set.af_cancelled |= 0x01;
+	cxt->cmr_set.af_cancelled |= (is_external & 0x1) << 1;
 	cxt->cmr_set.bflash = 1;
 	pthread_mutex_unlock(&cxt->cmr_set.set_mutex);
 
-	CMR_LOGV("af_cancelled %d", cxt->cmr_set.af_cancelled);
+	CMR_LOGV("af_cancelled 0x%x", cxt->cmr_set.af_cancelled);
 	camera_autofocus_quit();
 	CMR_LOGV("quit.");
 	return ret;
 }
 
-int camera_autofocus_need_exit(void)
+int camera_autofocus_need_exit(uint32_t *is_external)
 {
 	struct camera_context    *cxt = camera_get_cxt();
 	int                      ret = 0;
 
 	pthread_mutex_lock(&cxt->cmr_set.set_mutex);
-	ret = cxt->cmr_set.af_cancelled == 1 ? 1 : 0;
+	ret = (cxt->cmr_set.af_cancelled & 0x01) == 1 ? 1 : 0;
+	*is_external = (cxt->cmr_set.af_cancelled >> 1) & 0x1;
 	pthread_mutex_unlock(&cxt->cmr_set.set_mutex);
 
+	if (ret) {
+		CMR_LOGV("af_cancelled val: 0x%x, 0x%x", cxt->cmr_set.af_cancelled, *is_external);
+	}
 	return ret;
 }
 

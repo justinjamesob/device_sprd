@@ -134,10 +134,11 @@ static int  camera_preview_init(int format_mode);
 static void camera_set_client_data(void* user_data);
 static void camera_set_hal_cb(camera_cb_f_type cmr_cb);
 static void camera_set_af_cb(camera_cb_f_type cmr_cb);
-static void camera_call_af_cb(camera_cb_type cb,
-                 const void *client_data,
-                 camera_func_type func,
-                 int32_t parm4);
+static void camera_call_af_cb(camera_cb_f_type cmr_cb,
+			camera_cb_type cb,
+			const void *client_data,
+			camera_func_type func,
+			int32_t parm4);
 static int  camera_capture_init(void);
 static void *camera_main_routine(void *client_data);
 static int  camera_internal_handle(uint32_t evt_type, uint32_t sub_type, struct frm_info *data);
@@ -2567,7 +2568,7 @@ int camera_stop_preview_internal(void)
 
 	g_cxt->preview_status = CMR_IDLE;
 
-	_camera_autofocus_stop_handle();
+	camera_autofocus_stop(0);
 
 	g_cxt->chn_1_status   = CHN_IDLE;
 	SET_CHN_IDLE(CHN_1);
@@ -3218,7 +3219,7 @@ camera_ret_code_type camera_cancel_autofocus(void)
 {
 	int                      ret = CAMERA_SUCCESS;
 
-	ret = camera_autofocus_stop();
+	ret = camera_autofocus_stop(1);
 	return ret;
 }
 
@@ -3243,7 +3244,10 @@ int camera_start_autofocus(camera_focus_e_type focus,
 
 	CMR_LOGV("focus %d, client_data 0x%x", focus, (uint32_t)client_data);
 	CMR_PRINT_TIME;
-
+	if (NULL == callback) {
+		CMR_LOGE("NULL callback pointer");
+		return CAMERA_INVALID_PARM;
+	}
 	camera_set_client_data(client_data);
 	camera_autofocus();
 
@@ -4499,7 +4503,9 @@ void *camera_af_thread_proc(void *data)
 {
 	CMR_MSG_INIT(message);
 	int ret = CAMERA_SUCCESS;
-	int	af_exit_flag = 0;
+	int af_exit_flag = 0;
+	uint32_t ex_af_cancel_flag = 0;
+	camera_cb_type cb_type = CAMERA_CB_MAX;
 
 	CMR_PRINT_TIME;
 	sem_post(&g_cxt->af_sync_sem);
@@ -4524,44 +4530,44 @@ void *camera_af_thread_proc(void *data)
 			break;
 		case CMR_EVT_AF_START:
 			CMR_PRINT_TIME;
-			camera_set_af_cb((camera_cb_f_type)(message.data));
-
 			if (CMR_IDLE == g_cxt->preview_status) {
 				CMR_LOGI("preview already stoped.");
-				camera_call_af_cb(CAMERA_EXIT_CB_FAILED,
+				camera_autofocus_need_exit(&ex_af_cancel_flag);
+				if (0x01 == ex_af_cancel_flag) {
+					cb_type = CAMERA_EXIT_CB_ABORT;
+				} else {
+					cb_type = CAMERA_EXIT_CB_FAILED;
+				}
+
+				camera_call_af_cb((camera_cb_f_type)(message.data),
+					cb_type,
 					camera_get_client_data(),
 					CAMERA_FUNC_START_FOCUS,
 					0);
 				break;
+
 			}
 			pthread_mutex_lock(&g_cxt->af_cb_mutex);
 			ret = camera_autofocus_start();
 			pthread_mutex_unlock(&g_cxt->af_cb_mutex);
-/*
-			if (CMR_IDLE == g_cxt->preview_status) {
-				CMR_LOGI("preview already stoped.");
-				break;
-			}
-*/
-			if (CAMERA_INVALID_STATE == ret) {
-				camera_call_af_cb(CAMERA_EXIT_CB_ABORT,
-					camera_get_client_data(),
-					CAMERA_FUNC_START_FOCUS,
-					0);
-			} else if (CAMERA_FAILED == ret) {
-				camera_call_af_cb(CAMERA_EXIT_CB_FAILED,
-					camera_get_client_data(),
-					CAMERA_FUNC_START_FOCUS,
-					0);
+			camera_autofocus_need_exit(&ex_af_cancel_flag);
 
+			if (0x01 == ex_af_cancel_flag) {
+				cb_type = CAMERA_EXIT_CB_ABORT;
+			} else if (CAMERA_SUCCESS == ret) {
+				cb_type = CAMERA_EXIT_CB_DONE;
 			} else {
-				camera_call_af_cb(CAMERA_EXIT_CB_DONE,
-					camera_get_client_data(),
-					CAMERA_FUNC_START_FOCUS,
-					0);
+				cb_type = CAMERA_EXIT_CB_FAILED;
 			}
+
+			camera_call_af_cb((camera_cb_f_type)(message.data),
+				cb_type,
+				camera_get_client_data(),
+				CAMERA_FUNC_START_FOCUS,
+				0);
 			CMR_PRINT_TIME;
 			break;
+
 		case CMR_EVT_AF_EXIT:
 			CMR_LOGV("AF exit");
 			af_exit_flag = 1;
@@ -4590,19 +4596,18 @@ void camera_set_af_cb(camera_cb_f_type cmr_cb)
 	pthread_mutex_unlock(&g_cxt->af_cb_mutex);
 	return;
 }
-void camera_call_af_cb(camera_cb_type cb,
-                 const void *client_data,
-                 camera_func_type func,
-                 int32_t parm4)
+void camera_call_af_cb(camera_cb_f_type cmr_cb,
+			camera_cb_type cb,
+			const void *client_data,
+			camera_func_type func,
+			int32_t parm4)
 {
 	camera_cb_f_type         camera_af_run_cb = PNULL;
-	pthread_mutex_lock(&g_cxt->af_cb_mutex);
-	if (g_cxt->camera_af_cb) {
-		camera_af_run_cb = g_cxt->camera_af_cb;
-	}
-	pthread_mutex_unlock(&g_cxt->af_cb_mutex);
-	if (camera_af_run_cb) {
+	if (cmr_cb) {
+		camera_af_run_cb = cmr_cb;
 		(*camera_af_run_cb)(cb, client_data, func, parm4);
+	} else {
+		CMR_LOGE("af cb pointer NULL error!");
 	}
 	return;
 }
