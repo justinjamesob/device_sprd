@@ -494,6 +494,12 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
 service refnotify /system/bin/refnotify -t 0
     class main
     user root

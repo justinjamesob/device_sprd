@@ -107,6 +107,12 @@ service slog /system/bin/slog
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
 on property:lmk.autocalc=false
     setprop ro.LMK_SLOT0_ADJ 0
     setprop ro.LMK_SLOT1_ADJ 1
