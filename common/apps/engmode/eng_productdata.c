@@ -4,6 +4,8 @@
 #include "eng_productdata.h"
 
 #define PRODUCTINFO_FILE  "/dev/block/platform/sprd-sdhci.3/by-name/miscdata"
+#define PRODUCTINFO_FILE0  "/productinfo/productinfo.bin"
+#define PRODUCTINFO_FILE1  "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1"
 
 int eng_read_productnvdata(char *databuf,  int data_len)
 {
@@ -46,6 +48,34 @@ int eng_write_productnvdata(char *databuf,  int data_len)
 		ENG_LOG("%s open fail PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE);
 		ret = 1;
 	}
-	return ret;
+
+	if(ret ==0){
+		fd = open(PRODUCTINFO_FILE0,O_WRONLY);
+		if (fd >= 0){
+			ENG_LOG("%s open Ok PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE0);
+			len = write(fd, databuf, data_len);
+
+			if (len <= 0){
+				ENG_LOG("%s read fail PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE0);
+			}
+			close(fd);
+		} else {
+			ENG_LOG("%s open fail PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE0);
+		}
+
+		fd = open(PRODUCTINFO_FILE1,O_WRONLY);
+		if (fd >= 0){
+			ENG_LOG("%s open Ok PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE1);
+			len = write(fd, databuf, data_len);
+
+			if (len <= 0){
+				ENG_LOG("%s read fail PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE1);
+			}
+			close(fd);
+		} else {
+			ENG_LOG("%s open fail PRODUCTINFO_FILE = %s ",__FUNCTION__ , PRODUCTINFO_FILE1);
+		}
+	}
+  return ret;
 }
 
