@@ -21,6 +21,8 @@
 
 #define IS_NEED_FLASH(x,y)  ((x)&&((CAMERA_ZSL_MODE == (y))|| \
 	                          (CAMERA_NORMAL_MODE == (y))|| \
+	                          (CAMERA_NORMAL_CONTINUE_SHOT_MODE == (y))|| \
+	                          (CAMERA_ZSL_CONTINUE_SHOT_MODE == (y))|| \
 	                          (CAMERA_TOOL_RAW_MODE == (y))))
 
 static int camera_autofocus_need_exit(void);

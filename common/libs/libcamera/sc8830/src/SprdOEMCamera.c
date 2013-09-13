@@ -1426,12 +1426,6 @@ void *camera_cap_thread_proc(void *data)
 
 				camera_wait_takepicdone(g_cxt);
 /*				cmr_v4l2_free_frame(data->channel_id, data->frame_id);*/
-				if (camera_capture_need_exit()) {
-					g_cxt->jpeg_cxt.jpeg_state = JPEG_IDLE;
-					g_cxt->capture_status = CMR_IDLE;
-					CMR_LOGV("done.");
-					break;
-				}
 				if ((g_cxt->cap_cnt == g_cxt->total_capture_num)||(CAMERA_HDR_MODE == g_cxt->cap_mode)) {
 					g_cxt->capture_status = CMR_IDLE;
 					camera_snapshot_stop_set();
@@ -1440,9 +1434,21 @@ void *camera_cap_thread_proc(void *data)
 						g_cxt->chn_2_status = CHN_BUSY;
 					}
 				} else {
+					if (camera_capture_need_exit()) {
+						g_cxt->jpeg_cxt.jpeg_state = JPEG_IDLE;
+						g_cxt->capture_status = CMR_IDLE;
+						CMR_LOGV("done.");
+						break;
+					}
 					camera_cap_continue();
 				}
 				cmr_v4l2_free_frame(data->channel_id, data->frame_id);
+				if (camera_capture_need_exit()) {
+					g_cxt->jpeg_cxt.jpeg_state = JPEG_IDLE;
+					g_cxt->capture_status = CMR_IDLE;
+					CMR_LOGV("done.");
+					break;
+				}
 			}
 			CMR_PRINT_TIME;
 			break;
