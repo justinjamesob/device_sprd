@@ -59,7 +59,8 @@ static const char * batter_adc_files[] ={
 
 static const char * batter_prodinfo_files[] ={
     "/dev/block/platform/sprd-sdhci.3/by-name/miscdata",
-    "/productinfo/productinfo.bin"
+    "/productinfo/productinfo.bin",
+    "/dev/block/platform/sprd-sdhci.3/by-name/prodinfo1"
 };
 
 
@@ -351,16 +352,16 @@ static void init_adc(void)
     }
 }
 
-
 static void init_productinfo_ext(void)
 {
     int fd = -1;
-    int fdx = -1;
     int ret = 0;
     int i;
     int wsize =0;
     RAM_SP09_PHASE_CHECK_T        phase_check;
+    RAM_SP09_PHASE_CHECK_T        phase_check_temp;
 
+    chmod(batter_prodinfo_files[0], 777);
     fd = open(batter_prodinfo_files[0],O_RDWR);
 
     if(fd < 0){
@@ -370,27 +371,65 @@ static void init_productinfo_ext(void)
 
     DBG("%s: open %s  ok",__FUNCTION__, batter_prodinfo_files[0]);
     ret = read(fd,&phase_check,sizeof(phase_check));
-
-    DBG("%s: phase_check.Magic= %d \n ",__FUNCTION__, phase_check.Magic);
-    if (phase_check.Magic == RAM_SP09_SPPH_MAGIC_NUMBER)
+    close(fd);
+    if ((ret>0) && (phase_check.Magic == RAM_SP09_SPPH_MAGIC_NUMBER))
     {
-        close(fd);
+        DBG("%s: phase_check data is new  \n ",__FUNCTION__);
         return;
     }
-
-    fdx = open(batter_prodinfo_files[1],O_RDONLY);
-    if(fdx< 0){
+    fd = open(batter_prodinfo_files[1],O_RDONLY);
+    if(fd< 0){
         DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[1]);
-        close(fd);
         return ;
     }
-    DBG("%s: open %s  ok",__FUNCTION__, batter_prodinfo_files[1]);
-    ret = read(fdx,&phase_check,sizeof(phase_check));
-    close(fdx);
-    DBG("%s: phase_check.Magic= %d \n ",__FUNCTION__, phase_check.Magic);
-    wsize = write(fd,&phase_check,sizeof(phase_check));
-    DBG("write error rsize = %d  size = %d\n", wsize, sizeof(phase_check));
+    ret = read(fd,&phase_check,sizeof(phase_check));
     close(fd);
+    if(ret < 0)
+    {
+	    DBG("%s: read %s fail ",__FUNCTION__, batter_prodinfo_files[1]);
+	    return;
+    }
+    DBG(" %s phase_check.SN1 =%s \n",__FUNCTION__, phase_check.SN1);
+    if (!strcmp(phase_check.SN1, "12345678912345"))
+    {
+              fd= open(batter_prodinfo_files[2],O_RDONLY);
+		 if(fd< 0){
+			    DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[2]);
+		 }
+		 else{
+			ret = read(fd,&phase_check_temp,sizeof(phase_check_temp));
+			if((ret >0) && (phase_check_temp.Magic == RAM_SP09_SPPH_MAGIC_NUMBER))
+			{
+				DBG(" %s phase_check_temp.SN1 =%s \n",__FUNCTION__, phase_check_temp.SN1);
+				DBG(" %s phase_check_temp.SN2 =%s \n",__FUNCTION__, phase_check_temp.SN2);
+				memcpy(phase_check.SN1, phase_check_temp.SN1, 24);
+				memcpy(phase_check.SN2, phase_check_temp.SN2, 24);
+			}
+		    close(fd);
+		}
+     }
+     else{
+		fd= open(batter_prodinfo_files[2],O_RDWR);
+		 if(fd< 0){
+			    DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[2]);
+		 }
+		 else{
+		     wsize = write(fd,&phase_check,sizeof(phase_check));
+		     close(fd);
+		}
+     }
+   DBG(" %s phase_check.SN1 =%s \n",__FUNCTION__, phase_check.SN1);
+   DBG(" %s phase_check.SN2 =%s \n",__FUNCTION__, phase_check.SN2);
+
+   fd= open(batter_prodinfo_files[0],O_RDWR);
+   if(fd< 0){
+       DBG("%s: open %s fail ",__FUNCTION__, batter_prodinfo_files[0]);
+	return;
+   }
+  wsize = write(fd,&phase_check,sizeof(phase_check));
+  close(fd);
+  if(wsize < sizeof(phase_check))
+      DBG("write error rsize = %d  size = %d\n", wsize, sizeof(phase_check));
 }
 
 static void init_productinfo()
