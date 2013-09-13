@@ -14791,13 +14791,22 @@
     />
     -->
     <!-- Kenya YU -->
+    <!-- SPRD: modified the config file @{ -->
     <apn carrier="yu wap"
         mcc="639"
         mnc="05"
         apn="internet"
         server="http://wap.yu.co.ke"
-        user=""
-        password=""
+        type="default,supl"
+        authtype="1"
+    />
+    <apn carrier="yu wap"
+        mcc="639"
+        mnc="05"
+        apn="internet"
+        server="http://wap.yu.co.ke"
+        proxy="10.4.16.6"
+        port="8080"
         type="default,supl"
         authtype="1"
     />
@@ -14807,12 +14816,11 @@
         apn="internet"
         mmsproxy="10.4.16.6"
         mmsport="8080"
-        user=""
-        password=""
         mmsc="http://10.4.16.22/servlets/mms"
         type="mms"
         authtype="1"
     />
+    <!-- @} -->
     <!-- Kenya Orange Kenya -->
     <apn carrier="orange net"
         mcc="639"
