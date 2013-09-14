@@ -40,6 +40,7 @@
             android:storageDescription="@string/storage_sd_card"
             android:primary="true"
             android:emulated="false"
+            android:removable="true"
             android:allowMassStorage="true"
             android:mtpReserve="100" />
     <!-- external SD card -->
