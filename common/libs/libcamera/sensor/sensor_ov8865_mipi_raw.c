@@ -1398,8 +1398,6 @@ LOCAL uint32_t _ov8865_write_exposure(uint32_t param)
 	return ret_value;
 }
 
-#define HAIT_DEBUG 1
-
 LOCAL uint32_t _ov8865_write_gain(uint32_t param)
 {
 	uint32_t ret_value = SENSOR_SUCCESS;
@@ -1577,10 +1575,10 @@ LOCAL uint32_t _ov8865_get_gain128(void)
 	// read gain, 128 = 1x
 	uint32_t gain128, value;
 
-	value = Sensor_ReadReg(0x3509);
-	gain128 = value&0xff;
 	value = Sensor_ReadReg(0x3508);
-	gain128 |= (value<<0x08)&0x1f;
+	gain128 = value&0x1f;
+	value = Sensor_ReadReg(0x3509);
+	gain128 = (gain128<<8) + (value & 0xff);
 
 	return gain128;
 }
@@ -1654,7 +1652,7 @@ LOCAL uint32_t _ov8865_ExtFunc(uint32_t ctl_param)
 	SENSOR_EXT_FUN_PARAM_T_PTR ext_ptr =
 	    (SENSOR_EXT_FUN_PARAM_T_PTR) ctl_param;
 
-	if (PNULL != ext_ptr) {
+	if (PNULL == ext_ptr) {
 
 		SENSOR_PRINT_ERR("SENSOR_ov8865: _ov8865_ExtFunc -- ctl_param is NULL\n");
 		return SENSOR_FALSE;
@@ -1714,7 +1712,7 @@ LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain)
 	value = Sensor_ReadReg(0x3509);
 	gain128 = value&0xff;
 	value = Sensor_ReadReg(0x3508);
-	gain128 |= (value<<0x08)&0x1f;
+	gain128 = gain128 + ((value&0x1f)<<0x08);
 
 	s_ov8865_realgain_128 = (uint32_t)gain128;
 	if (real_gain) {

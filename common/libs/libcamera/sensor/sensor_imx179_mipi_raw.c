@@ -2054,6 +2054,7 @@ LOCAL uint32_t _imx179_write_exposure(uint32_t param)
 	uint16_t frame_len = 0x00;
 
 	return 0;
+#if 0
 	expsure_line = param & 0xffff;
 	dummy_line = (param >> 16) & 0xffff;
 	if(expsure_line < 1){
@@ -2086,6 +2087,7 @@ LOCAL uint32_t _imx179_write_exposure(uint32_t param)
 
 	ret_value = Sensor_WriteReg(0x0104, 0x00);
 	return ret_value;
+#endif
 }
 
 LOCAL uint32_t _imx179_write_gain(uint32_t param)
@@ -2094,7 +2096,7 @@ LOCAL uint32_t _imx179_write_gain(uint32_t param)
 	uint16_t value=0x00;
 	uint32_t real_gain = 0;
 	return 0;
-
+#if 0
 	real_gain = ((param&0xf)+16)*(((param>>4)&0x01)+1)*(((param>>5)&0x01)+1);
 	real_gain = real_gain*(((param>>6)&0x01)+1)*(((param>>7)&0x01)+1)*(((param>>8)&0x01)+1);
 	real_gain = real_gain*(((param>>9)&0x01)+1)*(((param>>10)&0x01)+1)*(((param>>11)&0x01)+1);
@@ -2106,7 +2108,7 @@ LOCAL uint32_t _imx179_write_gain(uint32_t param)
 	ret_value = Sensor_WriteReg(0x0205, value);
 	//ret_value = Sensor_WriteReg(0x0104, 0x00);
 	SENSOR_PRINT("SENSOR_IMX179: Bill@@@ param: 0x%x, write_gain:0x%x, ret_value: %d", param, value, ret_value);
-
+#endif
 	return ret_value;
 }
 
