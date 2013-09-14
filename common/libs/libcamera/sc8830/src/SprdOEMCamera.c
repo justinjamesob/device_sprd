@@ -2463,7 +2463,8 @@ camera_ret_code_type camera_start_preview(camera_cb_f_type callback,
 					void *client_data,takepicture_mode mode)
 {
 	CMR_MSG_INIT(message);
-	int                      ret = CAMERA_SUCCESS;
+	int          ret = CAMERA_SUCCESS;
+	uint32_t     isp_param = 1;
 
 	CMR_LOGV("start preview");
 	CMR_PRINT_TIME;
@@ -2483,11 +2484,21 @@ camera_ret_code_type camera_start_preview(camera_cb_f_type callback,
 	}
 
 	ret = camera_wait_start(g_cxt);
-	if (CAMERA_SUCCESS == ret) {
-		ret = g_cxt->err_code;
+
+	if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
+		camera_isp_ae_stab_set(1);
+		ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)&isp_param);
+		CMR_LOGV("wait AE stable ....");
+		ret = camera_isp_ae_wait_stab();
+		if (ret) {
+			CMR_LOGE("wait AE stable abnormal!");
+		} else {
+			CMR_LOGV("wait AE stable OK");
+		}
 	}
-	CMR_LOGV("start preview finished... %d", ret);
-	return ret;
+
+	CMR_LOGV("start preview finished... %d", g_cxt->err_code);
+	return g_cxt->err_code;
 }
 
 int camera_stop_capture_raw_internal(void)
@@ -3663,7 +3674,7 @@ int32_t camera_isp_evt_cb(int32_t evt, void* data)
 		memcpy(message.data, data, sizeof(struct frm_info));
 	}
 	message.msg_type = evt;
-    if (CMR_IDLE != g_cxt->preview_status) {
+	if (CMR_IDLE != g_cxt->preview_status) {
 		ret = cmr_msg_post(g_cxt->msg_queue_handle, &message);
 		if (ret) {
 			if (message.data) {
@@ -3671,7 +3682,7 @@ int32_t camera_isp_evt_cb(int32_t evt, void* data)
 			}
 			CMR_LOGE("Faile to send one msg to camera main thread");
 		}
-    } else {
+	} else {
 		ret = camera_isp_handle(message.msg_type,
 					message.sub_msg_type,
 					(void *)message.data);
@@ -7445,7 +7456,7 @@ int camera_get_is_noscale(void)
 void camera_isp_ae_stab_set (uint32_t is_ae_stab_eb)
 {
 
-	g_cxt-> is_isp_ae_stab_eb = is_ae_stab_eb;
+	g_cxt->is_isp_ae_stab_eb = is_ae_stab_eb;
 
 }
 

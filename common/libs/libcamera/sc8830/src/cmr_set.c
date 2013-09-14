@@ -1750,12 +1750,32 @@ int camera_isp_af_stat(void* data)
 int camera_isp_ae_stab(void* data)
 {
 	struct camera_context    *cxt = camera_get_cxt();
+	CMR_LOGE("callback return.");
 
-	if (cxt-> is_isp_ae_stab_eb) {
-		cxt-> is_isp_ae_stab_eb = 0;
+	if (cxt->is_isp_ae_stab_eb) {
+		cxt->is_isp_ae_stab_eb = 0;
 		sem_post(&cxt->cmr_set.isp_ae_stab_sem);
 	}
 	return 0;
+}
+
+int camera_isp_ae_wait_stab(void)
+{
+	int rtn = CAMERA_SUCCESS;
+	struct timespec ts;
+	struct camera_context    *cxt = camera_get_cxt();
+
+	if (clock_gettime(CLOCK_REALTIME, &ts)) {
+		rtn = -1;
+		CMR_LOGE("get time failed.");
+	} else {
+		ts.tv_sec += ISP_AE_STAB_TIMEOUT;
+		if (sem_timedwait((&cxt->cmr_set.isp_ae_stab_sem), &ts)) {
+			rtn = -1;
+			CMR_LOGE("timeout.");
+		}
+	}
+	return rtn;
 }
 
 int camera_set_flashdevice(uint32_t param)
