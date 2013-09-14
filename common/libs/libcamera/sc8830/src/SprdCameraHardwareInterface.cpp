@@ -1685,11 +1685,13 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 			if(NULL == PreviewHeap->handle) {
 				LOGE("Fail to GetPmem mPreviewHeap. buffer_size: 0x%x.", buffer_size);
+				freePreviewMem();
 				return false;
 			}
 
 			if(PreviewHeap->phys_addr & 0xFF) {
 				LOGE("error: the mPreviewHeap is not 256 bytes aligned.");
+				freePreviewMem();
 				return false;
 			}
 
