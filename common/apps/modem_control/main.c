@@ -392,7 +392,9 @@ int main(int argc, char *argv[])
                 print_modem_image_info();
 	}
 
-	pthread_create(&t1, NULL, (void*)modemd_listenaccept_thread, NULL);
+	if(0 != pthread_create(&t1, NULL, (void*)modemd_listenaccept_thread, NULL)){
+		printf(" modem_listenaccept_thread create error!\n");
+	}
 	
 	modem_state = MODEM_STA_INIT;
 	do{

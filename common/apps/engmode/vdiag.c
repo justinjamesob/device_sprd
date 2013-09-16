@@ -265,6 +265,8 @@ void *eng_vdiag_thread(void *x)
     if(!audio_total)
     {
         ENG_LOG("eng_vdiag_thread malloc audio_total memory error\n");
+	 close(sipc_fd);
+	 close(ser_fd);
         return NULL;
     }
     memset(audio_total, 0, sizeof(AUDIO_TOTAL_T)*adev_get_audiomodenum4eng());

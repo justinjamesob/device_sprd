@@ -107,7 +107,7 @@ void eng_check_factorymode_fornand(void)
     property_get("ro.modem.wcn.enable", modem_enable, "");
     if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {
         fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC);
-        if(fd > 0)
+        if(fd >= 0)
             close(fd);
 
         ENG_LOG("%s: modem_enable: %s\n", __FUNCTION__, modem_enable);
