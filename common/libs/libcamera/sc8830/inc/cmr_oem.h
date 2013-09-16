@@ -399,6 +399,7 @@ struct camera_context {
 	uint32_t                 thum_from;
 	uint32_t                 thum_ready;
 	struct img_size          thum_size;
+	struct img_size          thum_size_backup;
 	struct cmr_cap_mem       cap_mem[CAMERA_CAP_FRM_CNT];
 	struct cmr_cap_2_frm     cap_2_mems;
 	pthread_mutex_t          cancel_mutex;

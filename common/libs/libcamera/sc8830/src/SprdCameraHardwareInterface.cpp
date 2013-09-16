@@ -787,7 +787,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	LOGV("setParameters: requested picture size %d x %d", mRawWidth, mRawHeight);
 	LOGV("setParameters: requested preview size %d x %d", mPreviewWidth, mPreviewHeight);
 
-	camera_zsl_rot_cap_param_reset();
+	camera_cfg_rot_cap_param_reset();
 
 	if (camera_set_change_size(mRawWidth, mRawHeight, mPreviewWidth, mPreviewHeight)) {
 		mPreviewStartFlag = 2;
@@ -1705,7 +1705,11 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 uint32_t SprdCameraHardware::getRedisplayMem()
 {
-	uint32_t buffer_size = camera_get_size_align_page(mPreviewWidth*mPreviewHeight*3/2);
+	uint32_t buffer_size = camera_get_size_align_page(mPreviewWidth * mPreviewHeight * 3 / 2);
+
+	if (mIsRotCapture) {
+		buffer_size += camera_get_size_align_page(mRawWidth * mRawHeight * 3 / 2);
+	}
 
 	mReDisplayHeap = GetPmem(buffer_size, 1);
 
