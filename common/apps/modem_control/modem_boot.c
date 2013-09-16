@@ -211,6 +211,10 @@ int _chkImg(char *fileName, int size)
 	buf = malloc(size);
 	memset(buf,0xFF,size);
 	fileHandle = open(fileName, O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
+	if(fileHandle < 0){
+		free(buf);
+		return 0;
+	}
 	ret = read(fileHandle, buf, size);
 	close(fileHandle);
 	// check IO
