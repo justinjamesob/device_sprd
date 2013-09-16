@@ -482,6 +482,12 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
 on property:ro.modem.w.enable=1
     symlink /dev/slog_w /dev/vbpipe0
     symlink /dev/spipe_w1 /dev/vbpipe1

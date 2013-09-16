@@ -496,6 +496,12 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
 on boot
     chown system system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
     chown system system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_upthreshold

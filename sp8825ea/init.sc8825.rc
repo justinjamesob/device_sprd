@@ -331,6 +331,12 @@ service slog /system/bin/slog
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
 on early-boot
     chown system system /dev/iio:device0
     chown system system /sys/bus/iio/devices/trigger0/name
