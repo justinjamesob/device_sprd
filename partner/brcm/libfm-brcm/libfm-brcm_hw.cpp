@@ -78,7 +78,7 @@ static int FUNC_REGION_JP = 0x02;
 static int FUNC_REGION_JP_II = 0x03;
 
 static int gVolume = 0;
-static int volumeTbl[16] = {0, 1, 2, 4, 8, 16, 32, 48, 64, 80, 108, 128, 150, 180, 210, 256};
+static int volumeTbl[16] = {0, 1, 2, 4, 8, 16, 32, 48, 64, 80, 108, 128, 150, 180, 210, 255};
 
 /* native interface */
 const int APP_SCAN_MODE_DOWN = 0x00;
@@ -167,7 +167,7 @@ setControl(struct fm_device_t* dev,int id, int value)
                   }
                   else if( value > 15 )
                   {
-                      gVolume = 256;
+                      gVolume = 255;
                   }
                   else
                       gVolume = volumeTbl[value];
