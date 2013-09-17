@@ -42,7 +42,7 @@ on boot
 
     chmod 660 /proc/cpw/wdtirq
     chmod 660 /proc/cpw/stop
-    chmod 660 /proc/cpwt/start
+    chmod 660 /proc/cpw/start
     chmod 660 /proc/cpw/modem
     chmod 660 /proc/cpw/dsp
 
@@ -487,6 +487,14 @@ service boot_complete /system/bin/boot_complete
     user system
     group system shell
     oneshot
+
+service refnotify /system/bin/refnotify -t 0
+    class main
+    user root
+
+service refnotify_w /system/bin/refnotify -t 1
+    class main
+    user root
 
 on property:ro.modem.w.enable=1
     symlink /dev/slog_w /dev/vbpipe0

@@ -74,6 +74,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	nvitemd \
 	charge \
+	refnotify\
 	rawdatad \
 	batterysrv \
 	poweroff_alarm \

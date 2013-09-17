@@ -46,7 +46,7 @@ on boot
     chmod 660 /proc/cpt/dsp
     chmod 660 /proc/cpw/wdtirq
     chmod 660 /proc/cpw/stop
-    chmod 660 /proc/cpwt/start
+    chmod 660 /proc/cpw/start
     chmod 660 /proc/cpw/modem
     chmod 660 /proc/cpw/dsp
     chown system root /proc/cpt/wdtirq
@@ -501,6 +501,14 @@ service boot_complete /system/bin/boot_complete
     user system
     group system shell
     oneshot
+
+service refnotify /system/bin/refnotify -t 0
+    class main
+    user root
+
+service refnotify_w /system/bin/refnotify -t 1
+    class main
+    user root
 
 on boot
     chown system system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
