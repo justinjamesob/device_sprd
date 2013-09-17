@@ -184,9 +184,13 @@ void eng_btwifimac_write(char* bt_mac, char* wifi_mac)
 
     // If no bt_mac or wifi_mac, we can randomly generate them.
     if(!bt_mac || !wifi_mac) {
-        bt_mac = bt_mac_rand;
-        wifi_mac = wifi_mac_rand;
-        mac_rand(bt_mac, wifi_mac);
+        mac_rand(bt_mac_rand, wifi_mac_rand);
+        if(!bt_mac){
+            bt_mac = bt_mac_rand;
+        }
+        if(!wifi_mac){
+            wifi_mac = wifi_mac_rand;
+        }
     }
 
     write_to_randmacfile(bt_mac, wifi_mac);
