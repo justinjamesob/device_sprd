@@ -3258,7 +3258,7 @@ void SprdCameraHardware::HandleStartPreview(camera_cb_type cb,
 
 	case CAMERA_EVT_CB_FD:
 		LOGV("CAMERA_EVT_CB_FD");
-		if (isPreviewing()) {
+		if ((isPreviewing()) && (mMsgEnabled & CAMERA_MSG_PREVIEW_FRAME)) {
 			receivePreviewFDFrame((camera_frame_type *)parm4);
 		}
 		break;
