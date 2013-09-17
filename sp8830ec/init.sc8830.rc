@@ -104,6 +104,9 @@ on property:ro.debuggable=1
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
 
+on property:ro.modem.t.count=1
+    write /proc/sim/0 t
+
 on property:ro.modem.t.count=2
     write /proc/sim/0 t
     write /proc/sim/1 t

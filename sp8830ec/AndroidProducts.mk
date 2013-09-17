@@ -16,6 +16,7 @@
 
 
 PRODUCT_MAKEFILES := $(LOCAL_DIR)/prod_sp8830eccmccspecAplus_UUI.mk
+PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp8830eccmccspecAbase_UUI.mk
 				      
 
 

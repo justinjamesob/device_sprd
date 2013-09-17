@@ -17,6 +17,6 @@
 
 
 add_lunch_combo sp8830eccmccspecAplus_UUI-userdebug
-
+add_lunch_combo sp8830eccmccspecAbase_UUI-userdebug
 
 
