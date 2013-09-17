@@ -148,7 +148,7 @@ void *eng_vlog_thread(void *x)
             } else {
                 r_cnt -= w_cnt;
                 offset += w_cnt;
-                ENG_LOG("eng_vlog: r_cnt: %d, w_cnt: %d, offset: %d\n", r_cnt, w_cnt, offset);
+                //ENG_LOG("eng_vlog: r_cnt: %d, w_cnt: %d, offset: %d\n", r_cnt, w_cnt, offset);
             }
         } while(r_cnt > 0);
     }

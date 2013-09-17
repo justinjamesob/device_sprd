@@ -91,7 +91,7 @@ static int cali_parse_one_para(char * buf, char gap, int* value)
     return len;
 }
 
-void eng_check_factorymode_fornand(void)
+void eng_check_factorymode(void)
 {
     int ret;
     int fd;
@@ -102,28 +102,34 @@ void eng_check_factorymode_fornand(void)
     char usb_config[64];
 
 #ifdef USE_BOOT_AT_DIAG
-    ENG_LOG("%s: status=%x\n",__func__, status);
-    property_get("persist.sys.usb.config", config_property, "");
-    property_get("ro.modem.wcn.enable", modem_enable, "");
-    if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {
-        fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC);
-        if(fd >= 0)
-            close(fd);
+    fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC);
 
-        ENG_LOG("%s: modem_enable: %s\n", __FUNCTION__, modem_enable);
-        if(!strcmp(modem_enable, "1")) {
-            strcpy(usb_config, USB_CONFIG_GSER6);
-        }else {
-            strcpy(usb_config, USB_CONFIG_VSER_GSER);
+    if(fd >= 0){
+        ENG_LOG("%s: status=%x\n",__func__, status);
+        property_get("persist.sys.usb.config", config_property, "");
+        property_get("ro.modem.wcn.enable", modem_enable, "");
+        if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {
+            sprintf(status_buf, "%s", "1");
+            ENG_LOG("%s: modem_enable: %s\n", __FUNCTION__, modem_enable);
+            if(!strcmp(modem_enable, "1")) {
+                strcpy(usb_config, USB_CONFIG_GSER6);
+            }else {
+                strcpy(usb_config, USB_CONFIG_VSER_GSER);
+            }
+            if(strncmp(config_property, usb_config, strlen(usb_config))){
+                property_set("sys.usb.config", usb_config);
+                property_set("persist.sys.usb.config", usb_config);
+            }
+        } else {
+            sprintf(status_buf, "%s", "0");
         }
-        if(strncmp(config_property, usb_config, strlen(usb_config))){
-            property_set("sys.usb.config", usb_config);
-            property_set("persist.sys.usb.config", usb_config);
-        }
-    } else if (status == 0) {
-        remove(ENG_FACOTRYMODE_FILE);
-    } else {
-        remove(ENG_FACOTRYMODE_FILE);
+
+        ret = write(fd, status_buf, strlen(status_buf)+1);
+        ENG_LOG("%s: write %d bytes to %s",__FUNCTION__, ret, ENG_FACOTRYMODE_FILE);
+
+        close(fd);
+    }else{
+        ENG_LOG("%s: fd: %d, status: %d\n", __FUNCTION__, fd, status);
     }
 #endif
 
@@ -153,7 +159,7 @@ static int eng_parse_cmdline(struct eng_param * cmdvalue)
             str = strstr(cmdline, "calibration");
             if ( str  != NULL){
                 cmdvalue->califlag = 1;
-		   disconnect_vbus_charger();
+                disconnect_vbus_charger();
                 /*calibration= mode,freq, device. Example: calibration=8,10096,146*/
                 str = strchr(str, '=');
                 if(str != NULL){
@@ -285,7 +291,7 @@ int main (int argc, char** argv)
     if(cmdparam.califlag != 1){
         cmdparam.cp_type = run_type;
         // Check factory mode and switch device mode.
-        eng_check_factorymode_fornand();
+        eng_check_factorymode();
     }else{
         // Enable usb enum
         eng_usb_enable();

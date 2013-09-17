@@ -43,8 +43,7 @@ char *at_sipc_devname[] = {
 
 extern int g_run_mode;
 extern AUDIO_TOTAL_T *audio_total;
-extern void eng_check_factorymode_fornand(void);
-extern void eng_check_factorymode_formmc(void);
+extern void eng_check_factorymode(void);
 extern int parse_vb_effect_params(void *audio_params_ptr, unsigned int params_size);
 extern int SetAudio_pga_parameter_eng(AUDIO_TOTAL_T *aud_params_ptr, unsigned int params_size, uint32_t vol_level);
 extern int eng_battery_calibration(char *data,unsigned int count,char *out_msg,int out_len);
@@ -947,7 +946,7 @@ int eng_diag_factorymode(char *buf,int len, char *rsp)
             ENG_LOG("%s: should close the vser,gser when next reboot\n",__FUNCTION__);
         case 0x01:
             eng_sql_string2int_set(ENG_TESTMODE, *pdata);
-            eng_check_factorymode_fornand();
+            eng_check_factorymode();
             head_ptr->subtype = 0x00;
             break;
         default:
