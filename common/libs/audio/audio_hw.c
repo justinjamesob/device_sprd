@@ -1556,10 +1556,10 @@ static ssize_t out_write_vaudio(struct tiny_stream_out *out, const void* buffer,
 
 		int i=0;
 		int16_t * buf_p = buffer;
-		for(i=0;i<5;i++)
+		/*for(i=0;i<5;i++)
 		{
 			VOIP_TRACE("voip:out_write_vaudio is %d,%d,%d,%d,%d,%d,%d,%d,%d,%d",*(buf_p+0),*(buf_p+1),*(buf_p+2),*(buf_p+3),*(buf_p+4),*(buf_p+5),*(buf_p+6),*(buf_p+7),*(buf_p+8),*(buf_p+9));
-		}
+		}*/
 
         ret = pcm_write(out->pcm_vplayback, (void *)buf, out_frames*frame_size);
         BLUE_TRACE("out_write_vaudio out out frames  is %d",out_frames);
@@ -4102,7 +4102,7 @@ static void vb_effect_getpara(struct tiny_audio_device *adev)
 static void *audiopara_tuning_thread_entry(void * param)
 {
     struct tiny_audio_device *adev = (struct tiny_audio_device *)param;
-    int fd = -1;
+    int fd_aud = -1;
     int fd_dum = -1;
     int ops_bit = 0;
     int result = -1;
@@ -4120,8 +4120,8 @@ static void *audiopara_tuning_thread_entry(void * param)
     if(chmod(AUDFIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 0) {
         ALOGE("%s Cannot set RW to \"%s\": %s", __FUNCTION__,AUDFIFO, strerror(errno));
     }
-    fd = open(AUDFIFO,O_RDONLY);
-    if (fd == -1) {
+    fd_aud = open(AUDFIFO,O_RDONLY);
+    if (fd_aud == -1) {
         ALOGE("%s open audio FIFO error %s\n",__FUNCTION__,strerror(errno));
         return NULL;
     }
@@ -4131,7 +4131,7 @@ static void *audiopara_tuning_thread_entry(void * param)
         return NULL;
     }
     while (ops_bit != -1) {
-        result = read(fd,&ops_bit,sizeof(int));
+        result = read(fd_aud,&ops_bit,sizeof(int));
         ALOGE("%s read audio FIFO result %d,ram_req:%d\n",__FUNCTION__,result,ops_bit);
         if (result >0) {
             pthread_mutex_lock(&adev->lock);
@@ -4148,8 +4148,8 @@ static void *audiopara_tuning_thread_entry(void * param)
             else if(ops_bit & ENG_RAM_OPS)
             {
                 ALOGE("%s audio para --> update from RAM\n",__FUNCTION__);
-                result = read(fd,&mode_index,sizeof(int));
-                result = read(fd,&ram_from_eng,sizeof(AUDIO_TOTAL_T));
+                result = read(fd_aud,&mode_index,sizeof(int));
+                result = read(fd_aud,&ram_from_eng,sizeof(AUDIO_TOTAL_T));
                 ALOGE("%s read audio FIFO result %d,mode_index:%d,size:%d\n",__FUNCTION__,result,mode_index,sizeof(AUDIO_TOTAL_T));
                 adev->audio_para[mode_index] = ram_from_eng;
             }
@@ -4162,7 +4162,7 @@ static void *audiopara_tuning_thread_entry(void * param)
     }
     ALOGE("exit from audio tuning thread");
     close(fd_dum);
-    close(fd);
+    close(fd_aud);
     unlink(AUDFIFO);
     pthread_exit(NULL);
     return NULL;
@@ -4311,7 +4311,7 @@ static int adev_open(const hw_module_t* module, const char* name,
 #ifndef _VOICE_CALL_VIA_LINEIN
     /* Create a task to get vbpipe message from cp when voice-call */
     ret = vbc_ctrl_open(adev);
-    ret = 0;
+    //ret = 0;
     if (ret < 0)  goto ERROR;
 #endif
 

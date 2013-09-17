@@ -217,7 +217,7 @@ static void dump_start_tag(void *data, const XML_Char *tag_name,
 	memcpy( (void*)(&(aud_dump_file_info[aud_dump_info->aud_dump_item_info->index])),(void*)(aud_dump_info->aud_dump_item_info) , sizeof(aud_dump_item_t) );
 	
 	dump_open_file(aud_dump_info->aud_dump_item_info->index);
-	XDUMP_TRACE("dump_open_file -----,index =  %d ,filenanme =  %s ",aud_dump_info->aud_dump_item_info->index , aud_dump_file_info[aud_dump_info->aud_dump_item_info->index].file_name);
+	XDUMP_TRACE("dump_open_file ------index =  %d   filenanme =  %s ",aud_dump_info->aud_dump_item_info->index , aud_dump_file_info[aud_dump_info->aud_dump_item_info->index].file_name);
 	aud_dump_info->aud_dump_item_info ++;
     }
 	
@@ -338,17 +338,18 @@ static int dump_open_file(int index )
 	char  * w_file_path = NULL;
 	int 	ret= 0 ;
 	//aud_dump_file_info[index].fp =  NULL;
+	AUDIO_OUT_FILE_PATH[0] = '\0';
 	
 	property_get(DUMP_PATH_PROPERTY	 , AUDIO_OUT_FILE_PATH, NULL);
 
 	//XDUMP_TRACE(" dump_switch  = %x %s" , dump_switch,AUDIO_OUT_FILE_PATH);
 	
-	if( NULL ==  AUDIO_OUT_FILE_PATH )
+	if( '\0' ==  AUDIO_OUT_FILE_PATH[0] )
 		return -1;
 	
 	//XDUMP_TRACE(" dump_path =  %s %x" , aud_dump_file_info[index].file_name , aud_dump_file_info[index].fp);
-	if ( NULL == aud_dump_file_info[index].file_name)
-		return -2;
+	//if ( NULL == aud_dump_file_info[index].file_name)
+	//	return -2;
 
 		if( dump_switch &  (1<<index) )
 		{
@@ -404,7 +405,7 @@ int  dump_data(dump_data_info_t dump_info)
 	
 	fd = aud_dump_file_info[dump_info.dump_switch_info].fp;
 
-	XDUMP_TRACE(" dump_data buf_len = %d ,fd = %d index = %d", dump_info.buf_len,fd ,dump_info.dump_switch_info);
+	XDUMP_TRACE(" dump_data buf_len = %d  fd = %d  index = %d", dump_info.buf_len,fd ,dump_info.dump_switch_info);
 
 	if( NULL == fd ){
 		pthread_mutex_unlock(&Dumplock);	
