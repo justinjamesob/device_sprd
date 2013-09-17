@@ -70,7 +70,7 @@ int write_proc_file(char *file, int offset, char *string)
 
 	fd = open(file, O_RDWR);
 	if (fd < 0) {
-		MODEMD_LOGE("Unknown file %s", file);
+		MODEMD_LOGE("Unknown file %s, error: %s", file, strerror(errno));
 		return 0;
 	}
 
@@ -86,7 +86,7 @@ int write_proc_file(char *file, int offset, char *string)
 	}
 
 	res = 0;
-	MODEMD_LOGD("Wrote %s in file %s", string, file);
+	MODEMD_LOGD("Wrote %s in file %s, error: %s", string, file, strerror(errno));
 leave:
 	close(fd);
 
