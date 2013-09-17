@@ -65,7 +65,7 @@ static int load_sipc_image(char *fin, int offsetin, char *fout, int offsetout, i
 	}
 	if (fdout < 0) {
 		close(fdin);
-		MODEMD_LOGE("failed to open %s", fout);
+		MODEMD_LOGE("failed to open %s, error: %s", fout, strerror(errno));
 		return -1;
 	}
 
