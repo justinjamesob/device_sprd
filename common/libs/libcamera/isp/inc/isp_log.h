@@ -37,8 +37,8 @@ extern   "C"
 #define ISP_DEBUG_STR      "%s, %s, %d line,: "
 #define ISP_DEBUG_ARGS    __FILE__,__FUNCTION__,__LINE__
 #else
-#define ISP_DEBUG_STR      "%s, %d line,: "
-#define ISP_DEBUG_ARGS    __FUNCTION__,__LINE__
+#define ISP_DEBUG_STR      "ISP_RAW: %05d line, %s : "
+#define ISP_DEBUG_ARGS    __LINE__,__FUNCTION__
 #endif
 
 #ifdef ANDROID_4100

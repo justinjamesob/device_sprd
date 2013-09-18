@@ -152,6 +152,14 @@ enum isp_ae_mode{
 	ISP_AE_MODE_MAX
 };
 
+enum isp_smart_ae {
+	ISP_SMART_AE_NONE=0x00,
+	ISP_SMART_AE_DENDOISE=0x01,
+	ISP_SMART_AE_EDGE=0x02,
+	ISP_SMART_AE_SATURATION=0x04,
+	ISP_SMART_AE_MAX,
+};
+
 enum isp_iso{
 	ISP_ISO_AUTO=0x00,
 	ISP_ISO_100,
@@ -225,6 +233,8 @@ enum isp_ctrl_cmd{
 	ISP_CTRL_GET_AWB_STAT,
 	ISP_CTRL_GET_AF_STAT,
 	ISP_CTRL_GAMMA,
+	ISP_CTRL_DENOISE,
+	ISP_CTRL_SMART_AE,
 	ISP_CTRL_MAX
 };
 
@@ -293,6 +303,24 @@ struct isp_af_win{
 	enum isp_focus_mode mode;
 	struct isp_pos_rect win[9];
 	uint32_t valid_win;
+};
+
+struct isp_smart_ae_param {
+	uint8_t smart;
+	uint8_t smart_mode;
+	uint8_t smart_rotio;
+	uint16_t smart_base_gain;
+	uint16_t smart_wave_min;
+	uint16_t smart_wave_max;
+	uint8_t smart_pref_min;
+	uint8_t smart_pref_max;
+	uint8_t smart_denoise_min_index;
+	uint8_t smart_denoise_max_index;
+	uint8_t smart_edge_min_index;
+	uint8_t smart_edge_max_index;
+	uint8_t smart_sta_low_thr;
+	uint8_t smart_sta_high_thr;
+	uint8_t smart_sta_rotio;
 };
 
 struct isp_img_frm{
