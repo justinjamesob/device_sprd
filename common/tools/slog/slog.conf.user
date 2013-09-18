@@ -5,6 +5,10 @@ disable
 var	logpath		external
 var	screenshot	enable
 var	slogsaveall	on
+var	sysdump		crashkey
+var	coredump	off
+var	hprofs		off
+var	sprd_debug	off
 
 #type	name	state	size	level
 stream	kernel	on	0	7
