@@ -793,7 +793,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		mPreviewStartFlag = 2;
 		camera_set_stop_preview_mode(1);
 		stopPreviewInternal();
-		if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
+		if (NO_ERROR != setPreviewWindow(mPreviewWindow)) {
 			return UNKNOWN_ERROR;
 		}
 	}
