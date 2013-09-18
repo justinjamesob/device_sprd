@@ -148,7 +148,12 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
-	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
+	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so 
+
+ifeq ($(USE_PROJECT_SEC),true)
+PRODUCT_COPY_FILES += \
+frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
+endif
 
 BOARD_WLAN_DEVICE_REV       := bcm4330_b2
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
