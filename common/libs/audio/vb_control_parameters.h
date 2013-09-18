@@ -64,6 +64,7 @@ struct voip_res
     int8_t  pipe_name[VOIP_PIPE_NAME_MAX];
     int  channel_id;
     int enable;
+    int is_done;
    void *adev;
     pthread_t thread_id;
 };
