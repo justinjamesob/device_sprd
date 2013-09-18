@@ -227,6 +227,7 @@ struct rotation_context {
 struct arithmetic_context {
 	uint32_t                 fd_inited;
 	uint32_t                 fd_flag;
+	uint32_t                 fd_num;
 };
 
 struct jpeg_specify_context {

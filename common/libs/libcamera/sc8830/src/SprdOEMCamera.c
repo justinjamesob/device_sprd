@@ -3337,6 +3337,7 @@ int camera_set_frame_type(camera_frame_type *frame_type, struct frm_info* info)
 	uint32_t                 frm_id;
 	int                      ret = CAMERA_SUCCESS;
 	uint32_t                 chn_id;
+	int                      skip_frame_gap;
 
 	if (NULL == frame_type || NULL == info) {
 		CMR_LOGE("Wrong param, frame_type 0x%x, info 0x%x",
@@ -3371,8 +3372,15 @@ int camera_set_frame_type(camera_frame_type *frame_type, struct frm_info* info)
 					&g_cxt->prev_frm[frm_id].addr_vir);
 		}
 #endif
-		if ((1 == g_cxt->arithmetic_cxt.fd_flag) && (1 == g_cxt->arithmetic_cxt.fd_inited)) {
+		if (0 == g_cxt->arithmetic_cxt.fd_num) {
+			skip_frame_gap = FACE_DETECT_GAP_MAX;
+		} else {
+			skip_frame_gap = FACE_DETECT_GAP_MIN;
+		}
+		if ((1 == g_cxt->arithmetic_cxt.fd_flag) && (1 == g_cxt->arithmetic_cxt.fd_inited)
+			&& (0 == (g_cxt->pre_frm_cnt % (skip_frame_gap + 1)))) {
 			CMR_LOGI("face detect start.");
+			g_cxt->arithmetic_cxt.fd_num = 0;
 			arithmetic_fd_start((void*)frame_type->buf_Virt_Addr);
 		}
 	} else if (CHN_2 == info->channel_id) {

@@ -124,6 +124,7 @@ void *arithmetic_fd_thread_proc(void *data)
 			} else {
 				frame_type.face_ptr = face_rect_ptr;
 				frame_type.face_num = face_num;
+				cxt->arithmetic_cxt.fd_num = face_num;
 				if (CMR_IDLE == cxt->preview_status) {
 					s_arith_cxt->fd_busy = 0;
 					pthread_mutex_unlock(&s_arith_cxt->fd_lock);

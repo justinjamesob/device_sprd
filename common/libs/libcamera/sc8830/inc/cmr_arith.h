@@ -21,6 +21,9 @@ extern "C"
 {
 #endif
 
+#define FACE_DETECT_GAP_MAX    15
+#define FACE_DETECT_GAP_MIN    1
+
 int arithmetic_fd_init(void);
 int arithmetic_fd_deinit(void);
 int arithmetic_fd_start(void *data_addr);
