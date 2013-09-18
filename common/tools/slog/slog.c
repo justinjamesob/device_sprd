@@ -503,20 +503,20 @@ static int sdcard_mounted()
 	FILE *str;
 	char buffer[MAX_LINE_LEN];
 
-	str = popen("mount", "r");
+	str = fopen("/proc/mounts", "r");
 	if(str == NULL) {
-		err_log("can't popen mount!");
+		err_log("can't open '/proc/mounts'");
 		return 0;
 	}
 
 	while(fgets(buffer, MAX_LINE_LEN, str) != NULL) {
 		if(strstr(buffer, external_path)){
-			pclose(str);
+			fclose(str);
 			return 1;
 		}
 	}
 
-	pclose(str);
+	fclose(str);
 	return 0;
 }
 

@@ -847,6 +847,7 @@ connect_socket:
 					pthread_create(&modem_tid, NULL, modem_log_handler, NULL);
 				modem_reset_flag = 0;
 			} else if(strstr(buffer, "Modem Blocked") != NULL) {
+				dump_modem_memory_flag = 1;
 				/* for shark dump sipc info */
 				if(dev_shark_flag == 1)
 					handle_dump_shark_sipc_info();
