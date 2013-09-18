@@ -75,3 +75,15 @@ include $(BUILD_PREBUILT)
 #LOCAL_SRC_FILES := FBAndroid-1.9.7-preload.apk 
 
 #include $(BUILD_PREBUILT)
+
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := Permission.apk
+LOCAL_MODULE_CLASS := APPS
+LOCAL_CERTIFICATE := PRESIGNED
+LOCAL_SRC_FILES := Permission.apk 
+
+include $(BUILD_PREBUILT)
+
