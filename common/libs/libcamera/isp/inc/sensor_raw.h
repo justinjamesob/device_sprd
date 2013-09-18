@@ -257,6 +257,13 @@ struct sensor_bpc_param{
 	uint16_t reserved;
 };
 
+struct sensor_denoise_tab {
+	uint8_t diswei[19];
+	uint8_t reserved1;
+	uint8_t ranwei[31];
+	uint8_t reserved0;
+};
+
 struct sensor_denoise_param{
 	uint8_t write_back;
 	uint8_t reserved4;
@@ -270,7 +277,8 @@ struct sensor_denoise_param{
 	uint8_t ranwei[31];
 	uint8_t reserved1;
 	uint8_t reserved0;
-	uint32_t reserved7[70];
+	struct sensor_denoise_tab tab[1];
+	uint32_t reserved5[57];
 };
 
 struct sensor_grgb_param{

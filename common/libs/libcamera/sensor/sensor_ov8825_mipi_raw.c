@@ -2365,6 +2365,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	//af info
 	sensor_ptr->af.max_step = 0x3ff;
 	sensor_ptr->af.min_step = 0;
+	sensor_ptr->af.max_tune_step = 100;
 	sensor_ptr->af.stab_period = 100;
 	sensor_ptr->af.alg_id = 2;
 	sensor_ptr->af.rough_count = 17;
@@ -2731,6 +2732,11 @@ LOCAL uint32_t _ov8825_write_exposure(uint32_t param)
 	if(0x00!=max_frame_len)
 	{
 		frame_len = ((expsure_line+4)> max_frame_len) ? (expsure_line+4) : max_frame_len;
+
+		if(0x00!=(0x01&frame_len))
+		{
+			frame_len+=0x01;
+		}
 
 		frame_len_cur = (Sensor_ReadReg(0x380e)&0xff)<<8;
 		frame_len_cur |= Sensor_ReadReg(0x380f)&0xff;
