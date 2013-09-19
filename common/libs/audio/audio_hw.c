@@ -1410,34 +1410,37 @@ static int do_output_standby(struct tiny_stream_out *out)
         if(out->pcm_sco) {
             pcm_close(out->pcm_sco);
             out->pcm_sco = NULL;
-            if(out->buffer_sco) {
-                free(out->buffer_sco);
-                out->buffer_sco = 0;
-            }
-            if(out->resampler_sco) {
-                release_resampler(out->resampler_sco);
-                out->resampler_sco= 0;
-            }
-            out->is_sco=false;
+	}
+	if(out->buffer_sco) {
+	    free(out->buffer_sco);
+	    out->buffer_sco = 0;
+	}
+	if(out->resampler_sco) {
+	    release_resampler(out->resampler_sco);
+	    out->resampler_sco= 0;
+	}
+        if(out->is_sco) {
             adev->voip_state &= (~VOIP_PLAYBACK_STREAM);
             if(!adev->voip_state) {
                if(!adev->voip_state) {
                   close_voip_codec_pcm(adev);
                }
-           }
-           
+	    }
+	    out->is_sco = false;
         }
         if(out->pcm_bt_sco) {
             pcm_close(out->pcm_bt_sco);
             out->pcm_bt_sco = NULL;
-            if(out->buffer_bt_sco) {
-                free(out->buffer_bt_sco);
-                out->buffer_bt_sco = 0;
-            }
-            if(out->resampler_bt_sco) {
-                release_resampler(out->resampler_bt_sco);
-                out->resampler_bt_sco= 0;
-            }
+	}
+	if(out->buffer_bt_sco) {
+	    free(out->buffer_bt_sco);
+	    out->buffer_bt_sco = 0;
+	}
+	if(out->resampler_bt_sco) {
+	    release_resampler(out->resampler_bt_sco);
+	    out->resampler_bt_sco= 0;
+	}
+	if(out->is_bt_sco) {
             out->is_bt_sco=false;
         }
         if(out->pcm_vplayback) {
@@ -1851,6 +1854,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
 		 }
 
     if (out->standby) {
+        out->standby = 0;
         if(modem->debug_info.enable)
         {
             write_index=0;
@@ -1861,7 +1865,6 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
             pthread_mutex_unlock(&adev->lock);
             goto exit;
         }
-        out->standby = 0;
     }    
     low_power = adev->low_power && !adev->active_input;
     pthread_mutex_unlock(&adev->lock);
@@ -2022,6 +2025,7 @@ exit:
         else if (out->pcm_vplayback)
             ALOGW("vwarning:%d, (%s)", ret, pcm_get_error(out->pcm_vplayback));
         do_output_standby(out);
+	usleep(10000);
     }
     pthread_mutex_unlock(&out->lock);
     return bytes;
@@ -2312,17 +2316,18 @@ static int do_input_standby(struct tiny_stream_in *in)
         if (in->pcm) {
             pcm_close(in->pcm);
             in->pcm = NULL;
-            if(adev->voip_state) {
-                in->is_sco=false;
-                adev->voip_state &= (~VOIP_CAPTURE_STREAM);
-            if(!adev->voip_state)
-                close_voip_codec_pcm(adev);
-            }
-            if(in->is_bt_sco) {
-                in->is_bt_sco = false;
-            }
-            
-        }
+	}
+	if(in->is_sco) {
+	    if(adev->voip_state) {
+		adev->voip_state &= (~VOIP_CAPTURE_STREAM);
+	    if(!adev->voip_state)
+		close_voip_codec_pcm(adev);
+	    }
+	    in->is_sco = false;
+	}
+	if(in->is_bt_sco) {
+	    in->is_bt_sco = false;
+	}
         adev->active_input = 0;
         if ((adev->mode != AUDIO_MODE_IN_CALL)
 #ifdef VOIP_DSP_PROCESS
