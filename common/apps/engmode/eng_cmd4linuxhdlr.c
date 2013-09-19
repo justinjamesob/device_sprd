@@ -153,7 +153,7 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
     ENG_LOG("Call %s\n",__FUNCTION__);
 
     //delete files in ENG_RECOVERYDIR
-    system("rm -rf /cache/recovery");
+    system("rm -r /cache/recovery");
 
     //mkdir ENG_RECOVERYDIR
     if(mkdir(ENG_RECOVERYDIR, mode) == -1) {
