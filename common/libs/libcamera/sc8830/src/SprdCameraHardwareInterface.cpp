@@ -1705,7 +1705,7 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 uint32_t SprdCameraHardware::getRedisplayMem()
 {
-	uint32_t buffer_size = camera_get_size_align_page(mPreviewWidth * mPreviewHeight * 3 / 2);
+	uint32_t buffer_size = camera_get_size_align_page(((mPreviewWidth+15)&(~15)) * ((mPreviewHeight+15)&(~15)) * 3 / 2);
 
 	if (mIsRotCapture) {
 		buffer_size += camera_get_size_align_page(mRawWidth * mRawHeight * 3 / 2);
@@ -1725,6 +1725,7 @@ uint32_t SprdCameraHardware::getRedisplayMem()
 		LOGE("error: the mReDisplayHeap is not 256 bytes aligned.");
 		return 0;
 	}
+	LOGV("mReDisplayHeap addr:0x%x.",(uint32_t)mReDisplayHeap->data);
 	return mReDisplayHeap->phys_addr;
 }
 
@@ -2585,6 +2586,7 @@ bool SprdCameraHardware::displayOneFrameForCapture(uint32_t width, uint32_t heig
 
 	private_h = (struct private_handle_t *)(*buf_handle);
 	dst_phy_addr =  (uint32_t)(private_h->phyaddr);
+	LOGV("displayOneFrameForCapture,0x%x.",(uint32_t)virtual_addr);
 	ret = displayCopy(dst_phy_addr, (uint32_t)vaddr, phy_addr, (uint32_t)virtual_addr, width, height);
 
 	mGrallocHal->unlock(mGrallocHal, *buf_handle);
