@@ -3046,7 +3046,7 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 	camera_set_take_picture(TAKE_PICTURE_NEEDED);
 	pthread_mutex_unlock(&g_cxt->recover_mutex);
 
-	if (IS_ZSL_MODE(cap_mode)) {
+	if (IS_ZSL_MODE(cap_mode) || (CAMERA_RAW_MODE == cap_mode)) {
 		camera_snapshot_start_set();
 	}
 

@@ -23,9 +23,29 @@
 #define ov8865_I2C_ADDR_W        (0x20>>1)
 #define ov8865_I2C_ADDR_R         (0x21>>1)
 
-#define OV8865_RAW_PARAM_COM  0x0000
+#define OV8865_RAW_PARAM_COM  (0x0000)
+#define OV8865_RAW_PARAM_O_FILM (0x0007)
 
+#define  BG_RATIO_TYPICAL_OFILM (0x152)
+#define  RG_RATIO_TYPICAL_OFILM (0x137)
 #define OV8865_4_LANES
+
+struct ov8865_otp_info {
+	int32_t module_integrator_id;
+	int32_t lens_id;
+	int32_t production_year;
+	int32_t production_month;
+	int32_t production_day;
+	int32_t rg_ratio;
+	int32_t bg_ratio;
+	int32_t light_rg;
+	int32_t light_bg;
+	int32_t user_data[5];
+	int32_t lenc[62];
+	int32_t VCM_start;
+	int32_t VCM_end;
+	int32_t VCM_dir;
+};
 
 LOCAL uint32_t _ov8865_GetResolutionTrimTab(uint32_t param);
 LOCAL uint32_t _ov8865_PowerOn(uint32_t power_on);
@@ -45,19 +65,24 @@ LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain);
 LOCAL uint32_t _ov8865_set_video_mode(uint32_t param);
 LOCAL uint32_t _ov8865_get_shutter(void);
 LOCAL uint32_t _ov8865_com_Identify_otp(void* param_ptr);
+LOCAL uint32_t _ov8865_o_film_Identify_otp(void* param_ptr);
+LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain);
+LOCAL uint32_t _ov8865_dw9714_SRCInit(uint32_t mode);
+LOCAL uint32_t _ov8865_o_film_update_otp(void* param_ptr);
+LOCAL uint32_t _ov8865_cfg_otp(uint32_t  param);
+LOCAL int32_t _ov8865_check_o_film_otp(int32_t cmd, int32_t index);
+LOCAL int32_t _ov8865_read_o_film_otp(int32_t cmd, int32_t index, struct ov8865_otp_info *otp_ptr);
+LOCAL int32_t _ov8865_update_o_film_otp_wb(void);
+LOCAL int32_t _ov8865_update_o_film_otp_lenc(void);
 
 LOCAL uint32_t s_ov8865_realgain_128 = 0;
 LOCAL uint32_t s_capture_shutter = 0;
 LOCAL uint32_t s_capture_VTS = 0;
-LOCAL uint32_t s_video_min_framerate = 0;
-LOCAL uint32_t s_video_max_framerate = 0;
 LOCAL uint32_t g_module_id = 0;
-LOCAL uint32_t g_flash_mode_en = 0;
-LOCAL uint32_t g_af_slewrate = 1;
-
 struct sensor_raw_info* s_ov8865_mipi_raw_info_ptr=NULL;
 
 LOCAL const struct raw_param_info_tab s_ov8865_raw_param_tab[]={
+	{OV8865_RAW_PARAM_O_FILM, &s_ov8865_mipi_raw_info, _ov8865_o_film_Identify_otp, _ov8865_o_film_update_otp},
 	{OV8865_RAW_PARAM_COM, &s_ov8865_mipi_raw_info, _ov8865_com_Identify_otp, PNULL},
 	{RAW_INFO_END_ID, PNULL, PNULL, PNULL}
 };
@@ -956,7 +981,7 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov8865_ioctl_func_tab = {
 	PNULL, //get_status
 	_ov8865_StreamOn,
 	_ov8865_StreamOff,
-	PNULL,
+	_ov8865_cfg_otp,
 };
 
 
@@ -1212,6 +1237,7 @@ LOCAL uint32_t _ov8865_PowerOn(uint32_t power_on)
 		Sensor_SetMonitorVoltage(SENSOR_AVDD_2800MV);
 		Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
 		usleep(20*1000);
+		_ov8865_dw9714_SRCInit(2);
 		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
 		usleep(10*1000);
 		Sensor_PowerDown(!power_down);
@@ -1233,15 +1259,506 @@ LOCAL uint32_t _ov8865_cfg_otp(uint32_t  param)
 {
 	uint32_t rtn=SENSOR_SUCCESS;
 	struct raw_param_info_tab* tab_ptr = (struct raw_param_info_tab*)s_ov8865_raw_param_tab;
-	uint32_t module_id=g_module_id;
+	uint32_t module_id = g_module_id;
+	uint16_t stream_value = 0;
 
 	SENSOR_PRINT("SENSOR_OV8865: _ov8825_cfg_otp");
 
-	if(PNULL!=tab_ptr[module_id].cfg_otp){
+	stream_value = Sensor_ReadReg(0x0100);
+	SENSOR_PRINT("_ov8865_cfg_otp: stream_value = 0x%x\n", stream_value);
+	if(1 != (stream_value & 0x01)) {
+		Sensor_WriteReg(0x0100, 0x01);
+		usleep(5 * 1000);
+	}
+
+	if (PNULL!=tab_ptr[module_id].cfg_otp) {
 		tab_ptr[module_id].cfg_otp(0);
-		}
+	}
+
+	if(1 != (stream_value & 0x01)) {
+		Sensor_WriteReg(0x0100, stream_value);
+		usleep(5 * 1000);
+	}
 
 	return rtn;
+}
+
+LOCAL int32_t _ov8865_check_o_film_otp(int32_t cmd, int32_t index)
+{
+	int32_t rtn_index = 0;
+	int32_t flag, i;
+	int32_t address_start;
+	int32_t address_end;
+
+	switch (cmd)
+	{
+		case 0://for check otp info
+		{
+			address_start = 0x7010;
+			address_end = 0x7010;
+			/* read otp into buffer*/
+			Sensor_WriteReg(0x3d84, 0xc0);
+
+			/* program disable, manual mode*/
+			/*partial mode OTP write start address*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+
+			/*read otp*/
+			usleep(5*1000);
+			flag = Sensor_ReadReg(0x7010);
+		}
+		break;
+
+		case 1://for check opt wb
+		{
+			address_start = 0x7020;
+			address_end = 0x7020;
+			/*read otp into buffer*/
+			Sensor_WriteReg(0x3d84, 0xc0);
+
+			/* program disable, manual mode*/
+			/*partial mode OTP write start address*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			/*read OTP; select group*/
+			flag = Sensor_ReadReg(0x7020);
+		}
+		break;
+
+		case 2://for check otp lenc
+		{
+			address_start = 0x703a;
+			address_end = 0x703a;
+			/* read otp into buffer*/
+			Sensor_WriteReg(0x3d84, 0xc0);
+			/*
+			program disable, manual mode
+			partial mode OTP write start address
+			*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			flag = Sensor_ReadReg(0x703a);
+		}
+		break;
+
+		case 3:
+		{
+			address_start = 0x7030;
+			address_end = 0x7030;
+			// read otp into buffer
+			Sensor_WriteReg(0x3d84, 0xc0);
+			// program disable, manual mode
+			//partial mode OTP write start address
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+			// partial mode OTP write end address
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			//select group
+			flag = Sensor_ReadReg(0x7030);
+		}
+		break;
+
+		default:
+		break;
+	}
+
+	if(index==1) {
+		flag = (flag>>6) & 0x03;
+	}else if (index==2) {
+		flag = (flag>>4) & 0x03;
+	} else {
+		flag =( flag>>2) & 0x03;
+	}
+
+	/* clear otp buffer*/
+	for (i=address_start;i<=address_end;i++) {
+		Sensor_WriteReg(i, 0x00);
+	}
+	if (flag == 0x00) {
+		rtn_index = 0;
+	} else if (flag & 0x02) {
+		rtn_index = 1;
+	} else {
+		rtn_index = 2;
+	}
+
+	return rtn_index;
+}
+
+LOCAL int32_t _ov8865_read_o_film_otp(int32_t cmd, int32_t index, struct ov8865_otp_info *otp_ptr)
+{
+	int32_t i = 0x00;
+	int32_t address_start = 0x00;
+	int32_t address_end = 0x00;
+	int32_t temp = 0;
+
+	/*read otp into buffer*/
+	Sensor_WriteReg(0x3d84, 0xc0);
+
+	switch (cmd)
+	{
+		case 0:/*for read otp info*/
+		{
+			/*program disable, manual mode; select group*/
+			if (index==1) {
+				address_start = 0x7011;
+				address_end = 0x7015;
+			}
+			else if (index==2) {
+				address_start = 0x7016;
+				address_end = 0x701a;
+			} else {
+				address_start = 0x701b;
+				address_end = 0x701f;
+			}
+
+			/*partial mode OTP write start address*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			/*load otp into buffer*/
+			(*otp_ptr).module_integrator_id = Sensor_ReadReg(address_start);
+			(*otp_ptr).lens_id = Sensor_ReadReg(address_start + 1);
+			(*otp_ptr).production_year = Sensor_ReadReg(address_start + 2);
+			(*otp_ptr).production_month = Sensor_ReadReg(address_start + 3);
+			(*otp_ptr).production_day = Sensor_ReadReg(address_start + 4);
+		}
+		break;
+
+		case 1:/*for read otp wb*/
+		{
+			/* program disable, manual mode select group*/
+			if (index==1) {
+			address_start = 0x7021;
+			address_end = 0x7025;
+			}
+			else if (index==2) {
+			address_start = 0x7026;
+			address_end = 0x702a;
+			}
+			else {
+			address_start = 0x702b;
+			address_end = 0x702f;
+			}
+
+			/*partial mode OTP write start address*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			/*load otp into buffer*/
+			temp = Sensor_ReadReg(address_start + 4);
+			(*otp_ptr).rg_ratio = (Sensor_ReadReg(address_start )<<2) + ((temp>>6) & 0x03);
+			(*otp_ptr).bg_ratio = (Sensor_ReadReg(address_start + 1)<<2) + ((temp>>4) & 0x03);
+			(*otp_ptr).light_rg = (Sensor_ReadReg(address_start + 2) <<2) + ((temp>>2) & 0x03);
+			(*otp_ptr).light_bg = (Sensor_ReadReg(address_start + 3)<<2) + (temp & 0x03);
+		}
+		break;
+
+		case 2:/*for read otp lenc*/
+		{
+			/* program disable, manual mode; select group*/
+			if (index==1) {
+				address_start = 0x703b;
+				address_end = 0x7078;
+			}
+			else if (index==2) {
+				address_start = 0x7079;
+				address_end = 0x70b6;
+			}
+			else if (index==3) {
+				address_start = 0x70B7;
+				address_end = 0x70f4;
+			}
+			/*partial mode OTP write start address*/
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+			/*partial mode OTP write end address*/
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			/* load otp into buffer */
+			for(i=0; i<62; i++) {
+				(* otp_ptr).lenc[i]=Sensor_ReadReg(address_start + i);
+			}
+		}
+		break;
+
+		case 3:
+		{
+			// program disable, manual mode
+			//check group
+			if(index==1){
+				address_start = 0x7031;
+				address_end = 0x7033;
+			} else if(index==2) {
+				address_start = 0x7034;
+				address_end = 0x7036;
+			} else {
+				address_start = 0x7037;
+				address_end = 0x7039;
+			}
+			//partial mode OTP write start address
+			Sensor_WriteReg(0x3d88, (address_start>>8));
+			Sensor_WriteReg(0x3d89, (address_start & 0xff));
+			// partial mode OTP write end address
+			Sensor_WriteReg(0x3d8A, (address_end>>8));
+			Sensor_WriteReg(0x3d8B, (address_end & 0xff));
+			Sensor_WriteReg(0x3d81, 0x01);
+			usleep(5*1000);
+			// load otp into buffer
+			//flag and lsb of VCM start code
+			temp = Sensor_ReadReg(address_start + 2);
+			(* otp_ptr).VCM_start = (Sensor_ReadReg(address_start)<<2) | ((temp>>6) & 0x03);
+			(* otp_ptr).VCM_end = (Sensor_ReadReg(address_start + 1) << 2) | ((temp>>4) & 0x03);
+			(* otp_ptr).VCM_dir = (temp>>2) & 0x03;
+		}
+		break;
+
+		default:
+		break;
+	}
+
+	/* clear otp buffer */
+	for (i=address_start; i<=address_end; i++) {
+		Sensor_WriteReg(i, 0x00);
+	}
+
+	return 0;
+}
+
+/*
+call this function after OV8865 initialization
+return value: 0 update success; 1, no OTP
+*/
+LOCAL int32_t _ov8865_update_o_film_otp_wb(void)
+{
+	struct ov8865_otp_info current_otp;
+	int32_t i;
+	int32_t otp_index;/*bank 1,2,3*/
+	int32_t temp, rg, bg;
+	int32_t R_gain, G_gain, B_gain, G_gain_R, G_gain_B;
+	int32_t BG_Ratio_Typical = BG_RATIO_TYPICAL_OFILM;
+	int32_t RG_Ratio_Typical = RG_RATIO_TYPICAL_OFILM;
+
+	/*
+	R/G and B/G of current camera module is read out from sensor OTP
+	check first OTP with valid data
+	*/
+	for(i=1;i<4;i++) {
+		temp = _ov8865_check_o_film_otp(1, i);
+		if (temp == 2) {
+			otp_index = i;
+			break;
+		}
+	}
+	if (i==4) {
+		/* no valid wb OTP data*/
+		return 1;
+	}
+
+	/*set right bank*/
+	_ov8865_read_o_film_otp(1, otp_index, &current_otp);
+	if(current_otp.light_rg==0) {
+		/*no light source information in OTP, light factor = 1*/
+		rg = current_otp.rg_ratio;
+	}
+	else {
+		rg = current_otp.rg_ratio * (current_otp.light_rg + 512) / 1024;
+	}
+	if(current_otp.light_bg==0) {
+		/*not light source information in OTP, light factor = 1*/
+		bg = current_otp.bg_ratio;
+	}
+	else {
+		bg = current_otp.bg_ratio * (current_otp.light_bg + 512) / 1024;
+	}
+
+	/*calculate G gain
+	0x400 = 1x gain*/
+	if(bg < BG_Ratio_Typical) {
+		if (rg< RG_Ratio_Typical) {
+			/*
+			current_otp.bg_ratio < BG_Ratio_typical &&
+			current_otp.rg_ratio < RG_Ratio_typical
+			*/
+			G_gain = 0x400;
+			B_gain = 0x400 * BG_Ratio_Typical / bg;
+			R_gain = 0x400 * RG_Ratio_Typical / rg;
+		}
+		else {
+			/* current_otp.bg_ratio < BG_Ratio_typical &&
+			 current_otp.rg_ratio >= RG_Ratio_typical
+			 */
+			R_gain = 0x400;
+			G_gain = 0x400 * rg / RG_Ratio_Typical;
+			B_gain = G_gain * BG_Ratio_Typical /bg;
+		}
+	}
+	else {
+		if (rg < RG_Ratio_Typical) {
+			/* current_otp.bg_ratio >= BG_Ratio_typical &&
+			current_otp.rg_ratio < RG_Ratio_typical
+			*/
+			B_gain = 0x400;
+			G_gain = 0x400 * bg / BG_Ratio_Typical;
+			R_gain = G_gain * RG_Ratio_Typical / rg;
+		}
+		else {
+			/*
+			current_otp.bg_ratio >= BG_Ratio_typical &&
+			current_otp.rg_ratio >= RG_Ratio_typical
+			*/
+			G_gain_B = 0x400 * bg / BG_Ratio_Typical;
+			G_gain_R = 0x400 * rg / RG_Ratio_Typical;
+			if(G_gain_B > G_gain_R ) {
+				B_gain = 0x400;
+				G_gain = G_gain_B;
+				R_gain = G_gain * RG_Ratio_Typical /rg;
+		}
+		else {
+			R_gain = 0x400;
+			G_gain = G_gain_R;
+			B_gain = G_gain * BG_Ratio_Typical / bg;
+		}
+		}
+	}
+
+	/*update_awb_gain(R_gain, G_gain, B_gain)
+	R_gain, sensor red gain of AWB, 0x400 =1
+	G_gain, sensor green gain of AWB, 0x400 =1
+	B_gain, sensor blue gain of AWB, 0x400 =1
+	*/
+	if (R_gain>0x400) {
+		Sensor_WriteReg(0x5018, R_gain>>8);
+		Sensor_WriteReg(0x5019, R_gain & 0x00ff);
+	}
+	if (G_gain>0x400) {
+		Sensor_WriteReg(0x501A, G_gain>>8);
+		Sensor_WriteReg(0x501B, G_gain & 0x00ff);
+	}
+	if (B_gain>0x400) {
+		Sensor_WriteReg(0x501C, B_gain>>8);
+		Sensor_WriteReg(0x501D, B_gain & 0x00ff);
+	}
+
+	return 0;
+}
+
+/* call this function after OV8865 initialization
+return value: 0 update success*/
+LOCAL int32_t _ov8865_update_o_film_otp_lenc(void)
+{
+	struct ov8865_otp_info current_otp;
+	int32_t i;
+	int32_t otp_index;
+	int32_t temp;
+
+	/* check first lens correction OTP with valid data */
+	for (i=1;i<=3;i++) {
+		temp = _ov8865_check_o_film_otp(2, i);
+		if (temp == 2) {
+			otp_index = i;
+			break;
+		}
+	}
+
+	if (i>3) {
+		/* no valid WB OTP data */
+		return 1;
+	}
+	_ov8865_read_o_film_otp(2, otp_index, &current_otp);
+
+	/*update_lenc*/
+	temp = Sensor_ReadReg(0x5000);
+	temp = 0x80 | temp;
+	Sensor_WriteReg(0x5000, temp);
+	for(i=0;i<62;i++) {
+		Sensor_WriteReg(0x5800 + i, current_otp.lenc[i]);
+	}
+
+	return 0;
+}
+
+LOCAL uint32_t _ov8865_o_film_Identify_otp(void* param_ptr)
+{
+	uint32_t rtn=SENSOR_FAIL;
+	uint32_t param_id;
+	struct ov8865_otp_info current_otp;
+	int32_t i;
+	int32_t otp_index;
+	int32_t temp;
+	int32_t ret;
+
+	SENSOR_PRINT("SENSOR_ov8865: _ov8865_o_film_Identify_otp");
+
+	/*read param id from sensor omap*/
+	for (i=1;i<=3;i++) {
+		temp = _ov8865_check_o_film_otp(0, i);
+		SENSOR_PRINT("_ov8865_o_film_Identify_otp i=%d temp = %d \n",i,temp);
+		if (temp == 2) {
+			otp_index = i;
+			break;
+		}
+	}
+
+	if (i <= 3) {
+		_ov8865_read_o_film_otp(0, otp_index, &current_otp);
+		SENSOR_PRINT("read ov8865 otp  module_id = %x \n", current_otp.module_integrator_id);
+		if (OV8865_RAW_PARAM_O_FILM == current_otp.module_integrator_id) {
+			SENSOR_PRINT("SENSOR_OV8865: This is o_film module!!\n");
+			rtn = SENSOR_SUCCESS;
+		} else {
+			SENSOR_PRINT("SENSOR_OV8865: check module id faided!!\n");
+			rtn = SENSOR_FAIL;
+		}
+	} else {
+		/* no valid wb OTP data */
+		SENSOR_PRINT("ov8865_check_otp_module_id no valid wb OTP data\n");
+		rtn = SENSOR_FAIL;
+	}
+
+	return rtn;
+}
+
+LOCAL uint32_t  _ov8865_o_film_update_otp(void* param_ptr)
+{
+
+	SENSOR_PRINT("SENSOR_OV8865: _ov8865_o_film_update_otp");
+
+	//_ov8865_update_o_film_otp_wb();
+	_ov8865_update_o_film_otp_lenc();
+
+	return 0;
 }
 
 LOCAL uint32_t _ov8865_com_Identify_otp(void* param_ptr)
@@ -1265,31 +1782,39 @@ LOCAL uint32_t _ov8865_GetRawInof(void)
 {
 	uint32_t rtn=SENSOR_SUCCESS;
 	struct raw_param_info_tab* tab_ptr = (struct raw_param_info_tab*)s_ov8865_raw_param_tab;
-	uint32_t param_id;
 	uint32_t i=0x00;
+	uint16_t stream_value = 0;
 
-	/*read param id from sensor omap*/
-	param_id=OV8865_RAW_PARAM_COM;
+	stream_value = Sensor_ReadReg(0x0100);
+	SENSOR_PRINT("_ov8865_GetRawInof:stream_value = 0x%x\n", stream_value);
+	if (1 != (stream_value & 0x01)) {
+		Sensor_WriteReg(0x0100, 0x01);
+		usleep(5 * 1000);
+	}
 
-	for(i=0x00; ; i++)
-	{
+	for (i=0x00; ; i++) {
 		g_module_id = i;
-		if(RAW_INFO_END_ID==tab_ptr[i].param_id){
-			if(NULL==s_ov8865_mipi_raw_info_ptr){
+		if(RAW_INFO_END_ID==tab_ptr[i].param_id) {
+			if(NULL==s_ov8865_mipi_raw_info_ptr) {
 				SENSOR_PRINT("SENSOR_OV8865: ov8865_GetRawInof no param error");
 				rtn=SENSOR_FAIL;
 			}
 			SENSOR_PRINT("SENSOR_OV8865: ov8865_GetRawInof end");
 			break;
 		}
-		else if(PNULL!=tab_ptr[i].identify_otp){
-			if(SENSOR_SUCCESS==tab_ptr[i].identify_otp(0))
+		else if (PNULL!=tab_ptr[i].identify_otp) {
+			if (SENSOR_SUCCESS==tab_ptr[i].identify_otp(0))
 			{
 				s_ov8865_mipi_raw_info_ptr = tab_ptr[i].info_ptr;
 				SENSOR_PRINT("SENSOR_OV8865: ov8865_GetRawInof success");
 				break;
 			}
 		}
+	}
+
+	if(1 != (stream_value & 0x01)) {
+		Sensor_WriteReg(0x0100, stream_value);
+		usleep(5 * 1000);
 	}
 
 	return rtn;
@@ -1377,6 +1902,7 @@ LOCAL uint32_t _ov8865_write_exposure(uint32_t param)
 		SENSOR_PRINT("SENSOR_ov8865: write_exposure max line:%d, cur frame line:%d", max_frame_len, frame_len_cur);
 
 		if(frame_len_cur != frame_len){
+			frame_len = ((frame_len + 1)>>1)<<1;
 			value=(frame_len)&0xff;
 			ret_value = Sensor_WriteReg(0x380f, value);
 			value=(frame_len>>0x08)&0xff;
@@ -1418,17 +1944,22 @@ LOCAL uint32_t _ov8865_write_gain(uint32_t param)
 
 LOCAL uint32_t _ov8865_write_af(uint32_t param)
 {
+#define DW9714_VCM_SLAVE_ADDR (0x18>>1)
+
 	uint32_t ret_value = SENSOR_SUCCESS;
-	uint16_t value=0x00;
-	uint16_t reg_val = 0x0;
+	uint8_t cmd_val[2] = {0x00};
+	uint16_t  slave_addr = 0;
+	uint16_t cmd_len = 0;
 
-	SENSOR_PRINT("SENSOR_ov8865: _write_af 0x%x", param);
+	SENSOR_PRINT("SENSOR_ov8865: _write_af %d", param);
 
-	value = (param&0xf)<<0x04;
-	value = value + 8 + (g_af_slewrate&0x7);
-	//ret_value = Sensor_WriteReg(0x3618, value);
-	value = (param&0x3f0)>>0x04;
-	//ret_value = Sensor_WriteReg(0x3619, value);
+	slave_addr = DW9714_VCM_SLAVE_ADDR;
+	cmd_val[0] = (param&0xfff0)>>4;
+	cmd_val[1] = ((param&0x0f)<<4)|0x09;
+	cmd_len = 2;
+	ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
+
+	SENSOR_PRINT("SENSOR_ov8865: _write_af, ret =  %d, MSL:%x, LSL:%x\n", ret_value, cmd_val[0], cmd_val[1]);
 
 	return ret_value;
 }
@@ -1511,7 +2042,6 @@ LOCAL uint32_t _ov8865_flash(uint32_t param)
 	SENSOR_PRINT("SENSOR_ov8865: param=%d", param);
 
 	/* enable flash, disable in _ov8865_BeforeSnapshot */
-	g_flash_mode_en = param;
 	Sensor_SetFlash(param);
 	SENSOR_PRINT_HIGH("end");
 	return SENSOR_SUCCESS;
@@ -1575,10 +2105,10 @@ LOCAL uint32_t _ov8865_get_gain128(void)
 	// read gain, 128 = 1x
 	uint32_t gain128, value;
 
-	value = Sensor_ReadReg(0x3508);
-	gain128 = value&0x1f;
 	value = Sensor_ReadReg(0x3509);
-	gain128 = (gain128<<8) + (value & 0xff);
+	gain128 = value&0xff;
+	value = Sensor_ReadReg(0x3508);
+	gain128 = gain128 + ((value&0x1f)<<0x08);
 
 	return gain128;
 }
@@ -1599,7 +2129,7 @@ LOCAL uint32_t _ov8865_set_gain128(uint32_t gain128)
 	return 0;
 }
 
-LOCAL void _calculate_hdr_exposure(int capture_gain128,int capture_VTS, int capture_shutter)
+LOCAL void _calculate_hdr_exposure(int32_t capture_gain128,int32_t capture_VTS, int32_t capture_shutter)
 {
 	// write capture gain
 
@@ -1696,6 +2226,7 @@ LOCAL uint32_t _ov8865_set_VTS(uint32_t VTS)
 	// write VTS to registers
 	uint32_t temp;
 
+	VTS = ((VTS + 1)>>1)<<1;
 	temp = VTS & 0xff;
 	Sensor_WriteReg(0x380f, temp);
 
@@ -1704,6 +2235,7 @@ LOCAL uint32_t _ov8865_set_VTS(uint32_t VTS)
 
 	return 0;
 }
+
 LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain)
 {
 	uint32_t rtn = SENSOR_SUCCESS;
@@ -1722,6 +2254,53 @@ LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain)
 	SENSOR_PRINT("SENSOR_ov8825: _ov8865_ReadGain gain: 0x%x", gain128);
 
 	return rtn;
+}
+
+LOCAL uint32_t _ov8865_dw9714_SRCInit(uint32_t mode)
+{
+#define DW9714_VCM_SLAVE_ADDR (0x18>>1)
+
+	uint8_t cmd_val[2] = {0x00};
+	uint16_t  slave_addr = 0;
+	uint16_t cmd_len = 0;
+	uint32_t ret_value = SENSOR_SUCCESS;
+
+	slave_addr = DW9714_VCM_SLAVE_ADDR;
+	switch (mode) {
+		case 1:
+		break;
+
+		case 2:
+		{
+			cmd_len = 2;
+			cmd_val[0] = 0xec;
+			cmd_val[1] = 0xa3;
+			ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
+			if(ret_value){
+				SENSOR_PRINT("SENSOR_OV8865: _dw9174_SRCInit fail!1");
+			}
+			cmd_val[0] = 0xf2;
+			cmd_val[1] = 0x00;
+			ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
+			if(ret_value){
+				SENSOR_PRINT("SENSOR_OV8865: _dw9174_SRCInit fail!2");
+			}
+
+			cmd_val[0] = 0xdc;
+			cmd_val[1] = 0x51;
+			ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
+			if(ret_value){
+				SENSOR_PRINT("SENSOR_OV8865: _dw9174_SRCInit fail!3");
+			}
+		}
+		break;
+
+		case 3:
+		break;
+
+	}
+
+	return ret_value;
 }
 
 
