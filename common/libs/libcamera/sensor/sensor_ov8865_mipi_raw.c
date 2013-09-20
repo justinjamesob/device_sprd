@@ -1262,7 +1262,7 @@ LOCAL uint32_t _ov8865_cfg_otp(uint32_t  param)
 	uint32_t module_id = g_module_id;
 	uint16_t stream_value = 0;
 
-	SENSOR_PRINT("SENSOR_OV8865: _ov8825_cfg_otp");
+	SENSOR_PRINT("SENSOR_OV8865: _ov8865_cfg_otp");
 
 	stream_value = Sensor_ReadReg(0x0100);
 	SENSOR_PRINT("_ov8865_cfg_otp: stream_value = 0x%x\n", stream_value);
@@ -1286,9 +1286,9 @@ LOCAL uint32_t _ov8865_cfg_otp(uint32_t  param)
 LOCAL int32_t _ov8865_check_o_film_otp(int32_t cmd, int32_t index)
 {
 	int32_t rtn_index = 0;
-	int32_t flag, i;
-	int32_t address_start;
-	int32_t address_end;
+	int32_t flag = 0x00, i;
+	int32_t address_start = 0x00;
+	int32_t address_end = 0x00;
 
 	switch (cmd)
 	{
@@ -1880,9 +1880,6 @@ LOCAL uint32_t _ov8865_write_exposure(uint32_t param)
 	uint16_t frame_len_cur=0x00;
 	uint16_t max_frame_len=0x00;
 	uint16_t value=0x00;
-	uint16_t value0=0x00;
-	uint16_t value1=0x00;
-	uint16_t value2=0x00;
 
 	expsure_line=param&0xffff;
 	dummy_line=(param>>0x10)&0x0fff;
@@ -1967,7 +1964,7 @@ LOCAL uint32_t _ov8865_write_af(uint32_t param)
 LOCAL uint32_t _ov8865_BeforeSnapshot(uint32_t param)
 {
 	uint8_t ret_l, ret_m, ret_h;
-	uint32_t capture_exposure, preview_maxline;
+	uint32_t capture_exposure;
 	uint32_t capture_maxline, preview_exposure;
 	uint32_t capture_mode = param & 0xffff;
 	uint32_t preview_mode = (param >> 0x10 ) & 0xffff;
@@ -2116,7 +2113,6 @@ LOCAL uint32_t _ov8865_get_gain128(void)
 LOCAL uint32_t _ov8865_set_gain128(uint32_t gain128)
 {
 	// write gain, 128 = 1x
-	uint32_t ret_value = 0x00;
 	uint32_t gain_128 = 0x00, temp= 0x00;
 
 	gain_128 = gain128 & 0x1ff;
@@ -2144,7 +2140,6 @@ LOCAL uint32_t _ov8865_SetEV(uint32_t param)
 	SENSOR_EXT_FUN_PARAM_T_PTR ext_ptr = (SENSOR_EXT_FUN_PARAM_T_PTR) param;
 
 	uint32_t ev ;
-	uint16_t value=0x00;
 	uint32_t real_gain_128 = s_ov8865_realgain_128;
 	uint32_t capture_shutter = s_capture_shutter;
 	uint32_t capture_vts = s_capture_VTS;
@@ -2251,7 +2246,7 @@ LOCAL uint32_t _ov8865_ReadGain(uint32_t *real_gain)
 		*real_gain = gain128;
 	}
 
-	SENSOR_PRINT("SENSOR_ov8825: _ov8865_ReadGain gain: 0x%x", gain128);
+	SENSOR_PRINT("SENSOR_ov8865: _ov8865_ReadGain gain: 0x%x", gain128);
 
 	return rtn;
 }
