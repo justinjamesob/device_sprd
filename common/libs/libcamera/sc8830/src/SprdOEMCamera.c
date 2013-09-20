@@ -2467,7 +2467,6 @@ camera_ret_code_type camera_start_preview(camera_cb_f_type callback,
 {
 	CMR_MSG_INIT(message);
 	int          ret = CAMERA_SUCCESS;
-	uint32_t     isp_param = 1;
 
 	CMR_LOGV("start preview");
 	CMR_PRINT_TIME;
@@ -2487,18 +2486,6 @@ camera_ret_code_type camera_start_preview(camera_cb_f_type callback,
 	}
 
 	ret = camera_wait_start(g_cxt);
-
-	if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
-		camera_isp_ae_stab_set(1);
-		ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)&isp_param);
-		CMR_LOGV("wait AE stable ....");
-		ret = camera_isp_ae_wait_stab();
-		if (ret) {
-			CMR_LOGE("wait AE stable abnormal!");
-		} else {
-			CMR_LOGV("wait AE stable OK");
-		}
-	}
 
 	CMR_LOGV("start preview finished... %d", g_cxt->err_code);
 	return g_cxt->err_code;
@@ -4528,6 +4515,7 @@ void *camera_af_thread_proc(void *data)
 	int af_exit_flag = 0;
 	uint32_t ex_af_cancel_flag = 0;
 	camera_cb_type cb_type = CAMERA_CB_MAX;
+	uint32_t     isp_param = 1;
 
 	CMR_PRINT_TIME;
 	sem_post(&g_cxt->af_sync_sem);
@@ -4568,6 +4556,17 @@ void *camera_af_thread_proc(void *data)
 					0);
 				break;
 
+			}
+			if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
+				camera_isp_ae_stab_set(1);
+				ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)&isp_param);
+				CMR_LOGV("wait AE stable ....");
+				ret = camera_isp_ae_wait_stab();
+				if (ret) {
+					CMR_LOGE("wait AE stable abnormal!");
+				} else {
+					CMR_LOGV("wait AE stable OK");
+				}
 			}
 			pthread_mutex_lock(&g_cxt->af_cb_mutex);
 			ret = camera_autofocus_start();
@@ -5260,7 +5259,11 @@ int camera_alloc_preview_buf(struct buffer_cfg *buffer, uint32_t format)
 	if (NULL == buffer)
 		return -CAMERA_INVALID_PARM;
 
-	buffer_size = ((g_cxt->display_size.width+15)&(~15)) * ((g_cxt->display_size.height+15)&(~15));
+	if (0 != g_cxt->cmr_set.preview_env) {
+		buffer_size = ((g_cxt->display_size.width+15)&(~15)) * ((g_cxt->display_size.height+15)&(~15));
+	} else {
+		buffer_size = g_cxt->display_size.width * g_cxt->display_size.height;
+	}
 	if (IMG_DATA_TYPE_YUV420 == format) {
 		frame_size = buffer_size * 3 / 2;
 		CMR_LOGI("420.");

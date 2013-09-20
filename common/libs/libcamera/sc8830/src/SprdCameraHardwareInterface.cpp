@@ -64,6 +64,8 @@ namespace android {
 							LOGV("%s: set camera param: %s, %d", __func__, #x, y); \
 							camera_set_parm (x, y, NULL, NULL); \
 						} while(0)
+#define SIZE_ALIGN(x)   (((x)+15)&(~15))
+
 static nsecs_t s_start_timestamp = 0;
 static nsecs_t s_end_timestamp = 0;
 static int s_use_time = 0;
@@ -349,6 +351,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
     int min_bufs;
 
     mPreviewWindow = w;
+
     LOGV("%s: mPreviewWindow %p", __func__, mPreviewWindow);
 
     if (!w) {
@@ -420,13 +423,23 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
         	return INVALID_OPERATION;
     	}
     }
+	if (mParameters.getPreviewEnv()) {
+	    if (w->set_buffers_geometry(w,
+	                                SIZE_ALIGN(preview_width), SIZE_ALIGN(preview_height),
+	                                hal_pixel_format)) {
+	        LOGE("%s: could not set buffers geometry to %s",
+	             __func__, str_preview_format);
+	        return INVALID_OPERATION;
+	    }
+	} else {
+	    if (w->set_buffers_geometry(w,
+	                                preview_width, preview_height,
+	                                hal_pixel_format)) {
+	        LOGE("%s: could not set buffers geometry to %s",
+	             __func__, str_preview_format);
+	        return INVALID_OPERATION;
+	    }
 
-    if (w->set_buffers_geometry(w,
-                                (preview_width+15)&(~15), (preview_height+15)&(~15),
-                                hal_pixel_format)) {
-        LOGE("%s: could not set buffers geometry to %s",
-             __func__, str_preview_format);
-        return INVALID_OPERATION;
     }
 
     if (w->set_crop(w, 0, 0, preview_width-1, preview_height-1)) {
@@ -1706,10 +1719,10 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 uint32_t SprdCameraHardware::getRedisplayMem()
 {
-	uint32_t buffer_size = camera_get_size_align_page(((mPreviewWidth+15)&(~15)) * ((mPreviewHeight+15)&(~15)) * 3 / 2);
+	uint32_t buffer_size = camera_get_size_align_page(SIZE_ALIGN(mPreviewWidth) * (SIZE_ALIGN(mPreviewHeight)) * 3 / 2);
 
 	if (mIsRotCapture) {
-		buffer_size += camera_get_size_align_page(mRawWidth * mRawHeight * 3 / 2);
+		buffer_size += camera_get_size_align_page(SIZE_ALIGN(mRawWidth) * SIZE_ALIGN(mRawHeight) * 3 / 2);
 	}
 
 	mReDisplayHeap = GetPmem(buffer_size, 1);
@@ -1785,7 +1798,11 @@ bool SprdCameraHardware::initPreview()
 	switch (mPreviewFormat) {
 	case 0:
 		case 1:	//yuv420
-		mPreviewHeapSize = ((mPreviewWidth+15)&(~15)) * ((mPreviewHeight+15)&(~15)) * 3 / 2;
+		if (mParameters.getPreviewEnv()) {
+			mPreviewHeapSize = SIZE_ALIGN(mPreviewWidth) * SIZE_ALIGN(mPreviewHeight) * 3 / 2;
+		} else {
+			mPreviewHeapSize = mPreviewWidth * mPreviewHeight * 3 / 2;
+		}
 		break;
 
 	default:
@@ -2548,7 +2565,7 @@ int SprdCameraHardware::displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_
 	}
 	ret = uv420CopyTrim(dma_copy_cfg);
 #else
-	memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, ((src_w+15)&(~15))*((src_h+15)&(~15))*3/2);
+	memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, src_w*src_h*3/2);
 #endif
 
 #endif
@@ -2578,7 +2595,7 @@ bool SprdCameraHardware::displayOneFrameForCapture(uint32_t width, uint32_t heig
 	}
 
 	ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
-							0, 0, (width+15)&(~15), (height+15)&(~15), &vaddr);
+							0, 0, SIZE_ALIGN(width), SIZE_ALIGN(height), &vaddr);
 
 	if (0 != ret || NULL == vaddr) {
 		LOGE("%s: failed to lock gralloc buffer", __func__);
@@ -2629,9 +2646,13 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			LOGE("%s: failed to dequeue gralloc buffer!", __func__);
 			return false;
 		}
-
-		ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
-								0, 0, (width+15)&(~15), (height+15)&(~15), &vaddr);
+		if (mParameters.getPreviewEnv()) {
+			ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
+									0, 0, SIZE_ALIGN(width), SIZE_ALIGN(height), &vaddr);
+		} else {
+			ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
+									0, 0, width, height, &vaddr);
+		}
 
 		if (0 != ret || NULL == vaddr) {
 			LOGE("%s: failed to lock gralloc buffer", __func__);
