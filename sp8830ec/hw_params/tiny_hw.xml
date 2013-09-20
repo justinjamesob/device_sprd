@@ -140,9 +140,11 @@
 
 <device name="line">
   <path name="on">
+     <ctl name="HeadPhone Mute" val="1" />
      <ctl name="ADCL Mixer AILADCL Switch" val="1" />
      <ctl name="ADCR Mixer AIRADCR Switch" val="1" />
      <ctl name="Line Function" val="1" />
+     <ctl name="HeadPhone Mute" val="0" />
   </path>
   <path name="off">
      <ctl name="Line Function" val="0" />
