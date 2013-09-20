@@ -177,6 +177,10 @@ PRODUCT_COPY_FILES += \
 endif
 
 ifeq ($(USE_PROJECT_SEC),true)
+# prebuild files
+PRODUCT_PACKAGES += \
+	Permission.apk
+
 PRODUCT_COPY_FILES += \
 	frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
 endif
