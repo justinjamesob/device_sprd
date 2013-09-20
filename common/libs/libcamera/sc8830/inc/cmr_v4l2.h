@@ -65,6 +65,11 @@ enum if_status {
 	IF_CLOSE
 };
 
+enum cmr_v4l2_wtite_cmd_id {
+	CMR_V4L2_WRITE_STOP = 0x5AA5,
+	CMR_V4L2_WRITE_FREE_FRAME = 0xA55A,
+	CMR_V4L2_WRITE_MAX
+};
 	
 struct img_frm_cap {
 	struct img_rect                     src_img_rect;
