@@ -3715,7 +3715,7 @@ void camera_jpeg_evt_cb(int evt, void* data)
 		CMR_LOGE("Error param, 0x%x 0x%x", (uint32_t)data, evt);
 		message.data = 0;
 	} else {
-	    TAKE_PIC_CANCEL_NORETURNVALUE;
+		TAKE_PIC_CANCEL_NORETURNVALUE;
 		if(CMR_JPEG_DEC_DONE == evt) {
 			message.data = malloc(sizeof(JPEG_DEC_CB_PARAM_T));
 		} else {
@@ -4980,7 +4980,7 @@ int camera_capture_init(void)
 			g_cxt->isp_cxt.isp_state = ISP_COWORK;
 		}
 	}
-    g_cxt->recover_status = NO_RECOVERY;
+	g_cxt->recover_status = NO_RECOVERY;
 exit:
 	return ret;
 }
@@ -5026,7 +5026,7 @@ int camera_capture_init_continue(void)
 	if (IMG_DATA_TYPE_JPEG == v4l2_cfg.cfg.dst_img_fmt) {
 		v4l2_cfg.channel_id = CHN_0;
 	}
-    v4l2_cfg.frm_num = 1;
+	v4l2_cfg.frm_num = 1;
 	ret = cmr_v4l2_cap_cfg(&v4l2_cfg);
 	if (ret) {
 		CMR_LOGE("Can't support this capture configuration");
@@ -5072,7 +5072,7 @@ int camera_capture_init_continue(void)
 			g_cxt->isp_cxt.isp_state = ISP_COWORK;
 		}
 	}
-    g_cxt->recover_status = NO_RECOVERY;
+	g_cxt->recover_status = NO_RECOVERY;
 exit:
 	return ret;
 }
@@ -5119,7 +5119,7 @@ int camera_capture_init_raw(void)
 		CMR_LOGE("Failed to camera_capture_ability, %d", ret);
 		goto exit;
 	}
-    v4l2_cfg.frm_num = 1;
+	v4l2_cfg.frm_num = 1;
 	ret = cmr_v4l2_cap_cfg(&v4l2_cfg);
 	if (ret) {
 		CMR_LOGE("Can't support this capture configuration");
@@ -5871,7 +5871,7 @@ int camera_preview_err_handle(uint32_t evt_type)
 	case CMR_SENSOR_ERROR:
 	case CMR_V4L2_TIME_OUT:
 		rs_mode = RESTART_HEAVY;
-	//	g_cxt->preview_status = RESTART;
+		/*g_cxt->preview_status = RESTART;*/
 		CMR_LOGI("Sensor error, restart preview");
 		break;
 
@@ -6502,7 +6502,7 @@ int camera_start_scale(struct frm_info *data)
 
 	frm_data = *data;
 	frm_data.channel_id = CHN_2;
-//	data->channel_id = CHN_2;
+	/*data->channel_id = CHN_2;*/
 	frm_id = data->frame_id - CAMERA_CAP0_ID_BASE;
 
 	if (g_cxt->cap_zoom_mode == ZOOM_BY_CAP) {
@@ -6853,7 +6853,7 @@ int camera_get_data_redisplay(int output_addr,
 	uint32_t temp = 0;
 	enum img_rot_angle angle = IMG_ROT_0;
 
-	CMR_LOGV("(w,h)%d %d; addr src, 0x%x dst, (w,h)%d %d,0x%x rot %d",
+	CMR_LOGV("input(w,h,addr)%d %d 0x%x output(w,h,addr)%d %d,0x%x rot %d",
 		input_width, input_height, input_addr_y, output_width,output_height,
 		output_addr,g_cxt->cfg_cap_rot);
 
@@ -7030,8 +7030,8 @@ static int camera_convert_to_thumb(void)
 
 uint32_t camera_get_rot_set(void)
 {
-    CMR_LOGI("rot set %d.",g_cxt->prev_rot);
-    return g_cxt->prev_rot;
+	CMR_LOGI("rot set %d.",g_cxt->prev_rot);
+	return g_cxt->prev_rot;
 }
 
 int camera_uv422_to_uv420(uint32_t dst, uint32_t src, uint32_t width, uint32_t height)
@@ -7283,10 +7283,7 @@ void *camera_cb_thread_proc(void *data)
 				cbInfo = (camera_cb_info *)message.data;
 				CMR_LOGE("callback thread: message.msg_type 0x%x, cb func %d cb type %d",
 				message.msg_type, cbInfo->cb_func, cbInfo->cb_type);
-/*
-				CMR_LOGE("zxdbg refer data 0x%x, length %x", cbInfo->refer_data, cbInfo->refer_data_length);
-				CMR_LOGE("zxdbg cb data 0x%x, length %x", cbInfo->cb_data, cbInfo->cb_data_length);
-*/
+
 				CMR_PRINT_TIME;
 				camera_callback_handle(cbInfo->cb_type,
 							cbInfo->cb_func,
@@ -7531,7 +7528,7 @@ int camera_capture_get_max_size(SENSOR_MODE_INFO_T *sn_mode, uint32_t *io_width,
 		tmp_width = (uint32_t)(g_cxt->v4l2_cxt.sc_factor * img_rc.width);
 		if (img_rc.width >= CAMERA_SAFE_SCALE_DOWN(g_cxt->capture_size.width) ||
 			g_cxt->capture_size.width <= CMR_SCALING_TH) {
-			//if the out size is smaller than the in size, try to use scaler on the fly
+			/*if the out size is smaller than the in size, try to use scaler on the fly*/
 			if (g_cxt->capture_size.width > tmp_width) {
 				if (tmp_width > g_cxt->v4l2_cxt.sc_capability) {
 					img_sz.width  = g_cxt->v4l2_cxt.sc_capability;
@@ -7540,12 +7537,12 @@ int camera_capture_get_max_size(SENSOR_MODE_INFO_T *sn_mode, uint32_t *io_width,
 				}
 				img_sz.width = (uint32_t)(img_rc.height * g_cxt->v4l2_cxt.sc_factor);
 			} else {
-				// just use scaler on the fly
+				/*just use scaler on the fly*/
 				img_sz.width  = g_cxt->capture_size.width;
 				img_sz.height = g_cxt->capture_size.height;
 			}
 		} else {
-			//if the out size is larger than the in size
+			/*if the out size is larger than the in size*/
 			img_sz.width   = img_rc.width;
 			img_sz.height  = img_rc.height;
 		}
