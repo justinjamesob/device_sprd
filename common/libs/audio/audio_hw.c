@@ -891,7 +891,7 @@ static int start_vaudio_output_stream(struct tiny_stream_out *out)
     }
     BLUE_TRACE("start vaudio_output_stream cp_type is %d ,card is %d",cp_type, card);
 
-    out->pcm_vplayback= pcm_open(card, port, PCM_OUT, &out->config);
+    out->pcm_vplayback= pcm_open(card, port, PCM_OUT| PCM_MMAP |PCM_NOIRQ, &out->config);
 
     if (!pcm_is_ready(out->pcm_vplayback)) {
         goto error;
