@@ -1813,13 +1813,11 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
         if(!out->is_sco ) { 
 
          //ALOGD("voip:out_write: start: out->is_sco is %d, voip_state is %d",out->is_sco,adev->voip_state);
-        adev->voip_state |= VOIP_PLAYBACK_STREAM;
-        force_standby_for_voip(adev);
-
-            out->is_sco=true;
-
+	    adev->voip_state |= VOIP_PLAYBACK_STREAM;
+	    force_standby_for_voip(adev);
             ALOGI("wangzuo:out->is_sco is %d",out->is_sco);
             do_output_standby(out);
+            out->is_sco=true;
         }
     }
     else{
@@ -2868,11 +2866,8 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
     }
 
     if (in->standby) {
+        in->standby = 0;
         ret = start_input_stream(in);////////
-        if (ret == 0)
-            in->standby = 0;
-
-
     }
     pthread_mutex_unlock(&adev->lock);
     
@@ -3260,8 +3255,10 @@ static int adev_set_master_mute(struct audio_hw_device *dev, bool mute)
     struct tiny_audio_device *adev = (struct tiny_audio_device *)dev;
 
     //ALOGD("%s, mute=%d, master_mute=%d", __func__, mute, adev->master_mute);
-    if (adev->master_mute == mute)
+    if ((adev->master_mute == mute))
         return 0;
+    if (!adev->master_mute && adev->mode == AUDIO_MODE_IN_CALL)
+	return 0;
     adev->master_mute = mute;
     if (adev->private_ctl.speaker_mute
             && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
