@@ -1691,6 +1691,7 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 			if(PreviewHeap->phys_addr & 0xFF) {
 				LOGE("error: the mPreviewHeap is not 256 bytes aligned.");
+				FreePmem(PreviewHeap);
 				freePreviewMem();
 				return false;
 			}
