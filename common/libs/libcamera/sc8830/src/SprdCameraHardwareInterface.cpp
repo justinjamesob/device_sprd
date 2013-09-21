@@ -1722,7 +1722,7 @@ uint32_t SprdCameraHardware::getRedisplayMem()
 	uint32_t buffer_size = camera_get_size_align_page(SIZE_ALIGN(mPreviewWidth) * (SIZE_ALIGN(mPreviewHeight)) * 3 / 2);
 
 	if (mIsRotCapture) {
-		buffer_size += camera_get_size_align_page(SIZE_ALIGN(mRawWidth) * SIZE_ALIGN(mRawHeight) * 3 / 2);
+		buffer_size <<= 1 ;
 	}
 
 	mReDisplayHeap = GetPmem(buffer_size, 1);

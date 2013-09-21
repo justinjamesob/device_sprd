@@ -84,7 +84,7 @@ extern "C"
 #define CAMERA_CAP_FRM_CNT                           4 //CMR_IMG_CNT_MAX
 #define CAMERA_NORMAL_CAP_FRM_CNT                    1
 #define CAMERA_ZOOM_LEVEL_MAX                        8
-#define ZOOM_STEP(x)                                 ((x - x / CMR_ZOOM_FACTOR) / CAMERA_ZOOM_LEVEL_MAX)
+#define ZOOM_STEP(x)                                 (((x) - (x) / CMR_ZOOM_FACTOR) / CAMERA_ZOOM_LEVEL_MAX)
 #define CAMERA_PIXEL_ALIGNED                         4
 #define CAMERA_WIDTH(w)                              ((w)& ~(CAMERA_PIXEL_ALIGNED - 1))
 #define CAMERA_HEIGHT(h)                             ((h)& ~(CAMERA_PIXEL_ALIGNED - 1))
