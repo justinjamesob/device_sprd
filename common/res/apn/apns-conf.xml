@@ -2102,6 +2102,16 @@
         server="http:// wap.google.com"
         type="default,supl"
     />
+    <!-- SPRD: Add Bangladesh Bangladesh 470/04 TT-MMS MMS message @{ -->
+    <apn carrier="TT-MMS"
+        mcc="470"
+        mnc="04"
+        apn="MMS"
+        mmsproxy="10.5.4.40"
+        mmsc="http://10.5.4.22:38090/was"
+        type="mms"
+    />
+    <!-- @} -->
     <!-- Bangladesh Airtel Ban -->
     <apn carrier="Airtel Internet BG"
         mcc="470"
@@ -16208,14 +16218,17 @@
         type="mms"
     />
     <!-- Mexico Telcel -->
+    <!-- SPRD: Add Mexico 334/020 Telcel Internet's server is http://www.telcel.com @{ -->
     <apn carrier="Telcel Internet"
         mcc="334"
         mnc="020"
         apn="internet.itelcel.com"
         user="webgprs"
         password="webgprs2002"
+        server="http://www.telcel.com"
         type="default,supl"
     />
+    <!-- @} -->
     <apn carrier="Telcel WAP"
         mcc="334"
         mnc="020"
