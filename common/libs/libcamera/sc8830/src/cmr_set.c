@@ -184,6 +184,7 @@ uint32_t camera_flash_mode_to_status(enum cmr_flash_mode f_mode)
 		}else {
 			status = FLASH_CLOSE;
 		}
+		cxt->cmr_set.auto_flash_status = autoflash;
 		break;
 	default:
 		break;
@@ -757,6 +758,9 @@ int camera_snapshot_start_set(void)
 		} else {
 			camera_set_flashdevice((uint32_t)FLASH_HIGH_LIGHT);
 		}
+	} else if((CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode)
+			   && ((uint32_t)FLASH_OPEN == cxt->cmr_set.auto_flash_status)) {
+		camera_set_flashdevice((uint32_t)FLASH_HIGH_LIGHT);
 	}
 
 	if (camera_get_is_nonzsl()) {
@@ -791,7 +795,13 @@ int camera_snapshot_stop_set(void)
 
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 		/*open flash*/
+		if ((uint32_t)CAMERA_FLASH_MODE_TORCH != cxt->cmr_set.flash) {
+			camera_set_flashdevice((uint32_t)FLASH_CLOSE_AFTER_OPEN);
+		}
+	} else if(((uint32_t)CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode)
+			   && ((uint32_t)FLASH_OPEN == cxt->cmr_set.auto_flash_status)) {
 		camera_set_flashdevice((uint32_t)FLASH_CLOSE_AFTER_OPEN);
+		cxt->cmr_set.auto_flash_status = FLASH_CLOSE;
 	}
 	if ((CAMERA_NORMAL_MODE == cxt->cap_mode) || (CAMERA_HDR_MODE == cxt->cap_mode)
 		|| (CAMERA_NORMAL_CONTINUE_SHOT_MODE == cxt->cap_mode)) {
@@ -1351,7 +1361,7 @@ int camera_preflash(void)
 #ifdef CONFIG_CAMERA_FLASH_CTRL
 	CMR_LOGI("start.");
     if (CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode) {
-		uint32_t skip_mode = 0;;
+		uint32_t skip_mode = 0;
 		uint32_t skip_number = 0;
 		ret = camera_set_flash(cxt->cmr_set.flash_mode, &skip_mode, &skip_number);
     }
@@ -1449,7 +1459,7 @@ int camera_autofocus_start(void)
 	}
 #ifndef CONFIG_CAMERA_FLASH_CTRL
 	if (CAMERA_FLASH_MODE_AUTO == cxt->cmr_set.flash_mode) {
-		uint32_t skip_mode = 0;;
+		uint32_t skip_mode = 0;
 		uint32_t skip_number = 0;
 		ret = camera_set_flash(cxt->cmr_set.flash_mode, &skip_mode, &skip_number);
 	}
