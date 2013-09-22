@@ -86,6 +86,7 @@
 #include "gralloc_priv.h"
 
 #include "Utility.h"
+#include "SprdUtil.h"
 
 #include "OverlayNativeWindow.h"
 #include "Layer.h"
@@ -98,19 +99,24 @@ namespace android
 class OverlayComposer: public Thread
 {
 public:
-    OverlayComposer(overlayDevice_t *dev);
+    OverlayComposer(SprdPrimaryPlane *displayPlane);
     ~OverlayComposer();
 
     /* Start the HWLayer composer command */
     bool onComposer(hwc_layer_list_t* l);
+
+    void onClearOverlayComposerBuffer();
 
     /* Start display the composered Overlay Buffer */
     void onDisplay();
 
 private:
 
-    /* Overlay device Info */
-    overlayDevice_t *mDev;
+    /* Overlay composer Info */
+    SprdPrimaryPlane *mDisplayPlane;
+    unsigned int mFBWidth;
+    unsigned int mFBHeight;
+    bool mClearBuffer;
 
     /* Hardware Layer Info */
     hwc_layer_list_t* mList;
@@ -140,18 +146,6 @@ private:
     typedef List<Layer * > DrawLayerList;
     DrawLayerList mDrawLayerList;
 
-    private_handle_t *wrapBuffer(unsigned int w, unsigned int h,
-                                 int format, int index);
-
-    void unWrapBuffer(private_handle_t *h);
-
-    uint32_t getBufferPhyAddr(int index);
-    uint32_t getBufferVirAddr(int index);
-
-    inline unsigned int round_up_to_page_size(unsigned int x)
-    {
-         return (x + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1);
-    }
 
     static status_t selectConfigForPixelFormat(
                                  EGLDisplay dpy,
@@ -163,6 +157,7 @@ private:
     bool initEGL();
     void deInitEGL();
 
+    void ClearOverlayComposerBuffer();
     void caculateLayerRect(hwc_layer_t  *l, struct LayerRect *rect, struct LayerRect *rV);
 
     bool swapBuffers();

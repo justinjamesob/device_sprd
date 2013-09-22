@@ -22,13 +22,18 @@ ifeq ($(strip $(USE_SPRD_HWCOMPOSER)),true)
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_SHARED_LIBRARIES := liblog libEGL libbinder libutils libcutils libUMP libGLESv1_CM libhardware libui
-LOCAL_SRC_FILES := hwcomposer.cpp \
-		   vsync/vsync.cpp \
-                   dump_bmp.cpp
+LOCAL_SRC_FILES := SprdHWComposer.cpp \
+		   SprdVsyncEvent.cpp \
+		   SprdBufferManager.cpp \
+		   SprdHWLayerList.cpp \
+		   SprdDisplayPlane.cpp \
+		   SprdOverlayPlane.cpp \
+		   SprdPrimaryPlane.cpp \
+		   SprdUtil.cpp \
+                   dump.cpp
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../gralloc \
 	$(LOCAL_PATH)/../mali/src/ump/include \
-	$(LOCAL_PATH)/vsync \
 	$(LOCAL_PATH)/android \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL/usr/include/video \
         $(TOP)/frameworks/native/include/utils \
@@ -39,15 +44,11 @@ LOCAL_CFLAGS += -D_USE_SPRD_HWCOMPOSER -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOT
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
 	LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libcamera/sc8830/inc	
 	#LOCAL_CFLAGS += -DVIDEO_LAYER_USE_RGB
-	# _HWCOMPOSER_USE_GSP : protecting sc8830 code
-	LOCAL_CFLAGS += -D_HWCOMPOSER_USE_GSP
-        LOCAL_CFLAGS += -DGSP_SCALING_UP_TWICE
+	# PROCESS_VIDEO_USE_GSP : protecting sc8830 code
+	LOCAL_CFLAGS += -DPROCESS_VIDEO_USE_GSP
+	LOCAL_CFLAGS += -DGSP_OUTPUT_USE_YUV420
+	LOCAL_CFLAGS += -DGSP_SCALING_UP_TWICE
 	# LOCAL_CFLAGS += -D_DMA_COPY_OSD_LAYER
-
-HWCOMPOSER_USE_GSP_BLEND := true
-ifeq ($(strip $(HWCOMPOSER_USE_GSP_BLEND)),true)
-	LOCAL_CFLAGS += -D_HWCOMPOSER_USE_GSP_BLEND
-endif
 
 endif
 
@@ -57,8 +58,6 @@ endif
 # If you want to know how OVERLAY_COMPOSER use and work,
 # Please see the OverlayComposer/OverlayComposer.h for more details.
 ifeq ($(strip $(USE_OVERLAY_COMPOSER_GPU)),true)
-
-	LOCAL_CFLAGS += -D_ALLOC_OSD_BUF
 
 	LOCAL_CFLAGS += -DOVERLAY_COMPOSER_GPU
 
@@ -70,9 +69,12 @@ ifeq ($(strip $(USE_OVERLAY_COMPOSER_GPU)),true)
 
 	LOCAL_SRC_FILES += OverlayComposer/Utility.cpp
 
+	LOCAL_SRC_FILES += OverlayComposer/SyncThread.cpp
+
 endif
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8825)
+	#LOCAL_CFLAGS += -DTRANSFORM_USE_GPU
 	LOCAL_CFLAGS += -DSCAL_ROT_TMP_BUF
 
 	LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libcamera/sc8825/inc
@@ -81,26 +83,22 @@ ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8825)
 	LOCAL_CFLAGS += -D_PROC_OSD_WITH_THREAD
 
 	LOCAL_CFLAGS += -D_DMA_COPY_OSD_LAYER
-
-	LOCAL_CFLAGS += -D_ALLOC_OSD_BUF
 endif
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8810)
 	LOCAL_CFLAGS += -DSCAL_ROT_TMP_BUF
 	LOCAL_SRC_FILES += sc8810/scale_rotate.c
-	LOCAL_CFLAGS += -D_SUPPORT_SYNC_DISP
 	LOCAL_CFLAGS += -D_VSYNC_USE_SOFT_TIMER
 endif
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc7710)
 	LOCAL_CFLAGS += -DSCAL_ROT_TMP_BUF
 	LOCAL_SRC_FILES += sc8810/scale_rotate.c
-	LOCAL_CFLAGS += -D_SUPPORT_SYNC_DISP
 	LOCAL_CFLAGS += -D_VSYNC_USE_SOFT_TIMER
 endif
 
 ifeq ($(strip $(USE_GPU_PROCESS_VIDEO)) , true)
-	LOCAL_CFLAGS += -DUSE_GPU_PROCESS_VIDEO
+	LOCAL_CFLAGS += -DTRANSFORM_USE_GPU
 	LOCAL_SRC_FILES += gpu_transform.cpp
 endif
 
