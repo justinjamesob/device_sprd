@@ -248,6 +248,7 @@ struct camera_settings {
 	uint32_t                 scene_mode;
 	uint32_t                 flash;
 	uint32_t                 flash_mode;
+	uint32_t                 auto_flash_status;
 	uint32_t                 night_mode;
 	uint32_t                 flicker_mode;
 	uint32_t                 focus_rect;
