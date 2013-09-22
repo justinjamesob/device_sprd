@@ -4651,7 +4651,8 @@
         mmsc="http://mms.sonera.fi:8002"
         type="mms"
     />
-    <!-- France Orange -->
+    <!-- SPRD: Modify France (208) orange network name @{ -->
+    <!-- Orange F -->
     <apn carrier="Orange wap"
         mcc="208"
         mnc="00"
@@ -4778,6 +4779,7 @@
         type="mms"
         authtype="3"
     />
+    <!-- @} -->
     <!-- France SFR -->
     <apn carrier="F SFR"
         mcc="208"
@@ -5665,12 +5667,6 @@
         mmsc="http://10.6.32.27/servlets/mms"
         type="mms"
     />
-    <apn carrier="Tigo"
-        mcc="708"
-        mnc="020"
-        apn="internet.tigo.hn"
-        type="default,supl"
-    />
     <apn carrier="Tigo Wap"
         mcc="708"
         mnc="020"
@@ -5679,15 +5675,6 @@
         port="8888"
         server="Wap.tigo.com.hn"
         type="default,supl"
-    />
-    <apn carrier="Tigo MMS"
-        mcc="708"
-        mnc="020"
-        apn="mms.tigo.hn"
-        mmsproxy="10.16.17.12"
-        mmsport="8888"
-        mmsc="http://mms"
-        type="mms"
     />
     <!-- Honduras DIGICEL -->
     <apn carrier="DIGICEL web"
@@ -21042,7 +21029,8 @@
         type="mms"
         authtype="1"
     />
-    <!-- Ukraine Utel (3g.utel.ua) -->
+    <!-- SPRD: Update 255/07 network name for the Ukrtelecom @{ -->
+    <!-- Ukrtelecom -->
     <apn carrier="OGO mms"
 	mcc="255"
 	mnc="07"
@@ -21058,6 +21046,7 @@
 	apn="3g.utel.ua"
 	type="default, supl"
 	/>
+	<!-- @} -->
     <!-- Ukraine Utel (unlim.utel.ua) -->
     <!--
     <apn carrier="UA - Utel (unlim.utel.ua) Web"
