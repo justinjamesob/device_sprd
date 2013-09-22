@@ -3644,7 +3644,8 @@
         type="mms"
         authtype="3"
     />
-    <!-- Colombia Comcel -->
+    <!-- SPRD: Modify Colombia Colombia 732/101,103,123 of authtype=1，modify the 732/101 brand for claro @{ -->
+    <!-- claro -->
     <apn carrier="CO - Comcel Web"
         mcc="732"
         mnc="101"
@@ -3652,6 +3653,7 @@
         user="COMCELWEB"
         password="COMCELWEB"
         type="default,supl"
+        authtype="1"
     />
     <!-- Colombia movistar -->
     <apn carrier="Movistar internet"
@@ -3693,6 +3695,7 @@
         user="movistar"
         password="movistar"
         type="default,supl"
+        authtype="1"
     />
     <apn carrier="Movistar Wap"
         mcc="732"
@@ -3704,6 +3707,7 @@
         user="movistar"
         password="movistar"
         type="default,supl"
+        authtype="1"
     />
     <apn carrier="Movistar MMS"
         mcc="732"
@@ -3715,6 +3719,7 @@
         password="movistar"
         mmsc="http://mms.movistar.com.co"
         type="mms"
+        authtype="1"
     />
     <!-- Colombia tigo -->
     <apn carrier="Tigo web"
@@ -3723,6 +3728,7 @@
         apn="web.colombiamovil.com.co"
         server="http://wap.tigo.com.co"
         type="default,supl"
+        authtype="1"
     />
     <apn carrier="Tigo Wap"
         mcc="732"
@@ -3732,6 +3738,7 @@
         port="8080"
         server="http://wap.tigo.com.co"
         type="default,supl"
+        authtype="1"
     />
     <apn carrier="Tigo MMS"
         mcc="732"
@@ -3743,7 +3750,9 @@
         password="mms-cm1900"
         mmsc="http://mms.ola.com.co"
         type="mms"
+        authtype="1"
     />
+    <!-- @} -->
     <apn carrier="Tigo web"
         mcc="732"
         mnc="111"
