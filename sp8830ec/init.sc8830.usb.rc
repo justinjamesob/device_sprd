@@ -94,7 +94,7 @@ on property:sys.usb.config=rndis,vser,adb
     write /sys/class/android_usb/android0/idVendor 1782
     write /sys/class/android_usb/android0/idProduct 5d25
     write /sys/class/android_usb/android0/f_gser/port_count 6
-    write /sys/class/android_usb/android0/functions adb,gser,rndis
+    write /sys/class/android_usb/android0/functions rndis,adb,gser
     write /sys/class/android_usb/android0/bDeviceClass 0
     write /sys/class/android_usb/android0/enable 1
     start adbd
