@@ -55,6 +55,7 @@ on boot
     insmod /system/lib/modules/focaltech_ts.ko
 
     chmod 666 /dev/ttyS0
+    chmod 666 /dev/sttybt0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
@@ -303,9 +304,8 @@ service akmd /system/bin/akmd8975 -m 3
 
 service hciattach /system/bin/hciattach -n /dev/sttybt0 sprd_shark
     socket bluetooth stream 660 bluetooth bluetooth
-    user root
-    group bluetooth net_bt_admin
-    #net_bt inet net_raw net_admin system wifi
+    user bluetooth
+    group wifi bluetooth net_bt_admin net_bt inet net_raw net_admin system
     disabled
     oneshot
 
