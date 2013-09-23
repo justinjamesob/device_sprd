@@ -1187,15 +1187,51 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
 
 #ifdef OVERLAY_COMPOSER_GPU
             OverlayDeviceFlag = 1;
+            bool SkipLayerFlag = false;
 
-            for (size_t j=0 ; j < list->numHwLayers ; j++)
+            for (size_t j=0; j < list->numHwLayers; j++)
             {
-                if (list->hwLayers[j].compositionType == HWC_FRAMEBUFFER)
+                hwc_layer_t *l = &(list->hwLayers[j]);
+
+                if (l && (l->flags & HWC_SKIP_LAYER))
                 {
-                    list->hwLayers[j].compositionType = HWC_OVERLAY;
+                    SkipLayerFlag = true;
+                }
+
+                if (l->compositionType == HWC_FRAMEBUFFER && SkipLayerFlag == false)
+                {
+                    l->compositionType = HWC_OVERLAY;
                 }
             }
-            mOLCD->onComposer(list);
+
+            /*
+             *  When Skip layer is found, SurfaceFlinger maybe want to do the Animation
+             *  or other thing, here just disable OverlayComposer
+             *  Switch back to SurfaceFlinger for composition.
+             *  At present, it is just a workaround method.
+             * */
+            if (SkipLayerFlag)
+            {
+                overlay_video->compositionType = HWC_FRAMEBUFFER;
+                ctx->video_overlay_flag = 0;
+                ctx->fb_layer_count++;
+                ALOGI_IF(debugenable,"----------------------clear fb");
+                overlay_video->hints = HWC_HINT_CLEAR_FB;
+
+                if (overlay_osd)
+                {
+                    overlay_osd->compositionType = HWC_FRAMEBUFFER;
+                    ctx->osd_overlay_flag = 0;
+                    ALOGI_IF(debugenable,"osd_overlay_flag = 0 L%d",__LINE__);
+                    ctx->fb_layer_count++;
+                }
+
+                OverlayDeviceFlag = 0;
+            }
+            else
+            {
+                mOLCD->onComposer(list);
+            }
 #endif
         }
 #endif
