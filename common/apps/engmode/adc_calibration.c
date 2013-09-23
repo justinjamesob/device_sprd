@@ -133,7 +133,9 @@ static int AccessADCDataFile(unsigned char flag, char *lpBuff, int size)
         else
             memcpy(&cali_info.adc_para,lpBuff,sizeof(cali_info.adc_para));
         lseek(fd,SEEK_SET,0);
+	 cali_info.magic = CALI_MAGIC;
         ret = write(fd,&cali_info,sizeof(cali_info));
+	 fsync(fd);
     } else {
         if(fd < 0)
             return 0;
@@ -145,6 +147,7 @@ static int AccessADCDataFile(unsigned char flag, char *lpBuff, int size)
             memcpy(lpBuff,&cali_info.adc_para,sizeof(cali_info.adc_para));
     }
     close(fd);
+    sync();
 
     return ret;
 }
