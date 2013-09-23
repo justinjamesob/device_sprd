@@ -102,7 +102,7 @@ void eng_check_factorymode(void)
     char usb_config[64];
 
 #ifdef USE_BOOT_AT_DIAG
-    fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC);
+    fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC, 0660);
 
     if(fd >= 0){
         ENG_LOG("%s: status=%x\n",__func__, status);
@@ -133,7 +133,7 @@ void eng_check_factorymode(void)
     }
 #endif
 
-    fd=open(ENG_FACOTRYSYNC_FILE, O_RDWR|O_CREAT|O_TRUNC);
+    fd=open(ENG_FACOTRYSYNC_FILE, O_RDWR|O_CREAT|O_TRUNC, 0660);
     if(fd >= 0)
         close(fd);
 }

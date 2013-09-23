@@ -39,7 +39,7 @@ void	initialize_ctrl_file(void)
     int fd = open(CALI_CTRL_FILE_PATH,O_RDWR);
 
     if(fd < 0){
-        fd = open(CALI_CTRL_FILE_PATH,O_RDWR|O_CREAT);
+        fd = open(CALI_CTRL_FILE_PATH,O_RDWR|O_CREAT, 0666);
     }
     if(fd < 0){
         ALOGE("%s open %s failed\n",__func__,CALI_CTRL_FILE_PATH);
@@ -122,7 +122,7 @@ static int AccessADCDataFile(unsigned char flag, char *lpBuff, int size)
     fd = open(BATTER_CALI_CONFIG_FILE,O_RDWR);
     if(flag == 1){
         if(fd < 0){
-            fd = open(BATTER_CALI_CONFIG_FILE,O_CREAT|O_WRONLY);
+            fd = open(BATTER_CALI_CONFIG_FILE,O_CREAT|O_WRONLY, 0666);
             if(fd < 0)
                 return 0;
         }
