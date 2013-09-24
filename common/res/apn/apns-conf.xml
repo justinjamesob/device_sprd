@@ -2164,11 +2164,13 @@
         type="mms"
     />
     <!-- Bangladesh Robi-->
+    <!-- SPRD: Modify Bangladesh 470/02 Robi-INTERNET and MMS messages @{ -->
     <apn carrier="Robi-INTERNET"
         mcc="470"
         mnc="02"
         apn="internet"
-        server="www.google.com"
+        port="80"
+        server="http://robizone.mobi"
         type="default,supl"
     />
     <apn carrier="Robi-WAP"
@@ -2183,12 +2185,13 @@
     <apn carrier="Robi-MMS"
         mcc="470"
         mnc="02"
-        apn="wap"
-        mmsproxy="192.168.023.007"
+        apn="WAP"
+        mmsproxy="10.16.18.77"
         mmsport="9208"
-        mmsc="http://192.168.23.4/was"
+        mmsc="http://10.16.18.40:38090/was"
         type="mms"
     />
+    <!-- @} -->
     <!-- Barbados  Digicel -->
     <apn carrier="BB - Digicel Web"
         mcc="342"
