@@ -12,8 +12,51 @@ using namespace android;
 
 const int MAX_SERVICE_NAME = 100;
 
+#define  MSMS_PHONE_COUNT_PROP             "persist.msms.phone_count"
+#define  MODEM_TD_ENABLE_PROP              "ro.modem.t.enable"
+#define  MODEM_TD_ID_PROP                  "ro.modem.t.id"
+#define  MODEM_TD_COUNT_PROP               "ro.modem.t.count"
+#define  MODEM_WCDMA_ENABLE_PROP           "ro.modem.w.enable"
+#define  MODEM_WCDMA_ID_PROP               "ro.modem.w.id"
+#define  MODEM_WCDMA_COUNT_PROP            "ro.modem.w.count"
+
+
 static int getPhoneId(int modemId, int simId)
 {
+    /*
+     * Because there is no docs, LTE should be supported later.   
+     */
+    char prop[8] = "";
+    int tdEnable, wEnable;
+    int tdCount,  wCount;
+
+    property_get(MODEM_TD_ENABLE_PROP, prop, "0");
+    tdEnable = atoi(prop);
+    memset(prop, '\0', sizeof(prop));
+    property_get(MODEM_WCDMA_ENABLE_PROP, prop, "0");
+    wEnable = atoi(prop);
+
+    memset(prop, '\0', sizeof(prop));
+    property_get(MODEM_TD_COUNT_PROP, prop, "0");
+    tdCount = atoi(prop);
+    memset(prop, '\0', sizeof(prop));
+    property_get(MODEM_WCDMA_COUNT_PROP, prop, "0");
+    wCount = atoi(prop);
+
+    if (tdEnable) {
+        if (wEnable) {
+            return modemId * tdCount + simId;
+        } else {
+            return simId;
+        }
+    } else {
+        if(wEnable) {
+            return simId;
+        } else {
+            ALOGE("Both TD modem and WCDMA modem are disable, use default phoneID\n");
+        }
+    }
+
     return 0;
 }
 
@@ -23,7 +66,7 @@ static String16 getServiceName(int modemId, int simId)
     char phoneCount[8] = "";
 
     memset(serviceName, 0, sizeof(serviceName));
-    property_get("persist.msms.phone_count", phoneCount, "1");
+    property_get(MSMS_PHONE_COUNT_PROP, phoneCount, "1");
 
     if (atoi(phoneCount) > 1){
         snprintf(serviceName, MAX_SERVICE_NAME - 1, "atchannel%d", getPhoneId(modemId, simId));
