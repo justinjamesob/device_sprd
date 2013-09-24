@@ -33,152 +33,153 @@ extern	 "C"
 {
 #endif
 
-#define SENSOR_SUCCESS 0
-#define SENSOR_FAIL 1
-#define SENSOR_FALSE 0
-#define SENSOR_TRUE 1
+#define SENSOR_SUCCESS                                0
+#define SENSOR_FAIL                                   1
+#define SENSOR_CTX_ERROR                              0xF
+#define SENSOR_FALSE                                  0
+#define SENSOR_TRUE                                   1
 
-#define SENSOR_Sleep(ms) 		usleep(ms*1000)
-#define SENSOR_MEMSET 			memset
+#define SENSOR_Sleep(ms)                              usleep(ms*1000)
+#define SENSOR_MEMSET                                 memset
 
-#define BOOLEAN char
-#define PNULL  ((void *)0)
-#define LOCAL static
+#define BOOLEAN                                       char
+#define PNULL                                         ((void *)0)
+#define LOCAL                                         static
 
-#define DEBUG_SENSOR_DRV 1
+#define DEBUG_SENSOR_DRV                              1
 #ifdef DEBUG_SENSOR_DRV
-#define SENSOR_PRINT   			CMR_LOGV
+#define SENSOR_PRINT                                  CMR_LOGV
 #else
 #define SENSOR_PRINT(...)
 #endif
 
-#define SENSOR_PRINT_ERR   		CMR_LOGE
-#define SENSOR_PRINT_HIGH 		CMR_LOGV
-#define SENSOR_TRACE   			SENSOR_PRINT
+#define SENSOR_PRINT_ERR                              CMR_LOGE
+#define SENSOR_PRINT_HIGH                             CMR_LOGV
+#define SENSOR_TRACE                                  SENSOR_PRINT
 
 
-#define NUMBER_OF_ARRAY(a)    				(sizeof(a)/sizeof(a[0]))
-#define ADDR_AND_LEN_OF_ARRAY(a) 			(SENSOR_REG_T*)a, NUMBER_OF_ARRAY(a)
+#define NUMBER_OF_ARRAY(a)                            (sizeof(a)/sizeof(a[0]))
+#define ADDR_AND_LEN_OF_ARRAY(a)                      (SENSOR_REG_T*)a, NUMBER_OF_ARRAY(a)
 
-#define SENSOR_DEFALUT_MCLK					24	// MHZ
-#define SENSOR_DISABLE_MCLK					0	// MHZ
-#define SENSOR_LOW_PULSE_RESET				0x00
-#define SENSOR_HIGH_PULSE_RESET				0x01
+#define SENSOR_DEFALUT_MCLK                           24          /* MHZ */
+#define SENSOR_DISABLE_MCLK                           0           /* MHZ */
+#define SENSOR_LOW_PULSE_RESET                        0x00
+#define SENSOR_HIGH_PULSE_RESET                       0x01
 
-#define SENSOR_RESET_PULSE_WIDTH_DEFAULT	10
-#define SENSOR_RESET_PULSE_WIDTH_MAX		200
+#define SENSOR_RESET_PULSE_WIDTH_DEFAULT              10
+#define SENSOR_RESET_PULSE_WIDTH_MAX                  200
 
-#define SENSOR_LOW_LEVEL_PWDN				0x00
-#define SENSOR_HIGH_LEVEL_PWDN				0x01
+#define SENSOR_LOW_LEVEL_PWDN                         0x00
+#define SENSOR_HIGH_LEVEL_PWDN                        0x01
 
 
-#define SENSOR_IDENTIFY_CODE_COUNT			0x02
-#define CAP_MODE_BITS                       16
+#define SENSOR_IDENTIFY_CODE_COUNT                    0x02
+#define CAP_MODE_BITS                                 16
 
 /* bit define */
-#define S_BIT_0               0x00000001
-#define S_BIT_1               0x00000002
-#define S_BIT_2               0x00000004
-#define S_BIT_3               0x00000008
-#define S_BIT_4               0x00000010
-#define S_BIT_5               0x00000020
-#define S_BIT_6               0x00000040
-#define S_BIT_7               0x00000080
-#define S_BIT_8               0x00000100
+#define S_BIT_0                                       0x00000001
+#define S_BIT_1                                       0x00000002
+#define S_BIT_2                                       0x00000004
+#define S_BIT_3                                       0x00000008
+#define S_BIT_4                                       0x00000010
+#define S_BIT_5                                       0x00000020
+#define S_BIT_6                                       0x00000040
+#define S_BIT_7                                       0x00000080
+#define S_BIT_8                                       0x00000100
 
 /*Image effect*/
-#define SENSOR_IMAGE_EFFECT_NORMAL			(0x01 << 0)
-#define SENSOR_IMAGE_EFFECT_BLACKWHITE		(0x01 << 1)
-#define SENSOR_IMAGE_EFFECT_RED				(0x01 << 2)
-#define SENSOR_IMAGE_EFFECT_GREEN			(0x01 << 3)
-#define SENSOR_IMAGE_EFFECT_BLUE				(0x01 << 4)
-#define SENSOR_IMAGE_EFFECT_YELLOW			(0x01 << 5)
-#define SENSOR_IMAGE_EFFECT_NEGATIVE			(0x01 << 6)
-#define SENSOR_IMAGE_EFFECT_CANVAS			(0x01 << 7)
-#define SENSOR_IMAGE_EFFECT_EMBOSS			(0x01 << 8)
-#define SENSOR_IMAGE_EFFECT_OVEREXP			(0x01 << 9)
+#define SENSOR_IMAGE_EFFECT_NORMAL                    (0x01 << 0)
+#define SENSOR_IMAGE_EFFECT_BLACKWHITE                (0x01 << 1)
+#define SENSOR_IMAGE_EFFECT_RED                       (0x01 << 2)
+#define SENSOR_IMAGE_EFFECT_GREEN                     (0x01 << 3)
+#define SENSOR_IMAGE_EFFECT_BLUE                      (0x01 << 4)
+#define SENSOR_IMAGE_EFFECT_YELLOW                    (0x01 << 5)
+#define SENSOR_IMAGE_EFFECT_NEGATIVE                  (0x01 << 6)
+#define SENSOR_IMAGE_EFFECT_CANVAS                    (0x01 << 7)
+#define SENSOR_IMAGE_EFFECT_EMBOSS                    (0x01 << 8)
+#define SENSOR_IMAGE_EFFECT_OVEREXP                   (0x01 << 9)
 
 
 
 /*While balance mode*/
-#define SENSOR_WB_MODE_AUTO 				(0x01 << 0)
-#define SENSOR_WB_MODE_INCANDESCENCE		(0x01 << 1)
-#define SENSOR_WB_MODE_U30					(0x01 << 2)
-#define SENSOR_WB_MODE_CWF					(0x01 << 3)
-#define SENSOR_WB_MODE_FLUORESCENT		(0x01 << 4)
-#define SENSOR_WB_MODE_SUN					(0x01 << 5)
-#define SENSOR_WB_MODE_CLOUD				(0x01 << 6)
+#define SENSOR_WB_MODE_AUTO                           (0x01 << 0)
+#define SENSOR_WB_MODE_INCANDESCENCE                  (0x01 << 1)
+#define SENSOR_WB_MODE_U30                            (0x01 << 2)
+#define SENSOR_WB_MODE_CWF                            (0x01 << 3)
+#define SENSOR_WB_MODE_FLUORESCENT                    (0x01 << 4)
+#define SENSOR_WB_MODE_SUN                            (0x01 << 5)
+#define SENSOR_WB_MODE_CLOUD                          (0x01 << 6)
 
 /*Preview mode*/
-#define SENSOR_ENVIROMENT_NORMAL			(0x01 << 0)
-#define SENSOR_ENVIROMENT_NIGHT			(0x01 << 1)
-#define SENSOR_ENVIROMENT_SUNNY			(0x01 << 2)
-#define SENSOR_ENVIROMENT_SPORTS			(0x01 << 3)
-#define SENSOR_ENVIROMENT_LANDSCAPE		(0x01 << 4)
-#define SENSOR_ENVIROMENT_PORTRAIT			(0x01 << 5)
-#define SENSOR_ENVIROMENT_PORTRAIT_NIGHT	(0x01 << 6)
-#define SENSOR_ENVIROMENT_BACKLIGHT		(0x01 << 7)
-#define SENSOR_ENVIROMENT_MARCO			(0x01 << 8)
+#define SENSOR_ENVIROMENT_NORMAL                      (0x01 << 0)
+#define SENSOR_ENVIROMENT_NIGHT                       (0x01 << 1)
+#define SENSOR_ENVIROMENT_SUNNY                       (0x01 << 2)
+#define SENSOR_ENVIROMENT_SPORTS                      (0x01 << 3)
+#define SENSOR_ENVIROMENT_LANDSCAPE                   (0x01 << 4)
+#define SENSOR_ENVIROMENT_PORTRAIT                    (0x01 << 5)
+#define SENSOR_ENVIROMENT_PORTRAIT_NIGHT              (0x01 << 6)
+#define SENSOR_ENVIROMENT_BACKLIGHT                   (0x01 << 7)
+#define SENSOR_ENVIROMENT_MARCO                       (0x01 << 8)
 
-#define SENSOR_ENVIROMENT_MANUAL			(0x01 << 30)
-#define SENSOR_ENVIROMENT_AUTO				(0x01 << 31)
+#define SENSOR_ENVIROMENT_MANUAL                      (0x01 << 30)
+#define SENSOR_ENVIROMENT_AUTO                        (0x01 << 31)
 
 /*YUV PATTERN*/
-#define SENSOR_IMAGE_PATTERN_YUV422_YUYV	0x00
-#define SENSOR_IMAGE_PATTERN_YUV422_YVYU	0x01
-#define SENSOR_IMAGE_PATTERN_YUV422_UYVY	0x02
-#define SENSOR_IMAGE_PATTERN_YUV422_VYUY	0x03
+#define SENSOR_IMAGE_PATTERN_YUV422_YUYV              0x00
+#define SENSOR_IMAGE_PATTERN_YUV422_YVYU              0x01
+#define SENSOR_IMAGE_PATTERN_YUV422_UYVY              0x02
+#define SENSOR_IMAGE_PATTERN_YUV422_VYUY              0x03
 /*RAW RGB BAYER*/
-#define SENSOR_IMAGE_PATTERN_RAWRGB_GR	0x00
-#define SENSOR_IMAGE_PATTERN_RAWRGB_R		0x01
-#define SENSOR_IMAGE_PATTERN_RAWRGB_B		0x02
-#define SENSOR_IMAGE_PATTERN_RAWRGB_GB	0x03
+#define SENSOR_IMAGE_PATTERN_RAWRGB_GR                0x00
+#define SENSOR_IMAGE_PATTERN_RAWRGB_R                 0x01
+#define SENSOR_IMAGE_PATTERN_RAWRGB_B                 0x02
+#define SENSOR_IMAGE_PATTERN_RAWRGB_GB                0x03
 
 /*I2C REG/VAL BIT count*/
-#define SENSOR_I2C_VAL_8BIT			0x00
-#define SENSOR_I2C_VAL_16BIT			0x01
-#define SENSOR_I2C_REG_8BIT			(0x00 << 1)
-#define SENSOR_I2C_REG_16BIT			(0x01 << 1)
-#define SENSOR_I2C_CUSTOM 			(0x01 << 2)
+#define SENSOR_I2C_VAL_8BIT                           0x00
+#define SENSOR_I2C_VAL_16BIT                          0x01
+#define SENSOR_I2C_REG_8BIT                           (0x00 << 1)
+#define SENSOR_I2C_REG_16BIT                          (0x01 << 1)
+#define SENSOR_I2C_CUSTOM                             (0x01 << 2)
 
 /*I2C ACK/STOP BIT count*/
-#define SNESOR_I2C_ACK_BIT (0x00 << 3)
-#define SNESOR_I2C_NOACK_BIT (0x00 << 3)
-#define SNESOR_I2C_STOP_BIT (0x00 << 3)
-#define SNESOR_I2C_NOSTOP_BIT (0x00 << 3)
+#define SNESOR_I2C_ACK_BIT                            (0x00 << 3)
+#define SNESOR_I2C_NOACK_BIT                          (0x00 << 3)
+#define SNESOR_I2C_STOP_BIT                           (0x00 << 3)
+#define SNESOR_I2C_NOSTOP_BIT                         (0x00 << 3)
 
 /*I2C FEEQ BIT count*/
-#define SENSOR_I2C_CLOCK_MASK		(0x07 << 5)
-#define SENSOR_I2C_FREQ_20			(0x01 << 5)
-#define SENSOR_I2C_FREQ_50			(0x02 << 5)
-#define SENSOR_I2C_FREQ_100			(0x00 << 5)
-#define SENSOR_I2C_FREQ_200			(0x03 << 5)
-#define SENSOR_I2C_FREQ_400			(0x04 << 5)
+#define SENSOR_I2C_CLOCK_MASK                         (0x07 << 5)
+#define SENSOR_I2C_FREQ_20                            (0x01 << 5)
+#define SENSOR_I2C_FREQ_50                            (0x02 << 5)
+#define SENSOR_I2C_FREQ_100                           (0x00 << 5)
+#define SENSOR_I2C_FREQ_200                           (0x03 << 5)
+#define SENSOR_I2C_FREQ_400                           (0x04 << 5)
 
 
 /*Hardward signal polarity*/
-#define SENSOR_HW_SIGNAL_PCLK_N				0x00
-#define SENSOR_HW_SIGNAL_PCLK_P				0x01
-#define SENSOR_HW_SIGNAL_VSYNC_N			(0x00 << 2)
-#define SENSOR_HW_SIGNAL_VSYNC_P			(0x01 << 2)
-#define SENSOR_HW_SIGNAL_HSYNC_N			(0x00 << 4)
-#define SENSOR_HW_SIGNAL_HSYNC_P			(0x01 << 4)
+#define SENSOR_HW_SIGNAL_PCLK_N                       0x00
+#define SENSOR_HW_SIGNAL_PCLK_P                       0x01
+#define SENSOR_HW_SIGNAL_VSYNC_N                      (0x00 << 2)
+#define SENSOR_HW_SIGNAL_VSYNC_P                      (0x01 << 2)
+#define SENSOR_HW_SIGNAL_HSYNC_N                      (0x00 << 4)
+#define SENSOR_HW_SIGNAL_HSYNC_P                      (0x01 << 4)
 
-#define SENSOR_WRITE_DELAY					0xffff
+#define SENSOR_WRITE_DELAY                            0xffff
 
-#define SENSOR_IOCTL_FUNC_NOT_REGISTER		0xffffffff
+#define SENSOR_IOCTL_FUNC_NOT_REGISTER                0xffffffff
 
 /*sensor focus mode*/
-#define SENSOR_FOCUS_TRIG 0x01
-#define SENSOR_FOCUS_ZONE (0x01<<1)
+#define SENSOR_FOCUS_TRIG                             0x01
+#define SENSOR_FOCUS_ZONE                             (0x01<<1)
 
 /*sensor exposure mode*/
-#define SENSOR_EXPOSURE_AUTO 0x01
-#define SENSOR_EXPOSURE_ZONE (0x01<<1)
+#define SENSOR_EXPOSURE_AUTO                          0x01
+#define SENSOR_EXPOSURE_ZONE                          (0x01<<1)
 
-#define FOCUS_ZONE_CNT_MAX   6
+#define FOCUS_ZONE_CNT_MAX                            6
 
-#define SENSOR_VIDEO_MODE_MAX   4
+#define SENSOR_VIDEO_MODE_MAX                         4
 
 /*  isp param for raw */
 
@@ -232,31 +233,7 @@ typedef enum {
 	SENSOR_MCLK_MAX
 } SENSOR_M_CLK_E;
 
-/*
-typedef enum {
-	SENSOR_INTERFACE_CCIR601_8BITS = 0,
-	SENSOR_INTERFACE_CCIR601_4BITS,
-	SENSOR_INTERFACE_CCIR601_2BITS,
-	SENSOR_INTERFACE_CCIR601_1BITS,
-	SENSOR_INTERFACE_CCIR656_8BITS,
-	SENSOR_INTERFACE_CCIR656_4BITS,
-	SENSOR_INTERFACE_CCIR656_2BITS,
-	SENSOR_INTERFACE_CCIR656_1BITS,
-	SENSOR_INTERFACE_SPI_8BITS,
-	SENSOR_INTERFACE_SPI_4BITS,
-	SENSOR_INTERFACE_SPI_4BITS_BE,
-	SENSOR_INTERFACE_SPI_2BITS,
-	SENSOR_INTERFACE_SPI_2BITS_BE,
-	SENSOR_INTERFACE_SPI_1BITS,
-	SENSOR_INTERFACE_SPI_1BITS_BE,
-	SENSOR_INTERFACE_CSI2,
-	SENSOR_INTERFACE_CSI2_2LANES,
-	SENSOR_INTERFACE_CSI2_3LANES,
-	SENSOR_INTERFACE_CSI2_4LANES,
 
-	SENSOR_INTERFACE_MAX
-} SENSOR_INTERFACE_E;
-*/
 typedef enum {
 	SENSOR_INTERFACE_TYPE_CCIR601 = 0,
 	SENSOR_INTERFACE_TYPE_CCIR656,
@@ -275,15 +252,11 @@ typedef enum {
 }SESOR_HDR_EV_LEVEL_E;
 
 
-/* SAMPLE
-
+/* SAMPLE:
 type = SENSOR_INTERFACE_TYPE_CSI2; bus_width = 3;
-
 MIPI CSI2 and Lane3
-
 */
 typedef struct{
-
 	SENSOR_INF_TYPE_E  type;
 	uint32_t bus_width;//lane number or bit-width
 	uint32_t pixel_width; //bits per pixel
@@ -719,8 +692,6 @@ typedef enum {
 	SENSOR_PARAM_EFFECT_MAX
 } SENSOR_PARAM_EFFECT_E;
 
-
-//int Sensor_Init(void);
 int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr);
 int Sensor_WriteData(uint8_t *regPtr, uint32_t length);
 int Sensor_Open(uint32_t sensor_id);
@@ -732,12 +703,10 @@ int32_t Sensor_WriteReg(uint16_t subaddr, uint16_t data);
 uint16_t Sensor_ReadReg(uint16_t subaddr);
 int Sensor_SetMCLK(uint32_t mclk);
 int Sensor_SetVoltage(SENSOR_AVDD_VAL_E dvdd_val,
-		       SENSOR_AVDD_VAL_E avdd_val, SENSOR_AVDD_VAL_E iodd_val);  // todo splite 3 fun
-
+			SENSOR_AVDD_VAL_E avdd_val, SENSOR_AVDD_VAL_E iodd_val);  // todo splite 3 fun
 int Sensor_SetAvddVoltage(SENSOR_AVDD_VAL_E vdd_val);
 int Sensor_SetDvddVoltage(SENSOR_AVDD_VAL_E vdd_val);
 int Sensor_SetIovddVoltage(SENSOR_AVDD_VAL_E vdd_val);
-
 BOOLEAN Sensor_PowerDown(BOOLEAN power_down);
 BOOLEAN Sensor_SetResetLevel(BOOLEAN plus_level);
 void Sensor_Reset(uint32_t level);
@@ -746,20 +715,11 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param);
 EXIF_SPEC_PIC_TAKING_COND_T *Sensor_GetSensorExifInfo(void);
 int Sensor_EventReg(cmr_evt_cb  event_cb);
 int Sensor_SetMonitorVoltage(SENSOR_AVDD_VAL_E vdd_val);
-
-
-
-
 int32_t Sensor_WriteReg_8bits(uint16_t reg_addr, uint8_t value);
 int32_t Sensor_ReadReg_8bits(uint8_t reg_addr, uint8_t * reg_val);
-ERR_SENSOR_E Sensor_SendRegTabToSensor(SENSOR_REG_TAB_INFO_T *
-				       sensor_reg_tab_info_ptr);
+ERR_SENSOR_E Sensor_SendRegTabToSensor(SENSOR_REG_TAB_INFO_T *sensor_reg_tab_info_ptr);
 BOOLEAN Sensor_IsInit(void);
-
-
 ERR_SENSOR_E Sensor_Close(void);
-
-
 BOOLEAN Sensor_IsOpen(void);
 uint32_t Sensor_SetCurId(SENSOR_ID_E sensor_id);
 SENSOR_ID_E Sensor_GetCurId(void);
@@ -782,7 +742,7 @@ int Sensor_WriteI2C(uint16_t slave_addr, uint8_t *cmd, uint16_t cmd_length);
 int Sensor_GetMode(uint32_t *mode);
 int Sensor_GetFlashLevel(SENSOR_FLASH_LEVEL_T *level);
 int Sensor_SetMode_WaitDone();
-
+int Sensor_set_calibration(uint32_t value);
 #ifdef	 __cplusplus
 }
 #endif
