@@ -94,6 +94,8 @@ typedef enum {
 
 	ENG_AT_SSMP                     = 200,
 	ENG_AT_CMD_END,
+   ENG_AT_SET_SPSIMRST = 300,
+   ENG_AT_QUERY_SPSIMRST = 301,
 }ENG_AT_CMD;
 
 

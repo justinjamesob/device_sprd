@@ -932,6 +932,17 @@ char* eng_atCommandRequest(int cmd,  void *param)
 		case ENG_AT_SSMP:
 			sprintf(at_cmd_req, "AT+SSMP");
 			break;
+        case ENG_AT_SET_SPSIMRST: {
+            int *times;
+            times = (int *)param;
+            sprintf(at_cmd_req, "AT+SPSIMRST=%d",*times);
+            ALOGW("%s: index=%d, [%s]\n", __FUNCTION__, cmd, at_cmd_req);
+        }
+            break;
+        case ENG_AT_QUERY_SPSIMRST: {
+            sprintf(at_cmd_req, "AT+SPSIMRST?");
+        }
+            break;
 		default:
 			break;
 	}
@@ -1482,6 +1493,16 @@ eng_at_response* eng_atCommandResponse(int cmd, char* data, int data_len)
 				response.content= data;
 				response.content_len= strlen(data);
 			break;
+
+        case ENG_AT_QUERY_SPSIMRST:
+            {
+                int times;
+                response.content=&data[SEND_DATA_START_POS+SEND_DATA_ITEM_LENGTH_BYTES];
+                response.content_len = data[SEND_DATA_START_POS+SEND_DATA_ITEM_LENGTH_BYTES-1];
+                response.content_len=strlen(response.content);
+                ENG_LOG("%s: AT+SPSIMRST: %s ; length=%d\n", __FUNCTION__, response.content,response.content_len);
+            }
+            break;
 		
 		default:
 			break;
@@ -1981,6 +2002,10 @@ void * eng_parsecmd(int* cmd, char *data, int len)
 
 				return &at_sgmr;
 			}
+        case ENG_AT_SET_SPSIMRST:
+            err = at_tok_nextint(&data, &at_oneint);
+            ENG_LOG("%s: ENG AT SET SPSIMRST: %d\n", __FUNCTION__, at_oneint);
+            return &at_oneint;
 		default:
 			return NULL;
 			
