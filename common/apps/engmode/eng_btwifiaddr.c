@@ -21,10 +21,9 @@
 
 #define MAC_ERROR_EX			":::::"
 #define MAC_ERROR			"FF:FF:FF:FF:FF:FF"
-#define WIFI_MAC_FILE		"/data/wifimac.txt"
-#define BT_MAC_FILE			"/data/btmac.txt"
-#define MAC_RAND_FILE		"/data/rand_mac.txt"
-#define KMSG_LOG			"/data/rand_kmsg.txt"
+#define WIFI_MAC_FILE		"/productinfo/wifimac.txt"
+#define BT_MAC_FILE			"/productinfo/btmac.txt"
+#define MAC_RAND_FILE		"/productinfo/rand_mac.txt"
 
 typedef enum {
     BT_MAC_ADDR=0,
