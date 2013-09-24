@@ -729,7 +729,7 @@ int eng_linuxcmd_chargertest(char *req, char *rsp)
             ENG_LOG("%s: status=%d\n",__FUNCTION__, status);
             if(status==1) {
                 ENG_LOG("%s: Create %s",__FUNCTION__,ENG_CHARGERTEST_FILE);
-                fd=open(ENG_CHARGERTEST_FILE, O_RDWR|O_CREAT|O_TRUNC);
+                fd=open(ENG_CHARGERTEST_FILE, O_RDWR|O_CREAT|O_TRUNC, 0666);
                 if(fd >= 0)
                     close(fd);
                 sprintf(rsp, "%s\r\n", SPRDENG_OK);
