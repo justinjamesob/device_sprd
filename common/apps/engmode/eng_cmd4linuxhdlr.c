@@ -32,6 +32,7 @@
 #else
 #define ENG_KEYPAD_PATH "/sys/devices/platform/sprd-keypad/emulate"
 #endif
+extern int g_reset;
 extern int eng_atdiag_hdlr(unsigned char *buf,int len, char* rsp);
 extern int eng_atdiag_euthdlr(char *buf,int len,char* rsp,int module_index);
 extern void eng_check_factorymode(void);
@@ -170,8 +171,7 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
         ENG_LOG("%s: open %s fail [%s]\n",__FUNCTION__, ENG_RECOVERYCMD, strerror(errno));
         goto out;
     }
-    ret = write(fd, cmd, strlen(cmd));
-    if(ret < 0) {
+    if(write(fd, cmd, strlen(cmd)) < 0) {
         ret = 0;
         ENG_LOG("%s: write %s fail [%s]\n",__FUNCTION__, ENG_RECOVERYCMD, strerror(errno));
         goto out;
@@ -182,9 +182,10 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
         goto out;
     }
 
-    sync();
-    __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
-            LINUX_REBOOT_CMD_RESTART2, "recovery");
+    g_reset = 2;
+    //sync();
+    //__reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
+    //        LINUX_REBOOT_CMD_RESTART2, "recovery");
 out:
     if(ret==1)
         sprintf(rsp, "%s%s", SPRDENG_OK, ENG_STREND);

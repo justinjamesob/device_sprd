@@ -41,6 +41,7 @@ char *at_sipc_devname[] = {
     "/dev/stty_w30" // AT channel in W mode
 };
 
+int g_reset = 0;
 extern int g_run_mode;
 extern AUDIO_TOTAL_T *audio_total;
 extern void eng_check_factorymode(void);
@@ -80,6 +81,7 @@ static int eng_diag_btwifi(char *buf,int len, char *rsp, int *extra_len);
 static int eng_diag_audio(char *buf,int len, char *rsp);
 static int eng_diag_product_ctrl(char *buf,int len, char *rsp, int rsplen);
 static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen);
+static void eng_diag_reboot(int reset);
 int is_audio_at_cmd_need_to_handle(char *buf,int len);
 int is_btwifi_addr_need_to_handle(char *buf,int len);
 int eng_diag_factorymode(char *buf,int len, char *rsp);
@@ -236,7 +238,6 @@ int eng_diag_user_handle(int type, char *buf,int len)
     int rlen = 0,i;
     int extra_len=0;
     int ret;
-    int reset = 0;
     MSG_HEAD_T head,*head_ptr=NULL;
     char rsp[512];
     int adc_rsp[8];
@@ -252,7 +253,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
             break;
         case CMD_USER_RESET:
             rlen=eng_diag_bootreset((unsigned char*)buf,len, rsp);
-            reset = 1;
+            g_reset = 1;
             break;
         case CMD_USER_BTWIFI:
             rlen=eng_diag_btwifi(buf, len, rsp, &extra_len);
@@ -342,10 +343,8 @@ int eng_diag_user_handle(int type, char *buf,int len)
         restart_gser();
     }
 
-    if (reset){
-        sync();
-        __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
-                LINUX_REBOOT_CMD_RESTART2, "cftreboot");
+    if (g_reset){
+        eng_diag_reboot(g_reset);
     }
 
     if ( type == CMD_USER_AUDIO ) {
@@ -1781,4 +1780,26 @@ int is_btwifi_addr_need_to_handle(char *buf,int len)
     }
 
     return 0;
+}
+
+static void eng_diag_reboot(int reset)
+{
+    char name[64] = {0};
+
+    switch(reset){
+        case 1:
+            strcpy(name, "cftreboot");
+            break;
+        case 2:
+            strcpy(name, "recovery");
+            break;
+        default:
+            return;
+    }
+
+    sync();
+    __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
+            LINUX_REBOOT_CMD_RESTART2, name);
+
+    return;
 }
