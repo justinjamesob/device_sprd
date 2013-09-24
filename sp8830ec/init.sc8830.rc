@@ -52,6 +52,18 @@ on boot
     chown system root /proc/cpt/modem
     chown system root /proc/cpt/dsp
 
+    chmod 660 /proc/cpwcn/wdtirq
+    chmod 660 /proc/cpwcn/stop
+    chmod 660 /proc/cpwcn/start
+    chmod 660 /proc/cpwcn/modem
+    chmod 660 /proc/cpwcn/dsp
+
+    chown system root /proc/cpwcn/wdtirq
+    chown system root /proc/cpwcn/stop
+    chown system root /proc/cpwcn/start
+    chown system root /proc/cpwcn/modem
+    chown system root /proc/cpwcn/dsp
+
     insmod /system/lib/modules/focaltech_ts.ko
 
     chmod 666 /dev/ttyS0
