@@ -385,7 +385,14 @@ static int32_t GetAudio_mode_number_from_device(struct tiny_audio_device *adev)
     int32_t lmode;
     if(((adev->devices & AUDIO_DEVICE_OUT_WIRED_HEADSET) && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
         || ((adev->devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE) && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))){
-        lmode = 1;  //headfree
+
+	if(adev->input_source == AUDIO_SOURCE_CAMCORDER)
+	{
+		lmode = 0 ;  //under camera record , change mode to headset
+	}
+	else
+	        lmode = 1;  //headfree
+
     }else if(adev->devices & AUDIO_DEVICE_OUT_EARPIECE){
         lmode = 2;  //handset
     }else if((adev->devices & AUDIO_DEVICE_OUT_SPEAKER) || (adev->devices & AUDIO_DEVICE_OUT_FM_SPEAKER)){

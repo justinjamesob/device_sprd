@@ -307,6 +307,8 @@ struct tiny_audio_device {
     int voip_state;
     int voip_start;
     bool master_mute;
+
+    int  input_source;	
 };
 
 struct tiny_stream_out {
@@ -2403,6 +2405,7 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
         /* no audio source uses val == 0 */
         if ((in->source != val) && (val != 0)) {
             in->source = val;
+	     adev->input_source =val;
         }
     }
 
@@ -4545,7 +4548,8 @@ static int adev_open(const hw_module_t* module, const char* name,
     adev->call_prestop = 0;
     adev->voice_volume = 1.0f;
     adev->bluetooth_nrec = false;
-
+	
+    adev->input_source = 0;
     mixer_ctl_set_value(adev->private_ctl.vbc_switch, 0, VBC_ARM_CHANNELID);  //switch to arm
     adev->vbc_2arm = mixer_ctl_get_value(adev->private_ctl.vbc_switch,0);
     pthread_mutex_unlock(&adev->lock);
