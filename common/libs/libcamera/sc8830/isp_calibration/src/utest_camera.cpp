@@ -102,7 +102,6 @@ static char calibration_flashlight_file[] = "/data/sensor_%s_flashlight_%s.dat";
 static char calibration_lsc_file[] = "/data/sensor_%s_lnc_%d_%d_%d_%s.dat";
 static char calibration_raw_data_file[] = "/data/sensor_%s_raw_%d_%d_%s.raw";
 static char calibration_cap_jpg_file[] = "/data/sensor_cali_cap_jpg.jpg";
-extern uint32_t g_is_calibration;
 
 static struct utest_cmr_context utest_cmr_cxt;
 static struct utest_cmr_context *g_utest_cmr_cxt_ptr = &utest_cmr_cxt;
@@ -178,9 +177,7 @@ static int utest_dcam_param_set(int argc, char **argv)
 	if (sem_init(&(cmr_cxt_ptr->sem_cap_jpg_done), 0, 0))
 		return -1;
 
-	g_is_calibration = 1;
-
-	return 0;
+	return Sensor_set_calibration(1);
 }
 
 static void utest_dcam_wait_isp_ae_stab(void)
@@ -371,7 +368,7 @@ static int utest_dcam_cap_memory_alloc(void)
 
 static void utest_dcam_close(void)
 {
-	g_is_calibration = 0;
+	Sensor_set_calibration(0);
 	utest_dcam_preview_mem_release();
 	utest_dcam_cap_memory_release();
 	camera_stop(NULL, NULL);
