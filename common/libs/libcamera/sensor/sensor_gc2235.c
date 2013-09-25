@@ -537,48 +537,10 @@ LOCAL uint32_t Sensor_InitRawTuneInfo(void)
 	sensor_ptr->awb.r_gain[8]=0xff;
 	sensor_ptr->awb.g_gain[8]=0xff;
 	sensor_ptr->awb.b_gain[8]=0xff;
-	sensor_ptr->awb.cali_zone=0x40;
 	sensor_ptr->awb.target_zone=0x40;
 
 	/*awb cali*/
 	sensor_ptr->awb.quick_mode=1;
-	sensor_ptr->awb.cali_num=9;
-
-	sensor_ptr->awb.cali[0].x=140;
-	sensor_ptr->awb.cali[0].yt=241;
-	sensor_ptr->awb.cali[0].yb=212;
-
-	sensor_ptr->awb.cali[1].x=145;
-	sensor_ptr->awb.cali[1].yt=250;
-	sensor_ptr->awb.cali[1].yb=149;
-
-	sensor_ptr->awb.cali[2].x=152;
-	sensor_ptr->awb.cali[2].yt=254;
-	sensor_ptr->awb.cali[2].yb=136;
-
-	sensor_ptr->awb.cali[3].x=157;
-	sensor_ptr->awb.cali[3].yt=254;
-	sensor_ptr->awb.cali[3].yb=130;
-
-	sensor_ptr->awb.cali[4].x=163;
-	sensor_ptr->awb.cali[4].yt=245;
-	sensor_ptr->awb.cali[4].yb=126;
-
-	sensor_ptr->awb.cali[5].x=170;
-	sensor_ptr->awb.cali[5].yt=156;
-	sensor_ptr->awb.cali[5].yb=127;
-
-	sensor_ptr->awb.cali[6].x=175;
-	sensor_ptr->awb.cali[6].yt=157;
-	sensor_ptr->awb.cali[6].yb=130;
-
-	sensor_ptr->awb.cali[7].x=179;
-	sensor_ptr->awb.cali[7].yt=161;
-	sensor_ptr->awb.cali[7].yb=133;
-
-	sensor_ptr->awb.cali[8].x=184;
-	sensor_ptr->awb.cali[8].yt=166;
-	sensor_ptr->awb.cali[8].yb=135;
 
 	/*awb win*/
 	sensor_ptr->awb.win[0].x=132;
