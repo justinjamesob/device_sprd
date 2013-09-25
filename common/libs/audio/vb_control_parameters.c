@@ -1073,6 +1073,7 @@ static int vbc_call_end_process(struct tiny_audio_device *adev,int is_timeout)
     }
     if(is_timeout) {
 	adev->call_prestop = 0;
+	adev->call_start = 0;
     }
     pthread_mutex_unlock(&adev->lock);
     ALOGW("voice:vbc_call_end_process out");

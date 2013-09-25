@@ -197,8 +197,7 @@ struct pcm_config pcm_config_vplayback = {
     .channels = 2,
     .rate = VX_NB_SAMPLING_RATE,
     .period_size = 320,
-   // .period_size = 640,
-    .period_count = 8,
+    .period_count = 4,
     .format = PCM_FORMAT_S16_LE,
 };
 
@@ -1667,7 +1666,7 @@ static ssize_t out_write_vaudio(struct tiny_stream_out *out, const void* buffer,
 			VOIP_TRACE("voip:out_write_vaudio is %d,%d,%d,%d,%d,%d,%d,%d,%d,%d",*(buf_p+0),*(buf_p+1),*(buf_p+2),*(buf_p+3),*(buf_p+4),*(buf_p+5),*(buf_p+6),*(buf_p+7),*(buf_p+8),*(buf_p+9));
 		}*/
 
-        ret = pcm_write(out->pcm_vplayback, (void *)buf, out_frames*frame_size);
+        ret = pcm_mmap_write(out->pcm_vplayback, (void *)buf, out_frames*frame_size);
         BLUE_TRACE("out_write_vaudio out out frames  is %d",out_frames);
     }
     else
