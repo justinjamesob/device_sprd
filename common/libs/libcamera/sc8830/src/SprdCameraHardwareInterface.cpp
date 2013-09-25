@@ -400,6 +400,10 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
     LOGV("%s: preview format %s", __func__, str_preview_format);
 
+	if (preview_width < 640) {
+		mPreviewBufferUsage = PREVIEW_BUFFER_USAGE_DCAM;
+	}
+
 #ifdef CONFIG_CAMERA_DMA_COPY
     usage = GRALLOC_USAGE_SW_WRITE_OFTEN | GRALLOC_USAGE_PRIVATE_0;
 #else
@@ -2680,7 +2684,6 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			if (releasePreviewFrame())
 				return false;
 		}
-
 		if (0 != mPreviewWindow->enqueue_buffer(mPreviewWindow, mPreviewBufferHandle[id])) {
 			LOGE("displayOneFrame: eddy Could not enqueue gralloc buffer!\n");
 			return false;

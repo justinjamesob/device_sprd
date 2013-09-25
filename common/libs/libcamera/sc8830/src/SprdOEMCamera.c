@@ -3025,6 +3025,9 @@ camera_ret_code_type camera_take_picture(camera_cb_f_type    callback,
 
 	TAKE_PICTURE_STEP(CMR_STEP_TAKE_PIC);
 	CMR_LOGI("start");
+	if (IS_ZSL_MODE(cap_mode) || (CAMERA_RAW_MODE == cap_mode)) {
+		camera_preflash();
+	}
 
 	pthread_mutex_lock(&g_cxt->recover_mutex);
 	camera_set_client_data(client_data);
