@@ -208,7 +208,7 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mIsRotCapture(0),
 #endif
 	mTimeCoeff(1),
-	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS),
+	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_DCAM),
 	mSetFreqCount(0)
 {
 	LOGV("openCameraHardware: E cameraId: %d.", cameraId);
@@ -2569,7 +2569,11 @@ int SprdCameraHardware::displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_
 	}
 	ret = uv420CopyTrim(dma_copy_cfg);
 #else
-	memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, src_w*src_h*3/2);
+    if (mParameters.getPreviewEnv()) {
+		memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, SIZE_ALIGN(src_w)*SIZE_ALIGN(src_h)*3/2);
+    } else {
+		memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, src_w*src_h*3/2);
+    }
 #endif
 
 #endif
