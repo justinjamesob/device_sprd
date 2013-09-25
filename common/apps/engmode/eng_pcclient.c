@@ -99,7 +99,6 @@ void eng_check_factorymode(void)
     char status_buf[8];
     char config_property[64];
     char modem_enable[5];
-    char usb_config[64];
 
 #ifdef USE_BOOT_AT_DIAG
     fd=open(ENG_FACOTRYMODE_FILE, O_RDWR|O_CREAT|O_TRUNC, 0660);
@@ -111,14 +110,9 @@ void eng_check_factorymode(void)
         if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {
             sprintf(status_buf, "%s", "1");
             ENG_LOG("%s: modem_enable: %s\n", __FUNCTION__, modem_enable);
-            if(!strcmp(modem_enable, "1")) {
-                strcpy(usb_config, USB_CONFIG_GSER6);
-            }else {
-                strcpy(usb_config, USB_CONFIG_VSER_GSER);
-            }
-            if(strncmp(config_property, usb_config, strlen(usb_config))){
-                property_set("sys.usb.config", usb_config);
-                property_set("persist.sys.usb.config", usb_config);
+            if(strncmp(config_property, USB_CONFIG_VSER_GSER, strlen(USB_CONFIG_VSER_GSER))){
+                property_set("sys.usb.config", USB_CONFIG_VSER_GSER);
+                property_set("persist.sys.usb.config", USB_CONFIG_VSER_GSER);
             }
         } else {
             sprintf(status_buf, "%s", "0");
