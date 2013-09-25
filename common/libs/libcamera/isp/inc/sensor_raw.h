@@ -45,6 +45,7 @@
 #define SENSOR_MAP_NUM 0x08
 #define SENSOR_AWB_G_ESTIMATE_NUM 0x6
 #define SENSOR_AWB_GAIN_ADJUST_NUM 0x9
+#define SENSOR_AWB_LIGHT_NUM 0x10
 
 #define RAW_INFO_END_ID 0x71717567
 
@@ -220,16 +221,20 @@ struct sensor_awb_gain_adjust
 	uint32_t num;
 };
 
+struct sensor_awb_light_weight
+{
+	uint16_t t_thr[SENSOR_AWB_LIGHT_NUM];
+	uint16_t w_thr[SENSOR_AWB_LIGHT_NUM];
+	uint16_t num;
+};
+
 struct sensor_awb_param{
 	struct sensor_pos win_start;
 	struct sensor_size win_size;
 	struct sensor_rgb gain_convert[8];
 	struct sensor_awb_coord win[SENSOR_AWB_NUM];
-	struct sensor_awb_coord cali[SENSOR_AWB_CALI_NUM];
-	uint32_t cali_num;
-	uint32_t cali_index;
-	uint32_t cali_std;
-	uint32_t cali_zone;
+	struct sensor_awb_light_weight light;
+	uint32_t steady_speed;
 	uint16_t r_gain[SENSOR_AWB_NUM];
 	uint16_t g_gain[SENSOR_AWB_NUM];
 	uint16_t b_gain[SENSOR_AWB_NUM];
