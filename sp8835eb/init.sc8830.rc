@@ -55,111 +55,250 @@ on boot
     insmod /system/lib/modules/focaltech_ts.ko
 
     insmod /system/lib/modules/inv-mpu-iio.ko
+
     chown system system /dev/iio:device0
     chown system system /sys/bus/iio/devices/trigger0/name
-    chown system system /sys/bus/iio/devices/iio:device0/accl_bias
+    chown system system /sys/bus/iio/devices/trigger0/power
+    chown system system /sys/bus/iio/devices/trigger0/subsystem
+    chown system system /sys/bus/iio/devices/trigger0/uevent
     chown system system /sys/bus/iio/devices/iio:device0/accl_enable
     chown system system /sys/bus/iio/devices/iio:device0/accl_matrix
-    chown system system /sys/bus/iio/devices/iio:device0/buffer/length
-    chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
+    chown system system /sys/bus/iio/devices/iio:device0/buffer
     chown system system /sys/bus/iio/devices/iio:device0/compass_enable
     chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/dev
+    chown system system /sys/bus/iio/devices/iio:device0/display_orientation_on
     chown system system /sys/bus/iio/devices/iio:device0/dmp_event_int_on
     chown system system /sys/bus/iio/devices/iio:device0/dmp_firmware
     chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
     chown system system /sys/bus/iio/devices/iio:device0/dmp_on
     chown system system /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chown system system /sys/bus/iio/devices/iio:device0/event_accel_motion
     chown system system /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chown system system /sys/bus/iio/devices/iio:device0/event_tap
     chown system system /sys/bus/iio/devices/iio:device0/firmware_loaded
     chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
     chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
     chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_raw
     chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_raw
     chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
-    chown system system /sys/bus/iio/devices/iio:device0/key
+    chown system system /sys/bus/iio/devices/iio:device0/in_magn_x_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_magn_y_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_magn_z_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_quaternion_r_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_quaternion_x_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_quaternion_y_raw
+    chown system system /sys/bus/iio/devices/iio:device0/in_quaternion_z_raw
+    chown system system /sys/bus/iio/devices/iio:device0/motion_lpa_duration
+    chown system system /sys/bus/iio/devices/iio:device0/motion_lpa_freq
+    chown system system /sys/bus/iio/devices/iio:device0/motion_lpa_on
+    chown system system /sys/bus/iio/devices/iio:device0/motion_lpa_threshold
+    chown system system /sys/bus/iio/devices/iio:device0/name
+    chown system system /sys/bus/iio/devices/iio:device0/pedometer_steps
+    chown system system /sys/bus/iio/devices/iio:device0/pedometer_time
+    chown system system /sys/bus/iio/devices/iio:device0/power
     chown system system /sys/bus/iio/devices/iio:device0/power_state
     chown system system /sys/bus/iio/devices/iio:device0/quaternion_on
+    chown system system /sys/bus/iio/devices/iio:device0/reg_dump
     chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency_available
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements
     chown system system /sys/bus/iio/devices/iio:device0/self_test
+    chown system system /sys/bus/iio/devices/iio:device0/subsystem
+    chown system system /sys/bus/iio/devices/iio:device0/tap_min_count
     chown system system /sys/bus/iio/devices/iio:device0/tap_on
+    chown system system /sys/bus/iio/devices/iio:device0/tap_threshold
+    chown system system /sys/bus/iio/devices/iio:device0/tap_time
     chown system system /sys/bus/iio/devices/iio:device0/temperature
+    chown system system /sys/bus/iio/devices/iio:device0/trigger
+    chown system system /sys/bus/iio/devices/iio:device0/uevent
+    chown system system /sys/bus/iio/devices/iio:device0/power/autosuspend_delay_ms
+    chown system system /sys/bus/iio/devices/iio:device0/power/control
+    chown system system /sys/bus/iio/devices/iio:device0/power/runtime_active_time
+    chown system system /sys/bus/iio/devices/iio:device0/power/runtime_status
+    chown system system /sys/bus/iio/devices/iio:device0/power/runtime_suspended_time
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_type
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_index
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_type
     chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_offset
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_offset
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_offset
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
-    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
-    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
-    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
-    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
+    chown system system /sys/bus/iio/devices/iio:device0/buffer/length
 
-    chmod 0664 /dev/iio:device0
-    chmod 0664 /sys/bus/iio/devices/trigger0/name
-    chmod 0664 /sys/bus/iio/devices/iio:device0/accl_bias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/accl_enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/accl_matrix
-    chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/length
-    chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/compass_enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/compass_matrix
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_event_int_on
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_firmware
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_int_on
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_on
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_output_rate
-    chmod 0664 /sys/bus/iio/devices/iio:device0/event_display_orientation
-    chmod 0664 /sys/bus/iio/devices/iio:device0/firmware_loaded
-    chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_matrix
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_scale
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_scale
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_magn_scale
-    chmod 0664 /sys/bus/iio/devices/iio:device0/key
-    chmod 0664 /sys/bus/iio/devices/iio:device0/power_state
-    chmod 0664 /sys/bus/iio/devices/iio:device0/quaternion_on
-    chmod 0664 /sys/bus/iio/devices/iio:device0/sampling_frequency
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/self_test
-    chmod 0664 /sys/bus/iio/devices/iio:device0/tap_on
-    chmod 0664 /sys/bus/iio/devices/iio:device0/temperature
-    chmod 0664 /sys/bus/iio/devices/iio:device0/trigger/current_trigger
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_x_offset
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_y_offset
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_z_offset
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
+    chmod 0777 /dev/iio:device0
+    chmod 0777 /sys/bus/iio/devices/trigger0/name
+    chmod 0777 /sys/bus/iio/devices/trigger0/power
+    chmod 0777 /sys/bus/iio/devices/trigger0/subsystem
+    chmod 0777 /sys/bus/iio/devices/trigger0/uevent
+    chmod 0777 /sys/bus/iio/devices/iio:device0/accl_enable
+    chmod 0777 /sys/bus/iio/devices/iio:device0/accl_matrix
+    chmod 0777 /sys/bus/iio/devices/iio:device0/buffer
+    chmod 0777 /sys/bus/iio/devices/iio:device0/compass_enable
+    chmod 0777 /sys/bus/iio/devices/iio:device0/compass_matrix
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dev
+    chmod 0777 /sys/bus/iio/devices/iio:device0/display_orientation_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dmp_firmware
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dmp_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chmod 0777 /sys/bus/iio/devices/iio:device0/event_accel_motion
+    chmod 0777 /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chmod 0777 /sys/bus/iio/devices/iio:device0/event_tap
+    chmod 0777 /sys/bus/iio/devices/iio:device0/firmware_loaded
+    chmod 0777 /sys/bus/iio/devices/iio:device0/gyro_enable
+    chmod 0777 /sys/bus/iio/devices/iio:device0/gyro_matrix
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_scale
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_x_offset
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_x_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_y_offset
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_y_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_accel_z_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_scale
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_x_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_y_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_anglvel_z_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_magn_scale
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_magn_x_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_magn_y_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_magn_z_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_quaternion_r_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_quaternion_x_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_quaternion_y_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/in_quaternion_z_raw
+    chmod 0777 /sys/bus/iio/devices/iio:device0/motion_lpa_duration
+    chmod 0777 /sys/bus/iio/devices/iio:device0/motion_lpa_freq
+    chmod 0777 /sys/bus/iio/devices/iio:device0/motion_lpa_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/motion_lpa_threshold
+    chmod 0777 /sys/bus/iio/devices/iio:device0/name
+    chmod 0777 /sys/bus/iio/devices/iio:device0/pedometer_steps
+    chmod 0777 /sys/bus/iio/devices/iio:device0/pedometer_time
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power_state
+    chmod 0777 /sys/bus/iio/devices/iio:device0/quaternion_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/reg_dump
+    chmod 0777 /sys/bus/iio/devices/iio:device0/sampling_frequency
+    chmod 0777 /sys/bus/iio/devices/iio:device0/sampling_frequency_available
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements
+    chmod 0777 /sys/bus/iio/devices/iio:device0/self_test
+    chmod 0777 /sys/bus/iio/devices/iio:device0/subsystem
+    chmod 0777 /sys/bus/iio/devices/iio:device0/tap_min_count
+    chmod 0777 /sys/bus/iio/devices/iio:device0/tap_on
+    chmod 0777 /sys/bus/iio/devices/iio:device0/tap_threshold
+    chmod 0777 /sys/bus/iio/devices/iio:device0/tap_time
+    chmod 0777 /sys/bus/iio/devices/iio:device0/temperature
+    chmod 0777 /sys/bus/iio/devices/iio:device0/trigger
+    chmod 0777 /sys/bus/iio/devices/iio:device0/uevent
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power/autosuspend_delay_ms
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power/control
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power/runtime_active_time
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power/runtime_status
+    chmod 0777 /sys/bus/iio/devices/iio:device0/power/runtime_suspended_time
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_index
+    chmod 0777 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_type
+    chmod 0777 /sys/bus/iio/devices/iio:device0/trigger/current_trigger
+    chmod 0777 /sys/bus/iio/devices/iio:device0/buffer/enable
+    chmod 0777 /sys/bus/iio/devices/iio:device0/buffer/length
 
     chown system system /sys/class/compass/akm8975/enable_acc
     chown system system /sys/class/compass/akm8975/enable_mag
