@@ -58,7 +58,7 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
             // add by wangxiaobin 11-9 cmmb set end
             /* Modify 20130311 Spreadst of 127737 start the slog when boot start */
             String mode = SystemProperties.get("ro.product.hardware");
-            if(mode!=null && mode.contains("77")){
+            if(mode!=null) {// && mode.contains("77")){
                 atSlog(context);
             }
             /* Modify 20130311 Spreadst of 127737 start the slog when boot end */
@@ -68,7 +68,7 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
             if(DEBUG) Log.d(TAG, "modem state changed:" + intent.getExtra("modem_stat"));
             if (intent.getExtra("modem_stat").equals("modem_alive")) {
                 String mode = SystemProperties.get("ro.product.hardware");
-                if (mode != null && mode.contains("77")) {
+                if (mode != null ) {//&& mode.contains("77")) {
                     while(!atSlog(context)){
                         try {
                             Thread.sleep(1000);

@@ -83,7 +83,7 @@ public class LogSetting extends PreferenceActivity implements OnSharedPreference
         }
         slogPreference.setChecked("1".equals(re));
         /*Modify 20130527 spreadst of 166285:close the modem log in user-version end*/
-        if(mode==null || !mode.contains("77")){
+        if(mode==null ) {//|| !mode.contains("77")){
             getPreferenceScreen().removePreference(slogPreference);
             if(DEBUG) Log.d(LOG_TAG, "remove the preference");
         }
