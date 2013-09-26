@@ -2618,7 +2618,7 @@ bool SprdCameraHardware::displayOneFrameForCapture(uint32_t width, uint32_t heig
 	mGrallocHal->unlock(mGrallocHal, *buf_handle);
 
 	if (0 != ret) {
-		LOGE("%s: camera_copy_data_virtual() failed.", __func__);
+		LOGE("%s: camera copy data failed.", __func__);
 		return false;
 	}
 
@@ -2674,7 +2674,7 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 		mGrallocHal->unlock(mGrallocHal, *buf_handle);
 
 		if (0 != ret) {
-			LOGE("%s: camera_copy_data_virtual() failed.", __func__);
+			LOGE("%s: camera copy data failed.", __func__);
 			return false;
 		}
 

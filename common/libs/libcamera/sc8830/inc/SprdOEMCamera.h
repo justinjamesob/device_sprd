@@ -489,10 +489,6 @@ int camera_set_capture_mem2(uint32_t     cap_index,
 						uint32_t alloc_mem,
 						uint32_t free_mem,
 						uint32_t handle);
-int camera_copy_data(uint32_t width,
-				uint32_t height,
-				uint32_t in_addr,
-				uint32_t out_addr);
 
 int camera_get_data_redisplay(int output_addr,
 					int output_width,
@@ -503,8 +499,6 @@ int camera_get_data_redisplay(int output_addr,
 					int input_height);
 
 uint32_t camera_get_rot_set(void);
-
-int camera_copy_data_virtual(uint32_t width, uint32_t height, uint32_t in_addr, uint32_t out_addr);
 void camera_set_start_facedetect(uint32_t param);
 void camera_call_cb(camera_cb_type cb,
                  const void *client_data,

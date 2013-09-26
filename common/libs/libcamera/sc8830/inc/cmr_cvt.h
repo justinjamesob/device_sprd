@@ -45,12 +45,6 @@ int cmr_rot(enum img_rot_angle  angle,
 		struct img_frm  *dst_img,
 		void            *user_data);
 
-int cmr_rot_cpy(struct img_frm  *src_img,
-			struct img_frm  *dst_img);
-
-int cmr_rot_cpy_to_virtual(struct img_frm  *src_img,
-			struct img_frm  *dst_img);
-
 int cmr_rot_wait_done(void);
 
 int cmr_rot_deinit(void);
