@@ -1071,6 +1071,7 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
     hwc_layer_t * overlay_video = NULL;
     hwc_layer_t * overlay_osd = NULL;
     char value[PROPERTY_VALUE_MAX];
+    bool SkipLayerFlag = false;
 
     if(!list)
         return 0;
@@ -1116,7 +1117,13 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
     for (size_t i=0 ; i<list->numHwLayers ; i++) {
         dump_layer(&list->hwLayers[i]);
         list->hwLayers[i].compositionType = HWC_FRAMEBUFFER;
-        if((list->hwLayers[i].flags & HWC_SKIP_LAYER)|| !list->hwLayers[i].handle) {
+
+        if (list->hwLayers[i].flags & HWC_SKIP_LAYER)
+        {
+            SkipLayerFlag = true;
+        }
+
+        if(SkipLayerFlag || !list->hwLayers[i].handle) {
             ctx->fb_layer_count++;
             ALOGI_IF(debugenable,"fb_layer_count++,HWC_SKIP_LAYER! L%d",__LINE__);
             ALOGI_IF(debugenable , "skip_layer %p , flags:%d , GeometryNum:%lld",list->hwLayers[i].handle , list->hwLayers[i].flags , g_GeometoryChanged_Num);
@@ -1189,16 +1196,10 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
 
 #ifdef OVERLAY_COMPOSER_GPU
             OverlayDeviceFlag = 1;
-            bool SkipLayerFlag = false;
 
             for (size_t j=0; j < list->numHwLayers; j++)
             {
                 hwc_layer_t *l = &(list->hwLayers[j]);
-
-                if (l && (l->flags & HWC_SKIP_LAYER))
-                {
-                    SkipLayerFlag = true;
-                }
 
                 if (l->compositionType == HWC_FRAMEBUFFER && SkipLayerFlag == false)
                 {
