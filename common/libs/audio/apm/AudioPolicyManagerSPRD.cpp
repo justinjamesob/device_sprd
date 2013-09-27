@@ -209,19 +209,20 @@ audio_io_handle_t AudioPolicyManagerSPRD::getOutput(AudioSystem::stream_type str
           stream, samplingRate, format, channelMask, flags);
 
 	ALOGD("getOutput() is_voip_set %d,stream %d,",is_voip_set,stream);
-
+#if 0
 	if((!is_voip_set)&&(stream == AudioSystem::VOICE_CALL)) { 
 		for (size_t i = 0; i < mOutputs.size(); i++) {
-		    AudioOutputDescriptor *outputDesc = mOutputs.valueAt(i);
+			AudioOutputDescriptor *outputDesc = mOutputs.valueAt(i);
 			ALOGD("getOutput() outputDesc->mRefCount[AudioSystem::VOICE_CALL] %d",outputDesc->mRefCount[AudioSystem::VOICE_CALL]);
 			if(outputDesc->mRefCount[AudioSystem::VOICE_CALL] == 0) {			
 				AudioParameter param;
-    			param.add(String8("sprd_voip_start"), String8("true"));
+				param.add(String8("sprd_voip_start"), String8("true"));
 				mpClientInterface->setParameters(0, param.toString());
 				is_voip_set = true;
 			}
 		}
 	}
+#endif
 #ifdef AUDIO_POLICY_TEST
     if (mCurOutput != 0) {
         ALOGD("getOutput() test output mCurOutput %d, samplingRate %d, format %d, channelMask %x, mDirectOutput %d",

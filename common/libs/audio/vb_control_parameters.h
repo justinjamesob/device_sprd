@@ -26,7 +26,7 @@
 #define VOIP_PIPE_NAME_MAX     VBC_PIPE_NAME_MAX_LEN
 
 
-#define I2S_CTL_PATH_MAX      16
+#define I2S_CTL_PATH_MAX      100
 #define I2S_CTL_INDEX_MAX     3
 #define AUDIO_MODE_NAME_MAX_LEN 16
 
@@ -70,14 +70,29 @@ struct voip_res
 };
 
 
-
 typedef struct
 {
-    int fd;
-    int8_t ctl_path[I2S_CTL_PATH_MAX];
-    int8_t index[I2S_CTL_INDEX_MAX];
+    int fd_sys_cp0;
+    int8_t fd_sys_cp0_path[I2S_CTL_PATH_MAX];
+    int fd_sys_cp1;
+    int8_t fd_sys_cp1_path[I2S_CTL_PATH_MAX];
+    int fd_sys_cp2;
+    int8_t fd_sys_cp2_path[I2S_CTL_PATH_MAX];
+    int fd_sys_ap;
+    int8_t fd_sys_ap_path[I2S_CTL_PATH_MAX];
+    int fd_bt_cp0;
+    int8_t fd_bt_cp0_path[I2S_CTL_PATH_MAX];
+    int fd_bt_cp1;
+    int8_t fd_bt_cp1_path[I2S_CTL_PATH_MAX];
+    int fd_bt_cp2;
+    int8_t fd_bt_cp2_path[I2S_CTL_PATH_MAX];
+    int fd_bt_ap;
+    int8_t fd_bt_ap_path[I2S_CTL_PATH_MAX];
+    int8_t index;
     int is_switch;
+    int8_t is_ext;
 }i2s_ctl_t;
+
 
 
 typedef struct debuginfo
