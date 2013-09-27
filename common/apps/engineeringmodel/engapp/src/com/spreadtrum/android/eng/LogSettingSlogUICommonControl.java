@@ -349,6 +349,9 @@ public class LogSettingSlogUICommonControl extends Activity implements SlogUISyn
         }
 
         boolean tempHost = tempHostOn || tempHostLowPower;
+
+        btnDump.setEnabled(tempHost && SlogAction.IsHaveSDCard() && rdoSDCard.isChecked());
+
         SlogAction.SetCheckBoxBranchState(chkAndroid, tempHost,
                 SlogAction.GetState(SlogAction.ANDROIDKEY));
 
