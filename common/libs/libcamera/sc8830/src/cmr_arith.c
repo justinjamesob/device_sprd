@@ -59,6 +59,7 @@ struct arithmetic_conext{
 struct arithmetic_hdr_conext{
 	unsigned char *addr[HDR_CAP_NUM];
 	uint32_t       mem_size;
+	uint32_t       inited;
 };
 
 static struct arithmetic_conext s_arithmetix_cxt;
@@ -83,6 +84,7 @@ void *arithmetic_fd_thread_proc(void *data)
 	camera_cb_info      cb_info;
 	struct camera_context  *cxt = camera_get_cxt();
 
+	sem_post(&s_arith_cxt->fd_sync_sem);
 	while (1) {
 		ret = cmr_msg_get(s_arith_cxt->fd_msg_que_handle, &message);
 		if (ret) {
@@ -213,9 +215,9 @@ int arithmetic_fd_init(void)
 			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 			ret = pthread_create(&s_arith_cxt->fd_thread,  &attr, arithmetic_fd_thread_proc, NULL);
 			cxt->arithmetic_cxt.fd_inited = 1;
+			sem_wait(&s_arith_cxt->fd_sync_sem);
 		}
 	}
-	pthread_mutex_init(&s_arith_cxt->hdr_lock, NULL);
 	return ret;
 }
 
@@ -242,7 +244,7 @@ int arithmetic_fd_deinit(void)
 		CMR_LOGI("FaceSolid_Finalize done.");
 	}
 	memset(s_arith_cxt, 0, sizeof(struct arithmetic_conext));
-	pthread_mutex_destroy(&s_arith_cxt->hdr_lock);
+
 	CMR_PRINT_TIME;
 	CMR_LOGI("e.");
 	return ret;
@@ -293,7 +295,8 @@ int arithmetic_hdr_init(uint32_t pic_width, uint32_t pic_height)
 		CMR_LOGI("no need to init");
 		return ret;
 	}
-	pthread_mutex_lock(&s_arith_cxt->hdr_lock);
+	pthread_mutex_init(&s_arith_cxt->hdr_lock, NULL);
+	s_hdr_cxt->inited = 1;
 
 	s_hdr_cxt->addr[0] = (uint8_t*)malloc(size);
 	s_hdr_cxt->addr[1] = (uint8_t*)malloc(size);
@@ -306,7 +309,6 @@ int arithmetic_hdr_init(uint32_t pic_width, uint32_t pic_height)
 	} else {
 		s_hdr_cxt->mem_size = size;
 	}
-	pthread_mutex_unlock(&s_arith_cxt->hdr_lock);
 	return ret;
 }
 
@@ -314,6 +316,11 @@ int arithmetic_hdr_deinit(void)
 {
 	int ret = ARITH_SUCCESS;
 	CMR_LOGI("test log.");
+
+	if (0 == s_hdr_cxt->inited) {
+		CMR_LOGI("already deinit.");
+		return ret;
+	}
 	pthread_mutex_lock(&s_arith_cxt->hdr_lock);
 	if (PNULL != s_hdr_cxt->addr[0]) {
 		free(s_hdr_cxt->addr[0]);
@@ -327,7 +334,10 @@ int arithmetic_hdr_deinit(void)
 		free(s_hdr_cxt->addr[2]);
 		s_hdr_cxt->addr[2] = PNULL;
 	}
+	s_hdr_cxt->inited = 0;
 	pthread_mutex_unlock(&s_arith_cxt->hdr_lock);
+	pthread_mutex_destroy(&s_arith_cxt->hdr_lock);
+
 	CMR_LOGI("e.");
 	return ret;
 }
