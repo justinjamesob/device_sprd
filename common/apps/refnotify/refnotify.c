@@ -33,6 +33,10 @@
 
 #define RTC_DEV "/dev/rtc0"
 
+/*used to get sleep/wake state of display*/
+#define WakeFileName  "/sys/power/wait_for_fb_wake"
+#define SleepFileName  "/sys/power/wait_for_fb_sleep"
+
 enum {
 	REF_PSFREQ_CMD,
 	REF_SETTIME_CMD,
@@ -40,6 +44,8 @@ enum {
 	REF_GETTIME_CMD,
 	REF_GETDATE_CMD,
 	REF_AUTODLOADER_CMD,
+	REF_SLEEP_CMD,
+	REF_WAKE_CMD,
 	REF_CMD_MAX
 };
 
@@ -253,6 +259,53 @@ void RefNotify_DoCmd(int fd, struct refnotify_cmd *pcmd)
 	}
 }
 
+/*a daemon to notify cp of sleeping to prevent cp sending request*/
+void* sleep_monitor(void *arg)
+{
+	int fdw, fds, fd, r;
+	struct refnotify_cmd cmd;
+	char buf[1];
+	fd = (int)arg;
+	cmd.length = sizeof(struct refnotify_cmd);
+
+	while(1){
+		fds = open(SleepFileName, O_RDONLY);
+		if (fds < 0) {
+			REF_LOGE("Couldn't open file" SleepFileName);
+		}else{
+			/*we are awake, waiting for sleep*/
+			r = read(fds, buf, 1);
+			if(r < 0){
+				REF_LOGE("wait_for_fb_sleep read error: %s", strerror(errno));
+				close(fds);
+				continue;
+			}
+			/*here, we are in sleep state*/
+			cmd.cmd_type = REF_SLEEP_CMD;
+			write(fd, &cmd, cmd.length);
+			close(fds);
+		}
+		fdw = open(WakeFileName, O_RDONLY);
+		if (fdw < 0) {
+			REF_LOGE("Couldn't open file" WakeFileName);
+		}else{
+			/*we are sleeping, waiting for wake*/
+			r = read(fdw, buf, 1);
+			if(r < 0){
+				REF_LOGE("wait_for_fb_wake read error: %s", strerror(errno));
+				close(fdw);
+				continue;
+			}
+			/*here, we are awake*/
+			cmd.cmd_type = REF_WAKE_CMD;
+			write(fd, &cmd, cmd.length);
+			close(fdw);
+		}
+	}
+
+	return NULL;
+}
+
 int main(int argc, char *argv[])
 {
 	char buf[128];
@@ -263,6 +316,7 @@ int main(int argc, char *argv[])
 	uint32_t numRead;
 	char *path;
 	struct refnotify_cmd *pcmd;
+	pthread_t tid;
 	REF_LOGD("Enter RefNotify main \n");
 	if (argc == 1 || (strcmp(argv[1], "-t") && strcmp(argv[1], "-h"))) {
 		usage();
@@ -297,6 +351,8 @@ int main(int argc, char *argv[])
 		REF_LOGE("RefNotify open %s failed, error: %s", path, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+	/*start a service to notify cp of sleep/wake state*/
+	pthread_create(&tid, NULL,sleep_monitor, (void *)fd);
 
 	for (;;) {
 		pbuf = buf;
