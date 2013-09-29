@@ -159,6 +159,7 @@ static void write_mac2file(char *wifimac, char *btmac)
     fd = open(WIFI_MAC_FILE, O_CREAT|O_RDWR|O_TRUNC, 0666);
     ALOGD("%s: mac=%s, fd[%s]=%d",__FUNCTION__, wifimac, WIFI_MAC_FILE, fd);
     if(fd >= 0) {
+        chmod(WIFI_MAC_FILE, 0666);
         write(fd, wifimac, strlen(wifimac));
         close(fd);
     }
@@ -167,6 +168,7 @@ static void write_mac2file(char *wifimac, char *btmac)
     fd = open(BT_MAC_FILE, O_CREAT|O_RDWR|O_TRUNC, 0666);
     ALOGD("%s: mac=%s, fd[%s]=%d",__FUNCTION__, btmac, BT_MAC_FILE, fd);
     if(fd >= 0) {
+        chmod(BT_MAC_FILE, 0666);
         write(fd, btmac, strlen(btmac));
         close(fd);
     }
