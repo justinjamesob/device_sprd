@@ -22,12 +22,13 @@ void	disconnect_vbus_charger(void)
 {
 	int fd;
 	if(vbus_charger_disconnect == 0){
-		vbus_charger_disconnect = 1;
+
 		fd = open(CHARGER_STOP_PATH,O_WRONLY);
 		if(fd >= 0){
 			write(fd,"1",2);
 			close(fd);
 			sleep(1);
+			vbus_charger_disconnect = 1;
 		}
 	}
 }
@@ -187,6 +188,78 @@ static int get_battery_adc_value(void)
         }
 	return value;
 }
+static int get_fgu_current_adc(void)
+{
+    int fd = -1;
+    int read_len = 0;
+    char buffer[16]={0};
+    char *endptr;
+    int  value = 0;
+
+    fd = open(FGU_CURRENT_ADC_FILE_PATH,O_RDONLY);
+
+        if(fd >= 0){
+                read_len = read(fd,buffer,sizeof(buffer));
+                if(read_len > 0)
+                        value = strtol(buffer,&endptr,0);
+                close(fd);
+		    ALOGE("%s %s value = %d\n",__func__,FGU_VOL_ADC_FILE_PATH, value);
+        }
+	else{
+		ALOGE("%s open %s failed\n",__func__,FGU_CURRENT_ADC_FILE_PATH);
+	}
+	return value;
+}
+static int get_fgu_vol_adc(void)
+{
+    int fd = -1;
+    int read_len = 0;
+    char buffer[16]={0};
+    char *endptr;
+    int  value = 0;
+
+    fd = open(FGU_VOL_ADC_FILE_PATH,O_RDONLY);
+
+        if(fd >= 0){
+                read_len = read(fd,buffer,sizeof(buffer));
+                if(read_len > 0)
+                        value = strtol(buffer,&endptr,0);
+                close(fd);
+		   ALOGE("%s %s value = %d, read_len = %d \n",__func__,FGU_VOL_ADC_FILE_PATH, value, read_len);
+        }
+	 else{
+		ALOGE("%s open %s failed\n",__func__,FGU_VOL_ADC_FILE_PATH);
+	}
+	return value;
+}
+
+static unsigned int ap_get_fgu_current_adc(MSG_AP_ADC_CNF *pMsgADC)
+{
+    int	current_adc = 0;
+    current_adc = get_fgu_current_adc();
+    pMsgADC->ap_adc_req.parameters[0] = current_adc;
+    if(current_adc>0){
+		pMsgADC->diag_ap_cnf.status = 0;
+	}
+	else{
+		pMsgADC->diag_ap_cnf.status = 1;
+	}
+    return current_adc;
+}
+
+static unsigned int ap_get_fgu_vol_adc(MSG_AP_ADC_CNF *pMsgADC)
+{
+    int	vol_adc = 0;
+    vol_adc = get_fgu_vol_adc();
+    pMsgADC->ap_adc_req.parameters[0] = vol_adc;
+    if(vol_adc>0){
+		pMsgADC->diag_ap_cnf.status = 0;
+	}
+	else{
+		pMsgADC->diag_ap_cnf.status = 1;
+	}
+    return vol_adc;
+}
 
 /*copy from packet.c and modify*/
 static int untranslate_packet_header(char *dest,char *src,int size, int unpackSize)
@@ -281,7 +354,11 @@ static int is_adc_calibration(char *dest, int destSize, char *src,int srcSize)
                             return AP_ADC_LOAD;
                         else if (lpAPADCReq->operate == 2)
                             return AP_ADC_SAVE;
-                        else
+                        else if (lpAPADCReq->operate == 3)
+                            return AP_GET_FGU_VOL_ADC;
+			    else if (lpAPADCReq->operate == 4)
+                            return AP_GET_FGU_CURRENT_ADC;
+			    else
                             return 0;
                     }
                     break;
@@ -390,6 +467,12 @@ int  ap_adc_process(int adc_cmd, char * src, int size, MSG_AP_ADC_CNF * pMsgADC)
         case AP_GET_VOLT:
             ap_get_voltage(pMsgADC);
             break;
+	 case AP_GET_FGU_VOL_ADC:
+		ap_get_fgu_vol_adc(pMsgADC);
+		break;
+	 case AP_GET_FGU_CURRENT_ADC:
+		ap_get_fgu_current_adc(pMsgADC);
+		break;
         default:
             return 0;
     }

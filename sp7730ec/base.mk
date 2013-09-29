@@ -109,6 +109,7 @@ PRODUCT_COPY_FILES := \
         $(BOARDDIR)/vold_e.fstab:system/etc/vold_e.fstab \
 	$(BOARDDIR)/nvitem_w.cfg:root/nvitem_w.cfg \
 	device/sprd/common/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
+	device/sprd/common/res/adc/adc.bin:prodnv/adc.bin \
 	device/sprd/common/res/CDROM/adb.iso:system/etc/adb.iso \
 	device/sprd/common/libs/audio/apm/devicevolume.xml:system/etc/devicevolume.xml \
 	device/sprd/common/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
