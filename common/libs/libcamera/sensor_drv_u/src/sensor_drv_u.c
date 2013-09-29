@@ -1490,35 +1490,46 @@ static void _sensor_calil_lnc_param_recover(SENSOR_INFO_T *sensor_info_ptr)
 	uint32_t length = 0;
 	uint32_t addr = 0;
 	struct sensor_raw_fix_info *raw_fix_info_ptr = PNULL;
-	raw_fix_info_ptr = ((struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr)))->fix_ptr;
+	struct sensor_raw_info* raw_info_ptr = PNULL;
+	raw_info_ptr = (struct sensor_raw_info*)(*(sensor_info_ptr->raw_info_ptr));
+
 	SENSOR_DRV_CHECK_ZERO_VOID(s_p_sensor_cxt);
 
-	if (PNULL == raw_fix_info_ptr) {
+	if (PNULL != raw_info_ptr) {
+		raw_fix_info_ptr = raw_info_ptr->fix_ptr;
+		if (PNULL != raw_fix_info_ptr) {
+			for (i = 0; i < 8; i++) {
+				if (s_lnc_addr_bakup[i][1]) {
+
+					free((void*)s_lnc_addr_bakup[i][1]);
+					s_lnc_addr_bakup[i][1] = 0;
+					index = s_lnc_addr_bakup[i][0];     /*index*/
+					length = s_lnc_addr_bakup[i][3];    /*length*/
+					addr = s_lnc_addr_bakup[i][2];      /*original address*/
+
+					raw_fix_info_ptr->lnc.map[index][0].param_addr = (uint16_t*)addr;
+					raw_fix_info_ptr->lnc.map[index][0].len = length;
+					s_lnc_addr_bakup[i][0] = 0;
+					s_lnc_addr_bakup[i][1] = 0;
+					s_lnc_addr_bakup[i][2] = 0;
+					s_lnc_addr_bakup[i][3] = 0;
+				}
+			}
+		} else {
+			for (i = 0; i < 8; i++) {
+				if (s_lnc_addr_bakup[i][1]) {
+					free((void*)s_lnc_addr_bakup[i][1]);
+				}
+			}
+		memset((void*)&s_lnc_addr_bakup[0][0], 0x00, sizeof(s_lnc_addr_bakup));
+		}
+	}else {
 		for (i = 0; i < 8; i++) {
 			if (s_lnc_addr_bakup[i][1]) {
 				free((void*)s_lnc_addr_bakup[i][1]);
 			}
 		}
 		memset((void*)&s_lnc_addr_bakup[0][0], 0x00, sizeof(s_lnc_addr_bakup));
-	} else {
-		for (i = 0; i < 8; i++) {
-			if (s_lnc_addr_bakup[i][1]) {
-
-				free((void*)s_lnc_addr_bakup[i][1]);
-				s_lnc_addr_bakup[i][1] = 0;
-				index = s_lnc_addr_bakup[i][0];     /*index*/
-				length = s_lnc_addr_bakup[i][3];    /*length*/
-				addr = s_lnc_addr_bakup[i][2];      /*original address*/
-
-				raw_fix_info_ptr->lnc.map[index][0].param_addr = (uint16_t*)addr;
-				raw_fix_info_ptr->lnc.map[index][0].len = length;
-				s_lnc_addr_bakup[i][0] = 0;
-				s_lnc_addr_bakup[i][1] = 0;
-				s_lnc_addr_bakup[i][2] = 0;
-				s_lnc_addr_bakup[i][3] = 0;
-			}
-		}
-
 	}
 
 	s_p_sensor_cxt->is_calibration = 0;
@@ -2354,12 +2365,6 @@ ERR_SENSOR_E Sensor_Close(void)
 
 	sensor_register_info_ptr = &s_p_sensor_cxt->sensor_register_info;
 
-	if (SENSOR_IMAGE_FORMAT_RAW == s_p_sensor_cxt->sensor_info_ptr->image_format) {
-		if (0 == s_p_sensor_cxt->is_calibration) {
-			_sensor_calil_lnc_param_recover(s_p_sensor_cxt->sensor_info_ptr);
-		}
-	}
-
 	if (1 == s_p_sensor_cxt->is_register_sensor) {
 		if (1 == s_p_sensor_cxt->is_main_sensor) {
 			_Sensor_Device_I2CDeInit(SENSOR_MAIN);
@@ -2371,6 +2376,11 @@ ERR_SENSOR_E Sensor_Close(void)
 	}
 
 	if (SENSOR_TRUE == Sensor_IsInit()) {
+		if (SENSOR_IMAGE_FORMAT_RAW == s_p_sensor_cxt->sensor_info_ptr->image_format) {
+			if (0 == s_p_sensor_cxt->is_calibration) {
+				_sensor_calil_lnc_param_recover(s_p_sensor_cxt->sensor_info_ptr);
+			}
+		}
 		Sensor_PowerOn(SENSOR_FALSE);
 		if (SENSOR_MAIN == Sensor_GetCurId()) {
 			CMR_LOGV("SENSOR: Sensor_close 0.\n");
