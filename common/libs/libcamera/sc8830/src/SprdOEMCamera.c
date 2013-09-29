@@ -1182,11 +1182,11 @@ int camera_cap_post(void *data)
 			}
 		}
 		CMR_PRINT_TIME;
-		ret = camera_snapshot_stop_set();
+	/*	ret = camera_snapshot_stop_set();
 		if (ret) {
 			CMR_LOGE("Failed to exit snapshot %d", ret);
 			return -CAMERA_FAILED;
-		}
+		}*/
 	} else if (CAMERA_HDR_MODE == g_cxt->cap_mode) {
 		g_cxt->cap_process_id = 0;
 		ret = cmr_v4l2_cap_stop();
@@ -1260,11 +1260,11 @@ int camera_cap_post(void *data)
 #if !USE_SENSOR_OFF_ON_FOR_HDR
 			}
 #endif
-			ret = camera_snapshot_stop_set();
+		/*	ret = camera_snapshot_stop_set();
 			if (ret) {
 				CMR_LOGE("Failed to exit snapshot %d", ret);
 				return -CAMERA_FAILED;
-			}
+			}*/
 		} else {
 			tmp = g_cxt->cap_cnt;
 			camera_call_cb(CAMERA_EVT_CB_FLUSH,
@@ -1339,11 +1339,11 @@ int camera_cap_post(void *data)
 				}
 			}
 			CMR_PRINT_TIME;
-			ret = camera_snapshot_stop_set();
+		/*	ret = camera_snapshot_stop_set();
 			if (ret) {
 				CMR_LOGE("Failed to exit snapshot %d", ret);
 				return -CAMERA_FAILED;
-			}
+			}*/
 		} else {
 			g_cxt->chn_2_status = CHN_IDLE;
 			if ((TAKE_PICTURE_NEEDED == camera_get_take_picture()) && IS_CHN_BUSY(CHN_2)) {
@@ -1535,6 +1535,9 @@ void *camera_cap_thread_proc(void *data)
 				if (CAMERA_EXIT == ret) {
 					CMR_LOGI("normal exit.");
 					break;
+				}
+				if (g_cxt->cap_cnt == g_cxt->total_capture_num) {
+					camera_snapshot_stop_set();
 				}
 			}
 			CMR_PRINT_TIME;
