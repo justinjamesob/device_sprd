@@ -376,6 +376,7 @@ struct camera_context {
 
 	/*for capture*/
 	struct img_size          picture_size;
+	struct img_size          actual_picture_size;
 	struct img_size          picture_size_backup;
 	struct img_size          capture_size;
 	struct img_size          cap_orig_size;

@@ -133,6 +133,7 @@ uint32_t JPEGENC_encode_one_pic(JPEGENC_PARAMS_T *jpegenc_params, jpegenc_callba
 int JPEGENC_Slice_Start(JPEGENC_PARAMS_T *jpegenc_params, JPEGENC_SLICE_OUT_T *out_ptr);
 
 uint32_t JPEGENC_Slice_Next(JPEGENC_SLICE_NEXT_T *update_parm_ptr, JPEGENC_SLICE_OUT_T *out_ptr);
+int adjust_jpg_resolution(void* jpg_buf,int jpg_size,int width,int height);
 
 //////////////////////////////////////////////////////////////////////////
 

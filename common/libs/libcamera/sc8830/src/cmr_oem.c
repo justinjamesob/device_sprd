@@ -306,8 +306,8 @@ JINF_EXIF_INFO_T* camera_get_exif(struct camera_context *p_cxt)
 	    p_exif_info->spec_ptr->basic.PixelXDimension = p_cxt->picture_size.width;
 	    p_exif_info->spec_ptr->basic.PixelYDimension = p_cxt->picture_size.height;
 	}
-	p_exif_info->primary.basic.ImageWidth  = p_cxt->picture_size.width;
-	p_exif_info->primary.basic.ImageLength = p_cxt->picture_size.height;
+	p_exif_info->primary.basic.ImageWidth  = p_cxt->actual_picture_size.width;
+	p_exif_info->primary.basic.ImageLength = p_cxt->actual_picture_size.height;
 	CMR_LOGI("EXIF width=%d, height=%d \n",
 			p_exif_info->primary.basic.ImageWidth,
 			p_exif_info->primary.basic.ImageLength);

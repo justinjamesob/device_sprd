@@ -94,6 +94,7 @@ typedef struct
 {
 	uint32_t			src_fmt;
 	struct img_size     size;
+	struct img_size     out_size;
 	uint32_t			slice_height;/*slice height must be  8X, if slice_height == img height, is the frame mode*/
 	uint32_t			slice_mod;/*JPEG_YUV_SLICE_MODE*/
 
@@ -230,6 +231,14 @@ void _prc_enc_cbparam(uint32_t handle, JPEG_ENC_CB_PARAM_T *parm_ptr)
 
 	parm_ptr->slice_height = enc_cxt_ptr->slice_height;
 	parm_ptr->total_height = enc_cxt_ptr->cur_line_num;
+	if ((enc_cxt_ptr->cur_line_num == enc_cxt_ptr->size.height)
+		&& (1 != parm_ptr->is_thumbnail)) {
+		CMR_LOGI("adjust %d,%d.",enc_cxt_ptr->out_size.width,enc_cxt_ptr->out_size.height);
+		adjust_jpg_resolution((void*)parm_ptr->stream_buf_vir,
+			                 parm_ptr->stream_size,
+			                 enc_cxt_ptr->out_size.width,
+			                 enc_cxt_ptr->out_size.height);
+	}
 #ifdef JPEG_CODE_DEBUG
 	CMR_LOGV("slice_height %d,total_height %d,stream_size 0x%x.",
 		parm_ptr->slice_height,parm_ptr->total_height,parm_ptr->stream_size);
@@ -394,7 +403,6 @@ static  int  _enc_start(uint32_t handle)
 		}
 		CMR_LOGV("slice_num %d.",slice_num);
 	}
-
 	enc_cxt_ptr->cur_id = 0;
 #ifdef JPEG_CODE_DEBUG
 	CMR_LOGV("jpeg:  buf addr: 0x%x,  size: %d",enc_cxt_ptr->stream_buf_vir, enc_cxt_ptr->stream_real_size);
@@ -787,6 +795,7 @@ static void* _thread_proc(void* data)
 			if(JPEG_CODEC_SUCCESS == ret){
 				JPEG_ENC_CB_PARAM_T param;
 				memset((void*)&param,0,sizeof(JPEG_ENC_CB_PARAM_T));
+				param.is_thumbnail = 0;
 				_prc_enc_cbparam(handle, &param);
 				if (NULL != jcontext.event_cb) {
 					jcontext.event_cb(CMR_JPEG_ENC_DONE, &param );
@@ -822,6 +831,7 @@ static void* _thread_proc(void* data)
 				if(JPEG_CODEC_SUCCESS == ret){
 					JPEG_ENC_CB_PARAM_T param;
 					memset((void*)&param,0,sizeof(JPEG_ENC_CB_PARAM_T));
+					param.is_thumbnail = 0;
 					_prc_enc_cbparam(handle, &param);
 					if (NULL != jcontext.event_cb) {
 						jcontext.event_cb(CMR_JPEG_ENC_DONE, &param );
@@ -911,6 +921,7 @@ static void* _thread_proc(void* data)
 			ret = _enc_start(handle);
 			memset((void*)&s_thumbnail,0,sizeof(JPEG_ENC_CB_PARAM_T));
 			if(JPEG_CODEC_SUCCESS == ret){
+				s_thumbnail.is_thumbnail = 1;
 				_prc_enc_cbparam(handle, &s_thumbnail);
 			}
 			sem_post(&jcontext.sync_sem);
@@ -1019,6 +1030,7 @@ static int _get_enc_start_param(JPEG_ENC_T *cxt_ptr, struct jpeg_enc_in_param *i
 	cxt_ptr->quality_level = in_parm_ptr->quality_level;
 
 	cxt_ptr->size = in_parm_ptr->size;
+	cxt_ptr->out_size = in_parm_ptr->out_size;
 
 	cxt_ptr->slice_height = in_parm_ptr->slice_height;
 	cxt_ptr->slice_mod = in_parm_ptr->slice_mod;
