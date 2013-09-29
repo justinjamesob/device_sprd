@@ -147,7 +147,8 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
-	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
+	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so \
+	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
 
 $(call inherit-product, device/sprd/partner/ittiam/wlan/device-itm.mk)
 $(call inherit-product, device/sprd/partner/shark/bluetooth/device-shark-bt.mk)

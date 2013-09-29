@@ -146,7 +146,8 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_uart.xml:/system/etc/gpsconfig.xml \
-	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
+	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so \
+	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
 
 BOARD_WLAN_DEVICE_REV       := bcm4330_b2
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)

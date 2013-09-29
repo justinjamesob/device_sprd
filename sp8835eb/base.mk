@@ -156,7 +156,8 @@ PRODUCT_COPY_FILES := \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml \
-	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml
+	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
+	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
 PRODUCT_COPY_FILES += \
