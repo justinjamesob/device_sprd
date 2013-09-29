@@ -2049,9 +2049,13 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 			g_cxt->picture_size.width  = picture_width;
 			g_cxt->picture_size.height = picture_height;
 		}
-		CMR_LOGV("picture after ALIGNED_16 is %d %d",
+		g_cxt->actual_picture_size.width = picture_width;
+		g_cxt->actual_picture_size.height = picture_height;
+		CMR_LOGV("picture after ALIGNED_16 is %d %d picture is %d %d",
 			g_cxt->picture_size.width,
-			g_cxt->picture_size.height);
+			g_cxt->picture_size.height,
+			g_cxt->actual_picture_size.width,
+			g_cxt->actual_picture_size.height);
 		g_cxt->picture_size_backup = g_cxt->picture_size;
 		ret = camera_capture_sensor_mode();
 	} else {
@@ -6459,6 +6463,8 @@ int camera_start_jpeg_encode(struct frm_info *data)
 
 	g_cxt->jpeg_cxt.proc_status.frame_info = *data;
 	g_cxt->jpeg_cxt.jpeg_state = JPEG_ENCODE;
+	in_parm.out_size.width = g_cxt->actual_picture_size.width;
+	in_parm.out_size.height = g_cxt->actual_picture_size.height;
 	ret = jpeg_enc_start(&in_parm, &out_parm);
 	if (0 == ret) {
 		CMR_LOGV("OK, handle 0x%x", out_parm.handle);

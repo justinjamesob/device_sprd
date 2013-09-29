@@ -66,6 +66,7 @@ typedef struct{
 
 	uint32_t slice_height;
 	uint32_t total_height;  //current total current
+	uint32_t is_thumbnail;
 
 }JPEG_ENC_CB_PARAM_T;
 
@@ -95,30 +96,22 @@ typedef struct
 //only support YUV slice, do not support stream slice for simplicity.
 struct jpeg_enc_in_param{
 
-	uint32_t                            src_fmt;
-
-	struct img_size                     size;
+	uint32_t                  src_fmt;
+	struct img_size           size;
+	struct img_size           out_size;
 	uint32_t    slice_height;   //slice height must be  8X
 	uint32_t    slice_mod;   //JPEG_YUV_SLICE_MODE
-
-	struct img_addr                     src_addr_phy;
-	struct img_addr                     src_addr_vir;
-
-	struct img_data_end                 src_endian;
-
-	//if slice_height == img height, is the frame mode
-
-	uint32_t   quality_level;
+	struct img_addr       src_addr_phy;
+	struct img_addr       src_addr_vir;
+	struct img_data_end   src_endian;
+	uint32_t      quality_level;
   	uint32_t      stream_buf_phy;
 	uint32_t      stream_buf_vir;
 	uint32_t      stream_buf_size;  //bytes
-
 	//use by codec
 	uint32_t      temp_buf_phy;
 	uint32_t      temp_buf_vir;
 	uint32_t      temp_buf_size;  //bytes
-
-
 };
 
 

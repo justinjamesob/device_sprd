@@ -1202,6 +1202,41 @@ uint32_t JPEGENC_Slice_Next(JPEGENC_SLICE_NEXT_T *update_parm_ptr, JPEGENC_SLICE
 	return ret;
 }
 
+int adjust_jpg_resolution(void* jpg_buf,int jpg_size,int width,int height)
+{
+	int ret =-1;
+	int i = 0;
+	unsigned char *buf = (unsigned char *)jpg_buf;
+
+	unsigned char tmp1=0;
+	unsigned char tmp2=0;
+	SCI_TRACE_LOW("adjust_jpg_resolution");
+	do{
+		tmp1 = *buf++;
+                i++;
+		if(0xff == tmp1)
+		{
+			tmp2= *buf++;
+			i++;
+			if(0xc0 == tmp2)
+			{
+				ret = 0;
+				break;
+			}
+		}
+	}while(i<jpg_size);
+
+	if(0 == ret)
+	{
+		buf[3] = (height>>8)&0xff;
+		buf[4] = height&0xff;
+
+		buf[5] = (width>>8)&0xff;
+		buf[6] = width&0xff;
+	}
+
+	return ret;
+}
 //////////////////////////////////////////////////////////////////////////
 #endif //JPEG_ENC
 /**---------------------------------------------------------------------------*
