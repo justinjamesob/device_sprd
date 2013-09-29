@@ -104,10 +104,10 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+                   frameRate="25" />
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -127,10 +127,10 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+                   frameRate="25" />
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -236,9 +236,9 @@
                    width="720"
                    height="480"
                    frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="480p" fileFormat="mp4" duration="60">
@@ -247,9 +247,9 @@
                    width="720"
                    height="480"
                    frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -260,9 +260,9 @@
                    height="480"
                    frameRate="30" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="timelapse480p" fileFormat="mp4" duration="60">
@@ -272,9 +272,9 @@
                    height="480"
                    frameRate="30" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -284,9 +284,9 @@
                    width="1280"
                    height="720"
                    frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="720p" fileFormat="mp4" duration="60">
@@ -295,9 +295,9 @@
                    width="1280"
                    height="720"
                    frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -308,9 +308,9 @@
                    height="720"
                    frameRate="30" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="timelapse720p" fileFormat="mp4" duration="60">
@@ -320,9 +320,9 @@
                    height="720"
                    frameRate="30" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -331,10 +331,10 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+                   frameRate="25" />
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="1080p" fileFormat="mp4" duration="60">
@@ -342,10 +342,10 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+                   frameRate="25" />
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -354,11 +354,11 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
         <EncoderProfile quality="timelapse1080p" fileFormat="mp4" duration="60">
@@ -366,11 +366,11 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="96000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -439,9 +439,9 @@
                    width="720"
                    height="480"
                    frameRate="15" />
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 
@@ -452,9 +452,9 @@
                    height="480"
                    frameRate="15" />
             <!-- audio setting is ignored -->
-            <Audio codec="amrnb"
-                   bitRate="12200"
-                   sampleRate="8000"
+            <Audio codec="aac"
+                   bitRate="64000"
+                   sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
 

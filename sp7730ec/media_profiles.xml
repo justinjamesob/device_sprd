@@ -104,7 +104,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -127,7 +127,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -331,7 +331,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -342,7 +342,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -354,7 +354,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <!-- audio setting is ignored -->
             <Audio codec="aac"
                    bitRate="96000"
@@ -366,7 +366,7 @@
                    bitRate="16000000"
                    width="1920"
                    height="1080"
-                   frameRate="30" />
+                   frameRate="25" />
             <!-- audio setting is ignored -->
             <Audio codec="aac"
                    bitRate="96000"
