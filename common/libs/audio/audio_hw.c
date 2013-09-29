@@ -3265,20 +3265,16 @@ static int adev_set_master_mute(struct audio_hw_device *dev, bool mute)
     if (!adev->master_mute && adev->mode == AUDIO_MODE_IN_CALL)
 	return 0;
     adev->master_mute = mute;
-    if (adev->private_ctl.speaker_mute
-            && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
+    if (adev->private_ctl.speaker_mute)
         mixer_ctl_set_value(adev->private_ctl.speaker_mute, 0, mute);
 
-    if (adev->private_ctl.speaker2_mute
-            && (adev->devices & AUDIO_DEVICE_OUT_SPEAKER))
+    if (adev->private_ctl.speaker2_mute)
         mixer_ctl_set_value(adev->private_ctl.speaker2_mute, 0, mute);
 
-    if (adev->private_ctl.earpiece_mute
-            && (adev->devices & AUDIO_DEVICE_OUT_EARPIECE))
+    if (adev->private_ctl.earpiece_mute)
         mixer_ctl_set_value(adev->private_ctl.earpiece_mute, 0, mute);
 
-    if (adev->private_ctl.headphone_mute
-            && (adev->devices & (AUDIO_DEVICE_OUT_WIRED_HEADPHONE | AUDIO_DEVICE_OUT_WIRED_HEADPHONE)))
+    if (adev->private_ctl.headphone_mute)
         mixer_ctl_set_value(adev->private_ctl.headphone_mute, 0, mute);
 
     return 0;
