@@ -4373,6 +4373,7 @@ static void *audiopara_tuning_thread_entry(void * param)
     fd_dum = open(AUDFIFO,O_WRONLY);
     if (fd_dum == -1) {
         ALOGE("%s open dummy audio FIFO error %s\n",__FUNCTION__,strerror(errno));
+        close(fd_aud);
         return NULL;
     }
     while (ops_bit != -1) {
