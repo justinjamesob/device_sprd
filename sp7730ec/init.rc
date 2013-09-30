@@ -127,6 +127,7 @@ on fs
 on post-fs
     # once everything is setup, no need to modify /
     mount rootfs rootfs / rw remount
+    chown system system /productinfo/adc.bin
 
     # We chown/chmod /cache again so because mount is run as root + defaults
     chown system cache /cache
@@ -312,6 +313,12 @@ on boot
     chown system system /sys/class/power_supply/battery/battery_0
     chown system system /sys/class/power_supply/battery/battery_1
     chown system system /sys/class/power_supply/battery/hw_switch_point
+    chown system system /sys/class/power_supply/battery/real_time_voltage
+    chown system system /sys/class/power_supply/battery/real_time_vbat_adc
+    chown system system /sys/class/power_supply/battery/stop_charge
+    chown system system /sys/kernel/debug/sc2713-regulator/adc_chan
+    chown system system /sys/class/power_supply/sprdfgu/fgu_current_adc
+    chown system system /sys/class/power_supply/sprdfgu/fgu_vol_adc
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
     setprop net.tcp.buffersize.default 4096,87380,110208,4096,16384,110208
