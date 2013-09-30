@@ -179,10 +179,10 @@ service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS4 -d /dev/ttyGS5
     disabled
     oneshot
 
-service engsetmacaddr /system/bin/engsetmacaddr
-    class main
-    user system
-    oneshot
+#service engsetmacaddr /system/bin/engsetmacaddr
+#    class main
+#    user system
+#    oneshot
 
 service phoneserver_t /system/bin/phoneserver -m t
     class core
