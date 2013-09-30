@@ -6,8 +6,9 @@
 	<cp name="w" pipe="/dev/spipe_w6" vbchannel="0" />
 </modem>
 
-<i2s_for_btcall ctl_path="/d/efuse/iis-0" index="0" switch="1" />
-<i2s_for_extspeaker ctl_path="/d/efuse/iis-1" index="1" switch="0" />
+<i2s_for_btcall index="0" switch="1" dst="external" cp0_ctl_file="/d/pin_switch/iis0_sys_sel/cp0_iis0" cp1_ctl_file="/d/pin_switch/iis0_sys_sel/cp1_iis0"  cp2_ctl_file="/d/pin_switch/iis0_sys_sel/cp2_iis0" ap_ctl_file="/d/pin_switch/iis0_sys_sel/ap_iis0" cp0_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp0_iis0" cp1_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp1_iis0"  cp2_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp2_iis0" ap_bt_ctl_file="/d/pin_switch/iis0_sys_sel/ap_iis0" />
+
+<i2s_for_extspeaker index="1" switch="0" dst="external" cp0_ctl_file="/d/pin_switch/iis-1" cp1_ctl_file="/d/pin_switch/iis-1"  cp2_ctl_file="/d/pin_switch/iis-1" ap_ctl_file="/d/pin_switch/iis-1" /> 
 
 <voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="1" />
 <voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="1" />

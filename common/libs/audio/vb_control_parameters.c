@@ -1433,9 +1433,9 @@ RESTART:
 	{
 	case VBC_CMD_HAL_OPEN:
 	    {
-		uint32_t i2s_ctl = ((adev->cp->i2s_bt.is_switch << 8) | (atoi(adev->cp->i2s_bt.index) << 0) 
+		uint32_t i2s_ctl = ((adev->cp->i2s_bt.is_switch << 8) | (adev->cp->i2s_bt.index << 0) 
 
-        |(adev->cp->i2s_extspk.is_switch << 9) | (atoi(adev->cp->i2s_extspk.index) << 4));
+        |(adev->cp->i2s_extspk.is_switch << 9) | (adev->cp->i2s_extspk.index << 4));
 		cur_timeout = &timeout;
 		MY_TRACE("vocie:VBC_CMD_HAL_OPEN IN.");
 		ALOGW("vocie:VBC_CMD_HAL_OPEN, try lock");
