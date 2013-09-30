@@ -144,15 +144,61 @@ int eng_linuxcmd_rpoweron(char *req, char *rsp)
     return 0;
 }
 
+static int eng_get_device_from_path(const char *path, char *device_name)
+{
+    char device[256];
+    char mount_path[256];
+    char rest[256];
+    FILE *fp;
+    char line[1024];
+
+    if (!(fp = fopen("/proc/mounts", "r"))) {
+        SLOGE("Error opening /proc/mounts (%s)", strerror(errno));
+        return 0;
+    }
+
+    while(fgets(line, sizeof(line), fp)) {
+        line[strlen(line)-1] = '\0';
+        sscanf(line, "%255s %255s %255s\n", device, mount_path, rest);
+        if (!strcmp(mount_path, path)) {
+            strcpy(device_name,device);
+            fclose(fp);
+            return 1;
+        }
+
+    }
+
+    fclose(fp);
+    return 0;
+}
+
 int eng_linuxcmd_factoryreset(char *req, char *rsp)
 {
     int ret = 1;
     char cmd[]="--wipe_data";
     int fd=-1;
+    char device_name[256];
+    char convert_name[256];
+    char format_cmd[1024];
+    const char* externalStorage = getenv("SECONDARY_STORAGE");
+    static char MKDOSFS_PATH[] = "/system/bin/newfs_msdos";
     mode_t mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
     ENG_LOG("Call %s\n",__FUNCTION__);
 
+#ifdef CONFIG_EMMC
+    /*format internal sd card. code from vold*/
+    memset(device_name,0,256);
+    if (eng_get_device_from_path(externalStorage,device_name)){
+        memset(convert_name,0,256);
+        sprintf(convert_name,"/dev/block/mmcblk0p%d",atoi(strchr(device_name,':')+1));
+        memset(format_cmd,0,1024);
+        sprintf(format_cmd,"%s -F 32 -O android %s",MKDOSFS_PATH,convert_name);
+        system(format_cmd);
+    } else {
+        LOGE("do not format /mnt/internal");
+    }
+#endif
     //delete files in ENG_RECOVERYDIR
     system("rm -r /cache/recovery");
 
