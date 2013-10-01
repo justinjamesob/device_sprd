@@ -109,12 +109,13 @@ static inline int fls(int x)
 
 const char *mixer_ctl_get_name_d(struct mixer_ctl *ctl)
 {
-	/*
+#if 1
 	static char name[256] = {0};
 	mixer_ctl_get_name(ctl, name, 255);
-	return name;*/
-
+	return name;
+#else
 	return mixer_ctl_get_name(ctl);
+#endif
 }
 
 static struct pga_profile *profile_get_by_name(struct audio_pga *pga,

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 ifeq ($(BOARD_HAVE_FM_BEKEN),true) 
 LOCAL_PATH:= $(call my-dir)
 # HAL module implemenation, not prelinked and stored in
@@ -34,4 +35,5 @@ include $(BUILD_SHARED_LIBRARY)
 
 CUSTOM_MODULES += fm.$(TARGET_BOARD_PLATFORM)
 
+endif
 endif

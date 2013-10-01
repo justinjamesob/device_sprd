@@ -14,6 +14,6 @@
 # limitations under the License.
 #
 
-add_lunch_combo sp7710ga_hvga-userdebug
-add_lunch_combo sp7710ga_hvgatri-userdebug
-add_lunch_combo sp7710ga_hvgacucc-userdebug
+#add_lunch_combo sp7710ga_hvga-userdebug
+#add_lunch_combo sp7710ga_hvgatri-userdebug
+#add_lunch_combo sp7710ga_hvgacucc-userdebug

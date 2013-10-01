@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-add_lunch_combo sp7710ga_orange-userdebug
+#add_lunch_combo sp7710ga_orange-userdebug
 #add_lunch_combo sp7710ga_orangehvga-userdebug
-add_lunch_combo sp7710ga_orangetri-userdebug
-add_lunch_combo sp7710ga_orangecuccspecAplus-userdebug
+#add_lunch_combo sp7710ga_orangetri-userdebug
+#add_lunch_combo sp7710ga_orangecuccspecAplus-userdebug

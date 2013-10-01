@@ -4,7 +4,7 @@
 #
 
 # This is the audio policy manager
-
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
   LOCAL_PATH := $(call my-dir)
 
   include $(CLEAR_VARS)
@@ -55,3 +55,4 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
+endif

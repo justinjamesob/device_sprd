@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvga.mk
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvgatri.mk
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvgacuccspecAplus.mk
+#PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvga.mk
+#PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvgatri.mk
+#PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710ga_hvgacuccspecAplus.mk
 

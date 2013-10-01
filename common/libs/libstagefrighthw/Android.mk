@@ -1,3 +1,4 @@
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -21,4 +22,4 @@ LOCAL_MODULE := libstagefrighthw
 LOCAL_CFLAGS:= -DLOG_TAG=\"$(TARGET_BOARD_PLATFORM).libstagefright\"
 
 include $(BUILD_SHARED_LIBRARY)
-
+endif

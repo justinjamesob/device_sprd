@@ -1,3 +1,4 @@
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -34,3 +35,4 @@ include $(call all-makefiles-under,$(LOCAL_PATH))
 #OVERRIDE_BUILD_MODULE_PATH := $(TARGET_OUT_INTERMEDIATE_LIBRARIES)
  
 #include $(BUILD_PREBUILT)
+endif

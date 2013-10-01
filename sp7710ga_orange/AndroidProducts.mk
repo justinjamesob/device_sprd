@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-PRODUCT_MAKEFILES := $(LOCAL_DIR)/prod_sp7710ga.mk
+#PRODUCT_MAKEFILES := $(LOCAL_DIR)/prod_sp7710ga.mk
 #PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710gahvga.mk
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710gatri.mk
-PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710gacuccspecAplus.mk
+#PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710gatri.mk
+#PRODUCT_MAKEFILES += $(LOCAL_DIR)/prod_sp7710gacuccspecAplus.mk
 

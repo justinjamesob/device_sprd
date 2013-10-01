@@ -16,5 +16,5 @@
 
 add_lunch_combo sp7710ga-userdebug
 #add_lunch_combo sp7710gahvga-userdebug
-add_lunch_combo sp7710gatri-userdebug
-add_lunch_combo sp7710gacucc-userdebug
+#add_lunch_combo sp7710gatri-userdebug
+#add_lunch_combo sp7710gacucc-userdebug

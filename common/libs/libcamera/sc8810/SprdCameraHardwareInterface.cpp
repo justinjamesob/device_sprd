@@ -33,7 +33,8 @@
 #include "../../gralloc/gralloc_priv.h"
 #include "ion_sprd.h"
 
-#include <media/hardware/MetadataBufferType.h>
+#include <media/stagefright/MetadataBufferType.h>
+//#include <media/hardware/MetadataBufferType.h>
 #include <camera/Camera.h>
 
 #include "../sc8810/SprdOEMCamera.h"

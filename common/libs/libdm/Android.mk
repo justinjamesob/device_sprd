@@ -1,3 +1,4 @@
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -30,3 +31,4 @@ LOCAL_MODULE := libsprddm
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 
 include $(BUILD_SHARED_LIBRARY)
+endif

@@ -1,3 +1,4 @@
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 ifneq ($(TARGET_SIMULATOR),true)
 
 LOCAL_PATH:= $(call my-dir)
@@ -19,4 +20,5 @@ include $(BUILD_PACKAGE)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
 
+endif
 endif
