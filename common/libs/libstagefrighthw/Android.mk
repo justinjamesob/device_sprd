@@ -1,4 +1,3 @@
-ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -8,8 +7,9 @@ LOCAL_SRC_FILES := \
 LOCAL_CFLAGS := $(PV_CFLAGS_MINUS_VISIBILITY)
 
 LOCAL_C_INCLUDES:= \
-        $(TOP)/frameworks/native/include/media/openmax \
-	$(TOP)/frameworks/native/include/media/hardware
+    $(TOP)/frameworks/base/include/media/stagefright/openmax \
+    $(TOP)/frameworks/base/include/media/stagefright
+
 LOCAL_SHARED_LIBRARIES :=       \
         libbinder               \
         libutils                \
@@ -22,4 +22,3 @@ LOCAL_MODULE := libstagefrighthw
 LOCAL_CFLAGS:= -DLOG_TAG=\"$(TARGET_BOARD_PLATFORM).libstagefright\"
 
 include $(BUILD_SHARED_LIBRARY)
-endif
