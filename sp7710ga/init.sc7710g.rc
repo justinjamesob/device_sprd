@@ -1,16 +1,13 @@
 import init.sc7710g.usb.rc
 
 on early-init
-    export EXTERNAL_STORAGE /storage/sdcard1
-    export SECONDARY_STORAGE /storage/sdcard0
-    # 0 for nand,1 for emmc,2 for sdcard
-    export SECOND_STORAGE_TYPE 0
-    mkdir /storage 0777 system sdcard_rw
-    mkdir /storage/sdcard0 0000 system system
-    mkdir /storage/sdcard1 0000 system system
-    # for backwards compatibility
-    symlink /storage/sdcard1 /sdcard
-    symlink /storage/sdcard1 /mnt/sdcard
+
+    export EXTERNAL_STORAGE /mnt/external
+    export SECONDARY_STORAGE /mnt/sdcard
+
+    mkdir /mnt/sdcard 0000 system system
+    mkdir /mnt/external 0000 system system    
+
     symlink /dev/ts0710mux22  /dev/vbpipe0
     symlink /dev/ts0710mux23  /dev/vbpipe6
 # radio pipe
