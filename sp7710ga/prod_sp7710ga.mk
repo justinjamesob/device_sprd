@@ -80,7 +80,8 @@ PRODUCT_PACKAGES += \
 
 # packages files
 PRODUCT_PACKAGES += \
-	
+	Camera
+
 PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/sprd-keypad.kl:system/usr/keylayout/sprd-keypad.kl \
 	$(BOARDDIR)/ft5x0x_ts.idc:system/usr/idc/ft5x0x_ts.idc \
