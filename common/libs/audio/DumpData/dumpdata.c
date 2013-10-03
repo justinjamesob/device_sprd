@@ -217,7 +217,7 @@ static void dump_start_tag(void *data, const XML_Char *tag_name,
 	memcpy( (void*)(&(aud_dump_file_info[aud_dump_info->aud_dump_item_info->index])),(void*)(aud_dump_info->aud_dump_item_info) , sizeof(aud_dump_item_t) );
 	
 	dump_open_file(aud_dump_info->aud_dump_item_info->index);
-	XDUMP_TRACE("dump_open_file ------index =  %d   filenanme =  %s ",aud_dump_info->aud_dump_item_info->index , aud_dump_file_info[aud_dump_info->aud_dump_item_info->index].file_name);
+	ALOGE("dump_open_file ------index =  %d   filenanme =  %s ",aud_dump_info->aud_dump_item_info->index , aud_dump_file_info[aud_dump_info->aud_dump_item_info->index].file_name);
 	aud_dump_info->aud_dump_item_info ++;
     }
 	
@@ -405,7 +405,7 @@ int  dump_data(dump_data_info_t dump_info)
 	
 	fd = aud_dump_file_info[dump_info.dump_switch_info].fp;
 
-	XDUMP_TRACE(" dump_data buf_len = %d  fd = %d  index = %d", dump_info.buf_len,fd ,dump_info.dump_switch_info);
+	XDUMP_TRACE(" dump_data buf_len = %d  fd = %d  index = %d", (dump_info.buf_len), fd, (dump_info.dump_switch_info));
 
 	if( NULL == fd ){
 		pthread_mutex_unlock(&Dumplock);	

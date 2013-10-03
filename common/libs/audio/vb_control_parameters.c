@@ -1144,7 +1144,10 @@ RESTART:
     }
 
     maxfd = para->vbpipe_fd + 1;
-    fcntl(para->vbpipe_fd,F_SETFL,O_NONBLOCK);
+    if((fcntl(para->vbpipe_fd,F_SETFL,O_NONBLOCK))<0)
+    {
+        ALOGD("voip1:vbpipe_name(%s) vbpipe_fd(%d) fcntl error.", para->vbpipe, para->vbpipe_fd);
+    }
 
     /* loop to read parameters from vbpipe.*/
     while(!para->is_exit)
@@ -1377,7 +1380,10 @@ RESTART:
     }
 
     maxfd = para->vbpipe_fd + 1;
-    fcntl(para->vbpipe_fd,F_SETFL,O_NONBLOCK);
+    if((fcntl(para->vbpipe_fd,F_SETFL,O_NONBLOCK))<0)
+    {
+        ALOGD("voice:vbpipe_name(%s) vbpipe_fd(%d) fcntl error.", para->vbpipe, para->vbpipe_fd);
+    }
 
     /* loop to read parameters from vbpipe.*/
     while(!para->is_exit)
