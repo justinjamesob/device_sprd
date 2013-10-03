@@ -26,6 +26,8 @@ struct mali_session_data
 
 	struct mali_page_directory *page_directory; /**< MMU page directory for this session */
 
+	u32 pid;
+
 	_MALI_OSK_LIST_HEAD(link); /**< Link for list of all sessions */
 };
 

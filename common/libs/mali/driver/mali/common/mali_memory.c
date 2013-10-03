@@ -229,6 +229,8 @@ _mali_osk_errcode_t mali_memory_session_begin(struct mali_session_data * session
 	/* Init the session's memory allocation list */
 	_MALI_OSK_INIT_LIST_HEAD( &session_data->memory_head );
 
+	session_data->pid = _mali_osk_get_pid();
+
 	MALI_DEBUG_PRINT(5, ("MMU session begin: success\n"));
 	MALI_SUCCESS;
 }
@@ -1397,3 +1399,32 @@ static void mali_mmu_page_table_cache_destroy(void)
 
 	_mali_osk_lock_term(page_table_cache.lock);
 }
+
+u32 _mali_kernel_memory_dump_state(char* buf, u32 size)
+{
+	int n = 0;
+
+	struct mali_session_data *session, *tmp;
+
+	mali_session_lock();
+	MALI_SESSION_FOREACH(session, tmp, link)
+	{
+		mali_memory_allocation *descriptor, *temp;
+		u32 sum = 0;
+
+		n += _mali_osk_snprintf(buf + n, size - n, "Session %d\n", session->pid);
+		_mali_osk_lock_wait( session->memory_lock, _MALI_OSK_LOCKMODE_RW );
+		_MALI_OSK_LIST_FOREACHENTRY(descriptor, temp, &session->memory_head, mali_memory_allocation, list)
+		{
+//			n += _mali_osk_snprintf(buf + n, size - n, "\tGPU Addr: 0x%08x, Length: 0x%08x\n", descriptor->mali_address, descriptor->size);
+			sum += descriptor->size;
+		}
+		_mali_osk_lock_signal( session->memory_lock, _MALI_OSK_LOCKMODE_RW );
+		n += _mali_osk_snprintf(buf + n, size - n, "Total Size: 0x%08x\n", sum);
+		n += _mali_osk_snprintf(buf + n, size - n, "\n");
+	}
+	mali_session_unlock();
+
+	return n;
+}
+

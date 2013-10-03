@@ -79,4 +79,6 @@ _mali_osk_errcode_t mali_memory_core_resource_dedicated_memory(_mali_osk_resourc
 
 mali_allocation_engine mali_mem_get_memory_engine(void);
 
+u32 _mali_kernel_memory_dump_state(char* buf, u32 size);
+
 #endif /* __MALI_MEMORY_H__ */
