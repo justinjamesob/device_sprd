@@ -4376,7 +4376,7 @@ int camera_rotation_handle(uint32_t evt_type, uint32_t sub_type, struct img_frm 
 
 	if (IMG_CVT_ROTATING != g_cxt->rot_cxt.rot_state) {
 		CMR_LOGE("Error state %d", g_cxt->rot_cxt.rot_state);
-		return CAMERA_INVALID_STATE;
+		goto exit;
 	}
 
 	(void)sub_type;
