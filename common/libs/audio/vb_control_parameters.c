@@ -513,6 +513,11 @@ static int SetVoice_gain_by_devices(struct tiny_audio_device *adev, pga_gain_nv_
     return 0;
 }
 
+static int SetAudio_gain_fmradio(struct tiny_audio_device *adev, uint32_t gain)
+{
+    audio_pga_apply(adev->pga,gain,"digital-fm");
+    return 0;
+}
 static int SetAudio_gain_by_devices(struct tiny_audio_device *adev, pga_gain_nv_t *pga_gain_nv)
 {
     if(NULL == pga_gain_nv){
