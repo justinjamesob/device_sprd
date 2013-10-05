@@ -6,7 +6,9 @@ MALI := libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so 
 SPRD_FM_APP := FMPlayer
 
 
-PRODUCT_PROPERTY_OVERRIDES :=
+PRODUCT_PROPERTY_OVERRIDES := \
+	ro.moz.omx.hw.max_width=720 \
+	ro.moz.omx.hw.max_height=576
 
 # original apps copied from generic_no_telephony.mk
 PRODUCT_PACKAGES := \
