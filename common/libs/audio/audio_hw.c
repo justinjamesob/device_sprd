@@ -307,6 +307,7 @@ struct tiny_audio_device {
     int voip_state;
     int voip_start;
     bool master_mute;
+    int fm_volume;
 
     int  input_source;	
 };
@@ -427,6 +428,9 @@ static const dev_names_para_t dev_names_digitalfm[] = {
     { AUDIO_DEVICE_IN_BACK_MIC, "back-mic" },
     //{ "linein-capture"},
 };
+#define FM_VOLUME_MAX 15
+static const int fm_volume_tbl[FM_VOLUME_MAX] = {
+    80,76,72,68,64,60,56,52,48,44,40,36,32,28,24};
 
 static dev_names_para_t *dev_names = NULL;
 
@@ -2490,7 +2494,7 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
     ret = str_parms_get_str(parms, AUDIO_PARAMETER_STREAM_ROUTING, value, sizeof(value));
     if (ret >= 0) {
         val = atoi(value);
-        if ((in->device != val) && (val != 0)) {
+        if (in->device != val) {
             in->device = val;
             adev->devices &= ~AUDIO_DEVICE_IN_ALL;
             adev->devices |= in->device;
@@ -3205,6 +3209,7 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
     char value[32];
     int ret;
     int val=0;
+    uint32_t gain = 0;
 
     BLUE_TRACE("adev_set_parameters, kvpairs : %s", kvpairs);
     parms = str_parms_create_str(kvpairs);
@@ -3237,6 +3242,23 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
         }
     }
 #endif
+    ret = str_parms_get_str(parms, "FM_Volume", value, sizeof(value));
+    if (ret >= 0) {
+        bool checkvalid = false;
+        val = atoi(value);
+        if(0 < val && val <= FM_VOLUME_MAX)
+        {
+            checkvalid = true;
+        }
+        if(checkvalid && val != adev->fm_volume)
+        {
+            adev->fm_volume = val;
+            gain |=fm_volume_tbl[val-1];
+            gain |=fm_volume_tbl[val-1]<<16;
+            SetAudio_gain_fmradio(adev,gain);
+        }
+        ALOGE("adev_set_parameters fm volume :%d",val);
+    }
     ret = str_parms_get_str(parms, AUDIO_PARAMETER_STREAM_ROUTING, value, sizeof(value));                                                
     if (ret >= 0) {
         val = atoi(value);
