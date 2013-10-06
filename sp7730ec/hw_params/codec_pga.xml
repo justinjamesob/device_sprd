@@ -184,6 +184,11 @@
 	<pga name="VBC ADCR DG Switch" bit="15" />
 </profile>
 
+<profile name="digital-fm">
+	<pga name="VBC STL DG Set" bit="0" />
+	<pga name="VBC STR DG Set" bit="16" />
+</profile>
+
 <!-- the configuration PGA is the physical vaule -->
 <attribute>
 <!-- DO NOT modify the mixer attribute -->
@@ -270,6 +275,13 @@
 	<mixer name="VBC ADCR DG Switch">
 		<attr max="1" inverse="0" />
 	</mixer>
+	<mixer name="VBC STR DG Set">
+		<attr max="127" inverse="0" />
+	</mixer>
+
+	<mixer name="VBC STL DG Set">
+		<attr max="127" inverse="0" />
+	</mixer>	
 </attribute>
 
 </codec>
