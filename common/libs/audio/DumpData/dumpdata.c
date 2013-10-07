@@ -405,7 +405,10 @@ int  dump_data(dump_data_info_t dump_info)
 	
 	fd = aud_dump_file_info[dump_info.dump_switch_info].fp;
 
-	XDUMP_TRACE(" dump_data buf_len = %d  fd = %d  index = %d", (dump_info.buf_len), fd, (dump_info.dump_switch_info));
+	XDUMP_TRACE(" dump_data buf_len = %d  fd = 0x%x  index = %d",
+	    dump_info.buf_len,
+	    fd,
+	    dump_info.dump_switch_info);
 
 	if( NULL == fd ){
 		pthread_mutex_unlock(&Dumplock);	
