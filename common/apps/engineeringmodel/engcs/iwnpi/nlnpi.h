@@ -63,6 +63,8 @@ enum nlnpi_commands {
 	NLNPI_CMD_SET_SBLOCK,
 	NLNPI_CMD_GET_SBLOCK,
 	/* add new commands above here */
+	/* hery.he add the sin wave test */
+        NLNPI_CMD_SIN_WAVE,
 
 	/* used to define NLNPI_CMD_MAX below */
 	__NLNPI_CMD_AFTER_LAST,
@@ -115,6 +117,8 @@ enum nlnpi_attrs {
 	NLNPI_ATTR_GET_DEBUG_ARG,
 	NLNPI_ATTR_SBLOCK_ARG,
 	/* add attributes here, update the policy in itm_nlnpi.c */
+	/* hery.he add the sin wave test */
+        NLNPI_ATTR_SIN_WAVE,
 
 	__NLNPI_ATTR_AFTER_LAST,
 	NLNPI_ATTR_MAX = __NLNPI_ATTR_AFTER_LAST - 1
