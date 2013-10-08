@@ -449,7 +449,6 @@ bool SprdCameraHardware::initPreview()
         setCameraDimensions();
         ALOGV("initPreview: preview size=%dx%d", mPreviewWidth, mPreviewHeight);
 
-
 	width = mPreviewWidth;
 	width += mPreviewWidth%4;
 	mPreviewFrameSize = width * mPreviewHeight * 3 / 2;
