@@ -153,10 +153,10 @@ enum isp_ae_mode{
 };
 
 enum isp_smart_ae {
-	ISP_SMART_AE_NONE = 0x00,
-	ISP_SMART_AE_DENDOISE = 0x01,
+	ISP_SMART_AE_NONE=0x00,
+	ISP_SMART_AE_DENDOISE=0x01,
 	ISP_SMART_AE_EDGE=0x02,
-	ISP_SMART_AE_SATURATION = 0x04,
+	ISP_SMART_AE_SATURATION=0x04,
 	ISP_SMART_AE_MAX,
 };
 
@@ -317,7 +317,7 @@ struct isp_smart_ae_param {
 	uint8_t smart_denoise_min_index;
 	uint8_t smart_denoise_max_index;
 	uint8_t smart_edge_min_index;
-	uint8_t smart_edge_max_index;	
+	uint8_t smart_edge_max_index;
 	uint8_t smart_sta_low_thr;
 	uint8_t smart_sta_high_thr;
 	uint8_t smart_sta_rotio;

@@ -2533,6 +2533,26 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->special_effect[7].u_shift=0xffe2;
 	sensor_ptr->special_effect[7].v_shift=0x0028;
 #endif
+	sensor_ptr->af.max_step=0x3ff;
+	sensor_ptr->af.min_step=0;
+	sensor_ptr->af.max_tune_step=0;
+	sensor_ptr->af.stab_period=120;
+	sensor_ptr->af.alg_id=3;
+	sensor_ptr->af.rough_count=13;
+	sensor_ptr->af.af_rough_step[0]=320;
+	sensor_ptr->af.af_rough_step[2]=384;
+	sensor_ptr->af.af_rough_step[3]=448;
+	sensor_ptr->af.af_rough_step[4]=512;
+	sensor_ptr->af.af_rough_step[5]=576;
+	sensor_ptr->af.af_rough_step[6]=640;
+	sensor_ptr->af.af_rough_step[7]=704;
+	sensor_ptr->af.af_rough_step[8]=768;
+	sensor_ptr->af.af_rough_step[9]=832;
+	sensor_ptr->af.af_rough_step[10]=896;
+	sensor_ptr->af.af_rough_step[11]=960;
+	sensor_ptr->af.af_rough_step[12]=1023;
+	sensor_ptr->af.fine_count=4;
+
 	return rtn;
 }
 
