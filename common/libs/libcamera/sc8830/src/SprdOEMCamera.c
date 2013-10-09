@@ -2178,6 +2178,7 @@ int camera_before_set_internal(enum restart_mode re_mode)
 			g_cxt->stop_preview_mode = 1;
 			ret = camera_stop_preview_internal();
 			Sensor_Close();
+			CMR_LOGI("id:%d.",g_cxt->sn_cxt.cur_id);
 		} else {
 			g_cxt->stop_preview_mode = 0;
 			ret = camera_stop_preview_internal();

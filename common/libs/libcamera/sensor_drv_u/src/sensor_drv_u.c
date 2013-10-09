@@ -1976,7 +1976,7 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 	int ret_val = SENSOR_FAIL;
 	uint32_t sensor_num = 0;
 
-	CMR_LOGV("0, start");
+	CMR_LOGV("0, start,id %d.",sensor_id);
 
 	if (NULL != s_p_sensor_cxt) {
 		CMR_LOGV("sensor close.");
