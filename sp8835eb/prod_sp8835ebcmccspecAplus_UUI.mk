@@ -114,7 +114,7 @@ PRODUCT_CONFIG_SUPPORT_WIFI := true
 PRODUCT_CONFIG_SUPPORT_BT := true
 PRODUCT_CONFIG_SUPPORT_GPS := true
 
-USE_PROJECT_SEC :=true
+USE_PROJECT_SEC :=false
 
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
