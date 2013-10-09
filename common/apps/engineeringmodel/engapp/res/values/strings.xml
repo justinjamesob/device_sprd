@@ -117,7 +117,7 @@
 	<string name="wifi_eut_start">start</string>
 	<string name="wifi_eut_stop">stop</string>
 	<!-- add by wangxiaobin 2011-10-04 for wifi eut end -->
-	<string name="fill_memory_alert_msg">Please wait...</string>
+	<string name="fill_memory_alert_msg">It may cost 10 minutes or more,Please wait...</string>
 	<string name="fill_memory_stop_msg">Stuffing MEMORY has been deleted</string>
 	<string name="fill_memory_alert_ok">Ok,I got it</string>
 	<string name="memory_low">Warning:out of memory</string>
