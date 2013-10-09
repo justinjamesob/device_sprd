@@ -78,7 +78,7 @@ PRODUCT_PACKAGES := \
 PRODUCT_PACKAGES += \
 	wps.apk \
 	weibopro_10035_0001_0.9.0noshortcut_Android-0506.apk \
-	SogouInput_31143_android_oem_zhanxun_20130509.apk \
+	SogouInput_37434_android_oem_zhanxun_20130923.apk \
 	SohuNewsClient_v3.3_factory_zhanxun_6230.apk \
 	baidumap_andr_3052.apk \
 	wostore.apk \
