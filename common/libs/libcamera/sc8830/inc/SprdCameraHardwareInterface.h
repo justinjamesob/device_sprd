@@ -278,6 +278,7 @@ private:
 	bool                            iSDisplayCaptureFrame();
 	bool                            iSZslMode();
 	bool                            checkPreviewStateForCapture();
+	bool                            getLcdSize(uint32_t *width, uint32_t *height);
 	/* These constants reflect the number of buffers that libqcamera requires
 	for preview and raw, and need to be updated when libqcamera
 	changes.

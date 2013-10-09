@@ -74,6 +74,7 @@ public:
 	void getMeteringAreas(int *area, int *count, Size *preview_size,
 					 Rect *preview_rect, int orientation, bool mirror);
 	void setZSLSupport(const char* value);
+	void updateSupportedPreviewSizes(int width, int height);
 
 
 	// These sizes have to be a multiple of 16 in each dimension

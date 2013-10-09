@@ -86,6 +86,7 @@ const char SprdCameraParameters::KEY_AUTO_EXPOSURE[] = "auto-exposure";
 const char SprdCameraParameters::KEY_METERING_AREAS[] = "metering-areas";
 const char SprdCameraParameters::KEY_PREVIEW_ENV[] = "preview-env";
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 SprdCameraParameters::SprdCameraParameters():CameraParameters()
 {
@@ -365,6 +366,35 @@ void SprdCameraParameters::setZSLSupport(const char* value)
 {
 	set("zsl-supported",value);
 }
+
+void SprdCameraParameters::updateSupportedPreviewSizes(int width, int height)
+{
+	char size_new[32] = {0};
+	char vals_new[256] = {0};
+	const char *p = get(KEY_PREVIEW_SIZE);
+	const char *vals_p = get(KEY_SUPPORTED_PREVIEW_SIZES);
+	const char *pos_1 = vals_p, *pos_2 = vals_p;
+	unsigned int p_len = strlen(p);
+	unsigned int cnt = 0;
+	unsigned int i = 0;
+
+	height = width*3/4;
+	sprintf(size_new, "%dx%d", width, height);
+	LOGV("updateSupportedPreviewSizes preview-size %s", size_new);
+
+	pos_1 = strstr(vals_p, p);
+	if (!pos_1) return;
+
+	pos_2 = pos_1 + p_len;
+	strncpy(vals_new, vals_p, pos_1-vals_p);
+	strcat(vals_new, size_new);
+	strcat(vals_new, pos_2);
+	LOGV("updateSupportedPreviewSizes preview-size-values %s", vals_new);
+
+	set(KEY_SUPPORTED_PREVIEW_SIZES, vals_new);
+	set(KEY_PREVIEW_SIZE, size_new);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //

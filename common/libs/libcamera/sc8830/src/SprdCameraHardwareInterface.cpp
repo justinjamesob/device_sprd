@@ -2219,6 +2219,8 @@ status_t SprdCameraHardware::cancelPictureInternal()
 
 status_t SprdCameraHardware::initDefaultParameters()
 {
+	uint32_t lcd_w = 0, lcd_h = 0;
+
 	LOGV("initDefaultParameters E");
 	SprdCameraParameters p;
 
@@ -2228,6 +2230,12 @@ status_t SprdCameraHardware::initDefaultParameters()
 
 	p.setDefault(config);
 
+	if (getLcdSize(&lcd_w, &lcd_h))
+	{
+		/*update preivew size by lcd*/
+		p.updateSupportedPreviewSizes(lcd_w, lcd_h);
+	}
+
     if (setParameters(p) != NO_ERROR) {
 		LOGE("Failed to set default parameters?!");
 		return UNKNOWN_ERROR;
@@ -2236,6 +2244,48 @@ status_t SprdCameraHardware::initDefaultParameters()
     LOGV("initDefaultParameters X.");
     return NO_ERROR;
 }
+
+bool SprdCameraHardware::getLcdSize(uint32_t *width, uint32_t *height)
+{
+    char const * const device_template[] = {
+        "/dev/graphics/fb%u",
+        "/dev/fb%u",
+        NULL
+    };
+
+    int fd = -1;
+    int i = 0;
+    char name[64];
+
+    if (NULL == width || NULL == height)
+        return false;
+
+    while ((fd == -1) && device_template[i]) {
+        snprintf(name, 64, device_template[i], 0);
+        fd = open(name, O_RDONLY, 0);
+        i++;
+    }
+	LOGV("getLcdSize dev is %s", name);
+
+    if (fd < 0) {
+        LOGE("getLcdSize fail to open fb");
+        return false;
+    }
+
+    struct fb_var_screeninfo info;
+    if (ioctl(fd, FBIOGET_VSCREENINFO, &info) == -1) {
+        LOGE("getLcdSize fail to get fb info");
+		close(fd);
+        return false;
+    }
+
+	LOGV("getLcdSize w h %d %d", info.yres, info.xres);
+    *width  = info.yres;
+    *height = info.xres;
+
+	return true;
+}
+
 
 status_t SprdCameraHardware::setCameraParameters()
 {
