@@ -14314,6 +14314,41 @@
         mmsc="http://192.168.193.134:38090/was"
         type="mms"
     />
+    <!-- SPRD: Add Information to Iran @{ -->
+    <apn carrier="MCI-GPRS"
+        mcc="432"
+        mnc="11"
+        apn="mcinet"
+        proxy="192.168.194.73"
+        port="8080"
+        type="default,supl"
+        authtype="1"
+    />
+    <apn carrier="Rightel"
+        mcc="432"
+        mnc="20"
+        apn="RighTel"
+        type="default,supl"
+        authtype="1"
+    />
+    <apn carrier="RigTtel MMS"
+        mcc="432"
+        mnc="20"
+        apn="RighTel-wap"
+        mmsproxy="10.200.39.10"
+        mmsport="8080"
+        mmsc="http://10.200.40.55:38090/was"
+        type="mms"
+        authtype="1"
+    />
+    <apn carrier="Irancell-GPRS"
+        mcc="432"
+        mnc="35"
+        apn="mtnirancell"
+        type="default,supl"
+        authtype="1"
+    />
+    <!-- @} -->
     <!-- Iran Irancell -->
     <apn carrier="IR - MT Irancell Web"
         mcc="432"
@@ -18413,6 +18448,33 @@
         type="mms"
         authtype="3"
     />
+    <!-- SPRD: Add Russian Information @{ -->
+    <apn carrier="MOTIV internet"
+        mcc="250"
+        mnc="35"
+        apn="inet.ycc.ru"
+        server="wap.ycc.ru"
+        type="default,supl"
+    />
+    <apn carrier="MOTIV wap"
+        mcc="250"
+        mnc="35"
+        apn="wap.ycc.ru"
+        proxy="172.016.002.002"
+        port="8080"
+        server="wap.ycc.ru"
+        type="default,supl"
+    />
+    <apn carrier="MOTIV MMS"
+        mcc="250"
+        mnc="35"
+        apn="mms.ycc.ru"
+        mmsproxy="172.016.002.010"
+        mmsport="8080"
+        mmsc="http://mms.ycc.ru"
+        type="mms"
+    />
+    <!-- @} -->
     <apn carrier="MTS"
         mcc="250"
         mnc="39"
@@ -22759,6 +22821,20 @@
         proxy="10.0.0.172"
         port="80"
         type="dm"
+    />
+    <!-- @} -->
+    <!-- SPRD: Add Malawi Information @{ -->
+    <apn carrier="Airtel"
+        mcc="650"
+        mnc="10"
+        apn="internet"
+        type="default"
+    />
+    <apn carrier="TNM"
+        mcc="650"
+        mnc="01"
+        apn="internet"
+        type="default"
     />
     <!-- @} -->
 </apns>
