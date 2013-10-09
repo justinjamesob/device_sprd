@@ -32,8 +32,7 @@ PRODUCT_PACKAGES := \
 	calibration_init \
 	nvm_daemon \
 	modemd\
-	engpc \
-        choose_secure
+	engpc
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
 PRODUCT_PACKAGES += \
@@ -175,17 +174,6 @@ ifeq ($(PRODUCT_CONFIG_SUPPORT_WIFI),true)
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 endif
-
-ifeq ($(USE_PROJECT_SEC),true)
-# prebuild files
-PRODUCT_PACKAGES += \
-	Permission.apk
-
-PRODUCT_COPY_FILES += \
-	frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
-endif
-
-
 
 BOARD_WLAN_DEVICE_REV       := bcm4330_b2
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
