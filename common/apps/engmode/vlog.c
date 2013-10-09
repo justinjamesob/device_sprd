@@ -129,21 +129,24 @@ void *eng_vlog_thread(void *x)
 
         do {
             w_cnt = write(ser_fd, log_data + offset, r_cnt);
-            if (w_cnt < 0) {
-                ENG_LOG("eng_vlog no log data write:%d ,%s\n", w_cnt, strerror(errno));
+	    if (w_cnt < 0) {
+                if(errno == EBUSY)
+                    usleep(59000);
+                else {
+                    ENG_LOG("eng_vlog no log data write:%d ,%s\n", w_cnt, strerror(errno));
 
-                // FIX ME: retry to open
-                retry_num = 0; //reset the try number.
-                while (-1 == restart_gser()) {
-                    ENG_LOG("eng_vlog open gser port failed\n");
-                    sleep(1);
-                    retry_num ++;
-                    if(retry_num > MAX_OPEN_TIMES) {
-                        ENG_LOG("eng_vlog: vlog thread stop for gser error !\n");
-                        return 0;
+                    // FIX ME: retry to open
+                    retry_num = 0; //reset the try number.
+                    while (-1 == restart_gser()) {
+                        ENG_LOG("eng_vlog open gser port failed\n");
+                        sleep(1);
+                        retry_num ++;
+                        if(retry_num > MAX_OPEN_TIMES) {
+                            ENG_LOG("eng_vlog: vlog thread stop for gser error !\n");
+                            return 0;
+                        }
                     }
                 }
-
                 ser_fd = s_ser_fd;
             } else {
                 r_cnt -= w_cnt;

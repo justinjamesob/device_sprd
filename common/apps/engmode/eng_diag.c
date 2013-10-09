@@ -126,6 +126,27 @@ struct eut_cmd eut_cmds[]={
     {GPSPRN_INDEX,ENG_GPSPRN}
 };
 
+static int eng_diag_write2pc(void)
+{
+    int ret;
+    int i=0;
+    int fd=0;
+    int error = 0;
+
+    do{
+           fd = get_ser_fd();
+           error = 0;
+           ret = write(fd,eng_diag_buf,eng_diag_len);
+           if(ret < 0){
+               error = errno;
+               ENG_LOG("%s error: %s \n",__func__,strerror(errno));
+               if(error == EBUSY)
+               usleep(200000);
+           }
+           i++;
+    }while(( error == EBUSY)&&(i<25));
+    return ret;
+}
 
 static void print_log(char* log_data,int cnt)
 {
@@ -274,7 +295,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
         case CMD_USER_APCALI:
             rlen = eng_battery_calibration(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
             eng_diag_len = rlen;
-            eng_diag_write2pc(get_ser_fd());
+            eng_diag_write2pc();
             return 0;
             break;
         case CMD_USER_APCMD:
@@ -291,20 +312,20 @@ int eng_diag_user_handle(int type, char *buf,int len)
             memset(eng_diag_buf, 0, sizeof(eng_diag_buf));
             rlen = eng_diag_product_ctrl(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
             eng_diag_len = rlen;
-            eng_diag_write2pc(get_ser_fd());
+            eng_diag_write2pc();
             return 0;
         case CMD_USER_DIRECT_PHSCHK:
             ENG_LOG("%s: CMD_USER_DIRECT_PHSCHK\n", __FUNCTION__);
             memset(eng_diag_buf, 0, sizeof(eng_diag_buf));
             rlen = eng_diag_direct_phschk(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
             eng_diag_len = rlen;
-            eng_diag_write2pc(get_ser_fd());
+            eng_diag_write2pc();
             return 0;
         case CMD_USER_MMICIT_READ:
             ENG_LOG("%s: CMD_USER_MMICIT_READ Req !\n", __FUNCTION__);
             rlen = eng_diag_mmicit_read(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
             eng_diag_len = rlen;
-            eng_diag_write2pc(get_ser_fd());
+            eng_diag_write2pc();
             return 0;
         default:
             break;
@@ -336,8 +357,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
     }
     eng_diag_buf[head.len+extra_len+1] = 0x7e;
     eng_diag_len = head.len+extra_len+2;
-
-    ret = eng_diag_write2pc(get_ser_fd());
+    ret = eng_diag_write2pc();
     if ( ret<=0 ){
         ENG_LOG("%s: write to pc failed \n", __FUNCTION__);
         restart_gser();
@@ -604,7 +624,7 @@ int eng_diag(char *buf,int len)
 
             retry_time = 0; //reset retry time counter
 write_again:
-            ret = eng_diag_write2pc(get_ser_fd());
+            ret = eng_diag_write2pc();
             if (ret <= 0) {
                 restart_gser();
                 if((++retry_time) <= 10){
@@ -627,10 +647,6 @@ write_again:
     return ret;
 }
 
-int eng_diag_write2pc(int fd)
-{
-    return write(fd,eng_diag_buf,eng_diag_len);
-}
 
 //send at should from ril interface @allen
 //enable this function temporarily @alvin
@@ -1205,7 +1221,7 @@ void At_cmd_back_sig(void)
     eng_diag_buf[8] =0x00;
 
     eng_diag_buf[9] =0x7e;
-    eng_diag_write2pc(get_ser_fd());
+    eng_diag_write2pc();
     memset(eng_diag_buf, 0, 10);
 }
 

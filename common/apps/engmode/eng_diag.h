@@ -156,7 +156,6 @@ typedef struct _PHASE_CHECK_S
     TEST_TRACK_HEADER_T header;
 }TEST_DATA_INFO_T;
 int eng_diag(char *buf,int len);
-int eng_diag_write2pc(int fd);
 int eng_diag_writeimei(char *req, char *rsp);
 void *eng_vlog_thread(void *x);
 void *eng_vdiag_thread(void *x);
