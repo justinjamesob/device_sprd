@@ -1702,6 +1702,7 @@ bool SprdCameraHardware::allocatePreviewMem()
 
 			if(NULL == PreviewHeap->handle) {
 				LOGE("Fail to GetPmem mPreviewHeap. buffer_size: 0x%x.", buffer_size);
+				FreePmem(PreviewHeap);
 				freePreviewMem();
 				return false;
 			}
