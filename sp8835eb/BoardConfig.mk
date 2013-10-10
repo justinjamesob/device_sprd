@@ -106,6 +106,7 @@ WIFI_DRIVER_FW_PATH_P2P     := "/etc/wifi/fw_bcmdhd_p2p.bin"
 WIFI_DRIVER_FW_PATH_AP      := "/etc/wifi/fw_bcmdhd_apsta.bin"
 USE_CAMERA_STUB := true
 
+
 BOARD_USES_GENERIC_AUDIO := true
 
 # sensor config

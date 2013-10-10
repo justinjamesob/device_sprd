@@ -109,6 +109,8 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
+USE_PROJECT_SEC :=false
+
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
 $(call inherit-product, $(BOARDDIR)/proprietories.mk)
@@ -133,3 +135,18 @@ ifeq ($(MULTILANGUAGE_SUPPORT),true)
 endif
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=zh
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=CN
+
+ifeq ($(USE_PROJECT_SEC),true)
+PRODUCT_PROPERTY_OVERRIDES += \
+persist.support.securetest=1
+endif
+
+ifeq ($(USE_PROJECT_SEC),true)
+# prebuild files
+PRODUCT_PACKAGES += \
+        Permission.apk \
+        choose_secure
+
+PRODUCT_COPY_FILES += \
+        frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
+endif

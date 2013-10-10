@@ -49,8 +49,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.config.hw.camera_support=false \
 	ro.config.hw.search_support=false \
     persist.surpport.oplpnn=true \
-    persist.surpport.cphsfirst=false \
-    persist.support.securetest=0
+    persist.surpport.cphsfirst=false
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
   PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=1
@@ -115,6 +114,8 @@ PRODUCT_CONFIG_SUPPORT_WIFI := true
 PRODUCT_CONFIG_SUPPORT_BT := true
 PRODUCT_CONFIG_SUPPORT_GPS := true
 
+USE_PROJECT_SEC :=false
+
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
 $(call inherit-product, $(BOARDDIR)/proprietories.mk)
@@ -140,3 +141,18 @@ ifeq ($(MULTILANGUAGE_SUPPORT),true)
 endif
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=zh
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=CN
+
+ifeq ($(USE_PROJECT_SEC),true)
+PRODUCT_PROPERTY_OVERRIDES += \
+persist.support.securetest=1
+endif
+
+ifeq ($(USE_PROJECT_SEC),true)
+# prebuild files
+PRODUCT_PACKAGES += \
+        Permission.apk \
+        choose_secure
+
+PRODUCT_COPY_FILES += \
+        frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
+endif
