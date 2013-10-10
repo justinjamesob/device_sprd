@@ -251,7 +251,8 @@ struct sensor_awb_param{
 	struct sensor_awb_linear_func t_func;
 	struct sensor_awb_gain_adjust gain_adjust;
 	uint8_t debug_level;
-	uint8_t reserved0[3];
+	uint8_t smart_index;
+	uint8_t reserved0[2];
 	uint32_t reserved[9];
 };
 
