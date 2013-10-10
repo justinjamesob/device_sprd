@@ -463,7 +463,7 @@ int main(int argc, char **argv)
     unsigned int maskcode = 0;
     int i;
 
-    MP4Handle *mHandle;
+    MP4Handle *mHandle = NULL;
 
 
     // bitstream buffer, read from bs file
