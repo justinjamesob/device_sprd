@@ -184,6 +184,13 @@ enum isp_awb_mode{
 	ISP_AWB_MAX
 };
 
+enum isp_smart_awb {
+	ISP_SMART_AWB_NONE=0x00,
+	ISP_SMART_AWB_LNC=0x01,
+	ISP_SMART_AWB_CMC=0x02,
+	ISP_SMART_AWB_MAX
+};
+
 enum isp_format{
 	ISP_DATA_YUV422_3FRAME=0x00,
 	ISP_DATA_YUV422_2FRAME,

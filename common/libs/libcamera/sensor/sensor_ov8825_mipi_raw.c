@@ -1772,7 +1772,7 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 	sensor_ptr->awb.gain_convert[1].r=0x100;
 	sensor_ptr->awb.gain_convert[1].g=0x100;
 	sensor_ptr->awb.gain_convert[1].b=0x100;
-#endif
+
 	//ov8825 awb param
 	sensor_ptr->awb.t_func.a = 274;
 	sensor_ptr->awb.t_func.b = -335;
@@ -1836,7 +1836,8 @@ LOCAL uint32_t Sensor_ov8825_InitRawTuneInfo(void)
 
 	sensor_ptr->awb.steady_speed = 6;
 	sensor_ptr->awb.debug_level = 0;
-
+#endif
+	sensor_ptr->awb.smart_index = 4;
 #if 0
 	//bpc
 	sensor_ptr->bpc.flat_thr=80;
