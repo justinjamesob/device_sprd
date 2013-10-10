@@ -58,6 +58,8 @@ TOPLEVEL(rx_start, NULL, NLNPI_CMD_RX_START, 0, npi_set_noarg_cmd, "Start rx.");
 
 TOPLEVEL(rx_stop, NULL, NLNPI_CMD_RX_STOP, 0, npi_set_noarg_cmd, "Stop rx.");
 
+TOPLEVEL(sin_wave, NULL, NLNPI_CMD_SIN_WAVE, 0, npi_set_noarg_cmd, "Sin wave.");
+
 /* ----------------SET CMD WITH ARG -------------------- */
 #define NPI_SET_ARGINT_CMD(name, nl_attr)		\
 static int npi_ ## name ## _cmd(struct nlnpi_state *state,\
@@ -169,13 +171,7 @@ static int npi_set_reg_cmd(struct nlnpi_state *state,
 		if (err) {
 			fprintf(stderr, "Invild start_addr format\n");
 			return 2;
-		}
-		if (start_addr & 0x3) {
-			printf
-			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
-			     start_addr);
-			return 2;
-		}
+		}	
 		data[0] = REG_RF;
 	} else if (strncmp(argv[0], "phy0", 4) == 0) {
 		start_addr = strtol(argv[1], err, 16);
@@ -556,12 +552,6 @@ static int npi_get_reg_cmd(struct nlnpi_state *state,
 		start_addr = strtol(argv[1], err, 16);
 		if (err) {
 			fprintf(stderr, "Invild start_addr format\n");
-			return 2;
-		}
-		if (start_addr & 0x3) {
-			printf
-			    ("ret: Invild addr 0x%x, should 4 bytes align :end\n",
-			     start_addr);
 			return 2;
 		}
 		data[0] = REG_RF;
