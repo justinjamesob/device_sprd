@@ -71,18 +71,20 @@ int get_tp_resolution(char *filename)
 
 	if(ioctl(fd, EVIOCGABS(ABS_MT_POSITION_X), &absinfo_x)) {
 		printf("can not get absinfo\n");
+		close(fd);
 		return -1;
 	}
 
 	if(ioctl(fd, EVIOCGABS(ABS_MT_POSITION_Y), &absinfo_y)) {
 		printf("can not get absinfo\n");
+		close(fd);
 		return -1;
 	}
 	tp_width = absinfo_x.maximum;
 	tp_height = absinfo_y.maximum;
 	LOGD("absinfo_x.minimum = %d\nabsinfo_x.maximum = %d\n", absinfo_x.minimum, absinfo_x.maximum);
 	LOGD("absinfo_y.minimum = %d\nabsinfo_y.maximum = %d\n", absinfo_y.minimum, absinfo_y.maximum);
-
+	close(fd);
 	return 0;
 }
 void ev_exit(void)
