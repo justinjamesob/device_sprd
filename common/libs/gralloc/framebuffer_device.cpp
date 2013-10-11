@@ -41,6 +41,7 @@
 
 // numbers of buffers for page flipping
 #define NUM_BUFFERS 2
+#define DEBUG_FB_POST
 
 #ifdef DUMP_FB
 extern void dump_fb(void* addr, struct fb_var_screeninfo * info , int format);
@@ -89,6 +90,9 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 	private_handle_t const* hnd = reinterpret_cast<private_handle_t const*>(buffer);
 	private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
 
+#ifdef DEBUG_FB_POST
+	AINF( "%s in line=%d\n", __FUNCTION__, __LINE__);
+#endif
 	if (m->currentBuffer)
 	{
 		m->base.unlock(&m->base, m->currentBuffer);
@@ -200,6 +204,9 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 		m->base.unlock(&m->base, m->framebuffer); 
 	}
 
+#ifdef DEBUG_FB_POST
+	AINF( "%s out line=%d\n", __FUNCTION__, __LINE__);
+#endif
 	return 0;
 }
 
