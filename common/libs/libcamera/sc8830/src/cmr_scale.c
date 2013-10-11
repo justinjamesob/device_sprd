@@ -33,8 +33,7 @@
 		} while(0)
 
 
-enum scale_work_mode
-{
+enum scale_work_mode {
 	SC_FRAME = SCALE_MODE_NORMAL,
 	SC_SLICE_EXTERNAL = SCALE_MODE_SLICE,
 	SC_SLICE_INTERNAL
@@ -119,6 +118,10 @@ static void* cmr_scale_thread_proc(void* data)
 		if (-1 == ioctl(scaler_fd, SCALE_IO_IS_DONE, &sc_frm)) {
 			CMR_LOGV("To exit scaler thread");
 			break;
+		} else if (SCALE_FLAG_SYS_BUSY == sc_frm.scale_result) {
+			usleep(10000);
+			CMR_LOGV("scale continue.");
+			continue;
 		} else {
 			CMR_PRINT_TIME;
 			pthread_mutex_lock(&scaler_cb_mutex);

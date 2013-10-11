@@ -399,7 +399,7 @@ int cmr_v4l2_buff_cfg (struct buffer_cfg *buf_cfg)
 	/* secondly , set the frame address */
 	for (i = 0; i < buf_cfg->count; i++) {
 		v4l2_buf.m.userptr  = buf_cfg->addr[i].addr_y;
-		v4l2_buf.input      = buf_cfg->addr[i].addr_u;
+		v4l2_buf.length        = buf_cfg->addr[i].addr_u;
 		v4l2_buf.reserved   = buf_cfg->addr[i].addr_v;
 		CMR_LOGI("VIDIOC_QBUF: buf %d: Y=0x%x, U=0x%x, V=0x%x \n",
 			i, buf_cfg->addr[i].addr_y, buf_cfg->addr[i].addr_u, buf_cfg->addr[i].addr_v);

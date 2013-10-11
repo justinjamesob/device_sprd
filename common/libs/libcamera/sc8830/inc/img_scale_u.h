@@ -79,6 +79,12 @@ enum scale_rotate
 	SCALE_ROTATION_MAX
 };
 
+enum scale_flag {
+	SCALE_FLAG_SUCCESS = 0,
+	SCALE_FLAG_EXIT = -1,
+	SCALE_FLAG_SYS_BUSY = -2,
+	SCALE_FLAG_MAX = 0xFF
+};
 struct scale_size {
 	uint32_t               w;
 	uint32_t               h;
@@ -116,6 +122,7 @@ struct scale_frame {
 	uint32_t                uaddr;
 	uint32_t                vaddr;
 	struct scale_endian_sel endian;
+	enum scale_flag scale_result;
 };
 
 #ifdef __cplusplus
