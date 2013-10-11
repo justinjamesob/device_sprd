@@ -66,7 +66,7 @@ typedef struct Switch_ctrl
 
 typedef struct Samplerate_ctrl
 {
-    unsigned short samplerate; /* change samplerate.*/
+    unsigned int samplerate; /* change samplerate.*/
 }set_samplerate_t;
 
 typedef struct Set_Mute
@@ -214,10 +214,13 @@ static int read_nonblock(int fd,int8_t *buf,int bytes)
                     bytes -= ret;
                 }
             }
-            else if(!(errno = EAGAIN || errno == EINTR) || (0 == ret)) {
-                ALOGE("pipe read error %d",errno);
+            else if((!((errno == EAGAIN) || (errno == EINTR))) || (0 == ret)) {
+                ALOGE("pipe read error %d,bytes read is %d",errno,bytes_to_read - bytes);
                 break;
             }
+	    else {
+		ALOGW("pipe_read_warning: %d,ret is %d",errno,ret);
+	    }
         }while(bytes);
     }
 
@@ -240,10 +243,13 @@ static int write_nonblock(int fd,int8_t *buf,int bytes)
                     bytes -= ret;
                 }
             }
-            else if(!(errno = EAGAIN || errno == EINTR) || (0 == ret)) {
-                ALOGE("pipe read error %d",errno);
+            else if((!((errno == EAGAIN) || (errno == EINTR))) || (0 == ret)) {
+                ALOGE("pipe write error %d,bytes read is %d",errno,bytes_to_read - bytes);
                 break;
             }
+	    else {
+		ALOGW("pipe_write_warning: %d,ret is %d",errno,ret);
+	    }
         }while(bytes);
     }
 
@@ -760,10 +766,6 @@ int GetParas_Switch_Incall(int fd_pipe,switch_ctrl_t *swtich_ctrl_paras)	/* swit
     memset(&read_common_head, 0, sizeof(parameters_head_t));
     MY_TRACE("%s in...",__func__);
 
-    ret = Write_Rsp2cp(fd_pipe,VBC_CMD_SWITCH_CTRL);
-    if(ret < 0){
-        ALOGE("Error, %s Write_Rsp2cp failed(%d)",__func__,ret);
-    }
     ret = ReadParas_SwitchCtrl(fd_pipe,swtich_ctrl_paras);
     if (ret <= 0) {
         ALOGE("Error, read ReadParas_SwitchCtrl ret(%d) failed(%s)",ret,strerror(errno));
