@@ -18440,7 +18440,7 @@
     <apn carrier="Utel mms"
         mcc="250"
         mnc="39"
-        apn=mms.usi.ru
+        apn="mms.usi.ru"
         mmsproxy="192.168.168.192"
         mmsport="8080"
         user="mms"
