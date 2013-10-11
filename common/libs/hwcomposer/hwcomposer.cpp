@@ -1201,6 +1201,16 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
             {
                 hwc_layer_t *l = &(list->hwLayers[j]);
 
+                /*
+                 *  OverlayComposer cannot handle the lrregular layer display frame,
+                 *  so OverlayComposer should be disabled at this moment.
+                 * */
+                if (l->displayFrame.right == 1 ||
+                    l->displayFrame.bottom == 1)
+                {
+                    SkipLayerFlag = true;
+                }
+
                 if (l->compositionType == HWC_FRAMEBUFFER && SkipLayerFlag == false)
                 {
                     l->compositionType = HWC_OVERLAY;
@@ -1235,6 +1245,8 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
             {
                 mOLCD->onComposer(list);
             }
+
+            SkipLayerFlag = false;
 #endif
         }
 #endif
