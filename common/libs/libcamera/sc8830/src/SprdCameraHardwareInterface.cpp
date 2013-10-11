@@ -574,7 +574,7 @@ void SprdCameraHardware::stopRecording()
 {
 	LOGV("stopRecording: E");
 	Mutex::Autolock l(&mLock);
-	camera_set_stop_preview_mode(0);
+	camera_set_stop_preview_mode(1);
 	stopPreviewInternal();
 	mRecordingFirstFrameTime = 0;
 	LOGV("stopRecording: X");
