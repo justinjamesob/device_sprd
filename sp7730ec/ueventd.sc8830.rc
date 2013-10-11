@@ -38,6 +38,9 @@
 /dev/spipe_w6          0660     media   audio
 /dev/spipe_w8          0666     system  system
 
+/dev/slog_wcn          0666     system  system
+/dev/spipe_wcn2        0666     system  system
+
 /dev/block/mmcblk0p1    0660     system  system
 /dev/block/mmcblk0p2    0660     system  system
 
@@ -54,3 +57,8 @@
 
 /dev/vser              0660     system  system
 /dev/ttyGS0            0660     system  system
+/dev/ttyGS1            0660     system  system
+/dev/ttyGS2            0660     system  system
+/dev/ttyGS3            0660     system  system
+/dev/ttyGS4            0660     system  system
+/dev/ttyGS5            0660     system  system
