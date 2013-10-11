@@ -71,6 +71,9 @@ public class LogSettingSlogUITabHostActivity extends TabActivity {
         }
 
         public void handleMessage(android.os.Message msg) {
+            if (mContext == null || mProgressDialog == null) {
+                return;
+            }
             switch (msg.what) {
             case SlogAction.ANDROIDKEY:
                 isAndroidLog = true;
@@ -103,10 +106,14 @@ public class LogSettingSlogUITabHostActivity extends TabActivity {
                         isAndroidLog = false;
                     }
                 }
-                mProgressDialog.cancel();
+                if (mProgressDialog != null) {
+                    mProgressDialog.cancel();
+                }
                 break;
             case SlogAction.MESSAGE_DUMP_START:
-                mProgressDialog.setCancelable(false);
+                if (mProgressDialog != null) {
+                    mProgressDialog.setCancelable(false);
+                }
                 try {
                     mProgressDialog.show();
                 } catch (Exception error) {
@@ -118,23 +125,31 @@ public class LogSettingSlogUITabHostActivity extends TabActivity {
             case SlogAction.MESSAGE_DUMP_STOP:
                 if (mContext != null) {
                     Toast.makeText(mContext, R.string.slog_dump_ok, Toast.LENGTH_LONG).show();
+                } else {
+                    return;
                 }
                 mProgressDialog.cancel();
                 mProgressDialog.setCancelable(true);
                 break;
             case SlogAction.MESSAGE_DUMP_FAILED:
-                mProgressDialog.cancel();
-                mProgressDialog.setCancelable(true);
                 if (mContext != null) {
                     Toast.makeText(mContext, R.string.slog_dump_failed, Toast.LENGTH_LONG).show();
+                } else {
+                    return;
                 }
+                mProgressDialog.cancel();
+                mProgressDialog.setCancelable(true);
+
                 break;
             case SlogAction.MESSAGE_DUMP_OUTTIME:
-                mProgressDialog.cancel();
-                mProgressDialog.setCancelable(true);
                 if (mContext != null) {
                     Toast.makeText(mContext, R.string.slog_dump_failed, Toast.LENGTH_LONG).show();
+                } else {
+                    return;
                 }
+                mProgressDialog.cancel();
+                mProgressDialog.setCancelable(true);
+
                 break;
             case SlogAction.MESSAGE_CLEAR_START:
                 mProgressDialog.setCancelable(false);
