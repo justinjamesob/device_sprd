@@ -847,9 +847,6 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
 
                 /*phase1*/
                 gsp_cfg_info_phase1.layer_des_info.img_format = phase1_des_format;
-                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y = (context->overlay_phy_addr + context->overlay_buf_size*OVERLAY_BUF_NUM);
-                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_v =
-                    gsp_cfg_info_phase1.layer_des_info.src_addr.addr_uv = gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y + context->fb_width*context->fb_height;
 
                 gsp_cfg_info_phase1.layer0_info.des_rect.st_x = 0;
                 gsp_cfg_info_phase1.layer0_info.des_rect.st_y = 0;
@@ -870,6 +867,9 @@ static int set_GSP_layers(struct hwc_context_t *context, hwc_layer_t * l0,hwc_la
                         gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = ((gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe);
                     }
                 }
+                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y = (context->overlay_phy_addr + context->overlay_buf_size*OVERLAY_BUF_NUM);
+                gsp_cfg_info_phase1.layer_des_info.src_addr.addr_v =
+                    gsp_cfg_info_phase1.layer_des_info.src_addr.addr_uv = gsp_cfg_info_phase1.layer_des_info.src_addr.addr_y + gsp_cfg_info_phase1.layer0_info.des_rect.rect_w*gsp_cfg_info_phase1.layer0_info.des_rect.rect_h;
                 gsp_cfg_info_phase1.layer_des_info.pitch = gsp_cfg_info_phase1.layer0_info.des_rect.rect_w;
                 gsp_cfg_info_phase1.layer0_info.rot_angle = GSP_ROT_ANGLE_0;
                 gsp_cfg_info_phase1.layer1_info.layer_en = 0;//disable Layer1
@@ -1697,11 +1697,16 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
             dev->overlay_buf_size = round_up_to_page_size(dev->fb_width*dev->fb_height*3/2);//YUV420
 #endif
 #endif
+
+            uint32_t alloc_size = 0;
 #ifdef GSP_SCALING_UP_TWICE
-            dev->ion_heap = new MemoryHeapIon(SPRD_ION_DEV, dev->overlay_buf_size*(OVERLAY_BUF_NUM+1/2), MemoryHeapBase::NO_CACHING, (1 << ION_HEAP_CARVEOUT_ID1));
+            alloc_size = dev->overlay_buf_size*(OVERLAY_BUF_NUM+1);
 #else
-            dev->ion_heap = new MemoryHeapIon(SPRD_ION_DEV, dev->overlay_buf_size*OVERLAY_BUF_NUM, MemoryHeapBase::NO_CACHING, (1 << ION_HEAP_CARVEOUT_ID1));
+            alloc_size = dev->overlay_buf_size*OVERLAY_BUF_NUM;
 #endif
+            ALOGI("alloc overlay buffer size:%d",alloc_size);
+
+            dev->ion_heap = new MemoryHeapIon(SPRD_ION_DEV, alloc_size, MemoryHeapBase::NO_CACHING, (1 << ION_HEAP_CARVEOUT_ID1));
             int fd = dev->ion_heap->getHeapID();
             if (fd >= 0) {
                 int ret,phy_addr, buffer_size;
@@ -1733,6 +1738,12 @@ static int hwc_device_open(const struct hw_module_t* module, const char* name,
                 dev->overlay_v_addr2 = dev->ion_heap2->base();
                 dev->overlay_index2 = 0;
                 ALOGI("osd overlay_phy_addr = %x",dev->overlay_phy_addr2);
+                if((dev->overlay_phy_addr + alloc_size) > dev->overlay_phy_addr2){
+					ALOGE("osd_overlay_buffer alloc err !! (overlay_phy_addr 0x%08x + overlay_buffer_size 0x%08x) > osd_overlay_phy_addr %x",
+						dev->overlay_phy_addr,
+						alloc_size,
+						dev->overlay_phy_addr2);
+                }
             } else {
                 status = -EINVAL;
                 ALOGE("osd alloc overlay buffer failed");
