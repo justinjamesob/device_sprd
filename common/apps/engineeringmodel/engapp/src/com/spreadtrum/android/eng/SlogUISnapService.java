@@ -39,15 +39,15 @@ public class SlogUISnapService extends Service {
                 0);
 
         setNotification();
-        //registerReceiver(mLocalChangeReceiver,
-        //        new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
+        registerReceiver(mLocalChangeReceiver,
+                new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
     }
-    /*private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mLocalChangeReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Log.d("SlogUISnapService", "language is change....");
             setNotification();
         }
-    };*/
+    };
     private void setNotification() {
         // The PendingIntent to launch our activity if the user selects this
         // notification
@@ -116,6 +116,7 @@ public class SlogUISnapService extends Service {
             }
             return;
         }
+        unregisterReceiver(mLocalChangeReceiver);
         super.onDestroy();
     }
 
