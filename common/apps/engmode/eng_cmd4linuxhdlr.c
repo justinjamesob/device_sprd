@@ -153,7 +153,7 @@ static int eng_get_device_from_path(const char *path, char *device_name)
     char line[1024];
 
     if (!(fp = fopen("/proc/mounts", "r"))) {
-        SLOGE("Error opening /proc/mounts (%s)", strerror(errno));
+        ENG_LOG("Error opening /proc/mounts (%s)", strerror(errno));
         return 0;
     }
 
@@ -186,7 +186,6 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
 
     ENG_LOG("Call %s\n",__FUNCTION__);
 
-#ifdef CONFIG_EMMC
     /*format internal sd card. code from vold*/
     memset(device_name,0,256);
     if (eng_get_device_from_path(externalStorage,device_name)){
@@ -196,9 +195,8 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
         sprintf(format_cmd,"%s -F 32 -O android %s",MKDOSFS_PATH,convert_name);
         system(format_cmd);
     } else {
-        LOGE("do not format /mnt/internal");
+        ENG_LOG("do not format /mnt/internal");
     }
-#endif
     //delete files in ENG_RECOVERYDIR
     system("rm -r /cache/recovery");
 
