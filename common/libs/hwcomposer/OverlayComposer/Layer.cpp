@@ -375,10 +375,29 @@ void Layer::computeTransformMatrix()
 
 bool Layer::prepareDrawData()
 {
+    sp<GraphicBuffer>& buf(mGFXBuffer);
+
     GLfloat left = GLfloat(mRect->left) / GLfloat(mRect->right - mRect->left);
     GLfloat top = GLfloat(mRect->top) / GLfloat(mRect->bottom - mRect->top);
     GLfloat right = GLfloat(mRect->right) / GLfloat(mRect->right - mRect->left);
     GLfloat bottom = GLfloat(mRect->bottom) / GLfloat(mRect->bottom - mRect->top);
+
+    /*
+     *  The video layer height maybe loss some accuracy
+     *  when GPU transform float number into int number.
+     *  Here, just Compensate for the loss.
+     * */
+    int format = buf->getPixelFormat();
+    if (format == HAL_PIXEL_FORMAT_YCbCr_420_SP ||
+        format == HAL_PIXEL_FORMAT_YCrCb_420_SP ||
+        format == HAL_PIXEL_FORMAT_YV12)
+    {
+        float height = float(mRect->bottom - mRect->top);
+        float pixelOffset = 1.0 / height;
+
+        top -= pixelOffset;
+        bottom += pixelOffset;
+    }
 
     texCoord[0].u = texCoord[1].u = left;
     texCoord[0].v = texCoord[3].v = top;
