@@ -117,6 +117,7 @@ public class SlogService extends Service {
             }
             return;
         }
+        unregisterReceiver(mLocalChangeReceiver);
         super.onDestroy();
     }
 
