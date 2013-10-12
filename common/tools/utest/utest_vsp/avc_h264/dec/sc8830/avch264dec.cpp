@@ -425,7 +425,7 @@ int main(int argc, char **argv)
     unsigned int maskcode = 0;
     int i;
 
-    AVCHandle *mHandle;
+    AVCHandle *mHandle = NULL;
 
 
     // bitstream buffer, read from bs file
