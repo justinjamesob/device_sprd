@@ -171,6 +171,7 @@ extern void *snapshot_log_handler(void *arg);
 extern void *notify_log_handler(void *arg);
 extern void *bt_log_handler(void *arg);
 extern void *tcp_log_handler(void *arg);
+extern void *uboot_log_handler(void *arg);
 extern void *modem_log_handler(void *arg);
 extern void *modem_dump_memory_handler(void *arg);
 extern int stream_log_handler_started;

@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <pthread.h>
 #include <time.h>
 #include <sys/inotify.h>
@@ -1403,3 +1404,87 @@ void *tcp_log_handler(void *arg)
 
 	return NULL;
 }
+
+void *uboot_log_handler(void *arg)
+{
+	int fd = -1;
+	FILE *fout = NULL;
+	void *va = NULL;
+	char buffer[MAX_LINE_LEN];
+	char *s1, *s2;
+	unsigned long pa_start = 0;
+	unsigned long data_sz = 0;
+	int ret;
+
+        /* misc_log on/off state will control all snapshot log */
+        if(misc_log->state != SLOG_STATE_ON)
+                return NULL;
+
+	debug_log("Start dump uboot log..");
+
+	/* Check cmdline to find the location of uboot log */
+	if ((fd = open("/proc/cmdline", O_RDONLY)) == -1) {
+		err_log("open proc file cmdline error!");
+		return NULL;
+	}
+
+	ret = read(fd, buffer, sizeof(buffer));
+	if (ret < 0) {
+		err_log("read cmdline error");
+		return NULL;
+	}
+
+	/* parse address and size, format: boot_ram_log=0x..., 0x...*/
+	if ((s1 = strstr(buffer, "boot_ram_log=")) != NULL) {
+		s2= strsep(&s1, "="); /*0x=...*/
+		if ((s2 = strsep(&s1, ",")) != NULL) {
+			pa_start = strtoll(s2, NULL, 16);
+			if ((s2 = strsep(&s1, " ")) != NULL)
+				data_sz = strtoll(s2, NULL, 16);
+		}
+	}
+	else {
+		err_log("can not get boot_ram_log flag in cmdline");
+		return NULL;
+	}
+
+	close(fd);
+
+	debug_log("boot_ram_log base=%#010x, size=%#x", (unsigned int)pa_start, (unsigned int)data_sz);
+
+	/* map memory region from physcial address */
+        if ((fd = open("/dev/mem", O_RDWR | O_SYNC)) == -1) {
+                err_log("could not open /dev/mem/");
+                return NULL;
+        }
+
+        va = (char*)mmap(0, data_sz, PROT_READ | PROT_WRITE,
+                        MAP_SHARED, fd, pa_start);
+        if (va == MAP_FAILED) {
+                err_log("can not map region!");
+		return NULL;
+        }
+
+	sprintf(buffer, "%s/%s/misc/uboot.log",
+			current_log_path,
+			top_logdir);
+
+	if ((fout = fopen(buffer, "w")) == NULL) {
+		err_log("create log file error!");
+		return NULL;
+	}
+
+	ret = fwrite(va, 1, data_sz, fout);
+	debug_log("%#x bytes were written to file.", ret);
+
+	if (munmap(va, data_sz) == MAP_FAILED) {
+		err_log("munmap failed!");
+	}
+
+	close(fd);
+
+	fclose(fout);
+
+	return NULL;
+}
+

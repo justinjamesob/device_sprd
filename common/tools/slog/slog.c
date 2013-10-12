@@ -56,7 +56,7 @@ char external_path[MAX_NAME_LEN];
 struct slog_info *stream_log_head, *snapshot_log_head;
 struct slog_info *notify_log_head, *misc_log;
 
-pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, command_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid;
+pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, command_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid, uboot_log_tid;
 
 static void handler_exec_cmd(struct slog_info *info, char *filepath)
 {
@@ -422,6 +422,9 @@ static int start_sub_threads()
 		pthread_create(&bt_tid, NULL, bt_log_handler, NULL);
 	if(!tcp_log_handler_started)
 		pthread_create(&tcp_tid, NULL, tcp_log_handler, NULL);
+
+	pthread_create(&uboot_log_tid, NULL, uboot_log_handler, NULL);
+
 	return 0;
 }
 
