@@ -11,6 +11,7 @@
 #include "calibration.h"
 
 #define CONFIG_AP_ADC_CALIBRATION
+#define ADC_CALIBR_FGU_ON
 #ifdef CONFIG_AP_ADC_CALIBRATION
 
 #define PRECISION_1MV       (1<<24)
@@ -53,11 +54,17 @@ void	initialize_ctrl_file(void)
         return;
     }
     if(cali_info.magic!=CALI_MAGIC){
-        memset(&cali_info,0xff,sizeof(cali_info));
-        cali_info.magic = CALI_MAGIC;
-        lseek(fd,SEEK_SET,0);
-        write(fd,&cali_info,sizeof(cali_info));
+	memset(&cali_info,0xff,sizeof(cali_info));
+	cali_info.magic = CALI_MAGIC;
     }
+
+#ifdef ADC_CALIBR_FGU_ON
+    cali_info.adc_para.reserved[6] = 2;
+#else
+    cali_info.adc_para.reserved[6] = 0;
+#endif
+    lseek(fd,SEEK_SET,0);
+    write(fd,&cali_info,sizeof(cali_info));
     close(fd);
 }
 
@@ -113,7 +120,6 @@ void adc_get_result(char* chan)
 	read(fd, chan , 8);
 	close(fd);
 }
-
 static int AccessADCDataFile(unsigned char flag, char *lpBuff, int size)
 {
     int fd = -1;
@@ -188,77 +194,77 @@ static int get_battery_adc_value(void)
         }
 	return value;
 }
-static int get_fgu_current_adc(void)
+static int get_fgu_current_adc(int *value)
 {
     int fd = -1;
     int read_len = 0;
     char buffer[16]={0};
     char *endptr;
-    int  value = 0;
 
     fd = open(FGU_CURRENT_ADC_FILE_PATH,O_RDONLY);
 
         if(fd >= 0){
                 read_len = read(fd,buffer,sizeof(buffer));
                 if(read_len > 0)
-                        value = strtol(buffer,&endptr,0);
+                        *value = strtol(buffer,&endptr,0);
                 close(fd);
-		    ALOGE("%s %s value = %d\n",__func__,FGU_VOL_ADC_FILE_PATH, value);
+		    ALOGE("%s %s value = %d\n",__func__,FGU_VOL_ADC_FILE_PATH, *value);
         }
 	else{
 		ALOGE("%s open %s failed\n",__func__,FGU_CURRENT_ADC_FILE_PATH);
 	}
-	return value;
+	return read_len;
 }
-static int get_fgu_vol_adc(void)
+static int get_fgu_vol_adc(int *value)
 {
     int fd = -1;
     int read_len = 0;
     char buffer[16]={0};
     char *endptr;
-    int  value = 0;
 
     fd = open(FGU_VOL_ADC_FILE_PATH,O_RDONLY);
 
         if(fd >= 0){
                 read_len = read(fd,buffer,sizeof(buffer));
                 if(read_len > 0)
-                        value = strtol(buffer,&endptr,0);
+                        *value = strtol(buffer,&endptr,0);
                 close(fd);
-		   ALOGE("%s %s value = %d, read_len = %d \n",__func__,FGU_VOL_ADC_FILE_PATH, value, read_len);
+		   ALOGE("%s %s value = %d, read_len = %d \n",__func__,FGU_VOL_ADC_FILE_PATH, *value, read_len);
         }
 	 else{
 		ALOGE("%s open %s failed\n",__func__,FGU_VOL_ADC_FILE_PATH);
 	}
-	return value;
+	return read_len;
 }
 
-static unsigned int ap_get_fgu_current_adc(MSG_AP_ADC_CNF *pMsgADC)
+static void ap_get_fgu_current_adc(MSG_AP_ADC_CNF *pMsgADC)
 {
     int	current_adc = 0;
-    current_adc = get_fgu_current_adc();
-    pMsgADC->ap_adc_req.parameters[0] = current_adc;
-    if(current_adc>0){
+    int      read_len = 0;
+
+    read_len = get_fgu_current_adc(&current_adc);
+    if(read_len>0){
+		pMsgADC->ap_adc_req.parameters[0] = current_adc;
 		pMsgADC->diag_ap_cnf.status = 0;
 	}
 	else{
 		pMsgADC->diag_ap_cnf.status = 1;
 	}
-    return current_adc;
 }
 
-static unsigned int ap_get_fgu_vol_adc(MSG_AP_ADC_CNF *pMsgADC)
+static void ap_get_fgu_vol_adc(MSG_AP_ADC_CNF *pMsgADC)
 {
     int	vol_adc = 0;
-    vol_adc = get_fgu_vol_adc();
-    pMsgADC->ap_adc_req.parameters[0] = vol_adc;
-    if(vol_adc>0){
+    int      read_len = 0;
+    read_len = get_fgu_vol_adc(&vol_adc);
+
+    if(read_len>0){
+		pMsgADC->ap_adc_req.parameters[0] = vol_adc;
 		pMsgADC->diag_ap_cnf.status = 0;
 	}
 	else{
 		pMsgADC->diag_ap_cnf.status = 1;
 	}
-    return vol_adc;
 }
 
 /*copy from packet.c and modify*/
