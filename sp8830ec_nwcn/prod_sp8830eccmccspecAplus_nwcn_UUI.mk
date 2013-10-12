@@ -117,6 +117,11 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
+PRODUCT_CONFIG_SUPPORT_FM := false
+PRODUCT_CONFIG_SUPPORT_WIFI := false
+PRODUCT_CONFIG_SUPPORT_BT := false
+PRODUCT_CONFIG_SUPPORT_GPS := false
+
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
 $(call inherit-product, $(BOARDDIR)/proprietories.mk)
