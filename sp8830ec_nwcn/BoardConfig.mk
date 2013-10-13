@@ -50,7 +50,7 @@ RECOVERY_PROVIDES_INIT_RC := true
 #select 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
 #zsl capture
-TARGET_BOARD_CAMERA_CAPTURE_MODE := true
+TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 #back camera rotation capture
 TARGET_BOARD_BACK_CAMERA_ROTATION := false
 #front camera rotation capture
