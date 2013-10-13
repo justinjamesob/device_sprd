@@ -115,6 +115,7 @@ void *eng_vlog_thread(void *x)
 
     ENG_LOG("eng_vlog put log data from SIPC to serial\n");
     while(1) {
+        int split_flag = 0;
         memset(log_data, 0, sizeof(log_data));
         r_cnt = read(sipc_fd, log_data, DATA_BUF_SIZE);
         if (r_cnt <= 0) {
@@ -127,8 +128,13 @@ void *eng_vlog_thread(void *x)
 
         offset = 0; //reset the offset
 
+        if((r_cnt%64==0) && param->califlag && (param->connect_type==CONNECT_USB))
+            split_flag = 1;
         do {
-            w_cnt = write(ser_fd, log_data + offset, r_cnt);
+            if(split_flag)
+                w_cnt = write(ser_fd, log_data + offset, r_cnt-32);
+            else
+                w_cnt = write(ser_fd, log_data + offset, r_cnt);
 	    if (w_cnt < 0) {
                 if(errno == EBUSY)
                     usleep(59000);
@@ -151,6 +157,7 @@ void *eng_vlog_thread(void *x)
             } else {
                 r_cnt -= w_cnt;
                 offset += w_cnt;
+                split_flag = 0;
                 //ENG_LOG("eng_vlog: r_cnt: %d, w_cnt: %d, offset: %d\n", r_cnt, w_cnt, offset);
             }
         } while(r_cnt > 0);
