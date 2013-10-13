@@ -294,18 +294,20 @@ static int verify_video_layer(struct hwc_context_t *context, hwc_layer_t * l)
     const native_handle_t *pNativeHandle = l->handle;
     struct private_handle_t *private_h = (struct private_handle_t *)pNativeHandle;
 
-    //if (!((private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY) && !(private_h->flags & private_handle_t::PRIV_FLAGS_NOT_OVERLAY)))
-    if (!(private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
-            ||(private_h->flags & private_handle_t::PRIV_FLAGS_NOT_OVERLAY)) {
-        ALOGI_IF(debugenable,"verify_video L%d,flags:0x%08x ,ret 0 \n",__LINE__,private_h->flags);
-        return 0;
-    }
-
     //video layer
     if (private_h->format != HAL_PIXEL_FORMAT_YCbCr_420_SP &&
             private_h->format != HAL_PIXEL_FORMAT_YCrCb_420_SP &&
             private_h->format != HAL_PIXEL_FORMAT_YV12) {
         ALOGI_IF(debugenable,"verify_video L%d,color format:0x%08x,ret 0",__LINE__,private_h->format);
+        return 0;
+    }
+
+    context->YUVLayerCount++;
+
+    //if (!((private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY) && !(private_h->flags & private_handle_t::PRIV_FLAGS_NOT_OVERLAY)))
+    if (!(private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
+            ||(private_h->flags & private_handle_t::PRIV_FLAGS_NOT_OVERLAY)) {
+        ALOGI_IF(debugenable,"verify_video L%d,flags:0x%08x ,ret 0 \n",__LINE__,private_h->flags);
         return 0;
     }
 
@@ -1072,6 +1074,7 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
     hwc_layer_t * overlay_osd = NULL;
     char value[PROPERTY_VALUE_MAX];
     bool SkipLayerFlag = false;
+    ctx->YUVLayerCount = 0;
 
     if(!list)
         return 0;
@@ -1200,6 +1203,14 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
             for (size_t j=0; j < list->numHwLayers; j++)
             {
                 hwc_layer_t *l = &(list->hwLayers[j]);
+
+                /*
+                 *  At present, OverlayComposer cannot handle 2 or more than 2 YUV layers.
+                 * */
+                if (ctx->YUVLayerCount > 1)
+                {
+                    SkipLayerFlag = true;
+                }
 
                 /*
                  *  OverlayComposer cannot handle the lrregular layer display frame,

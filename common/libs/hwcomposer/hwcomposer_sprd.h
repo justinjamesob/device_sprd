@@ -38,6 +38,7 @@ struct hwc_context_t {
     //the following are for osd overlay layer
     int osd_overlay_flag;
     int osd_overlay_phy_addr;
+    int YUVLayerCount;
     //the following are for video overlay layer
     int video_overlay_flag;
     sp<MemoryHeapIon> ion_heap;
