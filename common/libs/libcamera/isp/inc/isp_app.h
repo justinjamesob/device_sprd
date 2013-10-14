@@ -248,7 +248,7 @@ enum isp_ctrl_cmd{
 enum isp_capbility_cmd{
 	ISP_VIDEO_SIZE,
 	ISP_CAPTURE_SIZE,
-	ISP_FALSH_EB,
+	ISP_FLASH_EB,
 	ISP_CAPBILITY_MAX
 };
 
@@ -379,7 +379,7 @@ struct ipn_in_param{
 
 int isp_init(struct isp_init_param* ptr);
 int isp_deinit(void);
-int isp_capbility(enum isp_capbility_cmd cmd, void* param_ptr);
+int isp_capability(enum isp_capbility_cmd cmd, void* param_ptr);
 int isp_ioctl(enum isp_ctrl_cmd cmd, void* param_ptr);
 int isp_video_start(struct isp_video_start* param_ptr);
 int isp_video_stop(void);

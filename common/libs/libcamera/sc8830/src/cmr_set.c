@@ -169,7 +169,7 @@ uint32_t camera_flash_mode_to_status(enum cmr_flash_mode f_mode)
 		break;
 	case CAMERA_FLASH_MODE_AUTO:
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-			ret = isp_capbility(ISP_FALSH_EB, (void *)&autoflash);
+			ret = isp_capability(ISP_FLASH_EB, (void *)&autoflash);
 			CMR_LOGV("isp auto flash value is %d", autoflash);
 		} else {
 			ret = Sensor_Ioctl(SENSOR_IOCTL_FLASH, (uint32_t)&autoflash);

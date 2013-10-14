@@ -341,7 +341,7 @@ int camera_isp_init(void)
 			ret = -CAMERA_NOT_SUPPORTED;
 			goto exit;
 		}
-		ret = isp_capbility(ISP_VIDEO_SIZE, &isp_limit);
+		ret = isp_capability(ISP_VIDEO_SIZE, &isp_limit);
 		if (ret) {
 			CMR_LOGE("Failed to get the limitation of ISP %d", ret);
 			ret = -CAMERA_NOT_SUPPORTED;
