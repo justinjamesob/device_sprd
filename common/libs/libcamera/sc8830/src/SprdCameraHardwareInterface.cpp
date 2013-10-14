@@ -2283,6 +2283,7 @@ bool SprdCameraHardware::getLcdSize(uint32_t *width, uint32_t *height)
     *width  = info.yres;
     *height = info.xres;
 
+	close(fd);
 	return true;
 }
 
