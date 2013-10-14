@@ -1,18 +1,18 @@
 MALI := libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so libboost.so ump.ko mali.ko
 INVENSENSE := libmllite.so libmplmpu.so libinvensense_hal
-
+ifeq ($(PRODUCT_CONFIG_SUPPORT_FM),true)
 SPRD_FM_APP := FMPlayer
 
 BRCM_FM := \
     fm.$(TARGET_PLATFORM) \
     FmDaemon \
     FmTest
+endif
 
 PRODUCT_PROPERTY_OVERRIDES :=
 
 PRODUCT_PACKAGES := \
 	DeskClock \
-	Bluetooth \
 	Calculator \
 	Calendar \
 	CertInstaller \
@@ -28,19 +28,27 @@ PRODUCT_PACKAGES := \
 	QuickSearchBox \
 	SystemUI \
 	CalendarProvider \
-	bluetooth-health \
-	hciconfig \
-	hcitool \
-	hcidump \
-	bttest\
-	hostapd \
-	wpa_supplicant.conf \
 	calibration_init \
 	nvm_daemon \
 	modemd\
-	engpc\
-	audio.a2dp.default
+	engpc
 
+ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
+PRODUCT_PACKAGES += \
+       Bluetooth \
+       bluetooth-health \
+       hciconfig \
+       hcitool \
+       hcidump \
+       audio.a2dp.default \
+       bttest
+endif
+
+ifeq ($(PRODUCT_CONFIG_SUPPORT_WIFI),true)
+PRODUCT_PACKAGES += \
+	hostapd \
+	wpa_supplicant.conf
+endif
 # own copyright packages files
 PRODUCT_PACKAGES += \
     FileExplorer \
@@ -94,11 +102,11 @@ ifeq ($(TARGET_PLATFORM),sc8830)
 PRODUCT_PACKAGES += \
 	sprd_gsp.$(TARGET_PLATFORM)
 endif
-
+ifeq ($(PRODUCT_CONFIG_SUPPORT_FM),true)
 PRODUCT_PACKAGES += \
             $(BRCM_FM) \
             $(SPRD_FM_APP)
-
+endif
 
 PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/init.rc:root/init.rc \
@@ -128,10 +136,8 @@ PRODUCT_COPY_FILES := \
 	device/sprd/sp8830ec/media_codecs.xml:system/etc/media_codecs.xml \
 	device/sprd/sp8830ec/media_profiles.xml:system/etc/media_profiles.xml \
 	frameworks/native/data/etc/handheld_core_hardware_8830ec.xml:system/etc/permissions/handheld_core_hardware.xml \
-	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
 	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
 	frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
-	frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
         frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
         frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
         frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
@@ -139,13 +145,26 @@ PRODUCT_COPY_FILES := \
     frameworks/native/data/etc/android.hardware.touchscreen.xml:system/etc/permissions/android.hardware.touchscreen.xml \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
-	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
 	frameworks/native/data/etc/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
-	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
-	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
-	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so \
 	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
+
+ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
+PRODUCT_COPY_FILES += \
+       frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml
+endif
+
+ifeq ($(PRODUCT_CONFIG_SUPPORT_GPS),true)
+PRODUCT_COPY_FILES += \
+       frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xm
+       device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
+       device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
+       device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
+endif
+ifeq ($(PRODUCT_CONFIG_SUPPORT_WIFI),true)
+PRODUCT_COPY_FILES += \
+       frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
+endif
 
 $(call inherit-product, device/sprd/partner/ittiam/wlan/device-itm.mk)
 $(call inherit-product, device/sprd/partner/shark/bluetooth/device-shark-bt.mk)
