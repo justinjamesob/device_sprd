@@ -8636,7 +8636,8 @@
         type="default,supl"
         authtype="1"
     />
-    <apn carrier="Idea Internet"
+    <!--Bug#224205 -->
+    <apn carrier="MTNL Internet"
         mcc="404"
         mnc="04"
         apn="internet"
@@ -8899,7 +8900,8 @@
         type="default"
         authtype="1"
     />
-    <apn carrier="Idea GPRS"
+    <!--Bug#224205-->
+    <apn carrier="MTNL WAP"
         mcc="404"
         mnc="04"
         apn="imis"
@@ -9163,7 +9165,8 @@
         type="mms"
         authtype="1"
     />
-    <apn carrier="IDEA MMS"
+    <!--Bug#224205 -->
+    <apn carrier="MTNL MMS"
         mcc="404"
         mnc="04"
         apn="mmsc"
@@ -25604,7 +25607,8 @@
         type="mms"
         authtype="1"
     />
-    <apn carrier="Etisalat MMS"
+    <!--Bug#224205 -->
+    <apn carrier="MTNL Internet"
         mcc="404"
         mnc="68"
         apn="mtnl.net"
@@ -25619,7 +25623,8 @@
         type="default,supl"
         authtype="1"
     />
-     <apn carrier="Etisalat MMS"
+    <!--Bug#224205 -->
+     <apn carrier="MTNL WAP"
         mcc="404"
         mnc="68"
         apn="mtnl.net"
@@ -25634,7 +25639,8 @@
         type="default"
         authtype="1"
     />
-    <apn carrier="Etisalat MMS"
+    <!--Bug#224205 -->
+    <apn carrier="MTNL MMS"
         mcc="404"
         mnc="68"
         apn="mtnl.net"
