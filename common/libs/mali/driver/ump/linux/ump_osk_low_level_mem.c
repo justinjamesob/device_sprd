@@ -148,7 +148,9 @@ _mali_osk_errcode_t _ump_osk_mem_mapregion_init( ump_memory_allocation * descrip
 
 	vma->vm_private_data = vma_usage_tracker;
 	vma->vm_flags |= VM_IO;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0))
 	vma->vm_flags |= VM_RESERVED;
+#endif
 
 	if (0==descriptor->is_cached)
 	{
