@@ -277,7 +277,9 @@ int main (int argc, char** argv)
     g_run_mode = run_type;
 
     // Create the sqlite database for factory mode.
-    eng_sqlite_create();
+    if(ENG_RUN_TYPE_BTWIFI != run_type){
+        eng_sqlite_create();
+    }
 
     // Get the status of calibration mode & device type.
     eng_parse_cmdline(&cmdparam);
@@ -285,7 +287,9 @@ int main (int argc, char** argv)
     if(cmdparam.califlag != 1){
         cmdparam.cp_type = run_type;
         // Check factory mode and switch device mode.
-        eng_check_factorymode();
+        if(ENG_RUN_TYPE_BTWIFI != run_type){
+            eng_check_factorymode();
+        }
     }else{
         // Enable usb enum
         eng_usb_enable();
