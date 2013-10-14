@@ -39,9 +39,6 @@
 
 #include <tinyalsa/asoundlib.h>
 #include <audio_utils/resampler.h>
-#include <audio_utils/echo_reference.h>
-#include <hardware/audio_effect.h>
-#include <audio_effects/effect_aec.h>
 #include "audio_pga.h"
 #include "vb_effect_if.h"
 #include "vb_pga.h"
@@ -73,8 +70,18 @@
 #define VOIP_TRACE
 #endif
 
+/**
+  * container_of - cast a member of a structure out to the containing structure
+  * @ptr:    the pointer to the member.
+  * @type:   the type of the container struct this is embedded in.
+  * @member: the name of the member within the struct.
+  *
+  */
+#define container_of(ptr, type, member) ({      \
+        const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+        (type *)( (char *)__mptr - offsetof(type,member) );})
 
-#define AUDIO_DUMP
+//#define AUDIO_DUMP
 #define AUDIO_DUMP_EX
 
 #define AUDIO_OUT_FILE_PATH  "data/audio_out.pcm"
@@ -287,7 +294,6 @@ struct tiny_audio_device {
     struct tiny_stream_in *active_input;
     struct tiny_stream_out *active_output;
     bool mic_mute;
-    struct echo_reference_itfe *echo_reference;
     bool bluetooth_nrec;
     bool low_power;
 
@@ -332,7 +338,6 @@ struct tiny_stream_out {
     char * buffer_voip;
     char * buffer_bt_sco;
     int standby;
-    struct echo_reference_itfe *echo_reference;
     struct tiny_audio_device *dev;
     unsigned int devices;
     int write_threshold;
@@ -360,9 +365,6 @@ struct tiny_stream_in {
     unsigned int requested_channels;
     int standby;
     int source;
-    struct echo_reference_itfe *echo_reference;
-    bool need_echo_reference;
-    effect_handle_t preprocessors[MAX_PREPROCESSORS];
     int num_preprocessors;
     int16_t *proc_buf;
     size_t proc_buf_size;
@@ -1011,7 +1013,7 @@ static int start_vaudio_output_stream(struct tiny_stream_out *out)
     }
     else {
         ret = create_resampler( DEFAULT_OUT_SAMPLING_RATE,
-                out->config .rate,
+                out->config.rate,
                 out->config.channels,
                 RESAMPLER_QUALITY_DEFAULT,
                 NULL,
@@ -1112,7 +1114,7 @@ static int start_mux_output_stream(struct tiny_stream_out *out)
     }
     else {
         ret = create_resampler( DEFAULT_OUT_SAMPLING_RATE,
-                out->config .rate,
+                out->config.rate,
                 out->config.channels,
                 RESAMPLER_QUALITY_DEFAULT,
                 NULL,
@@ -1170,8 +1172,8 @@ static int start_sco_output_stream(struct tiny_stream_out *out)
     }
     else {
         ret = create_resampler( DEFAULT_OUT_SAMPLING_RATE,
-                pcm_config_scoplayback .rate,
-                out->config .channels,
+                pcm_config_scoplayback.rate,
+                out->config.channels,
                 RESAMPLER_QUALITY_DEFAULT,
                 NULL,
                 &out->resampler_sco);
@@ -1228,8 +1230,8 @@ static int start_bt_sco_output_stream(struct tiny_stream_out *out)
     }
     else {
         ret = create_resampler( DEFAULT_OUT_SAMPLING_RATE,
-                pcm_config_scoplayback .rate,
-                out->config .channels,
+                pcm_config_scoplayback.rate,
+                out->config.channels,
                 RESAMPLER_QUALITY_DEFAULT,
                 NULL,
                 &out->resampler_bt_sco);
@@ -1349,9 +1351,6 @@ static int start_output_stream(struct tiny_stream_out *out)
         BLUE_TRACE("open s_tinycard successfully");
     }
 
-    if (adev->echo_reference != NULL)
-        out->echo_reference = adev->echo_reference;
-
     out->resampler->reset(out->resampler);
 #ifdef AUDIO_DUMP
     out_dump_create(&out->out_dump_fd, AUDIO_OUT_FILE_PATH);
@@ -1400,90 +1399,6 @@ static size_t get_input_buffer_size(uint32_t sample_rate, int format, int channe
     size = ((size + 15) / 16) * 16;
 
     return size * channel_count * sizeof(short);
-}
-
-static void add_echo_reference(struct tiny_stream_out *out,
-        struct echo_reference_itfe *reference)
-{
-    pthread_mutex_lock(&out->lock);
-    out->echo_reference = reference;
-    pthread_mutex_unlock(&out->lock);
-}
-
-static void remove_echo_reference(struct tiny_stream_out *out,
-        struct echo_reference_itfe *reference)
-{
-    pthread_mutex_lock(&out->lock);
-    if (out->echo_reference == reference) {
-        /* stop writing to echo reference */
-        reference->write(reference, NULL);
-        out->echo_reference = NULL;
-    }
-    pthread_mutex_unlock(&out->lock);
-}
-
-static void put_echo_reference(struct tiny_audio_device *adev,
-        struct echo_reference_itfe *reference)
-{
-    if (adev->echo_reference != NULL &&
-            reference == adev->echo_reference) {
-        if (adev->active_output != NULL)
-            remove_echo_reference(adev->active_output, reference);
-        release_echo_reference(reference);
-        adev->echo_reference = NULL;
-    }
-}
-
-static struct echo_reference_itfe *get_echo_reference(struct tiny_audio_device *adev,
-        audio_format_t format,
-        uint32_t channel_count,
-        uint32_t sampling_rate)
-{
-    put_echo_reference(adev, adev->echo_reference);
-    if (adev->active_output != NULL) {
-        struct audio_stream *stream = &adev->active_output->stream.common;
-        uint32_t wr_channel_count = popcount(stream->get_channels(stream));
-        uint32_t wr_sampling_rate = stream->get_sample_rate(stream);
-
-        int status = create_echo_reference(AUDIO_FORMAT_PCM_16_BIT,
-                channel_count,
-                sampling_rate,
-                AUDIO_FORMAT_PCM_16_BIT,
-                wr_channel_count,
-                wr_sampling_rate,
-                &adev->echo_reference);
-        if (status == 0)
-            add_echo_reference(adev->active_output, adev->echo_reference);
-    }
-    return adev->echo_reference;
-}
-
-static int get_playback_delay(struct tiny_stream_out *out,
-        size_t frames,
-        struct echo_reference_buffer *buffer)
-{
-    size_t kernel_frames;
-    int status;
-
-    status = pcm_get_htimestamp(out->pcm, &kernel_frames, &buffer->time_stamp);
-    if (status < 0) {
-        buffer->time_stamp.tv_sec  = 0;
-        buffer->time_stamp.tv_nsec = 0;
-        buffer->delay_ns           = 0;
-        ALOGV("get_playback_delay(): pcm_get_htimestamp error,"
-                "setting playbackTimestamp to 0");
-        return status;
-    }
-
-    kernel_frames = pcm_get_buffer_size(out->pcm) - kernel_frames;
-
-    /* adjust render time stamp with delay added by current driver buffer.
-     * Add the duration of current frame as we want the render time of the last
-     * sample being written. */
-    buffer->delay_ns = (long)(((int64_t)(kernel_frames + frames)* 1000000000)/
-            DEFAULT_OUT_SAMPLING_RATE);
-
-    return 0;
 }
 
 static uint32_t out_get_sample_rate(const struct audio_stream *stream)
@@ -1588,11 +1503,6 @@ static int do_output_standby(struct tiny_stream_out *out)
                 release_resampler(out->resampler_vplayback);
                 out->resampler_vplayback = 0;
             }
-        }
-        /* stop writing to echo reference */
-        if (out->echo_reference != NULL) {
-            out->echo_reference->write(out->echo_reference, NULL);
-            out->echo_reference = NULL;
         }
 #ifdef AUDIO_DUMP
         out_dump_release(&out->out_dump_fd);
@@ -2045,14 +1955,6 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
             out_frames = in_frames;
             buf = (void *)buffer;
         }
-        if (out->echo_reference != NULL) {
-            struct echo_reference_buffer b;
-            b.raw = (void *)buffer;
-            b.frame_count = in_frames;
-
-            get_playback_delay(out, out_frames, &b);
-            out->echo_reference->write(out->echo_reference, &b);
-        }
         XRUN_TRACE("in_frames=%d, out_frames=%d", in_frames, out_frames);
         XRUN_TRACE("out->write_threshold=%d, config.avail_min=%d, start_threshold=%d",
                 out->write_threshold,out->config.avail_min, out->config.start_threshold);
@@ -2209,9 +2111,7 @@ static int in_init_resampler(struct tiny_stream_in *in)
         ALOGE("in_init_resampler: alloc fail, size: %d", size);
         ret = -ENOMEM;
         goto err;
-    }
-    else
-    {
+    } else {
         memset(in->buffer, 0, size);
     }
 
@@ -2344,11 +2244,6 @@ static int start_input_stream(struct tiny_stream_in *in)
         }
     }
 
-    if (in->need_echo_reference && in->echo_reference == NULL)
-        in->echo_reference = get_echo_reference(adev,
-                AUDIO_FORMAT_PCM_16_BIT,
-                in->config.channels,
-                in->requested_rate);
     BLUE_TRACE("[TH], start_input,channels=%d,peroid_size=%d, peroid_count=%d,rate=%d",
             in->config.channels, in->config.period_size,
             in->config.period_count, in->config.rate);
@@ -2471,13 +2366,6 @@ static int do_input_standby(struct tiny_stream_in *in)
             select_devices_signal(adev);
         }
 
-        if (in->echo_reference != NULL) {
-            /* stop reading from echo reference */
-            in->echo_reference->read(in->echo_reference, NULL);
-            put_echo_reference(adev, in->echo_reference);
-            in->echo_reference = NULL;
-        }
-
         if(in->resampler){
             in_deinit_resampler( in);
         }
@@ -2568,151 +2456,6 @@ static int in_set_gain(struct audio_stream_in *stream, float gain)
     return 0;
 }
 
-static void get_capture_delay(struct tiny_stream_in *in,
-        size_t frames,
-        struct echo_reference_buffer *buffer)
-{
-
-    /* read frames available in kernel driver buffer */
-    size_t kernel_frames;
-    struct timespec tstamp;
-    long buf_delay;
-    long rsmp_delay;
-    long kernel_delay;
-    long delay_ns;
-
-    if (pcm_get_htimestamp(in->pcm, &kernel_frames, &tstamp) < 0) {
-        buffer->time_stamp.tv_sec  = 0;
-        buffer->time_stamp.tv_nsec = 0;
-        buffer->delay_ns           = 0;
-        ALOGW("read get_capture_delay(): pcm_htimestamp error");
-        return;
-    }
-
-    /* read frames available in audio HAL input buffer
-     * add number of frames being read as we want the capture time of first sample
-     * in current buffer */
-    buf_delay = (long)(((int64_t)(in->frames_in + in->proc_frames_in) * 1000000000)
-            / in->config.rate);
-    /* add delay introduced by resampler */
-    rsmp_delay = 0;
-    if (in->resampler) {
-        rsmp_delay = in->resampler->delay_ns(in->resampler);
-    }
-
-    kernel_delay = (long)(((int64_t)kernel_frames * 1000000000) / in->config.rate);
-
-    delay_ns = kernel_delay + buf_delay + rsmp_delay;
-
-    buffer->time_stamp = tstamp;
-    buffer->delay_ns   = delay_ns;
-    ALOGV("get_capture_delay time_stamp = [%ld].[%ld], delay_ns: [%d],"
-            " kernel_delay:[%ld], buf_delay:[%ld], rsmp_delay:[%ld], kernel_frames:[%d], "
-            "in->frames_in:[%d], in->proc_frames_in:[%d], frames:[%d]",
-            buffer->time_stamp.tv_sec , buffer->time_stamp.tv_nsec, buffer->delay_ns,
-            kernel_delay, buf_delay, rsmp_delay, kernel_frames,
-            in->frames_in, in->proc_frames_in, frames);
-
-}
-
-static int32_t update_echo_reference(struct tiny_stream_in *in, size_t frames)
-{
-    struct echo_reference_buffer b;
-    b.delay_ns = 0;
-
-    ALOGV("update_echo_reference, frames = [%d], in->ref_frames_in = [%d],  "
-            "b.frame_count = [%d]",
-            frames, in->ref_frames_in, frames - in->ref_frames_in);
-    if (in->ref_frames_in < frames) {
-        if (in->ref_buf_size < frames) {
-            in->ref_buf_size = frames;
-            in->ref_buf = (int16_t *)realloc(in->ref_buf,
-                    in->ref_buf_size *
-                    in->config.channels * sizeof(int16_t));
-        }
-
-        b.frame_count = frames - in->ref_frames_in;
-        b.raw = (void *)(in->ref_buf + in->ref_frames_in * in->config.channels);
-
-        get_capture_delay(in, frames, &b);
-
-        if (in->echo_reference->read(in->echo_reference, &b) == 0)
-        {
-            in->ref_frames_in += b.frame_count;
-            ALOGV("update_echo_reference: in->ref_frames_in:[%d], "
-                    "in->ref_buf_size:[%d], frames:[%d], b.frame_count:[%d]",
-                    in->ref_frames_in, in->ref_buf_size, frames, b.frame_count);
-        }
-    } else
-        ALOGW("update_echo_reference: NOT enough frames to read ref buffer");
-    return b.delay_ns;
-}
-
-static int set_preprocessor_param(effect_handle_t handle,
-        effect_param_t *param)
-{
-    uint32_t size = sizeof(int);
-    uint32_t psize = ((param->psize - 1) / sizeof(int) + 1) * sizeof(int) +
-        param->vsize;
-
-    int status = (*handle)->command(handle,
-            EFFECT_CMD_SET_PARAM,
-            sizeof (effect_param_t) + psize,
-            param,
-            &size,
-            &param->status);
-    if (status == 0)
-        status = param->status;
-
-    return status;
-}
-
-static int set_preprocessor_echo_delay(effect_handle_t handle,
-        int32_t delay_us)
-{
-    uint32_t buf[sizeof(effect_param_t) / sizeof(uint32_t) + 2];
-    effect_param_t *param = (effect_param_t *)buf;
-
-    param->psize = sizeof(uint32_t);
-    param->vsize = sizeof(uint32_t);
-    *(uint32_t *)param->data = AEC_PARAM_ECHO_DELAY;
-    *((int32_t *)param->data + 1) = delay_us;
-
-    return set_preprocessor_param(handle, param);
-}
-
-static void push_echo_reference(struct tiny_stream_in *in, size_t frames)
-{
-    /* read frames from echo reference buffer and update echo delay
-     * in->ref_frames_in is updated with frames available in in->ref_buf */
-    int32_t delay_us = update_echo_reference(in, frames)/1000;
-    int i;
-    audio_buffer_t buf;
-
-    if (in->ref_frames_in < frames)
-        frames = in->ref_frames_in;
-
-    buf.frameCount = frames;
-    buf.raw = in->ref_buf;
-
-    for (i = 0; i < in->num_preprocessors; i++) {
-        if ((*in->preprocessors[i])->process_reverse == NULL)
-            continue;
-
-        (*in->preprocessors[i])->process_reverse(in->preprocessors[i],
-                &buf,
-                NULL);
-        set_preprocessor_echo_delay(in->preprocessors[i], delay_us);
-    }
-
-    in->ref_frames_in -= buf.frameCount;
-    if (in->ref_frames_in) {
-        memcpy(in->ref_buf,
-                in->ref_buf + buf.frameCount * in->config.channels,
-                in->ref_frames_in * in->config.channels * sizeof(int16_t));
-    }
-}
-
 static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
         struct resampler_buffer* buffer)
 {
@@ -2722,8 +2465,7 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
     if (buffer_provider == NULL || buffer == NULL)
         return -EINVAL;
 
-    in = (struct tiny_stream_in *)((char *)buffer_provider -
-            offsetof(struct tiny_stream_in, buf_provider));
+    in = container_of(buffer_provider, struct tiny_stream_in, buf_provider);
 
     if (in->pcm == NULL) {
         buffer->raw = NULL;
@@ -2749,7 +2491,6 @@ static int get_next_buffer(struct resampler_buffer_provider *buffer_provider,
         }
 #else
 #if 1
-		BLUE_TRACE("voip:in_read get_next_buffer:before pcm_read");
         in->read_status = pcm_read(in->pcm,
                 (void*)in->buffer,
                 in->config.period_size *
@@ -2801,8 +2542,7 @@ static void release_buffer(struct resampler_buffer_provider *buffer_provider,
     if (buffer_provider == NULL || buffer == NULL)
         return;
 
-    in = (struct tiny_stream_in *)((char *)buffer_provider -
-            offsetof(struct tiny_stream_in, buf_provider));
+    in = container_of(buffer_provider, struct tiny_stream_in, buf_provider);
 
     in->frames_in -= buffer->frame_count;
 }
@@ -2842,74 +2582,6 @@ frame_count : frames_rd,
             return in->read_status;
 
         frames_wr += frames_rd;
-    }
-    return frames_wr;
-}
-
-/* process_frames() reads frames from kernel driver (via read_frames()),
- * calls the active audio pre processings and output the number of frames requested
- * to the buffer specified */
-static ssize_t process_frames(struct tiny_stream_in *in, void* buffer, ssize_t frames)
-{
-    ssize_t frames_wr = 0;
-    audio_buffer_t in_buf;
-    audio_buffer_t out_buf;
-    int i;
-
-    while (frames_wr < frames) {
-        /* first reload enough frames at the end of process input buffer */
-        if (in->proc_frames_in < (size_t)frames) {
-            ssize_t frames_rd;
-
-            if (in->proc_buf_size < (size_t)frames) {
-                in->proc_buf_size = (size_t)frames;
-                in->proc_buf = (int16_t *)realloc(in->proc_buf,
-                        in->proc_buf_size *
-                        in->config.channels * sizeof(int16_t));
-                ALOGV("process_frames(): in->proc_buf %p size extended to %d frames",
-                        in->proc_buf, in->proc_buf_size);
-            }
-            frames_rd = read_frames(in,
-                    in->proc_buf +
-                    in->proc_frames_in * in->config.channels,
-                    frames - in->proc_frames_in);
-            if (frames_rd < 0) {
-                frames_wr = frames_rd;
-                break;
-            }
-            in->proc_frames_in += frames_rd;
-        }
-
-        if (in->echo_reference != NULL)
-            push_echo_reference(in, in->proc_frames_in);
-
-        /* in_buf.frameCount and out_buf.frameCount indicate respectively
-         * the maximum number of frames to be consumed and produced by process() */
-        in_buf.frameCount = in->proc_frames_in;
-        in_buf.s16 = in->proc_buf;
-        out_buf.frameCount = frames - frames_wr;
-        out_buf.s16 = (int16_t *)buffer + frames_wr * in->config.channels;
-
-        for (i = 0; i < in->num_preprocessors; i++)
-            (*in->preprocessors[i])->process(in->preprocessors[i],
-                    &in_buf,
-                    &out_buf);
-
-        /* process() has updated the number of frames consumed and produced in
-         * in_buf.frameCount and out_buf.frameCount respectively
-         * move remaining frames to the beginning of in->proc_buf */
-        in->proc_frames_in -= in_buf.frameCount;
-        if (in->proc_frames_in) {
-            memcpy(in->proc_buf,
-                    in->proc_buf + in_buf.frameCount * in->config.channels,
-                    in->proc_frames_in * in->config.channels * sizeof(int16_t));
-        }
-
-        /* if not enough frames were passed to process(), read more and retry. */
-        if (out_buf.frameCount == 0)
-            continue;
-
-        frames_wr += out_buf.frameCount;
     }
     return frames_wr;
 }
@@ -3027,9 +2699,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
 
     /*BLUE_TRACE("in_read start.num_preprocessors=%d, resampler=%d",
       in->num_preprocessors, in->resampler);*/
-    if (in->num_preprocessors != 0)
-        ret = process_frames(in, buffer, frames_rq);
-    else if (in->resampler != NULL)
+        if (in->resampler != NULL)
         {
             ret = read_frames(in, buffer, frames_rq);/////////////get_next_buffer
         }
@@ -3075,86 +2745,6 @@ exit:
 static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
 {
     return 0;
-}
-
-static int in_add_audio_effect(const struct audio_stream *stream,
-        effect_handle_t effect)
-{
-    struct tiny_stream_in *in = (struct tiny_stream_in *)stream;
-    int status;
-    effect_descriptor_t desc;
-
-    pthread_mutex_lock(&in->dev->lock);
-    pthread_mutex_lock(&in->lock);
-    if (in->num_preprocessors >= MAX_PREPROCESSORS) {
-        status = -ENOSYS;
-        goto exit;
-    }
-
-    status = (*effect)->get_descriptor(effect, &desc);
-    if (status != 0)
-        goto exit;
-
-    in->preprocessors[in->num_preprocessors++] = effect;
-
-    if (memcmp(&desc.type, FX_IID_AEC, sizeof(effect_uuid_t)) == 0) {
-        in->need_echo_reference = true;
-        do_input_standby(in);
-    }
-
-exit:
-
-    pthread_mutex_unlock(&in->lock);
-    pthread_mutex_unlock(&in->dev->lock);
-    return status;
-}
-
-static int in_remove_audio_effect(const struct audio_stream *stream,
-        effect_handle_t effect)
-{
-    struct tiny_stream_in *in = (struct tiny_stream_in *)stream;
-    int i;
-    int status = -EINVAL;
-    bool found = false;
-    effect_descriptor_t desc;
-
-    pthread_mutex_lock(&in->dev->lock);
-    pthread_mutex_lock(&in->lock);
-    if (in->num_preprocessors <= 0) {
-        status = -ENOSYS;
-        goto exit;
-    }
-
-    for (i = 0; i < in->num_preprocessors; i++) {
-        if (found) {
-            in->preprocessors[i - 1] = in->preprocessors[i];
-            continue;
-        }
-        if (in->preprocessors[i] == effect) {
-            in->preprocessors[i] = NULL;
-            status = 0;
-            found = true;
-        }
-    }
-
-    if (status != 0)
-        goto exit;
-
-    in->num_preprocessors--;
-
-    status = (*effect)->get_descriptor(effect, &desc);
-    if (status != 0)
-        goto exit;
-    if (memcmp(&desc.type, FX_IID_AEC, sizeof(effect_uuid_t)) == 0) {
-        in->need_echo_reference = false;
-        do_input_standby(in);
-    }
-
-exit:
-
-    pthread_mutex_unlock(&in->lock);
-    pthread_mutex_unlock(&in->dev->lock);
-    return status;
 }
 
 static int adev_open_output_stream(struct audio_hw_device *dev,
@@ -3514,8 +3104,6 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     in->stream.common.dump = in_dump;
     in->stream.common.set_parameters = in_set_parameters;
     in->stream.common.get_parameters = in_get_parameters;
-    in->stream.common.add_audio_effect = in_add_audio_effect;
-    in->stream.common.remove_audio_effect = in_remove_audio_effect;
     in->stream.set_gain = in_set_gain;
     in->stream.read = in_read;
     in->stream.get_input_frames_lost = in_get_input_frames_lost;
