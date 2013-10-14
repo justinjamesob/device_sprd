@@ -218,8 +218,10 @@ void *detect_modem_blocked(void *par)
 	char prop[5], buf[128], buffer[10];
 	int is_reset, is_assert = 0;
 
-	if(par == NULL)
-		exit(-1);
+	if(par == NULL){
+                MODEMD_LOGE("%s: input parameter is NULL!", __func__);
+		return NULL;
+        }
 
 	modem = *((int *)par);
 	if(modem == TD_MODEM) {
@@ -228,7 +230,7 @@ void *detect_modem_blocked(void *par)
 		strcpy(socket_name, PHSW_SOCKET_NAME);
 	} else {
 		MODEMD_LOGE("%s: input wrong modem type!", __func__);
-		exit(-1);
+		return NULL;
 	}
 
 reconnect:
@@ -301,7 +303,7 @@ reconnect:
 				property_get(W_LOOP_PRO, loop_dev, W_LOOP_DEV);
 			} else {
 				MODEMD_LOGE("%s: invalid modem type, exit", __func__);
-				exit(-1);
+				return NULL;
 			}
 
 			loop_fd = open(loop_dev, O_RDWR | O_NONBLOCK);
@@ -375,21 +377,23 @@ void* detect_sipc_modem(void *param)
 	} else if(modem == WCN_MODEM) {
 		property_get(WCN_ASSERT_PRO, assert_dev, WCN_ASSERT_DEV);
 		snprintf(watchdog_dev, sizeof(watchdog_dev), "%s", WCN_WATCHDOG_DEV);
-	} else
+	} else {
 		MODEMD_LOGE("%s: input wrong modem type!", __func__);
+                return NULL;
+        }
 
 	assert_fd = open(assert_dev, O_RDWR);
 	MODEMD_LOGD("%s: open assert dev: %s, fd = %d", __func__, assert_dev, assert_fd);
 	if (assert_fd < 0) {
 		MODEMD_LOGE("open %s failed, error: %s", assert_dev, strerror(errno));
-		exit(-1);
+		return NULL;
 	}
 
 	watchdog_fd = open(watchdog_dev, O_RDONLY);
 	MODEMD_LOGD("%s: open watchdog dev: %s, fd = %d", __func__, watchdog_dev, watchdog_fd);
 	if (watchdog_fd < 0) {
 		MODEMD_LOGE("open %s failed, error: %s", watchdog_dev, strerror(errno));
-		exit(-1);
+		return NULL;
 	}
 
 	max_fd = watchdog_fd > assert_fd ? watchdog_fd : assert_fd;
