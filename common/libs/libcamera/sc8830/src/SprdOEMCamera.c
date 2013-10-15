@@ -2622,6 +2622,7 @@ int camera_stop_preview_internal(void)
 			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 			if (ret) {
 				CMR_LOGE("Failed to stop IF , %d", ret);
+				pthread_mutex_unlock(&g_cxt->prev_mutex);
 				return -CAMERA_FAILED;
 			}
 			CMR_LOGE("get sensor mode fail.");
@@ -2637,6 +2638,7 @@ int camera_stop_preview_internal(void)
 		ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
 		if (ret) {
 			CMR_LOGE("Failed to stop IF , %d", ret);
+			pthread_mutex_unlock(&g_cxt->prev_mutex);
 			return -CAMERA_FAILED;
 		}
 	}
