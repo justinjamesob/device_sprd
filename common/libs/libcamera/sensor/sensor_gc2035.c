@@ -935,18 +935,22 @@ static uint32_t GC2035_PowerOn(uint32_t power_on)
 	BOOLEAN reset_level = g_GC2035_yuv_info.reset_pulse_level;
 
 	if (SENSOR_TRUE == power_on) {
-		Sensor_PowerDown(power_down);
-		Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
+		Sensor_PowerDown(!power_down);
 		usleep(10*1000);
 		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
 		usleep(10*1000);
-		Sensor_PowerDown(!power_down);
+		Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
+		usleep(10*1000);
 		Sensor_Reset(reset_level);
 	} else {
 		Sensor_PowerDown(power_down);
-		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
+		usleep(5*1000);
+		Sensor_SetResetLevel(reset_level);
+		usleep(5*1000);
 		Sensor_SetVoltage(SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED,
 				SENSOR_AVDD_CLOSED);
+		usleep(5*1000);
+		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
 	}
 	SENSOR_PRINT("(1:on, 0:off): %d", power_on);
 	return (uint32_t)SENSOR_SUCCESS;

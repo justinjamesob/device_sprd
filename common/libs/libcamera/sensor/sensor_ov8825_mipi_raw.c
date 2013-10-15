@@ -2551,22 +2551,49 @@ LOCAL uint32_t _ov8825_PowerOn(uint32_t power_on)
 	//uint32_t reset_width=g_ov8825_yuv_info.reset_pulse_width;
 
 	if (SENSOR_TRUE == power_on) {
-		Sensor_PowerDown(power_down);
-		// Open power
-		Sensor_SetMonitorVoltage(SENSOR_AVDD_2800MV);
-		Sensor_SetVoltage(dvdd_val, avdd_val, iovdd_val);
-		usleep(20*1000);
-		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
-		usleep(10*1000);
-		Sensor_PowerDown(!power_down);
-		usleep(10*1000);
-		// Reset sensor
-		Sensor_Reset(reset_level);
-		usleep(20*1000);
-	} else {
-		Sensor_PowerDown(power_down);
+		//set all power pin to disable status
 		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
+		Sensor_SetMonitorVoltage(SENSOR_AVDD_CLOSED);
 		Sensor_SetVoltage(SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED, SENSOR_AVDD_CLOSED);
+		Sensor_SetResetLevel(reset_level);
+		Sensor_PowerDown(power_down);
+		usleep(20*1000);
+		//step 0 power up DOVDD, the AVDD
+		Sensor_SetMonitorVoltage(SENSOR_AVDD_3300MV);
+		Sensor_SetIovddVoltage(iovdd_val);
+		usleep(2000);
+		Sensor_SetAvddVoltage(avdd_val);
+		usleep(6000);
+		//step 1 power up DVDD
+		Sensor_SetDvddVoltage(dvdd_val);
+		usleep(6000);
+		//step 2 power down pin high
+		Sensor_PowerDown(!power_down);
+		usleep(2000);
+		//step 3 reset pin high
+		Sensor_SetResetLevel(!reset_level);
+		usleep(22*1000);
+		//step 4 xvclk
+		Sensor_SetMCLK(SENSOR_DEFALUT_MCLK);
+		usleep(4*1000);
+	} else {
+		//power off should start > 1ms after last SCCB
+		usleep(4*1000);
+		//step 1 reset and PWDN
+		Sensor_SetResetLevel(reset_level);
+		usleep(2000);
+		Sensor_PowerDown(power_down);
+		usleep(2000);
+		//step 2 dvdd
+		Sensor_SetDvddVoltage(SENSOR_AVDD_CLOSED);
+		usleep(2000);
+		//step 4 xvclk
+		Sensor_SetMCLK(SENSOR_DISABLE_MCLK);
+		usleep(5000);
+		//step 5 AVDD IOVDD
+		Sensor_SetAvddVoltage(SENSOR_AVDD_CLOSED);
+		usleep(2000);
+		Sensor_SetIovddVoltage(SENSOR_AVDD_CLOSED);
 		Sensor_SetMonitorVoltage(SENSOR_AVDD_CLOSED);
 	}
 	SENSOR_PRINT("SENSOR_ov8825: _ov8825_Power_On(1:on, 0:off): %d", power_on);
