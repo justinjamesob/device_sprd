@@ -505,6 +505,29 @@ int camera_set_flicker(uint32_t flicker_mode, uint32_t *skip_mode, uint32_t *ski
 	return ret;
 }
 
+uint32_t camera_convert_iso(uint32_t iso)
+{
+	uint32_t convert_iso = 100;
+
+	switch(iso) {
+	case 2:
+		convert_iso = 200;
+		break;
+	case 3:
+		convert_iso = 400;
+		break;
+	case 4:
+		convert_iso = 800;
+		break;
+	case 5:
+		convert_iso = 1600;
+		break;
+	default:
+		break;
+	}
+	return convert_iso;
+}
+
 int camera_set_iso(uint32_t iso, uint32_t *skip_mode, uint32_t *skip_num)
 {
 	struct camera_context    *cxt = camera_get_cxt();
@@ -522,7 +545,7 @@ int camera_set_iso(uint32_t iso, uint32_t *skip_mode, uint32_t *skip_num)
 		*skip_num  = cxt->sn_cxt.sensor_info->change_setting_skip_num;
 		ret = Sensor_Ioctl(SENSOR_IOCTL_ISO, iso);
 	}
-
+	Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_ISOSPEEDRATINGS,camera_convert_iso(iso));
 	return ret;
 }
 

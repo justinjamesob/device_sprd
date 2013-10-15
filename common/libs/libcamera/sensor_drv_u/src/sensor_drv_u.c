@@ -23,6 +23,7 @@
 #include "sensor_drv_u.h"
 #include "cmr_msg.h"
 #include "isp_cali_interface.h"
+#include "cmr_set.h"
 
 #define SENSOR_ONE_I2C                    1
 #define SENSOR_ZERO_I2C                   0
@@ -2535,6 +2536,11 @@ uint32_t Sensor_SetFlash(uint32_t flash_mode)
 		return 0;
 
 	s_p_sensor_cxt->flash_mode = flash_mode;
+	if ((FLASH_OPEN == flash_mode) || (FLASH_HIGH_LIGHT == flash_mode)) {
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_FLASH, 1);
+	} else {
+		Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_FLASH, 0);
+	}
 	_Sensor_Device_SetFlash(flash_mode);
 
 	CMR_LOGV("Sensor_SetFlash:flash_mode=0x%x .\n", flash_mode);
@@ -2597,7 +2603,7 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 			uint32_t exposureline_num = param;
 			uint32_t exposure_time = 0x00;
 
-			exposure_time = exposureline_time * exposureline_num;
+			exposure_time = exposureline_time * exposureline_num/10;
 			sensor_exif_info_ptr->valid.ExposureTime = 1;
 
 			if (0x00 == exposure_time) {
@@ -2630,6 +2636,12 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 	case SENSOR_EXIF_CTRL_SPECTRALSENSITIVITY:
 		break;
 	case SENSOR_EXIF_CTRL_ISOSPEEDRATINGS:
+		sensor_exif_info_ptr->valid.ISOSpeedRatings = 1;
+		sensor_exif_info_ptr->ISOSpeedRatings.count = 1;
+		sensor_exif_info_ptr->ISOSpeedRatings.type  = EXIF_SHORT;
+		sensor_exif_info_ptr->ISOSpeedRatings.size  = 2;
+		memcpy((void*)&sensor_exif_info_ptr->ISOSpeedRatings.ptr[0],
+			   (void*)&param,2);
 		break;
 	case SENSOR_EXIF_CTRL_OECF:
 		break;
@@ -2705,6 +2717,8 @@ uint32_t Sensor_SetSensorExifInfo(SENSOR_EXIF_CTRL_E cmd, uint32_t param)
 			break;
 		}
 	case SENSOR_EXIF_CTRL_FLASH:
+		sensor_exif_info_ptr->valid.Flash = 1;
+		sensor_exif_info_ptr->Flash = param;
 		break;
 	case SENSOR_EXIF_CTRL_FOCALLENGTH:
 		break;
