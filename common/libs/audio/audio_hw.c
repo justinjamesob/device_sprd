@@ -706,8 +706,10 @@ static int out_dump_doing(FILE *out_fd, const void* buffer, size_t bytes)
 
 static int out_dump_release(FILE **fd)
 {
-    fclose(*fd);
-    *fd = NULL;
+    if(*fd){
+        fclose(*fd);
+        *fd = NULL;
+    }
     return 0;
 }
 
@@ -2111,7 +2113,9 @@ static int in_init_resampler(struct tiny_stream_in *in)
         ALOGE("in_init_resampler: alloc fail, size: %d", size);
         ret = -ENOMEM;
         goto err;
-    } else {
+    }
+    else
+    {
         memset(in->buffer, 0, size);
     }
 
