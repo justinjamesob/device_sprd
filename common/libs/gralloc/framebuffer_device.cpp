@@ -166,9 +166,25 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 #ifdef FB_FORMAT_SWITCH
 		if(dev->format==HAL_PIXEL_FORMAT_RGB_565){
 			m->info.bits_per_pixel = 16;
+			m->info.red.offset     = 11;
+			m->info.red.length     = 5;
+			m->info.green.offset   = 5;
+			m->info.green.length   = 6;
+			m->info.blue.offset    = 0;
+			m->info.blue.length    = 5;
+			m->info.transp.offset  = 0;
+			m->info.transp.length  = 0;
 		}
 		else{
 			m->info.bits_per_pixel = 32;
+			m->info.red.offset     = 0;
+			m->info.red.length     = 8;
+			m->info.green.offset   = 8;
+			m->info.green.length   = 8;
+			m->info.blue.offset    = 16;
+			m->info.blue.length    = 8;
+			m->info.transp.offset  = 24;
+			m->info.transp.length  = 0;
 		}
 #endif
 		if (ioctl(m->framebuffer->fd, FBIOPUT_VSCREENINFO, &m->info) == -1) 
