@@ -706,10 +706,9 @@ static int out_dump_doing(FILE *out_fd, const void* buffer, size_t bytes)
 
 static int out_dump_release(FILE **fd)
 {
-    if(*fd){
-        fclose(*fd);
-        *fd = NULL;
-    }
+    if(*fd > 0)
+	fclose(*fd);
+    *fd = NULL;
     return 0;
 }
 
@@ -1001,9 +1000,11 @@ static int start_vaudio_output_stream(struct tiny_stream_out *out)
 
     cp_type = get_cur_cp_type(out->dev);
     if(cp_type == CP_TG) {
+	s_vaudio = get_snd_card_number(CARD_VAUDIO);
         card = s_vaudio;
     }
     else if (cp_type == CP_W) {
+	s_vaudio_w = get_snd_card_number(CARD_VAUDIO_W);
         card = s_vaudio_w;
     }
     BLUE_TRACE("start vaudio_output_stream cp_type is %d ,card is %d",cp_type, card);
@@ -1150,6 +1151,7 @@ static int start_sco_output_stream(struct tiny_stream_out *out)
 
     int ret=0;
     BLUE_TRACE(" start_sco_output_stream in");
+    s_voip = get_snd_card_number(CARD_SCO);
     card = s_voip;
     out->buffer_voip = malloc(RESAMPLER_BUFFER_SIZE);
     if(!out->buffer_voip){
@@ -2208,9 +2210,11 @@ static int start_input_stream(struct tiny_stream_in *in)
 #else
         cp_type = get_cur_cp_type(in->dev);
         if(cp_type == CP_TG) {
+	    s_vaudio = get_snd_card_number(CARD_VAUDIO);
             card = s_vaudio;
         }
         else if(cp_type == CP_W) {
+	    s_vaudio_w = get_snd_card_number(CARD_VAUDIO_W);
             card = s_vaudio_w;
         }
 
