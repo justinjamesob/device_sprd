@@ -65,6 +65,7 @@ namespace android {
 							camera_set_parm (x, y, NULL, NULL); \
 						} while(0)
 #define SIZE_ALIGN(x)   (((x)+15)&(~15))
+#define SWITCH_MONITOR_QUEUE_SIZE         50
 
 static nsecs_t s_start_timestamp = 0;
 static nsecs_t s_end_timestamp = 0;
@@ -174,6 +175,9 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mFDAddr(0),
 	mMetadataHeap(NULL),
 	mParameters(),
+	mSetParameters(),
+	mSetParametersBak(),
+	mUseParameters(),
 	mPreviewHeight_trimy(0),
 	mPreviewWidth_trimx(0),
 	mPreviewHeight_backup(0),
@@ -186,6 +190,7 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mPictureFormat(1),
 	mPreviewStartFlag(0),
 	mRecordingMode(0),
+	mBakParamFlag(0),
 	mRecordingFirstFrameTime(0),
 	mZoomLevel(0),
 	mJpegSize(0),
@@ -209,7 +214,9 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 #endif
 	mTimeCoeff(1),
 	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_DCAM),
-	mSetFreqCount(0)
+	mSetFreqCount(0),
+	mSwitchMonitorMsgQueHandle(0),
+	mSwitchMonitorInited(0)
 {
 	LOGV("openCameraHardware: E cameraId: %d.", cameraId);
 
@@ -231,6 +238,8 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 			LOGE("ERR(%s):Fail on loading gralloc HAL", __func__);
 	}
 
+	switch_monitor_thread_init((void *)this);
+
 	if (1 == getPropertyAtv()) {
 		mCameraId = 5; //for ATV
 	} else {
@@ -244,6 +253,9 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 
 SprdCameraHardware::~SprdCameraHardware()
 {
+	LOGV("closeCameraHardware: E cameraId: %d.", mCameraId);
+	switch_monitor_thread_deinit((void *)this);
+	LOGV("closeCameraHardware: X cameraId: %d.", mCameraId);
 }
 
 void SprdCameraHardware::release()
@@ -350,6 +362,11 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 {
     int min_bufs;
 
+	LOGV("setPreviewWindow E");
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
+
     mPreviewWindow = w;
 
     LOGV("%s: mPreviewWindow %p", __func__, mPreviewWindow);
@@ -361,13 +378,13 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
     }
 
     mPreviewStartFlag = 1;
-
+/*
     if (isPreviewing()){
         LOGI("stop preview (window change)");
 		camera_set_stop_preview_mode(0);
         stopPreviewInternal();
     }
-
+*/
     if (w->get_min_undequeued_buffer_count(w, &min_bufs)) {
         LOGE("%s: could not retrieve min undequeued buffer count", __func__);
         return INVALID_OPERATION;
@@ -386,7 +403,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
     int preview_width;
     int preview_height;
-    mParameters.getPreviewSize(&preview_width, &preview_height);
+    mUseParameters.getPreviewSize(&preview_width, &preview_height);
     LOGV("%s: preview size: %dx%d.", __func__, preview_width, preview_height);
 
 #if CAM_OUT_YUV420_UV
@@ -395,7 +412,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
     int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
 #endif
 
-    const char *str_preview_format = mParameters.getPreviewFormat();
+    const char *str_preview_format = mUseParameters.getPreviewFormat();
 	int usage;
 
     LOGV("%s: preview format %s", __func__, str_preview_format);
@@ -427,7 +444,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
         	return INVALID_OPERATION;
     	}
     }
-	if (mParameters.getPreviewEnv()) {
+	if (mUseParameters.getPreviewEnv()) {
 	    if (w->set_buffers_geometry(w,
 	                                SIZE_ALIGN(preview_width), SIZE_ALIGN(preview_height),
 	                                hal_pixel_format)) {
@@ -451,12 +468,12 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
              __func__, str_preview_format);
         return INVALID_OPERATION;
     }
-
+/*
    status_t ret = startPreviewInternal(isRecordingMode());
    if (ret != NO_ERROR) {
 		return INVALID_OPERATION;
    }
-
+*/
     return NO_ERROR;
 }
 
@@ -695,8 +712,7 @@ status_t SprdCameraHardware::checkSetParametersEnvironment( )
 	status_t ret =  NO_ERROR;
 	/*check capture status*/
 	if (SPRD_IDLE != getCaptureState()) {
-		LOGE("camera HAL in capturing process, not allov to setParameter");
-		return PERMISSION_DENIED;
+		LOGE("warning, camera HAL in capturing process, abnormal calling sequence!");
 	}
 
 	/*check preview status*/
@@ -708,22 +724,54 @@ status_t SprdCameraHardware::checkSetParametersEnvironment( )
 	return ret;
 }
 
-status_t SprdCameraHardware::checkSetParameters(const SprdCameraParameters& params)
+status_t SprdCameraHardware::checkSetParameters(const SprdCameraParameters& params, const SprdCameraParameters& oriParams)
 {
 	status_t ret =  NO_ERROR;
 	int32_t tmpSize = sizeof(SprdCameraParameters);
-	ret = memcmp(&params, &mParameters, tmpSize);
+	ret = memcmp(&params, &oriParams, tmpSize);
 	return ret;
 }
 
 status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 {
+	struct cmr_msg           message = {0, 0, 0, 0};
+	status_t                 ret = NO_ERROR;
+	Mutex::Autolock          l(&mLock);
+	mParamLock.lock();
+
+	if (0 == checkSetParameters(params, mSetParameters)) {
+		LOGV("same parameters with system, directly return!");
+		mParamLock.unlock();
+		return NO_ERROR;
+	} else if (SPRD_IDLE != getSetParamsState()) {
+		LOGV("set parameters is handling, backup the parameter!");
+		mSetParametersBak = params;
+		mBakParamFlag = 1;
+		mParamLock.unlock();
+		return NO_ERROR;
+	} else {
+		mSetParameters = params;
+	}
+
+	message.msg_type = CMR_EVT_SW_MON_SET_PARA;
+	message.data = NULL;
+
+	ret = cmr_msg_post(mSwitchMonitorMsgQueHandle, &message);
+	if (ret) {
+		LOGE("setParameters Fail to send one msg!");
+	}
+	mParamLock.unlock();
+	usleep(10*1000);
+	return ret;
+}
+
+status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& params)
+{
 	status_t ret =  NO_ERROR;
 
-	LOGV("setParameters: E params = %p", &params);
-	LOGV("mLock:setParameters S.\n");
-	Mutex::Autolock l(&mLock);
-
+	LOGV("setParametersInternal: E params = %p", &params);
+	LOGV("mLock:setParametersInternal E.\n");
+	mParamLock.lock();
 #if 0
 	// FIXME: verify params
 	// yuv422sp is here only for legacy reason. Unfortunately, we release
@@ -767,31 +815,34 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	mPictureFormat = 1;
 #endif
 
-	LOGV("setParameters: mPreviewFormat=%d,mPictureFormat=%d.",mPreviewFormat,mPictureFormat);
+	LOGV("setParametersInternal: mPreviewFormat=%d,mPictureFormat=%d.",mPreviewFormat,mPictureFormat);
 
-	if (0 == checkSetParameters(params)) {
+	if (0 == checkSetParameters(params, mParameters)) {
 		LOGV("same parameters with system, directly return!");
+		mParamLock.unlock();
 		return NO_ERROR;
 	}
 
 	ret = checkSetParametersEnvironment();
 	if (NO_ERROR != ret) {
-		LOGV("setParameters, invalid status , directly return!");
+		LOGV("invalid status , directly return!");
+		mParamLock.unlock();
 		return NO_ERROR;
 	}
 
 	// FIXME: will this make a deep copy/do the right thing? String8 i
 	// should handle it
 	mParameters = params;
+	mParamLock.unlock();
 
 	// libqcamera only supports certain size/aspect ratios
 	// find closest match that doesn't exceed app's request
 	int width = 0, height = 0;
 	int rawWidth = 0, rawHeight = 0;
 	params.getPreviewSize(&width, &height);
-	LOGV("setParameters: requested preview size %d x %d", width, height);
+	LOGV("setParametersInternal: requested preview size %d x %d", width, height);
 	params.getPictureSize(&rawWidth, &rawHeight);
-	LOGV("setParameters:requested picture size %d x %d", rawWidth, rawHeight);
+	LOGV("setParametersInternal:requested picture size %d x %d", rawWidth, rawHeight);
 
 	mPreviewWidth = (width + 1) & ~1;
 	mPreviewHeight = (height + 1) & ~1;
@@ -801,18 +852,24 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	mRawWidth = (rawWidth + 1) & ~1;
 
 	antiShakeParamSetup();
-	LOGV("setParameters: requested picture size %d x %d", mRawWidth, mRawHeight);
-	LOGV("setParameters: requested preview size %d x %d", mPreviewWidth, mPreviewHeight);
+	LOGV("setParametersInternal: requested picture size %d x %d", mRawWidth, mRawHeight);
+	LOGV("setParametersInternal: requested preview size %d x %d", mPreviewWidth, mPreviewHeight);
 
 	camera_cfg_rot_cap_param_reset();
 
 	if (camera_set_change_size(mRawWidth, mRawHeight, mPreviewWidth, mPreviewHeight)) {
 		mPreviewStartFlag = 2;
 		camera_set_stop_preview_mode(1);
+		mPreviewCbLock.lock();
 		stopPreviewInternal();
+		mPreviewCbLock.unlock();
 		if (NO_ERROR != setPreviewWindow(mPreviewWindow)) {
 			return UNKNOWN_ERROR;
 		}
+		if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
+			return UNKNOWN_ERROR;
+		}
+
 	}
 
 	if ((1 == params.getInt("zsl")) &&
@@ -821,7 +878,9 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		if (isPreviewing()) {
 			mPreviewStartFlag = 2;
 			camera_set_stop_preview_mode(1);
+			mPreviewCbLock.lock();
 			stopPreviewInternal();
+			mPreviewCbLock.unlock();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 				return UNKNOWN_ERROR;
 			}
@@ -833,7 +892,9 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		if (isPreviewing()) {
 			mPreviewStartFlag = 2;
 			camera_set_stop_preview_mode(0);
+			mPreviewCbLock.lock();
 			stopPreviewInternal();
+			mPreviewCbLock.unlock();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
 				return UNKNOWN_ERROR;
 			}
@@ -844,14 +905,23 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		return UNKNOWN_ERROR;
 	}
 
-	LOGV("mLock:setParameters E.\n");
+	LOGV("mLock:setParametersInternal X.\n");
 	return NO_ERROR;
 }
 
-SprdCameraParameters SprdCameraHardware::getParameters() const
+SprdCameraParameters SprdCameraHardware::getParameters()
 {
-	LOGV("getParameters: EX");
-	return mParameters;
+	LOGV("getParameters: E");
+	Mutex::Autolock          l(&mLock);
+
+	mParamLock.lock();
+	if (0 != checkSetParameters(mParameters, mUseParameters)) {
+		mUseParameters = mParameters;
+	}
+	mParamLock.unlock();
+
+	LOGV("getParameters: X");
+	return mUseParameters;
 }
 
 void SprdCameraHardware::setCallbacks(camera_notify_callback notify_cb,
@@ -869,28 +939,28 @@ void SprdCameraHardware::setCallbacks(camera_notify_callback notify_cb,
 
 void SprdCameraHardware::enableMsgType(int32_t msgType)
 {
-	LOGV("mLock:enableMsgType S .\n");
+	LOGV("mLock:enableMsgType E .\n");
 	Mutex::Autolock lock(mLock);
 	mMsgEnabled |= msgType;
-	LOGV("mLock:enableMsgType E .\n");
+	LOGV("mLock:enableMsgType X .\n");
 }
 
 void SprdCameraHardware::disableMsgType(int32_t msgType)
 {
-	LOGV("'mLock:disableMsgType S.\n");
+	LOGV("'mLock:disableMsgType E.\n");
 	//Mutex::Autolock lock(mLock);
 	if (msgType & CAMERA_MSG_VIDEO_FRAME) {
 		mRecordingFirstFrameTime = 0;
 	}
 	mMsgEnabled &= ~msgType;
-	LOGV("'mLock:disableMsgType E.\n");
+	LOGV("'mLock:disableMsgType X.\n");
 }
 
 bool SprdCameraHardware::msgTypeEnabled(int32_t msgType)
 {
-	LOGV("mLock:msgTypeEnabled S.\n");
-	Mutex::Autolock lock(mLock);
 	LOGV("mLock:msgTypeEnabled E.\n");
+	Mutex::Autolock lock(mLock);
+	LOGV("mLock:msgTypeEnabled X.\n");
 	return (mMsgEnabled & msgType);
 }
 
@@ -1015,12 +1085,16 @@ void SprdCameraHardware::setCameraPreviewMode()
 	} else {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
 	}*/
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
+
 	if (isRecordingMode()) {
-		SET_PARM(CAMERA_PARM_PREVIEW_MODE, mParameters.getPreviewFameRate());
+		SET_PARM(CAMERA_PARM_PREVIEW_MODE, mUseParameters.getPreviewFameRate());
 	} else {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
-		if (mParameters.getPreviewEnv()) {
-		    SET_PARM(CAMERA_PARM_PREVIEW_ENV, mParameters.getPreviewFameRate());
+		if (mUseParameters.getPreviewEnv()) {
+		    SET_PARM(CAMERA_PARM_PREVIEW_ENV, mUseParameters.getPreviewFameRate());
 		} else {
 			SET_PARM(CAMERA_PARM_PREVIEW_ENV, CAMERA_PREVIEW_MODE_SNAPSHOT);
 		}
@@ -1050,6 +1124,7 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 		mCameraState.preview_state = SPRD_IDLE;
 		mCameraState.capture_state = SPRD_IDLE;
 		mCameraState.focus_state = SPRD_IDLE;
+		mCameraState.setParam_state = SPRD_IDLE;
 		break;
 
 	case SPRD_IDLE:
@@ -1068,6 +1143,11 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 
 		case STATE_FOCUS:
 			mCameraState.focus_state = SPRD_IDLE;
+			break;
+
+		case STATE_SET_PARAMS:
+			mCameraState.setParam_state = SPRD_IDLE;
+			break;
 		}
 		break;
 
@@ -1091,6 +1171,9 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 
 		case STATE_FOCUS:
 			mCameraState.focus_state = SPRD_ERROR;
+			break;
+
+		default:
 			break;
 		}
 		break;
@@ -1130,16 +1213,22 @@ void SprdCameraHardware::setCameraState(Sprd_camera_state state, state_owner own
 		mCameraState.focus_state = SPRD_FOCUS_IN_PROGRESS;
 		break;
 
+	//set_param state
+	case SPRD_SET_PARAMS_IN_PROGRESS:
+		mCameraState.setParam_state = SPRD_SET_PARAMS_IN_PROGRESS;
+		break;
+
 	default:
 		LOGD("setCameraState: error");
 		break;
 	}
 
-	LOGV("setCameraState:camera state = %s, preview state = %s, capture state = %s focus state = %s",
+	LOGV("setCameraState:camera state = %s, preview state = %s, capture state = %s focus state = %s set param state = %s",
 				getCameraStateStr(mCameraState.camera_state),
 				getCameraStateStr(mCameraState.preview_state),
 				getCameraStateStr(mCameraState.capture_state),
-				getCameraStateStr(mCameraState.focus_state));
+				getCameraStateStr(mCameraState.focus_state),
+				getCameraStateStr(mCameraState.setParam_state));
 }
 
 SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getCameraState()
@@ -1164,6 +1253,12 @@ SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getFocusState()
 {
 	LOGV("getFocusState: %s", getCameraStateStr(mCameraState.focus_state));
 	return mCameraState.focus_state;
+}
+
+SprdCameraHardware::Sprd_camera_state SprdCameraHardware::getSetParamsState()
+{
+	LOGV("getSetParamsState: %s", getCameraStateStr(mCameraState.setParam_state));
+	return mCameraState.setParam_state;
 }
 
 bool SprdCameraHardware::isCameraInit()
@@ -1324,6 +1419,10 @@ bool SprdCameraHardware::WaitForFocusCancelDone()
 // Called with mLock held!
 bool SprdCameraHardware::startCameraIfNecessary()
 {
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
+
 	if (!isCameraInit()) {
 		LOGV("waiting for camera_init to initialize.startCameraIfNecessary");
 		if(CAMERA_SUCCESS != camera_init(mCameraId)){
@@ -1333,7 +1432,7 @@ bool SprdCameraHardware::startCameraIfNecessary()
 		}
 
 		if (!camera_is_sensor_support_zsl()) {
-			mParameters.setZSLSupport("false");
+			mUseParameters.setZSLSupport("false");
 		}
 
 		LOGV("waiting for camera_start.g_camera_id: %d.", mCameraId);
@@ -1780,7 +1879,9 @@ bool SprdCameraHardware::initPreview()
 {
 	uint32_t page_size, buffer_size;
 	uint32_t preview_buff_cnt = kPreviewBufferCount;
-
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
 	if (!startCameraIfNecessary())
 		return false;
 
@@ -1803,7 +1904,7 @@ bool SprdCameraHardware::initPreview()
 	switch (mPreviewFormat) {
 	case 0:
 		case 1:	//yuv420
-		if (mParameters.getPreviewEnv()) {
+		if (mUseParameters.getPreviewEnv()) {
 			mPreviewHeapSize = SIZE_ALIGN(mPreviewWidth) * SIZE_ALIGN(mPreviewHeight) * 3 / 2;
 		} else {
 			mPreviewHeapSize = mPreviewWidth * mPreviewHeight * 3 / 2;
@@ -2143,6 +2244,7 @@ void SprdCameraHardware::stopPreviewInternal()
 
 takepicture_mode SprdCameraHardware::getCaptureMode()
 {
+	Mutex::Autolock          paramLock(&mParamLock);
 	if (1 == mParameters.getInt("hdr")) {
         mCaptureMode = CAMERA_HDR_MODE;
     } else if ((1 == mParameters.getInt("zsl"))&&(1 != mParameters.getInt("capture-mode"))) {
@@ -2236,7 +2338,7 @@ status_t SprdCameraHardware::initDefaultParameters()
 		p.updateSupportedPreviewSizes(lcd_w, lcd_h);
 	}
 
-    if (setParameters(p) != NO_ERROR) {
+	if (setParametersInternal(p) != NO_ERROR) {
 		LOGE("Failed to set default parameters?!");
 		return UNKNOWN_ERROR;
     }
@@ -2511,6 +2613,9 @@ void SprdCameraHardware::getPictureFormat(int * format)
 bool SprdCameraHardware::getCameraLocation(camera_position_type *pt)
 {
 	bool result = true;
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
 
 	PARSE_LOCATION(timestamp, long, "%ld", "long");
 	if (0 == pt->timestamp)
@@ -2520,7 +2625,7 @@ bool SprdCameraHardware::getCameraLocation(camera_position_type *pt)
 	PARSE_LOCATION(latitude, double, "%lf", "double float");
 	PARSE_LOCATION(longitude, double, "%lf", "double float");
 
-	pt->process_method = mParameters.get("gps-processing-method");
+	pt->process_method = mUseParameters.get("gps-processing-method");
 /*
 	LOGV("%s: setting image location result %d,  ALT %lf LAT %lf LON %lf",
 			__func__, result, pt->altitude, pt->latitude, pt->longitude);
@@ -2575,6 +2680,10 @@ int SprdCameraHardware::displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_
 	int ret = 0;
 	struct _dma_copy_cfg_tag dma_copy_cfg;
 
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
+
 #ifdef CONFIG_CAMERA_DMA_COPY
 	dma_copy_cfg.format = DMA_COPY_YUV420;
 	dma_copy_cfg.src_size.w = src_w;
@@ -2616,7 +2725,7 @@ int SprdCameraHardware::displayCopy(uint32_t dst_phy_addr, uint32_t dst_virtual_
 	}
 	ret = uv420CopyTrim(dma_copy_cfg);
 #else
-    if (mParameters.getPreviewEnv()) {
+    if (mUseParameters.getPreviewEnv()) {
 		memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, SIZE_ALIGN(src_w)*SIZE_ALIGN(src_h)*3/2);
     } else {
 		memcpy((void *)dst_virtual_addr, (void *)src_virtual_addr, src_w*src_h*3/2);
@@ -2681,6 +2790,10 @@ bool SprdCameraHardware::displayOneFrameForCapture(uint32_t width, uint32_t heig
 
 bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32_t phy_addr, char *virtual_addr, uint32_t id)
 {
+	mParamLock.lock();
+	mUseParameters = mParameters;
+	mParamLock.unlock();
+
 	if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
 		if (!mPreviewWindow || !mGrallocHal || 0 == phy_addr) {
 			return false;
@@ -2701,7 +2814,7 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			LOGE("%s: failed to dequeue gralloc buffer!", __func__);
 			return false;
 		}
-		if (mParameters.getPreviewEnv()) {
+		if (mUseParameters.getPreviewEnv()) {
 			ret = mGrallocHal->lock(mGrallocHal, *buf_handle, GRALLOC_USAGE_SW_WRITE_OFTEN,
 									0, 0, SIZE_ALIGN(width), SIZE_ALIGN(height), &vaddr);
 		} else {
@@ -3640,6 +3753,135 @@ void SprdCameraHardware::camera_cb(camera_cb_type cb,
         LOGE("Unknown camera-callback status %d", cb);
 		break;
 	}
+}
+
+int SprdCameraHardware::switch_monitor_thread_init(void *p_data)
+{
+	struct cmr_msg           message = {0, 0, 0, 0};
+	int                      ret = NO_ERROR;
+	pthread_attr_t           attr;
+
+	SprdCameraHardware *obj = (SprdCameraHardware *)p_data;
+
+	LOGV("switch monitor thread init, %d", obj->mSwitchMonitorInited);
+
+	if (!obj->mSwitchMonitorInited) {
+		ret = cmr_msg_queue_create(SWITCH_MONITOR_QUEUE_SIZE, &obj->mSwitchMonitorMsgQueHandle);
+		if (ret) {
+			LOGE("NO Memory, Failed to create switch monitor message queue\n");
+			return ret;
+		}
+		sem_init(&obj->mSwitchMonitorSyncSem, 0, 0);
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+		ret = pthread_create(&obj->mSwitchMonitorThread,
+			&attr,
+			switch_monitor_thread_proc,
+			(void *)obj);
+		obj->mSwitchMonitorInited = 1;
+		message.msg_type = CMR_EVT_SW_MON_INIT;
+		message.data = NULL;
+		ret = cmr_msg_post(obj->mSwitchMonitorMsgQueHandle, &message);
+		if (ret) {
+			LOGE("switch_monitor_thread_init Fail to send one msg!");
+		}
+		sem_wait(&obj->mSwitchMonitorSyncSem);
+	}
+	return ret;
+}
+
+int SprdCameraHardware::switch_monitor_thread_deinit(void *p_data)
+{
+	struct cmr_msg           message = {0, 0, 0, 0};
+	int                      ret = NO_ERROR;
+	SprdCameraHardware *     obj = (SprdCameraHardware *)p_data;
+
+	LOGV("switch monitor thread deinit inited, %d", obj->mSwitchMonitorInited);
+
+	if (obj->mSwitchMonitorInited) {
+		message.msg_type = CMR_EVT_SW_MON_EXIT;
+		ret = cmr_msg_post(obj->mSwitchMonitorMsgQueHandle, &message);
+		if (ret) {
+			LOGE("Fail to send one msg to camera callback thread");
+		}
+		sem_wait(&obj->mSwitchMonitorSyncSem);
+		sem_destroy(&obj->mSwitchMonitorSyncSem);
+		cmr_msg_queue_destroy(obj->mSwitchMonitorMsgQueHandle);
+		obj->mSwitchMonitorMsgQueHandle = 0;
+		obj->mSwitchMonitorInited = 0;
+	}
+	return ret ;
+}
+
+void * SprdCameraHardware::switch_monitor_thread_proc(void *p_data)
+{
+	struct cmr_msg           message = {0, 0, 0, 0};
+	int                      exit_flag = 0;
+	int                      ret = NO_ERROR;
+	SprdCameraHardware *     obj = (SprdCameraHardware *)p_data;
+
+	while (1) {
+		ret = cmr_msg_get(obj->mSwitchMonitorMsgQueHandle, &message);
+		if (ret) {
+			CMR_LOGE("Message queue destroyed");
+			break;
+		}
+
+		CMR_LOGE("message.msg_type 0x%x, sub-type 0x%x",
+			message.msg_type,
+			message.sub_msg_type);
+
+		switch (message.msg_type) {
+		case CMR_EVT_SW_MON_INIT:
+			LOGV("switch monitor thread msg INITED!");
+			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+			sem_post(&obj->mSwitchMonitorSyncSem);
+			break;
+
+		case CMR_EVT_SW_MON_SET_PARA:
+			LOGV("switch monitor thread msg SET_PARA!");
+			obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
+			obj->setParametersInternal(obj->mSetParameters);
+			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+			break;
+
+		case CMR_EVT_SW_MON_EXIT:
+			LOGV("switch monitor thread msg EXIT!\n");
+			exit_flag = 1;
+			sem_post(&obj->mSwitchMonitorSyncSem);
+			CMR_PRINT_TIME;
+			break;
+
+		default:
+			LOGE("Unsupported switch monitorMSG");
+			break;
+		}
+
+		if (1 == message.alloc_flag) {
+			if (message.data) {
+				free(message.data);
+				message.data = 0;
+			}
+		}
+
+		if (obj->checkSetParameters(obj->mParameters, obj->mSetParametersBak) &&
+			obj->mBakParamFlag) {
+			LOGV("switch_monitor_thread_proc, ");
+			obj->mParamLock.lock();
+			obj->mSetParameters = obj->mSetParametersBak;
+			obj->mParamLock.unlock();
+			obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
+			obj->setParametersInternal(obj->mSetParameters);
+			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+			obj->mBakParamFlag = 0;
+		}
+
+		if (exit_flag) {
+			CMR_LOGI("switch monitor thread exit ");
+			break;
+		}
+	}
+	return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

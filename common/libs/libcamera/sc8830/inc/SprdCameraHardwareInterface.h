@@ -18,6 +18,8 @@
 
 #include <binder/MemoryHeapIon.h>
 #include <utils/threads.h>
+#include <pthread.h>
+#include <semaphore.h>
 extern "C" {
     #include <linux/android_pmem.h>
 }
@@ -33,6 +35,7 @@ extern "C" {
 #include <camera/CameraParameters.h>
 #include "SprdCameraParameters.h"
 #include "SprdOEMCamera.h"
+#include "cmr_oem.h"
 #include "sprd_dma_copy_k.h"
 
 namespace android {
@@ -76,7 +79,7 @@ public:
 	virtual status_t             autoFocus();
 	virtual status_t             cancelAutoFocus();
 	virtual status_t             setParameters(const SprdCameraParameters& params);
-	virtual SprdCameraParameters getParameters() const;
+	virtual SprdCameraParameters getParameters();
 	virtual void                 setCallbacks(camera_notify_callback notify_cb,
 						camera_data_callback data_cb,
 						camera_data_timestamp_callback data_cb_timestamp,
@@ -110,6 +113,9 @@ public:
 	static int                   getCameraInfo(int cameraId, struct camera_info *cameraInfo);
 	static const CameraInfo      kCameraInfo[];
 	static const CameraInfo      kCameraInfo3[];
+	static int                   switch_monitor_thread_init(void *p_data);
+	static int                   switch_monitor_thread_deinit(void *p_data);
+	static void*                 switch_monitor_thread_proc(void *p_data);
 
 private:
 	inline void                  print_time();
@@ -195,6 +201,7 @@ private:
 		SPRD_ERROR,
 		SPRD_PREVIEW_IN_PROGRESS,
 		SPRD_FOCUS_IN_PROGRESS,
+		SPRD_SET_PARAMS_IN_PROGRESS,
 		SPRD_WAITING_RAW,
 		SPRD_WAITING_JPEG,
 
@@ -212,13 +219,15 @@ private:
 		STATE_PREVIEW,
 		STATE_CAPTURE,
 		STATE_FOCUS,
+		STATE_SET_PARAMS,
 	};
 
 	typedef struct _camera_state	{
-		Sprd_camera_state 	camera_state;
-		Sprd_camera_state 	preview_state;
-		Sprd_camera_state 	capture_state;
-		Sprd_camera_state 	focus_state;
+		Sprd_camera_state      camera_state;
+		Sprd_camera_state      preview_state;
+		Sprd_camera_state      capture_state;
+		Sprd_camera_state      focus_state;
+		Sprd_camera_state      setParam_state;
 	} camera_state;
 
 	const char* getCameraStateStr(Sprd_camera_state s);
@@ -232,6 +241,7 @@ private:
 	inline Sprd_camera_state        getPreviewState();
 	inline Sprd_camera_state        getCaptureState();
 	inline Sprd_camera_state        getFocusState();
+	inline Sprd_camera_state        getSetParamsState();
 	inline bool                     isCameraError();
 	inline bool                     isCameraInit();
 	inline bool                     isCameraIdle();
@@ -253,6 +263,7 @@ private:
 	status_t                        startPreviewInternal(bool isRecordingMode);
 	void                            stopPreviewInternal();
 	status_t                        cancelPictureInternal();
+	virtual status_t                setParametersInternal(const SprdCameraParameters& params);
 	bool                            initPreview();
 	void                            deinitPreview();
 	bool                            initCapture(bool initJpegHeap);
@@ -260,7 +271,8 @@ private:
 	status_t                        initDefaultParameters();
 	status_t                        setCameraParameters();
 	status_t                        checkSetParametersEnvironment();
-	status_t                        checkSetParameters(const SprdCameraParameters& params);
+	status_t                        checkSetParameters(const SprdCameraParameters& params,
+							const SprdCameraParameters& oriParams);
 	bool                            setCameraDimensions();
 	void                            setCameraPreviewMode();
 	void                            changeEmcFreq(char flag);
@@ -294,15 +306,16 @@ private:
 	Mutex                           mCaptureCbLock;
 	Mutex                           mStateLock;
 	Condition                       mStateWait;
+	Mutex                           mParamLock;
 
 	uint32_t                        mPreviewHeapSize;
 	uint32_t                        mPreviewHeapNum;
 	uint32_t                        mPreviewDcamAllocBufferCnt;
 	sprd_camera_memory_t*           *mPreviewHeapArray;
 	uint32_t                        mPreviewHeapArray_phy[kPreviewBufferCount+kPreviewRotBufferCount+1];
-	uint32_t                           mPreviewHeapArray_vir[kPreviewBufferCount+kPreviewRotBufferCount+1];
-	buffer_handle_t           *mPreviewBufferHandle[kPreviewBufferCount];
-	buffer_handle_t           *mPreviewCancelBufHandle[kPreviewBufferCount];
+	uint32_t                        mPreviewHeapArray_vir[kPreviewBufferCount+kPreviewRotBufferCount+1];
+	buffer_handle_t                 *mPreviewBufferHandle[kPreviewBufferCount];
+	buffer_handle_t                 *mPreviewCancelBufHandle[kPreviewBufferCount];
 
 	sprd_camera_memory_t            *mRawHeap;
 	uint32_t                        mRawHeapSize;
@@ -319,8 +332,11 @@ private:
 	sprd_camera_memory_t            *mReDisplayHeap;
 	//TODO: put the picture dimensions in the CameraParameters object;
 	SprdCameraParameters            mParameters;
-	uint32_t                   mPreviewHeight_trimy;
-	uint32_t                   mPreviewWidth_trimx;
+	SprdCameraParameters            mSetParameters;
+	SprdCameraParameters            mSetParametersBak;
+	SprdCameraParameters            mUseParameters;
+	uint32_t                        mPreviewHeight_trimy;
+	uint32_t                        mPreviewWidth_trimx;
 	int                             mPreviewHeight_backup;
 	int                             mPreviewWidth_backup;
 	int                             mPreviewHeight;
@@ -332,6 +348,8 @@ private:
 	int                             mPreviewStartFlag;
 
 	bool                            mRecordingMode;
+	bool                            mBakParamFlag;
+
 	nsecs_t                         mRecordingFirstFrameTime;
 	uint32_t                        mZoomLevel;
 	/* mJpegSize keeps track of the size of the accumulated JPEG.  We clear it
@@ -358,6 +376,13 @@ private:
 	uint32_t                        mTimeCoeff;
 	uint32_t                        mPreviewBufferUsage;
 	int                             mSetFreqCount;
+
+	/*callback thread*/
+	pthread_t                       mSwitchMonitorThread;
+	uint32_t                        mSwitchMonitorMsgQueHandle;
+	uint32_t                        mSwitchMonitorInited;
+	sem_t                           mSwitchMonitorSyncSem;
+
 };
 
 }; // namespace android
