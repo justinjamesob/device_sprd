@@ -101,6 +101,7 @@ static void mac_rand(char *btmac, char *wifimac)
                     strcpy(btmac, buf);
 
                 ALOGD("%s: read btmac=%s, wifimac=%s",__FUNCTION__, btmac, wifimac);
+                close(fd);
                 return;
             }
             // realtek_add_start

@@ -105,6 +105,7 @@ void eng_check_factorymode(void)
 
     if(fd >= 0){
         ENG_LOG("%s: status=%x\n",__func__, status);
+        chmod(ENG_FACOTRYMODE_FILE, 0660);
         property_get("persist.sys.usb.config", config_property, "");
         property_get("ro.modem.wcn.enable", modem_enable, "");
         if((status==1)||(status == ENG_SQLSTR2INT_ERR)) {

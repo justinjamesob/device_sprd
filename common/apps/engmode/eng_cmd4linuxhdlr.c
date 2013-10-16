@@ -177,26 +177,16 @@ int eng_linuxcmd_factoryreset(char *req, char *rsp)
     int ret = 1;
     char cmd[]="--wipe_data";
     int fd=-1;
-    char device_name[256];
-    char convert_name[256];
     char format_cmd[1024];
-    const char* externalStorage = getenv("SECONDARY_STORAGE");
+    char convert_name[] = "/dev/block/platform/sprd-sdhci.3/by-name/sd";
     static char MKDOSFS_PATH[] = "/system/bin/newfs_msdos";
     mode_t mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
     ENG_LOG("Call %s\n",__FUNCTION__);
 
     /*format internal sd card. code from vold*/
-    memset(device_name,0,256);
-    if (eng_get_device_from_path(externalStorage,device_name)){
-        memset(convert_name,0,256);
-        sprintf(convert_name,"/dev/block/mmcblk0p%d",atoi(strchr(device_name,':')+1));
-        memset(format_cmd,0,1024);
-        sprintf(format_cmd,"%s -F 32 -O android %s",MKDOSFS_PATH,convert_name);
-        system(format_cmd);
-    } else {
-        ENG_LOG("do not format /mnt/internal");
-    }
+    sprintf(format_cmd,"%s -F 32 -O android %s",MKDOSFS_PATH,convert_name);
+    system(format_cmd);
     //delete files in ENG_RECOVERYDIR
     system("rm -r /cache/recovery");
 

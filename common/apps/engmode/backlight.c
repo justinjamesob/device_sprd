@@ -47,7 +47,7 @@ static int eng_lcdbacklight_test(int brightness)
 
     fd = open(LCD_BACKLIGHT_DEV, O_RDWR);
 
-    if(fd < -1) {
+    if(fd < 0) {
         SPRD_DBG("%s: open %s fail",__func__, LCD_BACKLIGHT_DEV);
         return -1;
     }
