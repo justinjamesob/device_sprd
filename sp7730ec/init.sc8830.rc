@@ -24,6 +24,7 @@ on fs
 on post-fs
     insmod /system/lib/modules/ump.ko
     insmod /system/lib/modules/mali.ko
+    insmod /system/lib/modules/trout_fm.ko
 
 on post-fs-data
     # we will remap this as /storage/sdcard0 with the sdcard fuse tool
@@ -410,6 +411,7 @@ service btld  /system/bin/btld -lpm 0 -hb 3000000
 service FmPower /system/bin/FmDaemon
    class main
    user root
+   disabled
    group vpn net_admin net_raw
 
 service p2p_supplicant /system/bin/wpa_supplicant \

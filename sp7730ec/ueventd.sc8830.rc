@@ -8,6 +8,7 @@
 /dev/sprd_jpg           0660     system      audio
 /dev/sprd_sensor        0660     system      audio
 /dev/video0             0660     system      audio
+/dev/Trout_FM           0660     system      audio
 /dev/ion                0664     system      audio
 /dev/ecompass_ctrl      0666     system      compass
 /dev/mxc622x            0666     system      input

@@ -65,7 +65,7 @@ TARGET_BOARD_CAMERA_FLASH_CTRL := false
 
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
-BOARD_HAVE_FM_BCM := true
+BOARD_HAVE_FM_TROUT := true
 BOARD_USE_SPRD_FMAPP := true
 
 # board specific modules
