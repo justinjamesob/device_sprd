@@ -51,7 +51,14 @@ on boot
     domainname localdomain
 
     class_start default
-
+# SPRD: add adb in recovery @{
+    write /sys/class/android_usb/android0/iManufacturer Spreadtrum
+    write /sys/class/android_usb/android0/iProduct Spreadtrum Phone
+    write /sys/class/android_usb/android0/iSerial $ro.serialno
+    write /sys/class/android_usb/android0/f_rndis/manufacturer Spreadtrum
+    write /sys/class/android_usb/android0/f_rndis/vendorID 8
+    write /sys/class/android_usb/android0/f_rndis/wceis 1
+# @}
 service ueventd /sbin/ueventd
     critical
 
@@ -64,8 +71,16 @@ service adbd /sbin/adbd recovery
 
 # Always start adbd on userdebug and eng builds
 on property:ro.debuggable=1
+# SPRD: add adb in recovery @{
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/idVendor 1782
+    write /sys/class/android_usb/android0/idProduct 5d06
+    write /sys/class/android_usb/android0/functions adb,vser,gser
+# @}
     write /sys/class/android_usb/android0/enable 1
     start adbd
+# SPRD: add adb in recovery
+    setprop sys.usb.state adb,vser,gser
 
 # Restart adbd so it can run as root
 on property:service.adb.root=1
