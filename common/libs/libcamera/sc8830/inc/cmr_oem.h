@@ -67,9 +67,14 @@ extern "C"
 #define CMR_EVT_CAP_RAW_TX_DONE                      (CMR_EVT_CAP_BASE + 4)
 
 #define CMR_EVT_CB_BASE                              (CMR_EVT_OEM_BASE + 0x800)
-#define CMR_EVT_CB_INIT                              (CMR_EVT_CAP_BASE + 0)
-#define CMR_EVT_CB_EXIT                              (CMR_EVT_CAP_BASE + 1)
-#define CMR_EVT_CB_HANDLE                            (CMR_EVT_CAP_BASE + 2)
+#define CMR_EVT_CB_INIT                              (CMR_EVT_CB_BASE + 0)
+#define CMR_EVT_CB_EXIT                              (CMR_EVT_CB_BASE + 1)
+#define CMR_EVT_CB_HANDLE                            (CMR_EVT_CB_BASE + 2)
+
+#define CMR_EVT_SW_MON_BASE                          (CMR_EVT_OEM_BASE + 0x900)
+#define CMR_EVT_SW_MON_INIT                          (CMR_EVT_SW_MON_BASE + 0)
+#define CMR_EVT_SW_MON_EXIT                          (CMR_EVT_SW_MON_BASE + 1)
+#define CMR_EVT_SW_MON_SET_PARA                      (CMR_EVT_SW_MON_BASE + 2)
 
 #define CAMERA_OEM_MSG_QUEUE_SIZE                    50
 #define CAMERA_AF_MSG_QUEUE_SIZE                     5
