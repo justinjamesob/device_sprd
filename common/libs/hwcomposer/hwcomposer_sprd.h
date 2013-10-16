@@ -39,6 +39,7 @@ struct hwc_context_t {
     int osd_overlay_flag;
     int osd_overlay_phy_addr;
     int YUVLayerCount;
+    bool RGBLayerFullScreen;
     //the following are for video overlay layer
     int video_overlay_flag;
     sp<MemoryHeapIon> ion_heap;

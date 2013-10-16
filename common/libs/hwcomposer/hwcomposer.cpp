@@ -233,14 +233,19 @@ static int verify_osd_layer(struct hwc_context_t *context, hwc_layer_t * l)
             ALOGI_IF(debugenable,"verify_osd L%d",__LINE__);
             return 0;
         }
+#ifndef OVERLAY_COMPOSER_GPU
 #ifndef _DMA_COPY_OSD_LAYER
         if (!(private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY)) {
             ALOGI_IF(debugenable,"verify_osd L%d",__LINE__);
             return 0;
         }
 #endif
+#endif
     } else if((private_h->width != context->fb_height) || (private_h->height!= context->fb_width)
-              || !(private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY)) {
+#ifndef OVERLAY_COMPOSER_GPU
+              || !(private_h->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
+#endif
+) {
         ALOGI_IF(debugenable,"verify_osd L%d",__LINE__);
         return 0;
     }
@@ -283,6 +288,8 @@ static int verify_osd_layer(struct hwc_context_t *context, hwc_layer_t * l)
         ALOGI_IF(debugenable,"verify_osd(),only support full screen now.wh. L%d",__LINE__);
         return 0;
     }
+
+    context->RGBLayerFullScreen = true;
 
     return SPRD_LAYERS_OSD;
 }
@@ -1117,6 +1124,8 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
     ctx->osd_overlay_flag = 0;
     ctx->video_overlay_flag = 0;
 
+    ctx->RGBLayerFullScreen = false;
+
     for (size_t i=0 ; i<list->numHwLayers ; i++) {
         dump_layer(&list->hwLayers[i]);
         list->hwLayers[i].compositionType = HWC_FRAMEBUFFER;
@@ -1200,31 +1209,35 @@ static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list) {
 #ifdef OVERLAY_COMPOSER_GPU
             OverlayDeviceFlag = 1;
 
-            for (size_t j=0; j < list->numHwLayers; j++)
+            /*
+             *  At present, OverlayComposer cannot handle 2 or more than 2 YUV layers.
+             *  And OverlayComposer also cannot handle cropped RGB layer.
+             * */
+            if (ctx->YUVLayerCount > 1 || ctx->RGBLayerFullScreen == false)
             {
-                hwc_layer_t *l = &(list->hwLayers[j]);
+                SkipLayerFlag = true;
+            }
 
-                /*
-                 *  At present, OverlayComposer cannot handle 2 or more than 2 YUV layers.
-                 * */
-                if (ctx->YUVLayerCount > 1)
+            if (SkipLayerFlag == false)
+            {
+                for (size_t j=0; j < list->numHwLayers; j++)
                 {
-                    SkipLayerFlag = true;
-                }
+                    hwc_layer_t *l = &(list->hwLayers[j]);
 
-                /*
-                 *  OverlayComposer cannot handle the lrregular layer display frame,
-                 *  so OverlayComposer should be disabled at this moment.
-                 * */
-                if (l->displayFrame.right == 1 ||
-                    l->displayFrame.bottom == 1)
-                {
-                    SkipLayerFlag = true;
-                }
+                    /*
+                     *  OverlayComposer cannot handle the lrregular layer display frame,
+                     *  so OverlayComposer should be disabled at this moment.
+                     * */
+                    if (l->displayFrame.right == 1 ||
+                        l->displayFrame.bottom == 1)
+                    {
+                        SkipLayerFlag = true;
+                    }
 
-                if (l->compositionType == HWC_FRAMEBUFFER && SkipLayerFlag == false)
-                {
-                    l->compositionType = HWC_OVERLAY;
+                    if (l->compositionType == HWC_FRAMEBUFFER && SkipLayerFlag == false)
+                    {
+                        l->compositionType = HWC_OVERLAY;
+                    }
                 }
             }
 
