@@ -35,9 +35,9 @@ endif
 # config kernel
 TARGET_NO_KERNEL := false
 ifeq ($(TARGET_BUILD_VARIANT),user)
-KERNEL_DEFCONFIG := sp8830ec-native_user_defconfig
+KERNEL_DEFCONFIG := sp8830ec-native_user_nwcn_defconfig
 else
-KERNEL_DEFCONFIG := sp8830ec-native_defconfig
+KERNEL_DEFCONFIG := sp8830ec-native_nwcn_defconfig
 endif
 USES_UNCOMPRESSED_KERNEL := true
 BOARD_KERNEL_BASE := 0x00000000
