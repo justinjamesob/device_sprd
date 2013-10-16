@@ -18,5 +18,6 @@
 
 PRODUCT_COPY_FILES += \
     device/sprd/partner/ittiam/wlan/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
-    device/sprd/partner/ittiam/wlan/wpa_supplicant_cmcc.conf:system/etc/wifi/wpa_supplicant_cmcc.conf
+    device/sprd/partner/ittiam/wlan/wpa_supplicant_cmcc.conf:system/etc/wifi/wpa_supplicant_cmcc.conf \
+    device/sprd/partner/ittiam/wlan/2351_wifi_configure.ini:system/etc/wifi/2351_wifi_configure.ini
 ########################
