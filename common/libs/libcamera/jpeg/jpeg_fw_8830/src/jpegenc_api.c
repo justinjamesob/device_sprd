@@ -437,7 +437,7 @@ LOCAL JPEG_RET_E JPEGENC_start_encode(JPEGENC_PARAMS_T *jpegenc_params)
 	SCI_TRACE_LOW("[JPEG_6600L_StartEncode] hardware write head done");
 
 	/*the input width must be mcu aligned width*/
-	if(1)//jpegenc_params->height > SLICE_HEIGHT)
+	if(jpegenc_params->height > slice_height)
 	{
 		ret_value = JPEG_HWEncStart(jpegenc_params->width, slice_height, &jpeg_enc_out_param);
 	}

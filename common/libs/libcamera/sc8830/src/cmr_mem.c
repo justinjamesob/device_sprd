@@ -34,6 +34,12 @@
 #define PIXEL_6P0_MEGA            0x600000 //6.0 *1024*1024
 #define PIXEL_7P0_MEGA            0x700000 //7.0 *1024*1024
 #define PIXEL_8P0_MEGA            0x800000 //8.0 *1024*1024
+#define PIXEL_9P0_MEGA            0x900000 //9.0 *1024*1024
+#define PIXEL_AP0_MEGA            0xA00000 //10.0 *1024*1024
+#define PIXEL_BP0_MEGA            0xB00000 //11.0 *1024*1024
+#define PIXEL_CP0_MEGA            0xC00000 //12.0 *1024*1024
+#define PIXEL_DP0_MEGA            0xD00000 //13.0 *1024*1024
+
 #define ISP_YUV_TO_RAW_GAP        CMR_SLICE_HEIGHT
 #define BACK_CAMERA_ID            0
 #define FRONT_CAMERA_ID           1
@@ -56,6 +62,11 @@ enum {
 	IMG_6P0_MEGA,
 	IMG_7P0_MEGA,
 	IMG_8P0_MEGA,
+	IMG_9P0_MEGA,
+	IMG_AP0_MEGA,
+	IMG_BP0_MEGA,
+	IMG_CP0_MEGA,
+	IMG_DP0_MEGA,
 	IMG_SIZE_NUM
 };
 
@@ -93,8 +104,12 @@ static const struct cap_size_to_mem back_cam_raw_mem_size_tab[IMG_SIZE_NUM] = {
 	{PIXEL_5P0_MEGA, (12 << 20)},
 	{PIXEL_6P0_MEGA, (14 << 20)},
 	{PIXEL_7P0_MEGA, (16 << 20)},
-	{PIXEL_8P0_MEGA, (17 << 20)}
-
+	{PIXEL_8P0_MEGA, (17 << 20)},
+	{PIXEL_9P0_MEGA, (30 << 20)},
+	{PIXEL_AP0_MEGA, (30 << 20)},
+	{PIXEL_BP0_MEGA, (30 << 20)},
+	{PIXEL_CP0_MEGA, (30 << 20)},
+	{PIXEL_DP0_MEGA, (30 << 20)}
 };
 
 

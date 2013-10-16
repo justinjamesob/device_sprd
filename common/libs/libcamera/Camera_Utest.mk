@@ -38,6 +38,7 @@ LOCAL_SRC_FILES:= \
 	sc8830/src/cmr_arith.c \
 	sensor_drv_u/src/sensor_drv_u.c \
 	sensor/sensor_ov8825_mipi_raw.c \
+	sensor/sensor_ov13850_mipi_raw.c \
 	sensor/sensor_ov5648_mipi_raw.c \
 	sensor/sensor_imx179_mipi_raw.c \
 	sensor/sensor_ov5640_mipi.c \
@@ -89,6 +90,10 @@ endif
 
 ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc7710)
 LOCAL_CFLAGS += -DCONFIG_CAMERA_5M
+endif
+
+ifeq ($(strip $(CAMERA_SUPPORT_SIZE)),13M)
+LOCAL_CFLAGS += -DCONFIG_CAMERA_SUPPORT_13M
 endif
 
 ifeq ($(strip $(CAMERA_SUPPORT_SIZE)),8M)

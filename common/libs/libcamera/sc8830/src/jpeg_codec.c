@@ -450,20 +450,31 @@ static  int  _enc_next(uint32_t handle, struct jpeg_enc_next_param *param_ptr)
 			update_parm.yuv_phy_buf = param_ptr->src_addr_phy.addr_y;
 			update_parm.yuv_u_phy_buf = param_ptr->src_addr_phy.addr_u;
 			update_parm.yuv_v_phy_buf = param_ptr->src_addr_phy.addr_v;
-			update_parm.slice_height = param_ptr->slice_height;
+			cur_slice_height = param_ptr->slice_height;
 	} else {
 		cur_line_num = enc_cxt_ptr->cur_line_num;
-		cur_slice_height =  enc_cxt_ptr->slice_height;
+		if (0 != param_ptr->slice_height) {
+			cur_slice_height = param_ptr->slice_height;
+		} else {
+			cur_slice_height =  enc_cxt_ptr->slice_height;
+		}
 
 		if(enc_cxt_ptr->cur_line_num >=  enc_cxt_ptr->size.height) {
 			return JPEG_CODEC_ERROR;
 		}
 
-		update_parm.slice_height = enc_cxt_ptr->slice_height;
+
+		if(((cur_line_num + enc_cxt_ptr->slice_height) > param_ptr->ready_line_num)
+				&& (param_ptr->ready_line_num == enc_cxt_ptr->size.height)){
+			cur_slice_height = param_ptr->ready_line_num - cur_line_num;
+		}
+
+
 		update_parm.yuv_phy_buf = enc_cxt_ptr->src_addr_phy.addr_y + cur_line_num*enc_cxt_ptr->size.width;
 		update_parm.yuv_u_phy_buf = enc_cxt_ptr->src_addr_phy.addr_u + cur_line_num*enc_cxt_ptr->size.width/2;
 		update_parm.yuv_v_phy_buf = enc_cxt_ptr->src_addr_phy.addr_v;
 	}
+	update_parm.slice_height = cur_slice_height;
 
 	CMR_LOGI("cur_line_num %d, addr y 0x%x,addr u 0x%x.",
 		cur_line_num,
@@ -474,8 +485,9 @@ static  int  _enc_next(uint32_t handle, struct jpeg_enc_next_param *param_ptr)
 	if(0 != JPEGENC_Slice_Next(&update_parm, &slice_out)) {
 		ret =  JPEG_CODEC_ERROR;
 	}
-    enc_cxt_ptr->cur_line_num += enc_cxt_ptr->slice_height;
-	if(1 == slice_out.is_over){
+    enc_cxt_ptr->cur_line_num += cur_slice_height;
+	enc_cxt_ptr->slice_height = cur_slice_height;
+	if(enc_cxt_ptr->cur_line_num == enc_cxt_ptr->size.height){
 		enc_cxt_ptr->is_finish = 1;
 		enc_cxt_ptr->stream_real_size = slice_out.stream_size;
 		enc_cxt_ptr->cur_line_num = enc_cxt_ptr->size.height;
@@ -845,8 +857,9 @@ static void* _thread_proc(void* data)
 						CMR_LOGE("even cb is NULL.");
 					}
 				}
+			} else {
+				CMR_LOGI("receive enc next message.");
 			}
-			CMR_LOGI("receive enc next message.");
 			break;
 		case  JPEG_EVT_DEC_START:
 			handle = (uint32_t )message.data;
