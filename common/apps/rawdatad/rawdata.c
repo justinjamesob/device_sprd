@@ -361,7 +361,6 @@ static void init_productinfo_ext(void)
     RAM_SP09_PHASE_CHECK_T        phase_check;
     RAM_SP09_PHASE_CHECK_T        phase_check_temp;
 
-    chmod(batter_prodinfo_files[0], 777);
     fd = open(batter_prodinfo_files[0],O_RDWR);
 
     if(fd < 0){
