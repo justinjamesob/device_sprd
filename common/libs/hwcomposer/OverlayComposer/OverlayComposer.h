@@ -176,7 +176,6 @@ private:
     sem_t         doneSem;
     sem_t         displaySem;
     bool   threadInitFlag;
-    volatile bool threadExit;
     int composerHWLayers();
     virtual bool        threadLoop();
     virtual status_t    readyToRun();
