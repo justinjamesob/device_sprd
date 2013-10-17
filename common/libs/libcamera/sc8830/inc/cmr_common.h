@@ -158,6 +158,7 @@ struct mipi_if {
 	uint8_t                             bits_per_pxl;
 	uint8_t                             is_loose;
 	uint8_t                             lane_num;
+	uint32_t                           pclk;
 };
 
 struct  sensor_if {

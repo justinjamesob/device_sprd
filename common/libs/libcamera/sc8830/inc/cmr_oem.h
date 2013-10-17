@@ -466,7 +466,7 @@ int camera_wait_exit(struct camera_context *p_cxt);
 int camera_exit_done(struct camera_context *p_cxt);
 int camera_wait_takepicdone(struct camera_context *p_cxt);
 int camera_takepic_done(struct camera_context *p_cxt);
-void camera_sensor_inf(struct sensor_if *cam_inf_ptr, SENSOR_INF_T *inf_ptr);
+void camera_sensor_inf(struct sensor_context *sensor_cxt);
 int camera_set_sensormark(void);
 int camera_save_sensormark(void);
 int camera_takepic_callback_done(struct camera_context *p_cxt);

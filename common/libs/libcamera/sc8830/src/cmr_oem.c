@@ -786,22 +786,25 @@ int camera_save_to_file(uint32_t index, uint32_t img_fmt,
 	return 0;
 }
 
-void camera_sensor_inf(struct sensor_if *cam_inf_ptr, SENSOR_INF_T *inf_ptr)
+void camera_sensor_inf(struct sensor_context *sensor_cxt)
 {
-	if (SENSOR_INTERFACE_TYPE_CSI2 == inf_ptr->type) {
-		cam_inf_ptr->if_type = 1;
-		//lane capabiligy should be gotten from MIPI driver
-		cam_inf_ptr->if_spec.mipi.lane_num     = inf_ptr->bus_width;
-		//pixel width should be gotten from MIPI driver
-		cam_inf_ptr->if_spec.mipi.bits_per_pxl = inf_ptr->pixel_width;
-		cam_inf_ptr->if_spec.mipi.is_loose    = inf_ptr->is_loose;
-		cam_inf_ptr->if_spec.mipi.use_href     = 0;
+	if (SENSOR_INTERFACE_TYPE_CSI2 == sensor_cxt->sensor_info->sensor_interface.type) {
+		sensor_cxt->sn_if.if_type = 1;
+		sensor_cxt->sn_if.if_spec.mipi.lane_num = sensor_cxt->sensor_info->sensor_interface.bus_width;
+		sensor_cxt->sn_if.if_spec.mipi.bits_per_pxl = sensor_cxt->sensor_info->sensor_interface.pixel_width;
+		sensor_cxt->sn_if.if_spec.mipi.is_loose = sensor_cxt->sensor_info->sensor_interface.is_loose;
+		sensor_cxt->sn_if.if_spec.mipi.use_href = 0;
 		CMR_LOGV("lane_num %d, bits_per_pxl %d, is_loose %d",
-			inf_ptr->bus_width,
-			inf_ptr->pixel_width,
-			inf_ptr->is_loose);
+			sensor_cxt->sn_if.if_spec.mipi.lane_num,
+			sensor_cxt->sn_if.if_spec.mipi.bits_per_pxl,
+			sensor_cxt->sn_if.if_spec.mipi.is_loose);
 	} else {
-		cam_inf_ptr->if_type = 0;
+		sensor_cxt->sn_if.if_type = 0;
+		sensor_cxt->sn_if.if_spec.ccir.v_sync_pol = sensor_cxt->sensor_info->vsync_polarity;
+		sensor_cxt->sn_if.if_spec.ccir.h_sync_pol = sensor_cxt->sensor_info->hsync_polarity;
+		sensor_cxt->sn_if.if_spec.ccir.pclk_pol   = sensor_cxt->sensor_info->pclk_polarity;
+		sensor_cxt->sn_if.frm_deci    = sensor_cxt->sensor_info->preview_deci_num;
+		sensor_cxt->sn_if.img_ptn     = sensor_cxt->sensor_info->image_pattern;
 	}
 
 	return;

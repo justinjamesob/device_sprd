@@ -287,15 +287,7 @@ int camera_sensor_init(int32_t camera_id)
 			CMR_LOGV("It's YUV Sensor, %d", sensor_cxt->sn_if.img_fmt);
 		}
 
-		camera_sensor_inf(&sensor_cxt->sn_if, &sensor_cxt->sensor_info->sensor_interface);
-
-		if (0 == sensor_cxt->sn_if.if_type) {
-			sensor_cxt->sn_if.if_spec.ccir.v_sync_pol = sensor_cxt->sensor_info->vsync_polarity;
-			sensor_cxt->sn_if.if_spec.ccir.h_sync_pol = sensor_cxt->sensor_info->hsync_polarity;
-			sensor_cxt->sn_if.if_spec.ccir.pclk_pol   = sensor_cxt->sensor_info->pclk_polarity;
-			sensor_cxt->sn_if.frm_deci    = sensor_cxt->sensor_info->preview_deci_num;
-			sensor_cxt->sn_if.img_ptn     = sensor_cxt->sensor_info->image_pattern;
-		}
+		camera_sensor_inf(sensor_cxt);
 
 		Sensor_EventReg(camera_sensor_evt_cb);
 		ctrl->sensor_inited = 1;
@@ -1963,6 +1955,7 @@ int camera_preview_sensor_mode(void)
 		} else {
 			g_cxt->sn_cxt.sn_if.img_fmt = V4L2_SENSOR_FORMAT_RAWRGB;
 		}
+		g_cxt->sn_cxt.sn_if.if_spec.mipi.pclk = sn_mode->pclk;
 	}
 
 	return ret;
@@ -2007,6 +2000,7 @@ int camera_capture_sensor_mode(void)
 		CMR_LOGE("Wrong sensor formast %d", sensor_mode->image_format);
 		ret = -CAMERA_NOT_SUPPORTED;
 	}
+	g_cxt->sn_cxt.sn_if.if_spec.mipi.pclk = sensor_mode->pclk;
 
 	g_cxt->max_size.width = g_cxt->picture_size.width;
 	g_cxt->max_size.height = g_cxt->picture_size.height;
@@ -2398,6 +2392,7 @@ int camera_start_preview_internal(void)
 				CMR_LOGE("Wrong sensor formast %d", sensor_if_mode->image_format);
 				ret = -CAMERA_NOT_SUPPORTED;
 			}
+			g_cxt->sn_cxt.sn_if.if_spec.mipi.pclk = sensor_if_mode->pclk;
 			ret = cmr_v4l2_if_cfg(&g_cxt->sn_cxt.sn_if);
 			if (ret) {
 				CMR_LOGE("the sensor interface is unsupported by V4L2");
@@ -4722,7 +4717,7 @@ int camera_preview_init(int format_mode)
 		ret = -CAMERA_INVALID_FORMAT;
 		goto exit;
 	}
-
+	g_cxt->sn_cxt.sn_if.if_spec.mipi.pclk = sensor_mode->pclk;
 	CMR_LOGI("sensor output, w h, %d %d", sensor_mode->width, sensor_mode->height);
 
 	v4l2_cfg.channel_id               = CHN_1;
@@ -4830,7 +4825,7 @@ int camera_preview_weak_init(int format_mode)
 		ret = -CAMERA_INVALID_FORMAT;
 		goto exit;
 	}
-
+	g_cxt->sn_cxt.sn_if.if_spec.mipi.pclk = sensor_mode->pclk;
 	CMR_LOGI("sensor output, width, hegiht %d %d", sensor_mode->width, sensor_mode->height);
 	v4l2_cfg.channel_id = CHN_1;
 	v4l2_cfg.cfg.dst_img_size.width   = g_cxt->preview_size.width;

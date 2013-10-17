@@ -210,7 +210,7 @@ int cmr_v4l2_if_cfg(struct sensor_if *sn_if)
 		timing_param[5] = sn_if->if_spec.mipi.bits_per_pxl;
 		timing_param[6] = sn_if->if_spec.mipi.is_loose;
 		timing_param[7] = sn_if->if_spec.mipi.lane_num;
-
+		timing_param[8] = sn_if->if_spec.mipi.pclk;
 	}
 
 	ctrl.id = V4L2_CID_USER_CLASS;

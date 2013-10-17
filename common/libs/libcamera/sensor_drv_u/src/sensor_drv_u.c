@@ -853,6 +853,8 @@ LOCAL void Sensor_SetExportInfo(SENSOR_EXP_INFO_T * exp_info_ptr)
 				    resolution_trim_ptr[i].trim_height;
 				exp_info_ptr->sensor_mode_info[i].line_time =
 				    resolution_trim_ptr[i].line_time;
+				exp_info_ptr->sensor_mode_info[i].pclk =
+				    resolution_trim_ptr[i].pclk;
 			} else {
 				exp_info_ptr->sensor_mode_info[i].trim_start_x =
 				    0x00;
