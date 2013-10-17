@@ -3,7 +3,7 @@ import init.sc8830.usb.rc
 on early-init
     export EXTERNAL_STORAGE /storage/sdcard0
     export SECONDARY_STORAGE /storage/sdcard1
-    mkdir /storage 0774 system sdcard_rw
+    mkdir /storage 0777 system sdcard_rw
     mkdir /storage/sdcard0 0000 system system
     mkdir /storage/sdcard1 0000 system system
     # for backwards compatibility

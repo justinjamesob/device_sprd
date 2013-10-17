@@ -126,7 +126,7 @@ on fs
 
 on post-fs
     # once everything is setup, no need to modify /
-    mount rootfs rootfs / rw remount
+    mount rootfs rootfs / ro remount
     chown system system /productinfo/adc.bin
 
     # We chown/chmod /cache again so because mount is run as root + defaults
