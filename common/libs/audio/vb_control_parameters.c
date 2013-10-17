@@ -1086,6 +1086,7 @@ static int vbc_call_end_process(struct tiny_audio_device *adev,int is_timeout)
 	i2s_pin_mux_sel(adev,2);
     }
     if(is_timeout) {
+	mixer_ctl_set_value(adev->private_ctl.vbc_switch, 0, VBC_ARM_CHANNELID);  //switch vbc to arm
 	adev->call_prestop = 0;
 	adev->call_start = 0;
     }
