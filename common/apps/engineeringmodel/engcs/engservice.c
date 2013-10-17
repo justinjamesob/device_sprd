@@ -8,6 +8,7 @@
 #include "stdlib.h"
 #include <errno.h>
 #include <sys/statfs.h>
+#include <pthread.h>
 
 #include "engservice.h"
 #include "engopt.h"
@@ -28,7 +29,7 @@ struct eng_client_info{
 };
 
 struct eng_client_info client_info[ENG_MAX_CONNECT_NUM];
-
+static pthread_mutex_t gEngRegMutex = PTHREAD_MUTEX_INITIALIZER;
 static int monitor_svc_fd = -1;
 static char eng_read_buf[ENG_MAX_RW_SIZE] = {0};
 static char eng_write_buf[ENG_MAX_RW_SIZE] = {0};
@@ -185,6 +186,7 @@ static int eng_event_unreg(int fd)
 	int i;
 
 	ENG_LOG("%s: fd=%d",__func__, fd);
+        pthread_mutex_lock(&gEngRegMutex);
 	for (i=0; i<ENG_MAX_CONNECT_NUM; i++) {
 
 		if(client_info[i].fe != NULL) {
@@ -209,7 +211,7 @@ static int eng_event_unreg(int fd)
 		}
 	}
 	close(fd);
-
+        pthread_mutex_unlock(&gEngRegMutex);
 	if(i>=ENG_MAX_CONNECT_NUM)
 		return -1;
 	
@@ -219,33 +221,45 @@ static int eng_event_unreg(int fd)
 static int eng_event_reg(int fd)
 {
 	int type;
+        int ret = 0;
 	char regname[ENG_MAX_CLIENT_NAME_LEN];
+        char engname[ENG_MAX_CONNECT_NUM];
 	fdevent* fe = NULL;
 	fd_func func = pcclient_event_func;
 	
 	ENG_LOG("%s: fd=%d",__func__, fd);
+        pthread_mutex_lock(&gEngRegMutex);
     if (0 == eng_event_can_reg()) {
         ENG_LOG("engserver eng_event_reg reached max num\n");
+        pthread_mutex_unlock(&gEngRegMutex);
         return -1;
     }
-
-	memset(eng_read_buf,0,ENG_MAX_RW_SIZE);
-	if (-1 == eng_read(fd, eng_read_buf, ENG_MAX_RW_SIZE)){
+         memset(engname, 0, ENG_MAX_CONNECT_NUM);
+         ret = eng_read(fd, engname, ENG_MAX_CONNECT_NUM);
+         if(-1 == ret)
+         {
 		ENG_LOG("engserver eng_event_reg read error\n");
 		eng_close(fd);
+                pthread_mutex_unlock(&gEngRegMutex);
 		return -1;
-	}
+	 }
+         if(0 == ret)
+         {
+                ENG_LOG("engserver eng_event_reg read no data\n");
+                eng_close(fd);
+                pthread_mutex_unlock(&gEngRegMutex);
+                return -1;
+         }
 
 
 	memset(regname, 0, ENG_MAX_CLIENT_NAME_LEN);
-	type = clinet_info_getnametype(eng_read_buf, regname);
+        type = clinet_info_getnametype(engname, regname);
 
 	if (monitor_svc_fd < 0
 			&& ( strncmp((const char*)regname,ENG_MONITOR,strlen(ENG_MONITOR)) != 0)){
-		memset(eng_write_buf, 0, ENG_MAX_RW_SIZE);
-		strcpy(eng_write_buf, ENG_DESTERROR);
-		eng_write(fd, eng_write_buf, strlen(eng_write_buf));
+		eng_write(fd,ENG_DESTERROR,strlen(ENG_DESTERROR));
 		close(fd);
+                pthread_mutex_unlock(&gEngRegMutex);
 		return -1;
 	}
 
@@ -253,6 +267,7 @@ static int eng_event_reg(int fd)
 	if (func==NULL){
 		ALOGD("engserver eng_event_reg get client function error\n");
 		eng_close(fd);
+                pthread_mutex_unlock(&gEngRegMutex);
 		return -1;
 	}
 
@@ -269,8 +284,10 @@ static int eng_event_reg(int fd)
 	else
 	{
 		eng_write(fd,ENG_ERROR,strlen(ENG_ERROR));
+                pthread_mutex_unlock(&gEngRegMutex);
 		return -1;
 	}
+        pthread_mutex_unlock(&gEngRegMutex);
 	return 0;
 }
 
