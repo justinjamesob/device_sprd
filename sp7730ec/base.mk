@@ -151,5 +151,6 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
 
 $(call inherit-product, device/sprd/partner/ittiam/wlan/device-itm.mk)
+$(call inherit-product, device/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/engineeringmodel/module.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)
