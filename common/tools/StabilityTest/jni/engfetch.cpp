@@ -22,7 +22,8 @@ int eng_getphasecheck(SP09_PHASE_CHECK_T* phase_check)
     int fd = open(PHASE_CHECKE_FILE,O_RDONLY);
     if (fd <0)
     {
-        ALOGD("open failed");
+        ALOGE("open failed");
+        return -1;
     }
     len = read(fd,phase_check,sizeof(SP09_PHASE_CHECK_T));
 
