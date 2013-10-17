@@ -91,20 +91,7 @@ bool OverlayComposer::threadLoop()
 
     sem_wait(&cmdSem);
 
-    if (threadExit == true)
-    {
-       ALOGI("composer thread safely exit");
-       threadExit = false;
-       return false;
-    }
-
-    int status = composerHWLayers();
-    if (status)
-    {
-        ALOGE("composerHWLayers failed");
-        sem_post(&doneSem);
-        return false;
-    }
+    composerHWLayers();
 
     glFinish();
 
