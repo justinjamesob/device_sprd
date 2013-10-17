@@ -1,1 +1,1 @@
-BUILD=debug CONFIG=sc8825 KDIR=../../../../../../../out/target/product/sp8825ea/obj/KERNEL make $1
+BUILD=debug CONFIG=sc8830 KDIR=../../../../../../../out/target/product/sp8835eb/obj/KERNEL make $1

@@ -47,6 +47,7 @@ static _mali_osk_resource_t arch_configuration [] =
 		.description = "Mali-400 PP 1",
 		.mmu_id = 3
 	},
+#if MALI_PP_CORE_NUMBER == 4
 	{
 		.type = MALI400PP,
 		.base = SPRD_MALI_PHYS+0xC000,
@@ -61,6 +62,7 @@ static _mali_osk_resource_t arch_configuration [] =
 		.description = "Mali-400 PP 3",
 		.mmu_id = 5
 	},
+#endif
 	{
 		.type = MMU,
 		.base = SPRD_MALI_PHYS+0x3000,
@@ -82,6 +84,7 @@ static _mali_osk_resource_t arch_configuration [] =
 		.description = "Mali-400 MMU for PP 1",
 		.mmu_id = 3
 	},
+#if MALI_PP_CORE_NUMBER == 4
 	{
 		.type = MMU,
 		.base = SPRD_MALI_PHYS+0x6000,
@@ -96,6 +99,7 @@ static _mali_osk_resource_t arch_configuration [] =
 		.description = "Mali-400 MMU for PP 3",
 		.mmu_id = 5
 	},
+#endif
 #if 0
 	{
 		.type = MEMORY,
