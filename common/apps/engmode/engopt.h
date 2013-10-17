@@ -37,13 +37,23 @@ extern "C" {
 #define ENG_WIFITX      "TX"
 #define ENG_WIFIRX_REQ      "RX?"
 #define ENG_WIFIRX      "RX"
-#define ENG_WIFIRX_PACKCOUNT	"RXPACKCOUNT?"
 #define ENG_WIFI_CLRRXPACKCOUNT	"CLRRXPACKCOUNT"
 #define ENG_GPSSEARCH_REQ	"SEARCH?"
 #define ENG_GPSSEARCH	"SEARCH"
 #define ENG_GPSPRNSTATE_REQ	"PRNSTATE?"
 #define ENG_GPSSNR_REQ	"SNR?"
 #define ENG_GPSPRN	"PRN"
+//------------------------------------------------
+
+#define ENG_WIFIRATE                "RATE"
+#define ENG_WIFIRATE_REQ            "RATE?" 
+#define ENG_WIFITXGAININDEX         "TXGAININDEX"
+#define ENG_WIFITXGAININDEX_REQ     "TXGAININDEX?"
+#define ENG_WIFIRX_PACKCOUNT	    "RXPACKCOUNT?"
+#define ENG_WIFIRSSI_REQ            "RSSI?"
+
+//------------------------------------------------
+
 
 #define ENG_AT_CHANNEL
 
@@ -68,6 +78,13 @@ extern "C" {
         GPSPRNSTATE_REQ_INDEX,
         GPSSNR_REQ_INDEX,
         GPSPRN_INDEX,
+//------------------------------------------------
+		ENG_WIFIRATE_INDEX,
+		ENG_WIFIRATE_REQ_INDEX,
+		ENG_WIFITXGAININDEX_INDEX,
+		ENG_WIFITXGAININDEX_REQ_INDEX,
+		ENG_WIFIRSSI_REQ_INDEX,
+//------------------------------------------------        
     }eut_cmd_enum;
 
     typedef enum{
