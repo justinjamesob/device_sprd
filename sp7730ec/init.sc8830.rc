@@ -172,6 +172,7 @@ on boot
 
 
     chmod 666 /dev/ttyS0
+    chmod 666 /dev/sttybt0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
@@ -405,12 +406,11 @@ service pbap /system/bin/sdptool add --channel=19 PBAP
 service akmd /system/bin/akmd8975 -m 3
     class main
     oneshot
-service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm --no2bytes \
-    --tosleep 50000 --baudrate 3000000 --use_baudrate_for_download  \
-    --patchram /system/bin/bcm4330.hcd /dev/ttyS0
-    class main
+
+service hciattach /system/bin/hciattach -n /dev/sttybt0 sprd_shark
+    socket bluetooth stream 660 bluetooth bluetooth
     user bluetooth
-    group bluetooth net_bt_admin
+    group wifi bluetooth net_bt_admin net_bt inet net_raw net_admin system
     disabled
     oneshot
 
