@@ -307,6 +307,7 @@ private:
 	Mutex                           mStateLock;
 	Condition                       mStateWait;
 	Mutex                           mParamLock;
+	Condition                       mParamWait;
 
 	uint32_t                        mPreviewHeapSize;
 	uint32_t                        mPreviewHeapNum;

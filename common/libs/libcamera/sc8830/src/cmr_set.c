@@ -1702,9 +1702,9 @@ int camera_autofocus_stop(uint32_t is_external)
 	cxt->cmr_set.af_cancelled |= 0x01;
 	cxt->cmr_set.af_cancelled |= (is_external & 0x1) << 1;
 	cxt->cmr_set.bflash = 1;
+	CMR_LOGV("af_cancelled 0x%x", cxt->cmr_set.af_cancelled);
 	pthread_mutex_unlock(&cxt->cmr_set.set_mutex);
 
-	CMR_LOGV("af_cancelled 0x%x", cxt->cmr_set.af_cancelled);
 	camera_autofocus_quit();
 	CMR_LOGV("quit.");
 	return ret;

@@ -363,9 +363,8 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
     int min_bufs;
 
 	LOGV("setPreviewWindow E");
-	mParamLock.lock();
-	mUseParameters = mParameters;
-	mParamLock.unlock();
+	Mutex::Autolock l(&mParamLock);
+
 
     mPreviewWindow = w;
 
@@ -403,7 +402,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
     int preview_width;
     int preview_height;
-    mUseParameters.getPreviewSize(&preview_width, &preview_height);
+    mParameters.getPreviewSize(&preview_width, &preview_height);
     LOGV("%s: preview size: %dx%d.", __func__, preview_width, preview_height);
 
 #if CAM_OUT_YUV420_UV
@@ -412,7 +411,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
     int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
 #endif
 
-    const char *str_preview_format = mUseParameters.getPreviewFormat();
+    const char *str_preview_format = mParameters.getPreviewFormat();
 	int usage;
 
     LOGV("%s: preview format %s", __func__, str_preview_format);
@@ -444,7 +443,7 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
         	return INVALID_OPERATION;
     	}
     }
-	if (mUseParameters.getPreviewEnv()) {
+	if (mParameters.getPreviewEnv()) {
 	    if (w->set_buffers_geometry(w,
 	                                SIZE_ALIGN(preview_width), SIZE_ALIGN(preview_height),
 	                                hal_pixel_format)) {
@@ -659,7 +658,7 @@ bool SprdCameraHardware::recordingEnabled()
 status_t SprdCameraHardware::autoFocus()
 {
 	LOGV("Starting auto focus.");
-	LOGV("mLock:autoFocus S.\n");
+	LOGV("mLock:autoFocus E.\n");
 	Mutex::Autolock l(&mLock);
 
 	if (!isPreviewing()) {
@@ -671,6 +670,7 @@ status_t SprdCameraHardware::autoFocus()
 		LOGE("autoFocus existing, direct return!");
 		return ALREADY_EXISTS;
 	}
+	mMsgEnabled |= CAMERA_MSG_FOCUS;
 
 	if(0 != camera_start_autofocus(CAMERA_AUTO_FOCUS, camera_cb, this)){
 		LOGE("auto foucs fail.");
@@ -679,17 +679,20 @@ status_t SprdCameraHardware::autoFocus()
 
 	setCameraState(SPRD_FOCUS_IN_PROGRESS, STATE_FOCUS);
 
-	LOGV("mLock:autoFocus E.\n");
+	LOGV("mLock:autoFocus X.\n");
 	return NO_ERROR;
 }
 
 status_t SprdCameraHardware::cancelAutoFocus()
 {
 	bool ret = 0;
+	LOGV("mLock:CancelFocus E.\n");
 	Mutex::Autolock l(&mLock);
+	mMsgEnabled &= ~CAMERA_MSG_FOCUS;
 	ret = camera_cancel_autofocus();
 
 	WaitForFocusCancelDone();
+	LOGV("mLock:CancelFocus X.\n");
 	return ret;
 }
 
@@ -759,6 +762,13 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	ret = cmr_msg_post(mSwitchMonitorMsgQueHandle, &message);
 	if (ret) {
 		LOGE("setParameters Fail to send one msg!");
+		mParamLock.unlock();
+		return NO_ERROR;
+	}
+	if (mParamWait.waitRelative(mParamLock, 500000000)) {
+		LOGE("setParameters wait timeout!");
+	} else {
+		LOGV("setParameters wait OK");
 	}
 	mParamLock.unlock();
 	usleep(10*1000);
@@ -833,6 +843,8 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 	// FIXME: will this make a deep copy/do the right thing? String8 i
 	// should handle it
 	mParameters = params;
+	mParamWait.signal();
+	LOGV("setParametersInternal param set OK.");
 	mParamLock.unlock();
 
 	// libqcamera only supports certain size/aspect ratios
@@ -1409,7 +1421,7 @@ bool SprdCameraHardware::WaitForFocusCancelDone()
 	while (SPRD_IDLE != mCameraState.focus_state
 		 && SPRD_ERROR != mCameraState.focus_state) {
 		LOGV("WaitForFocusCancelDone: waiting for SPRD_IDLE from %d", getFocusState());
-		mStateWait.wait(mStateLock);
+		mStateWait.waitRelative(mStateLock, 1000000000);
 		LOGV("WaitForFocusCancelDone: woke up");
 	}
 
