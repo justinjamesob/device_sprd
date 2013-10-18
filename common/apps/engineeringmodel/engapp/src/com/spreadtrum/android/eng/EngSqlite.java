@@ -46,12 +46,12 @@ public class EngSqlite {
             Process p = null;
             DataOutputStream os = null;
             try {
-                p = Runtime.getRuntime().exec("chmod 777 productinfo");
+                p = Runtime.getRuntime().exec("chmod 774 productinfo");
                 os = new DataOutputStream(p.getOutputStream());
                 BufferedInputStream err = new BufferedInputStream(p.getErrorStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(err));
                 if(DEBUG) Log.d("Vtools","os= "+br.readLine());
-                Runtime.getRuntime().exec("chmod 777 "+file.getAbsolutePath());
+                Runtime.getRuntime().exec("chmod 774 "+file.getAbsolutePath());
                 int status = p.waitFor();
 		Log.d(TAG, "process :"+status+"has finished");
             } catch (IOException e) {
