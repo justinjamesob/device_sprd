@@ -312,6 +312,7 @@ on boot
     chown system system /sys/class/power_supply/battery/battery_0
     chown system system /sys/class/power_supply/battery/battery_1
     chown system system /sys/class/power_supply/battery/hw_switch_point
+    chown system system /sys/class/power_supply/battery/save_capacity
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
     setprop net.tcp.buffersize.default 4096,87380,110208,4096,16384,110208
@@ -337,6 +338,7 @@ on charger
     chown system system /sys/class/power_supply/battery/battery_0
     chown system system /sys/class/power_supply/battery/battery_1
     chown system system /sys/class/power_supply/battery/hw_switch_point
+    chown system system /sys/class/power_supply/battery/save_capacity
     class_start core
     class_start charger
 

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 			LOGE("uevent init error\n");
 		}
 	}
-
+       init_capacity();
 	pre_usb_online = read_usb();
 	pre_ac_online = read_ac();
 	LOGD("inital status usb: %d ac: %d\n", pre_usb_online, pre_ac_online);
@@ -81,6 +81,7 @@ int main(int argc, char **argv)
 				LOGD("write_nv\n");
 			}
 		}
+        save_capacity();
 	}
 
 	/* never come to here */
@@ -258,3 +259,87 @@ void write_nv(void)
 	close(sys_fd);
 	close(file_fd);
 }
+#define CAPACITY_FILE "/data/.save_capacity"
+#define INIT_CAPACITY_NODE "/sys/class/power_supply/battery/save_capacity"
+#define CAPACITY_NODE "/sys/class/power_supply/battery/capacity"
+
+void init_capacity(void)
+{
+	int file_fd;
+	int sys_fd;
+	char nv_value[10] = { 0 };
+	int ret;
+	file_fd = open(CAPACITY_FILE, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	if (file_fd == -1) {
+		LOGE("open file: %s error %d\n", NV_FILE, file_fd);
+		return;
+	}
+
+	ret = read(file_fd, nv_value, sizeof(nv_value));
+
+	if (ret == 0) {
+		LOGD("file: %s empty\n", NV_FILE);
+		nv_value[0] = '3';
+		nv_value[1] = '3';
+		nv_value[2] = '3';
+		//close(file_fd);
+		//return;
+	}
+
+	sys_fd = open(INIT_CAPACITY_NODE, O_WRONLY);
+	if (sys_fd == -1) {
+		LOGE("file: %s open error\n", INIT_CAPACITY_NODE);
+		close(file_fd);
+		return;
+	}
+	ret = write(sys_fd, nv_value, strlen(nv_value));
+	if (ret != (int)strlen(nv_value)) {
+		LOGE("write %s failed\n", INIT_CAPACITY_NODE);
+	}
+	LOGD("write %s to %s \n", nv_value, INIT_CAPACITY_NODE);
+	close(file_fd);
+	close(sys_fd);
+	return;
+}
+
+int old_capacity = 200;
+void save_capacity(void)
+{
+	int file_fd;
+	int sys_fd;
+    int new_capacity;
+	char nv_value[10] = { 0 };
+	int ret;
+
+	sys_fd = open(CAPACITY_NODE, O_RDONLY);
+	if (sys_fd == -1) {
+		LOGE("file: %s open error\n", CAPACITY_NODE);
+		return;
+	}
+	ret = read(sys_fd, nv_value, sizeof(nv_value));
+	if (ret == 0) {
+		LOGE("read %s failed\n", CAPACITY_NODE);
+		close(sys_fd);
+		return;
+	}
+        close(sys_fd);
+        new_capacity = strtol(nv_value,NULL,0);
+        if(new_capacity != old_capacity){
+            old_capacity = new_capacity;
+        }else{
+            return;
+        }
+	file_fd = open(CAPACITY_FILE, O_WRONLY |O_CREAT, S_IRUSR | S_IWUSR);
+	if (file_fd == -1) {
+		LOGE("open %s failed\n", CAPACITY_FILE);
+		return;
+	}
+	ret = write(file_fd, nv_value, strlen(nv_value));
+	if (ret != (int)strlen(nv_value)) {
+		LOGE("write %s failed\n", CAPACITY_FILE);
+	}
+	LOGD("write %s to %s \n", nv_value, CAPACITY_FILE);
+	close(file_fd);
+}
+
+
