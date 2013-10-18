@@ -15,13 +15,13 @@
 		android:title="Application"
 		android:summaryOn="Logcat enable"
 		android:summaryOff="Logcat disable"
-		android:defaultValue="true">
+		android:defaultValue="false">
 	</CheckBoxPreference>
 	<CheckBoxPreference android:key="modemlog_enable"
 		android:title="Modem"
 		android:summaryOn="Modem log enable"
 		android:summaryOff="Modem log disable"
-		android:defaultValue="true">
+		android:defaultValue="false">
 	</CheckBoxPreference>
     <CheckBoxPreference android:key="modem_slog_enable"
         android:title="Modem slog"
