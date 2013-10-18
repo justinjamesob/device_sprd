@@ -670,7 +670,7 @@ int eng_linuxcmd_bteutmode(char *req, char *rsp)
 int eng_linuxcmd_wifieutmode(char * req, char * rsp)
 {
     int ret,len;
-    ALOGI("Call %s     Command is  %s",__FUNCTION__,req);
+    ENG_LOG("Call %s     Command is  %s\n",__FUNCTION__,req);
     ret = eng_atdiag_euthdlr(req,len,rsp,WIFI_MODULE_INDEX);
     return ret;
 }

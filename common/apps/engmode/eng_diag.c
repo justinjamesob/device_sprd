@@ -115,6 +115,8 @@ struct eut_cmd eut_cmds[]={
     {WIFIRATIO_INDEX,ENG_WIFIRATIO},
     {WIFITX_FACTOR_REQ_INDEX,ENG_WIFITX_FACTOR_REQ},
     {WIFITX_FACTOR_INDEX,ENG_WIFITX_FACTOR},
+	{ENG_WIFITXGAININDEX_REQ_INDEX, ENG_WIFITXGAININDEX_REQ},
+	{ENG_WIFITXGAININDEX_INDEX, ENG_WIFITXGAININDEX},
     {WIFITX_REQ_INDEX,ENG_WIFITX_REQ},
     {WIFITX_INDEX,ENG_WIFITX},
     {WIFIRX_PACKCOUNT_INDEX,ENG_WIFIRX_PACKCOUNT},
@@ -123,7 +125,10 @@ struct eut_cmd eut_cmds[]={
     {WIFIRX_INDEX,ENG_WIFIRX},
     {GPSPRNSTATE_REQ_INDEX,ENG_GPSPRNSTATE_REQ},
     {GPSSNR_REQ_INDEX,ENG_GPSSNR_REQ},
-    {GPSPRN_INDEX,ENG_GPSPRN}
+    {GPSPRN_INDEX,ENG_GPSPRN},
+	{ENG_WIFIRATE_REQ_INDEX, ENG_WIFIRATE_REQ},
+    {ENG_WIFIRATE_INDEX,ENG_WIFIRATE},
+    {ENG_WIFIRSSI_REQ_INDEX, ENG_WIFIRSSI_REQ},  
 };
 
 static int eng_diag_write2pc(void)
@@ -367,7 +372,7 @@ int eng_diag_user_handle(int type, char *buf,int len)
         eng_diag_reboot(g_reset);
     }
 
-    if ( type == CMD_USER_AUDIO ) {
+    if ( type == CMD_USER_AUDIO || (CMD_USER_APCMD == type)) {
         ENG_LOG("%s: this is audio type !\n", __FUNCTION__);
         return 1;
     }
@@ -421,7 +426,8 @@ int eng_atdiag_euthdlr(char * buf, int len, char * rsp,int module_index)
     int cmd_index = -1;
     get_sub_str(buf,data ,'=' ,',');
     cmd_index = get_cmd_index(buf);
-    ALOGD("eng_atdiag_euthdlr  args0 = %s   args1 = %s  cmd_index=%d",args0,args1,cmd_index);
+	ENG_LOG("\r\n");
+    ENG_LOG("eng_atdiag_euthdlr(), args0 =%s, args1=%s, cmd_index=%d\n",args0,args1,cmd_index);
     switch(cmd_index){
         case EUT_REQ_INDEX:
             if(module_index == BT_MODULE_INDEX){
@@ -429,8 +435,8 @@ int eng_atdiag_euthdlr(char * buf, int len, char * rsp,int module_index)
                 bt_eutops.bteut_req(rsp);
             }
             else if(module_index == WIFI_MODULE_INDEX){
-                ALOGD("case WIFIEUT_INDEX");
-                wifi_eutops.wifieut_req(rsp);
+                ENG_LOG("case WIFIEUT_INDEX");
+                wifi_eut_get(rsp);
             }
             else {
                 ALOGD("case GPS_INDEX");
@@ -443,8 +449,8 @@ int eng_atdiag_euthdlr(char * buf, int len, char * rsp,int module_index)
                 bt_eutops.bteut(atoi(data[1]),rsp);
             }
             else if(module_index == WIFI_MODULE_INDEX){
-                ALOGD("case WIFIEUT_INDEX");
-                wifi_eutops.wifieut(atoi(data[1]),rsp);
+                ENG_LOG("case WIFIEUT_INDEX");
+                wifi_eut_set(atoi(data[1]), rsp);
             }
             else {
                 ALOGD("case GPS_INDEX");
@@ -452,45 +458,46 @@ int eng_atdiag_euthdlr(char * buf, int len, char * rsp,int module_index)
             }
             break;
         case WIFICH_REQ_INDEX:
-            wifi_eutops.wifi_ch_req(rsp);
+            wifi_channel_get(rsp);
             break;
         case WIFICH_INDEX:
-            ALOGD("case WIFICH_INDEX   %d",WIFICH_INDEX);
-            wifi_eutops.set_wifi_ch(atoi(data[1]),rsp);
+            ENG_LOG("case WIFICH_INDEX   %d",WIFICH_INDEX);
+            wifi_channel_set(atoi(data[1]),rsp);
             break;
         case WIFIMODE_INDEX:
-            wifi_eutops.set_wifi_mode(data[1],rsp);
+            //wifi_eutops.set_wifi_mode(data[1],rsp);
             break;
         case WIFIRATIO_INDEX:
             ALOGD("case WIFIRATIO_INDEX   %d",WIFIRATIO_INDEX);
-            wifi_eutops.set_wifi_ratio(atof(data[1]),rsp);
+            //wifi_eutops.set_wifi_ratio(atof(data[1]),rsp);
             break;
         case WIFITX_FACTOR_INDEX:
-            wifi_eutops.set_wifi_tx_factor(atol(data[1]),rsp);
+            //wifi_eutops.set_wifi_tx_factor(atol(data[1]),rsp);
             break;
         case WIFITX_INDEX:
-            wifi_eutops.wifi_tx(atoi(data[1]),rsp);
+			ENG_LOG("case WIFITX_INDEX   %d",WIFITX_INDEX);
+            wifi_tx_set(atoi(data[1]),rsp);
             break;
         case WIFIRX_INDEX:
-            wifi_eutops.wifi_rx(atoi(data[1]),rsp);
+            wifi_rx_set(atoi(data[1]),rsp);
             break;
         case WIFITX_REQ_INDEX:
-            wifi_eutops.wifi_tx_req(rsp);
+            wifi_tx_get(rsp);
             break;
         case WIFIRX_REQ_INDEX:
-            wifi_eutops.wifi_rx_req(rsp);
+            wifi_rx_get(rsp);
             break;
         case WIFITX_FACTOR_REQ_INDEX:
-            wifi_eutops.wifi_tx_factor_req(rsp);
+            //wifi_eutops.wifi_tx_factor_req(rsp);
             break;
         case WIFIRATIO_REQ_INDEX:
-            wifi_eutops.wifi_ratio_req(rsp);
+            //wifi_eutops.wifi_ratio_req(rsp);
             break;
         case WIFIRX_PACKCOUNT_INDEX:
-            wifi_eutops.wifi_rxpackcount(rsp);
+            wifi_rxpktcnt_get(rsp);
             break;
         case WIFICLRRXPACKCOUNT_INDEX:
-            wifi_eutops.wifi_clr_rxpackcount(rsp);
+            //wifi_eutops.wifi_clr_rxpackcount(rsp);
             break;
         case GPSSEARCH_REQ_INDEX:
             gps_eutops.gps_search_req(rsp);
@@ -507,6 +514,28 @@ int eng_atdiag_euthdlr(char * buf, int len, char * rsp,int module_index)
         case GPSPRN_INDEX:
             gps_eutops.gps_setprn(atoi(data[1]),rsp);
             break;
+//-----------------------------------------------------
+		case ENG_WIFIRATE_INDEX:
+			ENG_LOG("%s(), case:ENG_WIFIRATE_INDEX\n", __FUNCTION__);
+			wifi_rate_set(data[1], rsp);
+			break;
+		case ENG_WIFIRATE_REQ_INDEX:
+			ENG_LOG("%s(), case:ENG_WIFIRATE_REQ_INDEX\n", __FUNCTION__);
+			wifi_rate_get(rsp);
+			break;
+		case ENG_WIFITXGAININDEX_INDEX:
+			ENG_LOG("%s(), case:ENG_WIFITXGAININDEX_INDEX\n", __FUNCTION__);
+			wifi_txgainindex_set(atoi(data[1]),rsp);
+			break;
+		case ENG_WIFITXGAININDEX_REQ_INDEX:
+			ENG_LOG("%s(), case:ENG_WIFITXGAININDEX_REQ_INDEX\n", __FUNCTION__);
+			wifi_txgainindex_get(rsp);
+			break;
+		case ENG_WIFIRSSI_REQ_INDEX:
+			ENG_LOG("%s(), case:ENG_WIFIRSSI_REQ_INDEX\n", __FUNCTION__);
+			wifi_rssi_get(rsp);
+			break;
+//-----------------------------------------------------
         default:
             strcpy(rsp,"can not match the at command");
             return 0;
@@ -549,7 +578,7 @@ int get_cmd_index(char *buf)
     int index = -1;
     int i;
     for(i=0;i<(int)NUM_ELEMS(eut_cmds);i++){
-        if(strstr(buf,eut_cmds[i].name) != NULL)
+       if(strstr(buf,eut_cmds[i].name) != NULL)
         {
             index = eut_cmds[i].index;
             break;
