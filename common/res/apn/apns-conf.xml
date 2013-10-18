@@ -2442,18 +2442,6 @@
         type="default,supl"
         authtype="1"
     />
-    <apn carrier="BO - Nuevatel MMS"
-        mcc="736"
-        mnc="01"
-        apn=""
-        mmsproxy=""
-        mmsport=""
-        user=""
-        password=""
-        mmsc=""
-        type="mms"
-        authtype="1"
-    />
     <!-- Bolivia Tigo -->
     <apn carrier="BO - TIGO Web"
         mcc="736"
@@ -2464,18 +2452,6 @@
         user=""
         password=""
         type="default,supl"
-        authtype="1"
-    />
-    <apn carrier="BO - TIGO MMS"
-        mcc="736"
-        mnc="03"
-        apn=""
-        mmsproxy=""
-        mmsport=""
-        user=""
-        password=""
-        mmsc=""
-        type="mms"
         authtype="1"
     />
     <!-- Bosnia and Herzegovina HT-ERONET -->
