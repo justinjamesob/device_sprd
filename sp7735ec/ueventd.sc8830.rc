@@ -36,6 +36,7 @@
 /dev/spipe_td4          0666     system  system
 /dev/spipe_td5          0666     system  system
 /dev/spipe_td6          0660     media   audio
+/dev/spipe_td8          0666     system  system
 
 /dev/slog_w            0666     system  system
 /dev/spipe_w0          0666     system  system
