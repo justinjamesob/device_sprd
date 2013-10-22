@@ -247,4 +247,6 @@
     <string name="type_is_wrong_uplmn">Type should be 1 or 0. try again!</string>
     <string name="fail_uplmn">Failed and try again.</string>
     <!-- Add 20130625 Spreadst of 177803 add Traditional Chinese support for uplum end -->
+    <string name="cmcc_wifi_test_sleep">Never sleep</string>
+    <string name="cmcc_wifi_test_Maximum_power">Maximum power</string>
 </resources>
