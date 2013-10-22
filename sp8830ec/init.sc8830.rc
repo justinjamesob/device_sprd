@@ -132,7 +132,7 @@ service engservicet /system/bin/engservice -t 1
     socket engtd stream 660 system system
     class core
     user system
-    group system
+    group system wifi inet
     disabled
     oneshot
 

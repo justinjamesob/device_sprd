@@ -458,6 +458,18 @@ static void eng_test_function(char* buf)
 		ALOGD("wl PM 0");
 		system("wl PM 0");
 		//system("iwconfig wlan0 power off");
+	}else if( 0 == strncmp (buf,"SET MAX POWER",strlen("SET MAX POWER")) ){
+		ENG_LOG("SET MAX POWER");
+		ALOGD("iwnpi wlan0 set_tx_power 1127");
+		system("iwnpi wlan0 set_tx_power 1127");
+		ALOGD("iwnpi wlan0 set_tx_power 127");
+		system("iwnpi wlan0 set_tx_power 127");
+	}else if( 0 == strncmp (buf,"UNSET MAX POWER",strlen("UNSET MAX POWER")) ){
+		ENG_LOG("UNSET MAX POWER");
+		ALOGD("iwnpi wlan0 set_tx_power 1088");
+		system("iwnpi wlan0 set_tx_power 1088");
+		ALOGD("iwnpi wlan0 set_tx_power 72");
+		system("iwnpi wlan0 set_tx_power 72");
 	}
 }
 static void  appclient_event_func(int _fd, unsigned ev, void *_l)
