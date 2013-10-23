@@ -9115,7 +9115,7 @@
         type="default,supl"
         authtype="1"
     />
-    <apn carrier="MTNL_Internet"
+    <apn carrier="Idea Internet"
         mcc="404"
         mnc="04"
         apn="internet"
@@ -9379,7 +9379,7 @@
         type="default"
         authtype="1"
     />
-    <apn carrier="MTNL_GPRS"
+    <apn carrier="Idea GPRS"
         mcc="404"
         mnc="04"
         apn="imis"
@@ -9643,7 +9643,7 @@
         type="mms"
         authtype="1"
     />
-    <apn carrier="MTNL_MMS"
+    <apn carrier="IDEA MMS"
         mcc="404"
         mnc="04"
         apn="mmsc"
