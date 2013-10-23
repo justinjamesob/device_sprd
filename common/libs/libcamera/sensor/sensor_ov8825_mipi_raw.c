@@ -887,10 +887,10 @@ LOCAL const SENSOR_REG_T ov8825_1632x1224_setting[] = {
 	{0x3809, 0x60}, //ISPHO
 	{0x380a, 0x04}, //ISPVO =, 0x1224
 	{0x380b, 0xc8}, //ISPVO
-	{0x380c, 0x0b}, //HTS =, 0x3516
-	{0x380d, 0x72}, //HTS
-	{0x380e, 0x05}, //VTS =, 0x1264
-	{0x380f, 0xf4}, //VTS
+	{0x380c, 0x0d}, //HTS =, 0x3516
+	{0x380d, 0xbc}, //HTS
+	{0x380e, 0x04}, //VTS =, 0x1264
+	{0x380f, 0xf0}, //VTS
 	{0x3810, 0x00}, //HOFF =, 0x8
 	{0x3811, 0x08}, //HOFF
 	{0x3812, 0x00}, //VOFF =, 0x4
@@ -905,7 +905,7 @@ LOCAL const SENSOR_REG_T ov8825_1632x1224_setting[] = {
 	{0x4600, 0x04}, //VFIFO, 0xctrl0
 	{0x4601, 0x00}, //VFIFO Read ST High
 	{0x4602, 0x78}, //VFIFO Read ST Low
-	{0x4837, 0x15}, // MIPI PCLK PERIOD
+	{0x4837, 0x28}, // MIPI PCLK PERIOD
 	{0x5068, 0x00}, //HSCALE_CTRL
 	{0x506a, 0x00}, //VSCALE_CTRL
 	//{0x0100, 0x01}, //wake up
@@ -1165,7 +1165,7 @@ LOCAL const SENSOR_REG_T ov8825_3264x2448_setting[] = {
 	{0x4600, 0x04}, //VFIFO, 0xctrl0
 	{0x4601, 0x00}, //VFIFO Read ST High
 	{0x4602, 0x20}, //VFIFO Read ST Low
-	{0x4837, 0x15}, // MIPI PCLK PERIOD
+	{0x4837, 0x1e}, // MIPI PCLK PERIOD
 	{0x5068, 0x00}, //HSCALE_CTRL
 	{0x506a, 0x00}, //VSCALE_CTRL
 	//{0x0100, 0x01}, //wake up
@@ -1189,9 +1189,9 @@ LOCAL SENSOR_REG_TAB_INFO_T s_ov8825_resolution_Tab_RAW[] = {
 
 LOCAL SENSOR_TRIM_T s_ov8825_Resolution_Trim_Tab[] = {
 	{0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 1632, 1224, 219, 900, 1524},
+	{0, 0, 1632, 1224, 219, 408, 1524},
 /*	{0, 0, 1920, 1080, 178, 90, 1868},*/
-	{0, 0, 3264, 2448, 168, 900, 2480},
+	{0, 0, 3264, 2448, 168, 528, 2480},
 
 	{0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0},
