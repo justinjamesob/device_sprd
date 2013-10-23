@@ -1091,7 +1091,7 @@ bool SprdCameraHardware::setCameraDimensions()
 	return true;
 }
 
-void SprdCameraHardware::setCameraPreviewMode()
+void SprdCameraHardware::setCameraPreviewMode(bool isRecordMode)
 {
 /*	if (isRecordingMode()) {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_MOVIE);
@@ -1102,7 +1102,7 @@ void SprdCameraHardware::setCameraPreviewMode()
 	mUseParameters = mParameters;
 	mParamLock.unlock();
 
-	if (isRecordingMode()) {
+	if (isRecordMode) {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, mUseParameters.getPreviewFameRate());
 	} else {
 		SET_PARM(CAMERA_PARM_PREVIEW_MODE, CAMERA_PREVIEW_MODE_SNAPSHOT);
@@ -1898,7 +1898,7 @@ bool SprdCameraHardware::initPreview()
 	if (!startCameraIfNecessary())
 		return false;
 
-	setCameraPreviewMode();
+	setCameraPreviewMode(isRecordingMode());
 
 	// Tell libqcamera what the preview and raw dimensions are.  We
 	// call this method even if the preview dimensions have not changed,
@@ -2152,7 +2152,7 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 	if (isPreviewing()) {
 		LOGE("startPreviewInternal: already in progress, doing nothing.X");
 		setRecordingMode(isRecording);
-		setCameraPreviewMode();
+		setCameraPreviewMode(isRecordingMode());
 		return NO_ERROR;
 	}
 	//to do it

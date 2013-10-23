@@ -29,6 +29,7 @@ extern "C"
 #define INVALID_SET_WORD                              0xFFFFFFFF
 #define SCENE_MODE_NIGHT                              1
 #define ISP_AE_STAB_TIMEOUT                           1  //sec
+#define ISP_ALG_TIMEOUT                               1 //sec
 
 enum cmr_focus_mode {
 	CAMERA_FOCUS_MODE_AUTO = 0,
@@ -84,6 +85,7 @@ int camera_isp_ae_stab(void* data);
 int camera_autofocus_quit(void);
 int camera_autofocus_need_exit(uint32_t *is_external);
 int camera_isp_ae_wait_stab(void);
+int camera_isp_alg_wait(void);
 #ifdef __cplusplus
 }
 #endif

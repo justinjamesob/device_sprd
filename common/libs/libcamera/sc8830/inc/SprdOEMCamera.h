@@ -25,6 +25,9 @@ extern "C"
 #include "../../arithmetic/sc8825/inc/FaceSolid.h"
 #include "../../arithmetic/sc8825/inc/HDR2.h"
 #include "sprd_dma_copy_k.h"
+#include "cmr_v4l2.h"
+#include "isp_app.h"
+#include "sensor_drv_u.h"
 
 #define FACE_DETECT_NUM     10
 #define FACE_SMILE_LIMIT    10
@@ -519,6 +522,17 @@ camera_ret_code_type camera_cfg_rot_cap_param_reset(void);
 int camera_get_is_nonzsl(void);
 void camera_set_stop_preview_mode(uint32_t stop_mode);
 int camera_is_sensor_support_zsl(void);
+
+
+
+int camera_isp_start(uint32_t work_mode,uint32_t need_binning,SENSOR_MODE_INFO_T *sensor_mode);
+int camera_isp_ae_info(SENSOR_AE_INFO_T *sensor_aec_info);
+int camera_isp_wb_trim(struct img_frm_cap *frm_cfg);
+int camera_isp_awb_bypass(enum isp_alg_mode awb_mode);
+int camera_isp_ae_bypass(enum isp_alg_mode ae_mode);
+int camera_isp_flash_ratio(SENSOR_FLASH_LEVEL_T *flash_level);
+int camera_isp_get_ae_stab(uint32_t *isp_param);
+
 
 #ifdef __cplusplus
 }
