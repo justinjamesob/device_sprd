@@ -1051,6 +1051,7 @@ const char* SprdCameraHardware::getCameraStateStr(
             STATE_STR(SPRD_ERROR),
             STATE_STR(SPRD_PREVIEW_IN_PROGRESS),
             STATE_STR(SPRD_FOCUS_IN_PROGRESS),
+            STATE_STR(SPRD_SET_PARAMS_IN_PROGRESS),
             STATE_STR(SPRD_WAITING_RAW),
             STATE_STR(SPRD_WAITING_JPEG),
             STATE_STR(SPRD_INTERNAL_PREVIEW_STOPPING),
