@@ -50,6 +50,7 @@
 /dev/block/mmcblk0p8   0660     system  system
 /dev/block/mmcblk0p9   0660     system  system
 /dev/block/mmcblk0p10   0660     system  system
+/dev/block/mmcblk0p12   0660     system  system
 /dev/block/mmcblk0p13    0660     system  system
 /dev/block/mmcblk0p14    0660     system  system
 /dev/block/mmcblk0p15    0660     system  system

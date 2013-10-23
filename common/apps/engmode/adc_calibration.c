@@ -80,7 +80,6 @@ void	disable_calibration(void)
 	}
 	read(fd,&cali_info,sizeof(cali_info));
 	cali_info.magic = CALI_MAGIC;
-	cali_info.cali_flag = CALI_COMP;
 
 	lseek(fd,SEEK_SET,0);
 	write(fd,&cali_info,sizeof(cali_info));
