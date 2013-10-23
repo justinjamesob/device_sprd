@@ -107,7 +107,7 @@ struct sensor_drv_context {
 
 LOCAL char                             dev_name[50] = "/dev/sprd_sensor";
 LOCAL char                             cali_file_dir[64] = "/data/";
-LOCAL struct sensor_drv_context        *s_p_sensor_cxt;
+LOCAL struct sensor_drv_context        *s_p_sensor_cxt = PNULL;
 /*item0: index, item1: new_address, item2: original address, item3: length*/
 static uint32_t                        s_lnc_addr_bakup[8][4];
 
