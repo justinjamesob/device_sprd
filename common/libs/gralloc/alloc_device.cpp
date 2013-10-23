@@ -335,6 +335,7 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
 					{
 						private_handle_t* hnd = new private_handle_t(private_handle_t::PRIV_FLAGS_USES_UMP, size, (int)cpu_ptr,
 																	 private_handle_t::LOCK_STATE_MAPPED, ump_id, ump_mem_handle);
+						ALOGD("%s hnd:0x%x ump_id:0x%x",__FUNCTION__,(uint32_t)hnd,hnd->ump_id);
 						if (NULL != hnd)
 						{
 							*pHandle = hnd;
@@ -435,7 +436,7 @@ static int gralloc_alloc_framebuffer(alloc_device_t* dev, size_t size, int usage
 
 static int alloc_device_alloc(alloc_device_t* dev, int w, int h, int format, int usage, buffer_handle_t* pHandle, int* pStride)
 {
-	ALOGD("%s w:%d, h:%d, format:%d usage:%d start",__FUNCTION__,w,h,format,usage);
+	ALOGD("%s w:%d, h:%d, format:%d usage:0x%x start",__FUNCTION__,w,h,format,usage);
 	if (!pHandle || !pStride)
 	{
 		return -EINVAL;
@@ -558,14 +559,13 @@ AllocNormalBuffer:
 
 static int alloc_device_free(alloc_device_t* dev, buffer_handle_t handle)
 {
-	ALOGD("%s buffer_handle_t:0x%x start",__FUNCTION__,(unsigned int)handle);
 	if (private_handle_t::validate(handle) < 0)
 	{
 		return -EINVAL;
 	}
 
 	private_handle_t const* hnd = reinterpret_cast<private_handle_t const*>(handle);
-
+	ALOGD("%s buffer_handle_t:0x%x flags:0x%x ump_id:0x%x start",__FUNCTION__,(unsigned int)handle,hnd->flags,hnd->ump_id);
 		//LOGD("unmapping from %p, size=%d", base, size);
 
 				// we can't deallocate the memory in case of UNMAP failure

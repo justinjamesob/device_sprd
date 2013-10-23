@@ -143,7 +143,7 @@ static int gralloc_register_buffer(gralloc_module_t const* module, buffer_handle
 			}
 			else
 			{
-				AERR("Failed to map UMP handle 0x%x", hnd->ump_mem_handle );
+				AERR("Failed to map UMP handle 0x%x ump_id:0x%x", hnd->ump_mem_handle,hnd->ump_id);
 			}
 
 			ump_reference_release((ump_handle)hnd->ump_mem_handle);
