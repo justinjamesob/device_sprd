@@ -213,7 +213,7 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	mIsRotCapture(0),
 #endif
 	mTimeCoeff(1),
-	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_DCAM),
+	mPreviewBufferUsage(PREVIEW_BUFFER_USAGE_GRAPHICS),
 	mSetFreqCount(0),
 	mSwitchMonitorMsgQueHandle(0),
 	mSwitchMonitorInited(0)
@@ -4054,6 +4054,8 @@ static int HAL_camera_device_close(struct hw_device_t* device)
 	ispvideo_RegCameraFunc(3, NULL);
 	ispvideo_RegCameraFunc(4, NULL);
 #endif
+    property_set("media.buffer.trace" ,  "0");
+
     return 0;
 }
 
@@ -4479,6 +4481,8 @@ done:
     *device = (hw_device_t *)g_cam_device;
 
     LOGI("%s: opened camera %s (%p)", __func__, id, *device);
+
+    property_set("media.buffer.trace" ,  "1");
     return 0;
 }
 
