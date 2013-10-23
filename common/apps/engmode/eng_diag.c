@@ -82,6 +82,7 @@ static int eng_diag_audio(char *buf,int len, char *rsp);
 static int eng_diag_product_ctrl(char *buf,int len, char *rsp, int rsplen);
 static int eng_diag_direct_phschk(char *buf,int len, char *rsp, int rsplen);
 static void eng_diag_reboot(int reset);
+static int eng_diag_deep_sleep(char *buf,int len, char *rsp);
 int is_audio_at_cmd_need_to_handle(char *buf,int len);
 int is_btwifi_addr_need_to_handle(char *buf,int len);
 int eng_diag_factorymode(char *buf,int len, char *rsp);
@@ -251,6 +252,12 @@ int eng_diag_parse(char *buf,int len)
                 ret = CMD_COMMON;
             }
             break;
+        case DIAG_CMD_CURRENT_TEST:
+            ENG_LOG("%s: Handle DIAG_CMD_CURRENT_TEST", __FUNCTION__);
+            if(head_ptr->subtype==0x2) {
+                ret = CMD_USER_DEEP_SLEEP;
+            }
+            break;
         default:
             ENG_LOG("%s: Default\n",__FUNCTION__);
             ret = CMD_COMMON;
@@ -331,6 +338,11 @@ int eng_diag_user_handle(int type, char *buf,int len)
             rlen = eng_diag_mmicit_read(buf,len,eng_diag_buf,sizeof(eng_diag_buf));
             eng_diag_len = rlen;
             eng_diag_write2pc();
+            return 0;
+        case CMD_USER_DEEP_SLEEP:
+            ENG_LOG("%s: CMD_USER_DEEP_SLEEP Req!\n", __FUNCTION__);
+            rlen = eng_diag_deep_sleep(buf, len, rsp);
+            s_cp_ap_proc = 1;// This cmd need cp proc.
             return 0;
         default:
             break;
@@ -1847,4 +1859,11 @@ static void eng_diag_reboot(int reset)
             LINUX_REBOOT_CMD_RESTART2, name);
 
     return;
+}
+
+static int eng_diag_deep_sleep(char *buf,int len, char *rsp)
+{
+    char cmd[] = {"echo mem > /sys/power/state"};
+    system(cmd);
+    return 0;
 }
