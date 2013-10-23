@@ -51,35 +51,62 @@ public class adcCalibrateInfo extends Activity {
     	}
 
     	@Override
-    	public void handleMessage(Message msg) {
-    		 switch(msg.what)
-    		 {
-                    case engconstents.ENG_AT_SGMR:
-			ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
-			DataOutputStream outputBufferStream = new DataOutputStream(outputBuffer);
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case engconstents.ENG_AT_SGMR:
+				ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
+				DataOutputStream outputBufferStream = new DataOutputStream(
+						outputBuffer);
 
-			if(DEBUG) Log.d(LOG_TAG, "engopen sockid=" + sockid);
+				if (DEBUG)
+					Log.d(LOG_TAG, "engopen sockid=" + sockid);
 
-            /*Modify 20130205 Spreadst of 125480 change the method of creating cmd start*/
-            //str=String.format("%d,%d,%d,%d,%d", msg.what,3,0,0,3);
-            str = new StringBuilder().append(msg.what).append(",").append(3).append(",")
-                  .append(0).append(",").append(0).append(",").append(3).toString();
-            /*Modify 20130205 Spreadst of 125480 change the method of creating cmd end*/
-			try {
-			    outputBufferStream.writeBytes(str);
-			} catch (IOException e) {
-			    Log.e(LOG_TAG, "writebytes error");
-			return;
+				/*
+				 * Modify 20130205 Spreadst of 125480 change the method of
+				 * creating cmd start
+				 */
+				// str=String.format("%d,%d,%d,%d,%d", msg.what,3,0,0,3);
+				str = new StringBuilder().append(msg.what).append(",")
+						.append(3).append(",").append(0).append(",").append(0)
+						.append(",").append(3).toString();
+				/*
+				 * Modify 20130205 Spreadst of 125480 change the method of
+				 * creating cmd end
+				 */
+				try {
+					outputBufferStream.writeBytes(str);
+				} catch (IOException e) {
+					Log.e(LOG_TAG, "writebytes error");
+					return;
+				}
+				mEf.engwrite(sockid, outputBuffer.toByteArray(),
+						outputBuffer.toByteArray().length);
+
+				int dataSize = 1024;
+				byte[] inputBytes = new byte[dataSize];
+				int showlen = mEf.engread(sockid, inputBytes, dataSize);
+				String str = new String(inputBytes, 0, showlen,
+						Charset.defaultCharset());
+				Log.v(LOG_TAG, "str = " + str);
+				int pos = str.indexOf("CMMB");
+				String tempStr;
+				int pos1,
+				pos2;
+				String tempStr1,
+				tempStr2;
+				if (-1 != pos) {
+					tempStr = str.substring(0, pos);
+					pos1 = tempStr.lastIndexOf('\n');
+					tempStr1 = tempStr.substring(0, pos1 + 1);
+
+					tempStr = str.substring(pos);
+					pos2 = tempStr.indexOf('\n');
+					tempStr2 = tempStr.substring(pos2 + 1);
+					str = tempStr1 + tempStr2;
+				}
+				txtViewlabel01.setText(str);
+				break;
 			}
-			mEf.engwrite(sockid,outputBuffer.toByteArray(),outputBuffer.toByteArray().length);
-
-			int dataSize = 512;
-			byte[] inputBytes = new byte[dataSize];
-			int showlen= mEf.engread(sockid,inputBytes,dataSize);
-			String str =  new String(inputBytes, 0, showlen,Charset.defaultCharset());
-			txtViewlabel01.setText(str);
-			break;
-    		 }
-    	}
+		}
     }    
 }
