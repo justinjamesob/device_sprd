@@ -3,7 +3,8 @@ LOCAL_PATH := $(call my-dir)
 $(call add-radio-file,modem_bins/tdmodem.bin)
 $(call add-radio-file,modem_bins/tdnvitem.bin)
 $(call add-radio-file,modem_bins/tddsp.bin)
-
+$(call add-radio-file,modem_bins/wcnnvitem.bin)
+$(call add-radio-file,modem_bins/wcnmodem.bin)
 
 
 # Compile U-Boot
