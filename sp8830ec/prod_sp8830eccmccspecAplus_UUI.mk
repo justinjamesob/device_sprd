@@ -116,7 +116,7 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
-USE_PROJECT_SEC :=false
+USE_PROJECT_SEC :=true
 
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
@@ -146,7 +146,8 @@ ifeq ($(USE_PROJECT_SEC),true)
 # prebuild files
 PRODUCT_PACKAGES += \
         Permission.apk \
-        choose_secure
+        choose_secure \
+	framework-se-res.apk
 
 PRODUCT_COPY_FILES += \
         frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
