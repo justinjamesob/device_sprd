@@ -4642,37 +4642,16 @@ void camera_set_hal_cb(camera_cb_f_type cmr_cb)
 	return;
 }
 
-int camera_cb_need_lock(camera_cb_type cb)
-{
-	int         is_needed = 1;
-
-	switch (cb) {
-	case CAMERA_EVT_CB_FD:
-		is_needed = 0;
-	break;
-	default:
-	break;
-	}
-
-	return is_needed;
-}
-
 void camera_call_cb(camera_cb_type cb,
                  const void *client_data,
                  camera_func_type func,
                  int32_t parm4)
 {
-	int         need_lock = camera_cb_need_lock(cb);
-
-	if (need_lock) {
-		pthread_mutex_lock(&g_cxt->cb_mutex);
-	}
+	pthread_mutex_lock(&g_cxt->cb_mutex);
 	if (g_cxt->camera_cb) {
 		(*g_cxt->camera_cb)(cb, client_data, func, parm4);
 	}
-	if (need_lock) {
-		pthread_mutex_unlock(&g_cxt->cb_mutex);
-	}
+	pthread_mutex_unlock(&g_cxt->cb_mutex);
 	return;
 }
 
