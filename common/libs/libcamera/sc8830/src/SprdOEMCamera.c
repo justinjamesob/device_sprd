@@ -70,6 +70,9 @@ struct camera_context        *g_cxt = &cmr_cxt;
 #define IS_WAIT_FOR_NORMAL_CONTINUE(x,y)  (((x) == CAMERA_NORMAL_CONTINUE_SHOT_MODE)&&((y) != g_cxt->total_capture_num))
 #define USE_SENSOR_OFF_ON_FOR_HDR    1
 
+#define	bzero(b, len)		memset((b), '\0', (len))
+
+
 //camera_takepic_step timestamp
 enum CAMERA_TAKEPIC_STEP {
 		CMR_STEP_TAKE_PIC = 0,
@@ -3596,6 +3599,7 @@ void camera_v4l2_evt_cb(int evt, void* data)
 
 	message.data = malloc(sizeof(struct frm_info));
 	if (NULL == message.data) {
+		cmr_v4l2_free_frame(info->channel_id, info->frame_id);
 		CMR_LOGE("NO mem, Faile to alloc memory for one msg");
 		return;
 	}
@@ -4557,7 +4561,7 @@ void *camera_af_thread_proc(void *data)
 			}
 			if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
 				camera_isp_ae_stab_set(1);
-				ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)&isp_param);
+				ret = camera_isp_get_ae_stab(&isp_param);
 				CMR_LOGV("wait AE stable ....");
 				ret = camera_isp_ae_wait_stab();
 				if (ret) {
@@ -4677,8 +4681,8 @@ int camera_preview_init(int format_mode)
 	uint32_t                 sn_work_mode;
 	SENSOR_MODE_INFO_T       *sensor_mode;
 	struct buffer_cfg        buffer_info;
-	struct isp_video_start   isp_param;
 	SENSOR_AE_INFO_T         *sensor_aec_info;
+
 
 	memset(&v4l2_cfg,0,sizeof(v4l2_cfg));
 	if (IS_ZSL_MODE(g_cxt->cap_mode)) {
@@ -4762,35 +4766,13 @@ int camera_preview_init(int format_mode)
 	SET_CHN_BUSY(CHN_1);
 	if (v4l2_cfg.cfg.need_isp) {
 		uint32_t video_mode = 0;
-		struct isp_trim_size wb_trim;
+
 		video_mode = g_cxt->cmr_set.video_mode;
-		isp_param.size.w = sensor_mode->width;
-		if (v4l2_cfg.cfg.need_binning) {
-			isp_param.size.w = (isp_param.size.w >> 1);
-		}
-		isp_param.size.h = sensor_mode->height;
-		isp_param.format = ISP_DATA_NORMAL_RAW10;
-		isp_param.mode= ISP_VIDEO_MODE_CONTINUE;
-		CMR_LOGV("isp w h, %d %d", isp_param.size.w, isp_param.size.h);
 		sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[sn_work_mode].ae_info[video_mode];
-		CMR_LOGE("%d,%d,%d,%d,%d,%d.",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
-			     sensor_aec_info->line_time,sensor_aec_info->gain,sn_work_mode,video_mode);
-		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
-		if (CAMERA_SUCCESS != ret) {
-			CMR_LOGE("set ae information error.");
-		}
-		wb_trim.x = v4l2_cfg.cfg.src_img_rect.start_x;
-		wb_trim.y = v4l2_cfg.cfg.src_img_rect.start_y;
-		wb_trim.w = v4l2_cfg.cfg.src_img_rect.width;
-		wb_trim.h = v4l2_cfg.cfg.src_img_rect.height;
-		ret = isp_ioctl(ISP_CTRL_WB_TRIM,(void*)&wb_trim);
-		if (CAMERA_SUCCESS != ret) {
-			CMR_LOGE("set wb trim information error.");
-		}
-		ret = isp_video_start(&isp_param);
-		if (CAMERA_SUCCESS == ret) {
-			g_cxt->isp_cxt.isp_state = ISP_COWORK;
-		}
+		camera_isp_ae_info(sensor_aec_info);
+		camera_isp_wb_trim(&v4l2_cfg.cfg);
+
+		ret = camera_isp_start(CMR_PREVIEW, v4l2_cfg.cfg.need_binning, sensor_mode);
 	}
 
 exit:
@@ -4854,16 +4836,8 @@ int camera_preview_weak_init(int format_mode)
 		goto exit;
 	}
 	SET_CHN_BUSY(CHN_1);
-	if (1 == v4l2_cfg.cfg.need_isp) {
-		struct isp_trim_size wb_trim;
-		wb_trim.x = v4l2_cfg.cfg.src_img_rect.start_x;
-		wb_trim.y = v4l2_cfg.cfg.src_img_rect.start_y;
-		wb_trim.w = v4l2_cfg.cfg.src_img_rect.width;
-		wb_trim.h = v4l2_cfg.cfg.src_img_rect.height;
-		ret = isp_ioctl(ISP_CTRL_WB_TRIM,(void*)&wb_trim);
-		if (CAMERA_SUCCESS != ret) {
-			CMR_LOGE("set wb trim information error.");
-		}
+	if (v4l2_cfg.cfg.need_isp) {
+		ret = camera_isp_wb_trim(&v4l2_cfg.cfg);
 	}
 
 exit:
@@ -4877,8 +4851,6 @@ int camera_capture_init(void)
 	struct cap_cfg           v4l2_cfg;
 	SENSOR_MODE_INFO_T       *sensor_mode;
 	struct buffer_cfg        buffer_info;
-	struct isp_video_start   isp_video_param;
-	SENSOR_AE_INFO_T         *sensor_aec_info;
 	struct sn_cfg            sensor_cfg;
 
 	camera_cfg_rot_cap_param_reset();
@@ -4965,21 +4937,7 @@ int camera_capture_init(void)
 	}
 
 	if (v4l2_cfg.cfg.need_isp && ISP_IDLE == g_cxt->isp_cxt.isp_state) {
-		uint32_t video_mode = g_cxt->cmr_set.video_mode;
-		CMR_LOGI("start ISP.");
-		isp_video_param.size.w = sensor_mode->width;
-		isp_video_param.size.h = sensor_mode->height;
-		/*sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[g_cxt->sn_cxt.capture_mode].ae_info[video_mode];
-		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
-		if (CAMERA_SUCCESS != ret) {
-			CMR_LOGE("set ae information error.");
-		}*/
-		isp_video_param.format = ISP_DATA_NORMAL_RAW10;
-		isp_video_param.mode= ISP_VIDEO_MODE_SINGLE;
-		ret = isp_video_start(&isp_video_param);
-		if (CAMERA_SUCCESS == ret) {
-			g_cxt->isp_cxt.isp_state = ISP_COWORK;
-		}
+		ret = camera_isp_start(CMR_CAPTURE,0,sensor_mode);
 	}
 	g_cxt->recover_status = NO_RECOVERY;
 exit:
@@ -5057,21 +5015,7 @@ int camera_capture_init_continue(void)
 	}
 
 	if (v4l2_cfg.cfg.need_isp && ISP_IDLE == g_cxt->isp_cxt.isp_state) {
-		uint32_t video_mode = g_cxt->cmr_set.video_mode;
-		CMR_LOGI("start ISP.");
-		isp_video_param.size.w = sensor_mode->width;
-		isp_video_param.size.h = sensor_mode->height;
-		/*sensor_aec_info = &g_cxt->sn_cxt.sensor_info->sensor_video_info[g_cxt->sn_cxt.capture_mode].ae_info[video_mode];
-		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
-		if (CAMERA_SUCCESS != ret) {
-			CMR_LOGE("set ae information error.");
-		}*/
-		isp_video_param.format = ISP_DATA_NORMAL_RAW10;
-		isp_video_param.mode= ISP_VIDEO_MODE_SINGLE;
-		ret = isp_video_start(&isp_video_param);
-		if (CAMERA_SUCCESS == ret) {
-			g_cxt->isp_cxt.isp_state = ISP_COWORK;
-		}
+		ret = camera_isp_start(CMR_CAPTURE,0,sensor_mode);
 	}
 	g_cxt->recover_status = NO_RECOVERY;
 exit:
@@ -5202,7 +5146,6 @@ int camera_get_sensor_preview_mode(struct img_size* target_size, uint32_t *work_
 	uint32_t                 target_mode = SENSOR_MODE_MAX;
 	SENSOR_EXP_INFO_T        *sn_info = g_cxt->sn_cxt.sensor_info;
 	int                      ret = -CAMERA_FAILED;
-	int32_t j = 0;
 
 	if (NULL == target_size || NULL == g_cxt->sn_cxt.sensor_info || NULL == work_mode)
 		return ret;
@@ -5213,41 +5156,24 @@ int camera_get_sensor_preview_mode(struct img_size* target_size, uint32_t *work_
 		if (SENSOR_MODE_MAX != sn_info->sensor_mode_info[i].mode) {
 			height = sn_info->sensor_mode_info[i].height;
 			CMR_LOGV("height = %d", height);
-			if (search_height <= height && SENSOR_IMAGE_FORMAT_JPEG != sn_info->sensor_mode_info[i].image_format) {
-				target_mode = i;
-				ret = CAMERA_SUCCESS;
-				break;
-			} else {
-				last_one = i;
+			if (SENSOR_IMAGE_FORMAT_JPEG != sn_info->sensor_mode_info[i].image_format) {
+				if (search_height <= height) {
+					target_mode = i;
+					ret = CAMERA_SUCCESS;
+					break;
+				} else {
+					last_one = i;
+				}
 			}
-
 		}
 	}
 
 	if (i == SENSOR_MODE_MAX) {
-		CMR_LOGV("can't find the right mode, %d, so antitone search", i);
-
-		for (j = SENSOR_MODE_MAX - 1; j >= SENSOR_MODE_PREVIEW_ONE; j--) {
-			if (SENSOR_MODE_MAX != sn_info->sensor_mode_info[j].mode) {
-				height = sn_info->sensor_mode_info[j].height;
-				CMR_LOGV("height = %d", height);
-				if (search_height >= height && SENSOR_IMAGE_FORMAT_JPEG != sn_info->sensor_mode_info[j].image_format) {
-					target_mode = j;
-					ret = CAMERA_SUCCESS;
-					break;
-				} else {
-					last_one = j;
-				}
-			}
-		}
-
-		if (j < 0) {
-			CMR_LOGV("can't find the right mode 2, %d, use the last one %d", j, last_one);
-			target_mode = last_one;
-		}
-	} else {
-		CMR_LOGV("target_mode %d", target_mode);
+		CMR_LOGV("can't find the right mode, %d", i);
+		target_mode = last_one;
 	}
+	CMR_LOGV("target_mode %d", target_mode);
+
 
 	*work_mode = target_mode;
 	return ret;
@@ -7577,6 +7503,138 @@ static int camera_is_jpeg_encode_direct_process(void)
 	}
 
 	CMR_LOGV("ret=%d",ret);
+
+	return ret;
+}
+
+int camera_isp_wb_trim(struct img_frm_cap *frm_cfg)
+{
+	int	ret = CAMERA_SUCCESS;
+	struct isp_trim_size wb_trim;
+
+
+	if (frm_cfg) {
+		wb_trim.x = frm_cfg->src_img_rect.start_x;
+		wb_trim.y = frm_cfg->src_img_rect.start_y;
+		wb_trim.w = frm_cfg->src_img_rect.width;
+		wb_trim.h = frm_cfg->src_img_rect.height;
+		ret = isp_ioctl(ISP_CTRL_WB_TRIM,(void*)&wb_trim);
+		if (CAMERA_SUCCESS != ret) {
+			CMR_LOGE("set wb trim information error.");
+		}
+	}
+
+	return ret;
+}
+
+int camera_isp_ae_info(SENSOR_AE_INFO_T *sensor_aec_info)
+{
+	int	ret = CAMERA_SUCCESS;
+
+
+	if (sensor_aec_info) {
+		CMR_LOGE("%d,%d,%d,%d",sensor_aec_info->min_frate,sensor_aec_info->max_frate,
+				 sensor_aec_info->line_time,sensor_aec_info->gain);
+		ret = isp_ioctl(ISP_CTRL_AE_INFO,(void*)sensor_aec_info);
+		if (CAMERA_SUCCESS != ret) {
+			CMR_LOGE("set ae information error.");
+		}
+	}
+
+	return ret;
+}
+
+int camera_isp_start(uint32_t work_mode,uint32_t need_binning,SENSOR_MODE_INFO_T *sensor_mode)
+{
+	int	ret = CAMERA_SUCCESS;
+	struct isp_video_start   isp_param;
+
+
+	if (CMR_PREVIEW == work_mode) {
+		if (sensor_mode) {
+			isp_param.size.w = sensor_mode->width;
+			if (need_binning) {
+				isp_param.size.w = (isp_param.size.w >> 1);
+			}
+			isp_param.size.h = sensor_mode->height;
+			isp_param.format = ISP_DATA_NORMAL_RAW10;
+			isp_param.mode =  ISP_VIDEO_MODE_CONTINUE;
+		}
+	} else {
+		if (sensor_mode) {
+			isp_param.size.w = sensor_mode->width;
+			isp_param.size.h = sensor_mode->height;
+			isp_param.format = ISP_DATA_NORMAL_RAW10;
+			isp_param.mode = ISP_VIDEO_MODE_SINGLE;
+		}
+	}
+
+	CMR_LOGV("isp w h, %d %d", isp_param.size.w, isp_param.size.h);
+
+	ret = isp_video_start(&isp_param);
+	if (CAMERA_SUCCESS == ret) {
+		g_cxt->isp_cxt.isp_state = ISP_COWORK;
+	}
+
+	return ret;
+}
+
+int camera_isp_awb_bypass(enum isp_alg_mode awb_mode)
+{
+	int ret = CAMERA_SUCCESS;
+	struct isp_alg flash_param;
+
+
+	flash_param.mode = awb_mode;
+	ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
+	if (CAMERA_SUCCESS != ret) {
+		CMR_LOGE("ISP_CTRL_ALG error.");
+	}
+
+	return ret;
+}
+
+int camera_isp_ae_bypass(enum isp_alg_mode ae_mode)
+{
+	int ret = CAMERA_SUCCESS;
+	struct isp_alg flash_param;
+
+
+	flash_param.mode = ae_mode;
+	flash_param.flash_eb = 0x01;
+	ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
+	if (CAMERA_SUCCESS != ret) {
+		CMR_LOGE("ISP_AE_BYPASS error.");
+	}
+
+	return ret;
+}
+
+int camera_isp_flash_ratio(SENSOR_FLASH_LEVEL_T *flash_level)
+{
+	int ret = CAMERA_SUCCESS;
+	struct isp_alg flash_param;
+
+
+	flash_param.mode = ISP_ALG_FAST;
+	flash_param.flash_eb = 0x01;
+	/*flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;*/
+	/*because hardware issue high equal to low, so use hight div high */
+	flash_param.flash_ratio = flash_level->high_light*256/flash_level->high_light;
+	ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
+	if (CAMERA_SUCCESS != ret) {
+		CMR_LOGE("ISP_CTRL_FLASH_EG error.");
+	}
+
+	return ret;
+}
+
+int camera_isp_get_ae_stab(uint32_t *isp_param)
+{
+	int ret = CAMERA_SUCCESS;
+
+
+	ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)isp_param);
 
 	return ret;
 }

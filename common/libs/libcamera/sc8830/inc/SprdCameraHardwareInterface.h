@@ -274,7 +274,7 @@ private:
 	status_t                        checkSetParameters(const SprdCameraParameters& params,
 							const SprdCameraParameters& oriParams);
 	bool                            setCameraDimensions();
-	void                            setCameraPreviewMode();
+	void                            setCameraPreviewMode(bool isRecordMode);
 	void                            changeEmcFreq(char flag);
 	void                            setPreviewFreq();
 	void                            set_ddr_freq(const char* freq_in_khz);

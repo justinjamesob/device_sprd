@@ -1389,40 +1389,22 @@ int camera_preflash(void)
 
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-			struct isp_alg flash_param;
 			SENSOR_FLASH_LEVEL_T flash_level;
 			if (Sensor_GetFlashLevel(&flash_level)) {
 				CMR_LOGE("get flash level error.");
 			}
 
-			flash_param.mode=ISP_AWB_BYPASS;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_ALG error.");
-			}
+			camera_isp_awb_bypass(ISP_AWB_BYPASS);
+			camera_isp_ae_bypass(ISP_AE_BYPASS);
 
-			flash_param.mode=ISP_AE_BYPASS;
-			flash_param.flash_eb=0x01;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
-			}
-			sem_wait(&cxt->cmr_set.isp_alg_sem);
+			camera_isp_alg_wait();
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
-			flash_param.mode=ISP_ALG_FAST;
-			flash_param.flash_eb=0x01;
-			/*flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;*/
-			/*because hardware issue high equal to low, so use hight div high */
-			flash_param.flash_ratio=flash_level.high_light*256/flash_level.high_light;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
-			}
+			camera_isp_flash_ratio(&flash_level);
 		}
 	}
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-			sem_wait(&cxt->cmr_set.isp_alg_sem);
+			camera_isp_alg_wait();
 		}
 		camera_set_flashdevice((uint32_t)FLASH_CLOSE_AFTER_OPEN);
 	}
@@ -1430,7 +1412,7 @@ int camera_preflash(void)
 	return ret;
 }
 
-static int camera_check_autofocus_aera(SENSOR_RECT_T *rect_ptr,uint32_t rect_num)
+static int camera_check_autofocus_area(SENSOR_RECT_T *rect_ptr,uint32_t rect_num)
 {
 	uint32_t                 ret = CAMERA_SUCCESS;
 	struct camera_context    *cxt = camera_get_cxt();
@@ -1487,26 +1469,16 @@ int camera_autofocus_start(void)
 
 	if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 		if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-			struct isp_alg flash_param;
 			SENSOR_FLASH_LEVEL_T flash_level;
 			if (Sensor_GetFlashLevel(&flash_level)) {
 				CMR_LOGE("get flash level error.");
 			}
 
-			flash_param.mode=ISP_AWB_BYPASS;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_ALG error.");
-			}
+			camera_isp_awb_bypass(ISP_AWB_BYPASS);
 
-			flash_param.mode=ISP_AE_BYPASS;
-			flash_param.flash_eb=0x01;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_AE_BYPASS error.");
-			}
+			camera_isp_ae_bypass(ISP_AE_BYPASS);
 
-			while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
+			if (CAMERA_SUCCESS != camera_isp_alg_wait()) {
 				if (camera_autofocus_need_exit(&af_cancel_is_ext)) {
 					ret = CAMERA_INVALID_STATE;
 					CMR_RTN_IF_ERR(ret);
@@ -1515,21 +1487,13 @@ int camera_autofocus_start(void)
 			}
 
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
-			flash_param.mode=ISP_ALG_FAST;
-			flash_param.flash_eb=0x01;
-			/*flash_param.flash_ratio=flash_level.high_light*256/flash_level.low_light;*/
-			/*because hardware issue high equal to low, so use hight div high */
-			flash_param.flash_ratio=flash_level.high_light*256/flash_level.high_light;
-			ret = isp_ioctl(ISP_CTRL_ALG, (void*)&flash_param);
-			if (CAMERA_SUCCESS != ret) {
-				CMR_LOGE("ISP_CTRL_FLASH_EG error.");
-			}
+			camera_isp_flash_ratio(&flash_level);
 		} else {
 			camera_set_flashdevice((uint32_t)FLASH_OPEN);
 		}
 		if (IS_NEED_FLASH(cxt->cmr_set.flash,cxt->cap_mode)) {
 			if (V4L2_SENSOR_FORMAT_RAWRGB == cxt->sn_cxt.sn_if.img_fmt) {
-				while (CAMERA_SUCCESS != sem_trywait(&cxt->cmr_set.isp_alg_sem)){
+				if (CAMERA_SUCCESS != camera_isp_alg_wait()){
 					if (camera_autofocus_need_exit(&af_cancel_is_ext)) {
 						ret = CAMERA_INVALID_STATE;
 						CMR_RTN_IF_ERR(ret);
@@ -1551,7 +1515,7 @@ int camera_autofocus_start(void)
 		af_param.zone[0].y = *ptr++;
 		af_param.zone[0].w = *ptr++;
 		af_param.zone[0].h = *ptr++;
-		if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+		if (CAMERA_SUCCESS != camera_check_autofocus_area(&af_param.zone[0],1)) {
 			af_param.zone_cnt = 0;
 		}
 	} else {
@@ -1565,7 +1529,7 @@ int camera_autofocus_start(void)
 				af_param.zone[0].y = *ptr++;
 				af_param.zone[0].w = *ptr++;
 				af_param.zone[0].h = *ptr++;
-				if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+				if (CAMERA_SUCCESS != camera_check_autofocus_area(&af_param.zone[0],1)) {
 					af_param.zone_cnt = 0;
 				}
 			}
@@ -1577,7 +1541,7 @@ int camera_autofocus_start(void)
 			af_param.zone[0].y = *ptr++;
 			af_param.zone[0].w = *ptr++;
 			af_param.zone[0].h = *ptr++;
-			if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],1)) {
+			if (CAMERA_SUCCESS != camera_check_autofocus_area(&af_param.zone[0],1)) {
 				af_param.cmd = SENSOR_EXT_FOCUS_START;
 				af_param.param = SENSOR_EXT_FOCUS_TRIG;
 				af_param.zone_cnt = 0;
@@ -1593,7 +1557,7 @@ int camera_autofocus_start(void)
 				af_param.zone[i].w = *ptr++;
 				af_param.zone[i].h = *ptr++;
 			}
-			if (CAMERA_SUCCESS != camera_check_autofocus_aera(&af_param.zone[0],zone_cnt)) {
+			if (CAMERA_SUCCESS != camera_check_autofocus_area(&af_param.zone[0],zone_cnt)) {
 				af_param.cmd = SENSOR_EXT_FOCUS_START;
 				af_param.param = SENSOR_EXT_FOCUS_TRIG;
 				af_param.zone_cnt = 0;
@@ -1788,6 +1752,25 @@ int camera_isp_ae_stab(void* data)
 		sem_post(&cxt->cmr_set.isp_ae_stab_sem);
 	}
 	return 0;
+}
+
+int camera_isp_alg_wait(void)
+{
+	int rtn = CAMERA_SUCCESS;
+	struct timespec ts;
+	struct camera_context    *cxt = camera_get_cxt();
+
+	if (clock_gettime(CLOCK_REALTIME, &ts)) {
+		rtn = -1;
+		CMR_LOGE("get time failed.");
+	} else {
+		ts.tv_sec += ISP_ALG_TIMEOUT;
+		if (sem_timedwait((&cxt->cmr_set.isp_alg_sem), &ts)) {
+			rtn = -1;
+			CMR_LOGE("timeout.");
+		}
+	}
+	return rtn;
 }
 
 int camera_isp_ae_wait_stab(void)
