@@ -2000,7 +2000,8 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 
 		if (_Sensor_DeviceInit()) {
 			CMR_LOGV("_Sensor_DeviceInit error, return");
-			return SENSOR_FAIL;
+			ret_val = SENSOR_FAIL;
+			goto init_exit;
 		}
 		if (SCI_TRUE == s_p_sensor_cxt->sensor_identified) {
 			if (SENSOR_SUCCESS == _Sensor_Register(SENSOR_MAIN)) {
@@ -2040,13 +2041,20 @@ int Sensor_Init(uint32_t sensor_id, uint32_t *sensor_num_ptr)
 			ret_val = _sensor_cali_load_param(cali_file_dir, s_p_sensor_cxt->sensor_info_ptr, sensor_id);
 			if (ret_val) {
 				CMR_LOGV("load cali data fail!! rtn:%d",ret_val);
-				return ret_val;
+				goto init_exit;
 			}
 		}
 	}
 
 	*sensor_num_ptr = sensor_num;
-
+init_exit:
+	if (SENSOR_SUCCESS != ret_val) {
+		if (PNULL != s_p_sensor_cxt) {
+			free(s_p_sensor_cxt);
+			s_p_sensor_cxt = PNULL;
+			CMR_LOGI("free s_p_sensor_cxt.");
+		}
+	}
 	CMR_LOGV("2 init OK!");
 	return ret_val;
 }
