@@ -35,7 +35,13 @@ endif
 
 # config kernel
 TARGET_NO_KERNEL := false
+#KERNEL_DEFCONFIG := sp8835eb-native_defconfig
+ifeq ($(TARGET_BUILD_VARIANT),user)
+KERNEL_DEFCONFIG := sp8835eb-native_user_defconfig
+else
 KERNEL_DEFCONFIG := sp8835eb-native_defconfig
+endif
+
 USES_UNCOMPRESSED_KERNEL := true
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
