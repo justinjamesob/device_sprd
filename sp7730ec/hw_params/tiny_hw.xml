@@ -138,7 +138,7 @@
 <device name="digital-fm">
   <path name="on">
      <ctl name="Digital FM Function" val="1" />
-     <ctl name="AD IISMUX" val="2" />
+     <ctl name="AD IISMUX" val="1" />
   </path>
   <path name="off">
      <ctl name="Digital FM Function" val="0" />
