@@ -5219,6 +5219,13 @@
         mmsc="http://airtelmms/servlets/mms"
         type="mms"
     />
+    <!-- Ghana Glo -->
+    <apn carrier="Glo Internet"
+        mcc="620"
+        mnc="07"
+        apn="internet"
+        type="default"
+    />
     <!-- Greece Cosmote -->
     <apn carrier="Cosmote Wireless Internet"
         mcc="202"
