@@ -286,11 +286,6 @@ service phoneserver_w /system/bin/phoneserver -m w
 #    class main
 #    oneshot
 
-service rawdatadinit /bin/rawdatad
-    class main
-    user root
-    oneshot
-
 service batterysrv /bin/batterysrv
     class core
     user system
