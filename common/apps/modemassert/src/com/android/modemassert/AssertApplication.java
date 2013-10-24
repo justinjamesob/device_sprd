@@ -140,7 +140,7 @@ public class AssertApplication extends Application {
                     }
                     AssertInfo = tempStr;
                     Log.d(MTAG, "read something: "+ tempStr);
-                    if (0 == tempStr.compareTo("Modem Alive")) {
+                    if (tempStr.contains("Modem Alive")) {
                         sendModemStatBroadcast(MODEM_ALIVE);
                         hideNotification();
                     } else if (tempStr.length() > 0) {
