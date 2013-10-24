@@ -178,6 +178,7 @@ public:
     SprdHWLayerList(int fbWidth, int fbHeight)
         : mLayerList(0),mLayerCount(0), 
           mRGBLayerCount(0), mYUVLayerCount(0),
+          mRGBLayerFullScreenFlag(false),
           mFBWidth(fbWidth), mFBHeight(fbHeight),
           mList(NULL),
           mDebugFlag(0), mDumpFlag(0)
@@ -221,6 +222,7 @@ private:
     unsigned int mLayerCount;
     unsigned int mRGBLayerCount;
     unsigned int mYUVLayerCount;
+    bool mRGBLayerFullScreenFlag;
     unsigned int mFBWidth;
     unsigned int mFBHeight;
     hwc_layer_list_t *mList;
