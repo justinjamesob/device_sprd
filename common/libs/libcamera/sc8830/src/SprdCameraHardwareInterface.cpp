@@ -324,11 +324,6 @@ status_t SprdCameraHardware::startPreview()
 
 	setCaptureRawMode(0);
 
-	if(mPreviewStartFlag == 0) {
-	    LOGV("don't need to start preview.");
-	    return NO_ERROR;
-	}
-
 	bool isRecordingMode = (mMsgEnabled & CAMERA_MSG_VIDEO_FRAME) > 0 ? true : false;
 	return startPreviewInternal(isRecordingMode);
 }
@@ -349,13 +344,7 @@ bool SprdCameraHardware::previewEnabled()
     LOGV("mLock:previewEnabled E.\n");
     Mutex::Autolock l(&mLock);
     LOGV("mLock:previewEnabled X.\n");
-    if(0 == mPreviewStartFlag) {
-        return 1;
-    }  else if (2 == mPreviewStartFlag) {
-        return 0;
-    } else {
-        return isPreviewing();
-    }
+    return isPreviewing();
 }
 
 status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
@@ -372,11 +361,9 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
     if (!w) {
         LOGE("preview window is NULL!");
-        mPreviewStartFlag = 0;
         return NO_ERROR;
     }
 
-    mPreviewStartFlag = 1;
 /*
     if (isPreviewing()){
         LOGI("stop preview (window change)");
@@ -870,7 +857,6 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 	camera_cfg_rot_cap_param_reset();
 
 	if (camera_set_change_size(mRawWidth, mRawHeight, mPreviewWidth, mPreviewHeight)) {
-		mPreviewStartFlag = 2;
 		camera_set_stop_preview_mode(1);
 		mPreviewCbLock.lock();
 		stopPreviewInternal();
@@ -888,7 +874,6 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 		((mCaptureMode != CAMERA_ZSL_CONTINUE_SHOT_MODE) && (mCaptureMode != CAMERA_ZSL_MODE))) {
 		LOGI("mode change:stop preview.");
 		if (isPreviewing()) {
-			mPreviewStartFlag = 2;
 			camera_set_stop_preview_mode(1);
 			mPreviewCbLock.lock();
 			stopPreviewInternal();
@@ -902,7 +887,6 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 		((mCaptureMode == CAMERA_ZSL_CONTINUE_SHOT_MODE) || (mCaptureMode == CAMERA_ZSL_MODE))) {
 		LOGI("mode change:stop preview.");
 		if (isPreviewing()) {
-			mPreviewStartFlag = 2;
 			camera_set_stop_preview_mode(0);
 			mPreviewCbLock.lock();
 			stopPreviewInternal();
