@@ -39,6 +39,8 @@ PRODUCT_PACKAGES := \
 	nvm_daemon \
 	modemd\
 	engpc\
+    libengappjni \
+    Engapp \
 	audio.a2dp.default
 
 # own copyright packages files

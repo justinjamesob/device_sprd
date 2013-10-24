@@ -31,6 +31,8 @@ PRODUCT_PACKAGES := \
 	calibration_init \
 	nvm_daemon \
 	modemd\
+    libengappjni \
+    Engapp \
 	engpc
 
 ifeq ($(PRODUCT_CONFIG_SUPPORT_BT),true)
