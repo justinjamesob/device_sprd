@@ -2046,8 +2046,15 @@ camera_ret_code_type camera_set_dimensions(uint16_t picture_width,
 			g_cxt->picture_size.width  = picture_width;
 			g_cxt->picture_size.height = picture_height;
 		}
-		g_cxt->actual_picture_size.width = picture_width;
-		g_cxt->actual_picture_size.height = picture_height;
+
+		if (g_cxt->is_cfg_rot_cap && (IMG_ROT_0 != g_cxt->cfg_cap_rot)) {
+			g_cxt->actual_picture_size.width = picture_height;
+			g_cxt->actual_picture_size.height = picture_width;
+		} else {
+			g_cxt->actual_picture_size.width = picture_width;
+			g_cxt->actual_picture_size.height = picture_height;
+		}
+
 		CMR_LOGV("picture after ALIGNED_16 is %d %d picture is %d %d",
 			g_cxt->picture_size.width,
 			g_cxt->picture_size.height,
@@ -4424,6 +4431,7 @@ int camera_rotation_handle(uint32_t evt_type, uint32_t sub_type, struct img_frm 
 			tmp = g_cxt->cap_orig_size.width;
 			g_cxt->cap_orig_size.width = g_cxt->cap_orig_size.height;
 			g_cxt->cap_orig_size.height = tmp;
+			info->height = g_cxt->cap_orig_size.height;
 		}
 
 		CMR_LOGV("orig size %d %d, %d %d",
