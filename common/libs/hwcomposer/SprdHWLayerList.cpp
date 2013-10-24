@@ -204,6 +204,7 @@ bool SprdHWLayerList:: revistGeometry(bool *forceOverlayFlag)
         }
     }
 
+#ifdef DIRECT_DISPLAY_SINGLE_OSD_LAYER
     /*
      *  if the RGB layer is bottom layer and there is no other layer,
      *  go overlay.
@@ -212,6 +213,7 @@ bool SprdHWLayerList:: revistGeometry(bool *forceOverlayFlag)
     {
         goto Overlay;
     }
+#endif
 
     /*
      *  Make sure the OSD layer is the top layer and the layer below it
@@ -251,15 +253,40 @@ Overlay:
         resetOverlayFlag(YUVLayer);
         FBLayerCount++;
 #else
-        for (int j = 0; j < LayerCount; j++)
+
+        /*
+         *  At present, OverlayComposer cannot handle 2 or more than 2 YUV layers.
+         *  And OverlayComposer also cannot handle cropped RGB layer.
+         * */
+        if (mYUVLayerCount > 1 || mRGBLayerFullScreenFlag == false)
         {
-            if (mLayerList[j].getPlaneType() == PLANE_FRAMEBUFFER && SkipLayerFlag == false)
-            {
-                forceOverlay(&(mLayerList[j]));
-                FBLayerCount--;
-            }
+            SkipLayerFlag = true;
         }
-        *forceOverlayFlag = true;
+
+        if (SkipLayerFlag == false)
+        {
+            for (int j = 0; j < LayerCount; j++)
+            {
+                hwc_layer_t *l = &(mList->hwLayers[j]);
+
+                /*
+                 *  OverlayComposer cannot handle the lrregular layer display frame,
+                 *  OverlayComposer should be disabled at this moment.
+                 * */
+                if (l->displayFrame.right == 1 ||
+                    l->displayFrame.bottom == 1)
+                {
+                    SkipLayerFlag = true;
+                }
+
+                if (mLayerList[j].getPlaneType() == PLANE_FRAMEBUFFER && SkipLayerFlag == false)
+                {
+                    forceOverlay(&(mLayerList[j]));
+                    FBLayerCount--;
+                }
+            }
+            *forceOverlayFlag = true;
+        }
 
 
         /*
@@ -272,13 +299,19 @@ Overlay:
         {
             resetOverlayFlag(YUVLayer);
 
+            FBLayerCount++;
+
             if (RGBLayer)
             {
                 resetOverlayFlag(RGBLayer);
+
+                FBLayerCount++;
             }
 
             *forceOverlayFlag = false;
         }
+
+        SkipLayerFlag = false;
 #endif
     }
 
@@ -374,11 +407,13 @@ bool SprdHWLayerList:: prepareOSDLayer(SprdHWLayer *l)
 
 
 #ifdef PROCESS_VIDEO_USE_GSP
+#ifndef OVERLAY_COMPOSER_GPU
     if (!(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY))
     {
         ALOGI_IF(mDebugFlag, "prepareOSDLayer find virtual address Line:%d", __LINE__);
         return false;
     }
+#endif
 #else
     if ((layer->transform != 0) || !(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY))
     {
@@ -403,16 +438,21 @@ bool SprdHWLayerList:: prepareOSDLayer(SprdHWLayer *l)
         }
 
 #ifndef _DMA_COPY_OSD_LAYER
+#ifndef OVERLAY_COMPOSER_GPU
         if (!(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY))
         {
             ALOGI_IF(mDebugFlag, "prepareOSDLayer Not physical address %d", __LINE__);
             return false;
         }
 #endif
+#endif
     }
     else if (((unsigned int)privateH->width != mFBHeight)
-             || ((unsigned int)privateH->height != mFBWidth) ||
-        !(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY))
+             || ((unsigned int)privateH->height != mFBWidth)
+#ifndef OVERLAY_COMPOSER_GPU
+             || !(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
+#endif
+    )
     {
         ALOGI_IF(mDebugFlag, "prepareOSDLayer L%d", __LINE__);
         return false;
@@ -464,7 +504,7 @@ bool SprdHWLayerList:: prepareOSDLayer(SprdHWLayer *l)
         return false;
     }
 
-
+    mRGBLayerFullScreenFlag = true;
 
     l->setLayerType(LAYER_OSD);
     mRGBLayerCount++;
@@ -499,6 +539,7 @@ bool SprdHWLayerList:: prepareOverlayLayer(SprdHWLayer *l)
         return false;
     }
 
+    mYUVLayerCount++;
 
     if (!(privateH->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
         || (privateH->flags & private_handle_t::PRIV_FLAGS_NOT_OVERLAY)) {
@@ -651,9 +692,7 @@ bool SprdHWLayerList:: prepareOverlayLayer(SprdHWLayer *l)
 #endif
 
 
-
     l->setLayerType(LAYER_OVERLAY);
-    mYUVLayerCount++;
 
 
     return true;

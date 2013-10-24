@@ -388,9 +388,10 @@ bool Layer::prepareDrawData()
      *  Here, just Compensate for the loss.
      * */
     int format = buf->getPixelFormat();
-    if (format == HAL_PIXEL_FORMAT_YCbCr_420_SP ||
+    if ((mTransform == 0 ) &&
+        (format == HAL_PIXEL_FORMAT_YCbCr_420_SP ||
         format == HAL_PIXEL_FORMAT_YCrCb_420_SP ||
-        format == HAL_PIXEL_FORMAT_YV12)
+        format == HAL_PIXEL_FORMAT_YV12))
     {
         float height = float(mRect->bottom - mRect->top);
         float pixelOffset = 1.0 / height;
