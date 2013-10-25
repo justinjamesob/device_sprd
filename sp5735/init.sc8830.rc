@@ -3,7 +3,7 @@ import init.sc8830.usb.rc
 on early-init
     export EXTERNAL_STORAGE /storage/sdcard0
     export SECONDARY_STORAGE /storage/sdcard1
-    mkdir /storage 0777 system sdcard_rw
+    mkdir /storage 0774 system sdcard_rw
     mkdir /storage/sdcard0 0000 system system
     mkdir /storage/sdcard1 0000 system system
     mkdir /storage/usbdisk 0000 system system
@@ -33,12 +33,14 @@ on post-fs-data
 
     # Set indication (checked by vold) that we have finished this action
     setprop vold.post_fs_data_done 1
+    
 on init
     mkdir /dev/pipe 0755 system system
     pipe 666 /dev/pipe/mmi.audio.ctrl
     
 on boot
     chown system system /sys/class/backlight/sprd_backlight/brightness
+
 
     chmod 660 /proc/cpw/wdtirq
     chmod 660 /proc/cpw/stop
@@ -57,14 +59,20 @@ on boot
     insmod /system/lib/modules/inv-mpu-iio.ko
     chown system system /dev/iio:device0
     chown system system /sys/bus/iio/devices/trigger0/name
+    chown system system /sys/bus/iio/devices/iio:device0/accl_bias
     chown system system /sys/bus/iio/devices/iio:device0/accl_enable
     chown system system /sys/bus/iio/devices/iio:device0/accl_matrix
     chown system system /sys/bus/iio/devices/iio:device0/buffer/length
     chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
     chown system system /sys/bus/iio/devices/iio:device0/compass_enable
     chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
-    chown system system /sys/bus/iio/devices/iio:device0/dmp_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_firmware
     chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chown system system /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chown system system /sys/bus/iio/devices/iio:device0/firmware_loaded
     chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
     chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
     chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
@@ -72,6 +80,7 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
     chown system system /sys/bus/iio/devices/iio:device0/key
     chown system system /sys/bus/iio/devices/iio:device0/power_state
+    chown system system /sys/bus/iio/devices/iio:device0/quaternion_on
     chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
@@ -82,34 +91,41 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chown system system /sys/bus/iio/devices/iio:device0/self_test
+    chown system system /sys/bus/iio/devices/iio:device0/tap_on
     chown system system /sys/bus/iio/devices/iio:device0/temperature
     chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
-    chown system system /dev/iio:device1
-    chown system system /sys/bus/iio/devices/trigger1/name
-    chown system system /sys/bus/iio/devices/iio:device1/buffer/length
-    chown system system /sys/bus/iio/devices/iio:device1/buffer/enable
-    chown system system /sys/bus/iio/devices/iio:device1/compass_enable
-    chown system system /sys/bus/iio/devices/iio:device1/compass_matrix
-    chown system system /sys/bus/iio/devices/iio:device1/in_magn_scale
-    chown system system /sys/bus/iio/devices/iio:device1/power_state
-    chown system system /sys/bus/iio/devices/iio:device1/sampling_frequency
-    chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_x_en
-    chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_y_en
-    chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_z_en
-    chown system system /sys/bus/iio/devices/iio:device1/scan_elements/in_timestamp_en
-    chown system system /sys/bus/iio/devices/iio:device1/trigger/current_trigger
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
 
     chmod 0664 /dev/iio:device0
     chmod 0664 /sys/bus/iio/devices/trigger0/name
+    chmod 0664 /sys/bus/iio/devices/iio:device0/accl_bias
     chmod 0664 /sys/bus/iio/devices/iio:device0/accl_enable
     chmod 0664 /sys/bus/iio/devices/iio:device0/accl_matrix
     chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/length
     chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/enable
     chmod 0664 /sys/bus/iio/devices/iio:device0/compass_enable
     chmod 0664 /sys/bus/iio/devices/iio:device0/compass_matrix
-    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_on
+    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_firmware
     chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_on
+    chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chmod 0664 /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chmod 0664 /sys/bus/iio/devices/iio:device0/firmware_loaded
     chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_enable
     chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_matrix
     chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_scale
@@ -117,6 +133,7 @@ on boot
     chmod 0664 /sys/bus/iio/devices/iio:device0/in_magn_scale
     chmod 0664 /sys/bus/iio/devices/iio:device0/key
     chmod 0664 /sys/bus/iio/devices/iio:device0/power_state
+    chmod 0664 /sys/bus/iio/devices/iio:device0/quaternion_on
     chmod 0664 /sys/bus/iio/devices/iio:device0/sampling_frequency
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
@@ -127,23 +144,24 @@ on boot
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chmod 0664 /sys/bus/iio/devices/iio:device0/self_test
+    chmod 0664 /sys/bus/iio/devices/iio:device0/tap_on
     chmod 0664 /sys/bus/iio/devices/iio:device0/temperature
     chmod 0664 /sys/bus/iio/devices/iio:device0/trigger/current_trigger
-    chmod 0664 /dev/iio:device1
-    chmod 0664 /sys/bus/iio/devices/trigger1/name
-    chmod 0664 /sys/bus/iio/devices/iio:device1/buffer/length
-    chmod 0664 /sys/bus/iio/devices/iio:device1/buffer/enable
-    chmod 0664 /sys/bus/iio/devices/iio:device1/compass_enable
-    chmod 0664 /sys/bus/iio/devices/iio:device1/compass_matrix
-    chmod 0664 /sys/bus/iio/devices/iio:device1/in_magn_scale
-    chmod 0664 /sys/bus/iio/devices/iio:device1/power_state
-    chmod 0664 /sys/bus/iio/devices/iio:device1/sampling_frequency
-    chmod 0664 /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device1/scan_elements/in_magn_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device1/scan_elements/in_timestamp_en
-    chmod 0664 /sys/bus/iio/devices/iio:device1/trigger/current_trigger
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_x_offset
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_y_offset
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
+    chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
 
     chown system system /sys/class/compass/akm8975/enable_acc
     chown system system /sys/class/compass/akm8975/enable_mag
@@ -207,9 +225,8 @@ on property:ro.debuggable=1
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
 
-on property:ro.modem.w.count=2
+on property:ro.modem.w.count=1
     write /proc/sim/0 w
-    write /proc/sim/1 w
 
 service modemd /system/bin/modemd
     class core
@@ -217,27 +234,18 @@ service modemd /system/bin/modemd
     group system radio shell
     oneshot
 
-service engservicet /system/bin/engservice -t 1
-    socket engtd stream 660 system system
-    class core
-    user system
-    group system
-    disabled
-    oneshot
 
-service engmodemclientt /system/bin/engmodemclient -t 1
-    class core
-    user system
-    group system radio
-    disabled
-    oneshot
 
-service engpcclientt /system/bin/engpc -t 1
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
+#start nvitem daemon.
+#service nvm_daemon /system/bin/nvm_daemon
+#    class core
+#    user system
+#    group system radio shell
+#    oneshot
+
+
+
+
 
 service engservicew /system/bin/engservice -t 0
     socket engw stream 660 system system
@@ -260,7 +268,7 @@ service engpcclientw /system/bin/engpc -t 0
     group system radio shell
     disabled
     oneshot
-
+    
 service engsetmacaddr /system/bin/engsetmacaddr
     class main
     user system
@@ -462,6 +470,20 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service boot_complete /system/bin/boot_complete
+    class main
+    user system
+    group system shell
+    oneshot
+
+service refnotify /system/bin/refnotify -t 0
+    class main
+    user root
+
+service refnotify_w /system/bin/refnotify -t 1
+    class main
+    user root
+
 on property:ro.modem.w.enable=1
     symlink /dev/slog_w /dev/vbpipe0
     symlink /dev/spipe_w1 /dev/vbpipe1
@@ -500,7 +522,6 @@ on property:ro.modem.w.enable=1
     symlink /dev/stty_w29 /dev/ts0710mux29
     symlink /dev/stty_w30 /dev/ts0710mux30
     symlink /dev/stty_w31 /dev/ts0710mux31
-
 
 
 #create symlink
