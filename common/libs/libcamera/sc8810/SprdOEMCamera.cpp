@@ -3254,7 +3254,9 @@ int camera_preview_init(int preview_mode)
 	{
 		ALOGV("V4L2_PIX_FMT_RGB565X\n");
 	}
-    camera_set_rot_angle(&orientation_parm,&rotation_parm);
+        if (0 == orientation_parm) {
+            camera_set_rot_angle(&orientation_parm,&rotation_parm);
+        }
 	if(1 == orientation_parm)
 	{
 
