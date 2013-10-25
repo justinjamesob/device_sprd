@@ -392,6 +392,7 @@ void* detect_sipc_modem(void *param)
 	watchdog_fd = open(watchdog_dev, O_RDONLY);
 	MODEMD_LOGD("%s: open watchdog dev: %s, fd = %d", __func__, watchdog_dev, watchdog_fd);
 	if (watchdog_fd < 0) {
+		close(assert_fd);
 		MODEMD_LOGE("open %s failed, error: %s", watchdog_dev, strerror(errno));
 		return NULL;
 	}
