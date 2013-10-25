@@ -109,7 +109,7 @@ PRODUCT_COPY_FILES := \
         device/sprd/common/res/spn/spn-conf.xml:system/etc/spn-conf.xml
 
 
-USE_PROJECT_SEC :=false
+USE_PROJECT_SEC :=true
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
@@ -149,7 +149,8 @@ ifeq ($(USE_PROJECT_SEC),true)
 # prebuild files
 PRODUCT_PACKAGES += \
         Permission.apk \
-        choose_secure
+        choose_secure \
+	framework-se-res.apk
 
 PRODUCT_COPY_FILES += \
         frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
