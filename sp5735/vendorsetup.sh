@@ -16,7 +16,7 @@
 
 
 
-add_lunch_combo sp5735cuccspecAplus_UUI-userdebug
-add_lunch_combo sp5735wifionlycuccspecAplus_UUI-userdebug
+add_lunch_combo sp5735base-userdebug
+add_lunch_combo sp5735wifionly-userdebug
 
 

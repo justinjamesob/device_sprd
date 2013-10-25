@@ -12,13 +12,13 @@ PRODUCT_PROPERTY_OVERRIDES :=
 
 PRODUCT_PACKAGES := \
 	DeskClock \
-	Bluetooth \
 	Calculator \
 	Calendar \
 	CertInstaller \
 	DrmProvider \
 	Email \
 	Exchange2 \
+        Launcher2 \
 	Gallery2 \
 	InputDevices \
 	LatinIME \
@@ -28,28 +28,31 @@ PRODUCT_PACKAGES := \
 	QuickSearchBox \
 	SystemUI \
 	CalendarProvider \
+
+ifeq ($(ENABLE_BLUETOOTH), true)
+PRODUCT_PACKAGES += \
+	Bluetooth \
 	bluetooth-health \
 	hciconfig \
 	hcitool \
 	hcidump \
 	bttest\
+	audio.a2dp.default
+endif
+
+PRODUCT_PACKAGES += \
 	hostapd \
 	wpa_supplicant.conf \
 	calibration_init \
 	nvm_daemon \
 	modemd\
-	engpc\
-    libengappjni \
-    Engapp \
-	audio.a2dp.default
+	engpc
 
 # own copyright packages files
 PRODUCT_PACKAGES += \
-    FileExplorer \
-    SprdAppBackup \
     AudioProfile \
+    FileExplorer \
     NoteBook \
-    CallFireWall \
     ValidationTools \
     libsprddm \
     libvalidationtoolsjni \
@@ -60,6 +63,7 @@ PRODUCT_PACKAGES += \
     libstagefright_sprd_h264dec	\
     libstagefright_sprd_h264enc	\
     libstagefright_sprd_vpxdec \
+    libstagefright_soft_mjpgdec \
     libstagefright_sprd_aacdec \
     libstagefright_sprd_mp3dec
 
@@ -70,6 +74,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	nvitemd \
 	charge \
+	refnotify\
 	rawdatad \
 	batterysrv \
 	poweroff_alarm \
@@ -122,13 +127,11 @@ PRODUCT_COPY_FILES := \
 	$(BOARDDIR)/scripts/ext_kill.sh:system/bin/ext_kill.sh \
 	$(BOARDDIR)/scripts/ext_chown.sh:system/bin/ext_chown.sh \
 	$(BOARDDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
-	$(BOARDDIR)/patch.record:system/patch/patch.record \
 	device/sprd/common/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	device/sprd/common/libs/audio/audio_policy.conf:system/etc/audio_policy.conf \
 	device/sprd/sp5735/media_codecs.xml:system/etc/media_codecs.xml \
 	device/sprd/sp5735/media_profiles.xml:system/etc/media_profiles.xml \
 	frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
-	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
 	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
 	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
 	frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
@@ -147,8 +150,12 @@ PRODUCT_COPY_FILES := \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	device/sprd/partner/brcm/gps/glgps:/system/bin/glgps \
 	device/sprd/partner/brcm/gps/gpsconfig_shark.xml:/system/etc/gpsconfig.xml \
-	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so \
-	device/sprd/common/tools/e2fsprogs/e2fsck:root/sbin/e2fsck
+	device/sprd/partner/brcm/gps/gps.default.so:/system/lib/hw/gps.default.so
+
+ifeq ($(ENABLE_BLUETOOTH), true)
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml
+endif
 
 BOARD_WLAN_DEVICE_REV       := bcm4330_b2
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)

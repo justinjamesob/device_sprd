@@ -1,4 +1,4 @@
-# mount point	fstype		device												extract dir
+# mount point	fstype		device
 
 /sdcard		vfat		/dev/block/platform/sprd-sdhci.0/mmcblk1p1
 /system		ext4		/dev/block/platform/sprd-sdhci.3/by-name/system
