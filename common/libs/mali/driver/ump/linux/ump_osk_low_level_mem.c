@@ -234,7 +234,7 @@ void _ump_osk_msync( ump_dd_mem * mem, void * virt, u32 offset, u32 size, ump_uk
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0))
 		dmac_flush_range(start_v, end_v);
 #else
-		__cpuc_coherent_user_range((unsigned long)start_v, (unsigned long)end_v);
+		__cpuc_flush_dcache_area(start_v, size);
 #endif
 		DBG_MSG(3, ("UMP[%02u] Flushing CPU L1 Cache. Cpu address: %x-%x\n", mem->secure_id, start_v,end_v));
 	}
