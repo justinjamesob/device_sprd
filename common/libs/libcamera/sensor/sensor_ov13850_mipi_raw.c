@@ -16,15 +16,10 @@
 #include "sensor_drv_u.h"
 #include "sensor_raw.h"
 #include "sensor_ov13850_raw_param.c"
-//#include "sensor_ov13850_otp.c"
+#include "sensor_ov13850_otp.c"
 
-#if 0
-#define ov13850_I2C_ADDR_W        (0x20 >> 1)
-#define ov13850_I2C_ADDR_R         (0x20 >> 1)
-#else
 #define ov13850_I2C_ADDR_W        (0x6c >> 1)
 #define ov13850_I2C_ADDR_R         (0x6c >> 1)
-#endif
 
 #define OV13850_FLIP_MIRROR
 #define DW9714_VCM_SLAVE_ADDR (0x18>>1)
@@ -32,6 +27,12 @@
 //#define use_sensor_gain	
 
 #define OV13850_RAW_PARAM_COM  0x0000
+#define OV13850_RAW_PARAM_OFLIM  0x0007
+#define OV13850_OTP_CASE 			1
+#define OV13850_UPDATE_LNC		1
+#define OV13850_UPDATE_WB			2
+#define OV13850_UPDATE_LNC_WB	3
+#define OV13850_UPDATE_VCM		4
 
 #define OV13850_MIN_FRAME_LEN_PRV  0x5e8
 static int s_ov13850_gain = 0;
@@ -59,10 +60,12 @@ LOCAL uint32_t _ov13850_ReadGain(uint32_t param);
 LOCAL uint32_t _ov13850_set_video_mode(uint32_t param);
 LOCAL uint32_t _ov13850_get_shutter(void);
 LOCAL uint32_t _ov13850_com_Identify_otp(void* param_ptr);
-LOCAL uint32_t _ov13850_com_Identify_otp_1(void* param_ptr);
+LOCAL uint32_t _ov13850_Oflim_Identify_otp(void* param_ptr);
+LOCAL uint32_t _ov13850_cfg_otp(uint32_t  param);
+LOCAL uint32_t _ov13850_update_otp(void* param_ptr);
 
 LOCAL const struct raw_param_info_tab s_ov13850_raw_param_tab[]={
-	//{OV13850_RAW_PARAM_COM, &s_ov13850_mipi_raw_info, _ov13850_com_Identify_otp_1, PNULL},
+	{OV13850_RAW_PARAM_COM, &s_ov13850_mipi_raw_info, _ov13850_Oflim_Identify_otp, _ov13850_update_otp},
 	{OV13850_RAW_PARAM_COM, &s_ov13850_mipi_raw_info, _ov13850_com_Identify_otp, PNULL},
 	{RAW_INFO_END_ID, PNULL, PNULL, PNULL}
 };
@@ -291,8 +294,8 @@ LOCAL const SENSOR_REG_T ov13850_4208x3120_setting[] =
 	{0x3813, 0x04},  // V win off
 	{0x3814, 0x11},  // H inc
 	{0x3815, 0x11},  // V inc
-	{0x3820, 0x00},  // V flip off, V bin off
-	{0x3821, 0x04},  // H mirror on, H bin off
+	{0x3820, 0x04},  // V flip on, V bin off
+	{0x3821, 0x00},  // H mirror off, H bin off
 	{0x3836, 0x04}, 
 	{0x3837, 0x01}, 
 	{0x4020, 0x04}, 
@@ -309,13 +312,9 @@ LOCAL const SENSOR_REG_T ov13850_4208x3120_setting[] =
 
 };
 
-
-
 LOCAL SENSOR_REG_TAB_INFO_T s_ov13850_resolution_Tab_RAW[] = {
 	{ADDR_AND_LEN_OF_ARRAY(ov13850_common_init), 0, 0, 24, SENSOR_IMAGE_FORMAT_RAW},
-//	{ADDR_AND_LEN_OF_ARRAY(ov13850_720x480_setting), 720, 480, 24, SENSOR_IMAGE_FORMAT_RAW},
 	{ADDR_AND_LEN_OF_ARRAY(ov13850_2112x1568_setting), 2112, 1568, 24, SENSOR_IMAGE_FORMAT_RAW},
-/*	{ADDR_AND_LEN_OF_ARRAY(ov13850_1920x1080_setting), 1920, 1080, 24, SENSOR_IMAGE_FORMAT_RAW},*/
 	{ADDR_AND_LEN_OF_ARRAY(ov13850_4208x3120_setting), 4208, 3120, 24, SENSOR_IMAGE_FORMAT_RAW},
 	{PNULL, 0, 0, 0, 0, 0},
 	{PNULL, 0, 0, 0, 0, 0},
@@ -337,7 +336,6 @@ LOCAL SENSOR_TRIM_T s_ov13850_Resolution_Trim_Tab[] = {
 	{0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0}
 };
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 
 LOCAL const SENSOR_REG_T s_ov13850_2112x1568_video_tab[SENSOR_VIDEO_MODE_MAX][1] = {
 	/*video mode 0: ?fps*/
@@ -422,8 +420,6 @@ LOCAL uint32_t _ov13850_set_video_mode(uint32_t param)
 	return 0;
 }
 
-#endif
-
 LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov13850_ioctl_func_tab = {
 	PNULL,
 	_ov13850_PowerOn,
@@ -469,17 +465,13 @@ LOCAL SENSOR_IOCTL_FUNC_TAB_T s_ov13850_ioctl_func_tab = {
 	PNULL, //_ov13850_GetExifInfo,
 	_ov13850_ExtFunc,
 	PNULL, //_ov13850_set_anti_flicker,
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	_ov13850_set_video_mode,
-#else
-	PNULL,
-#endif
 	PNULL, //pick_jpeg_stream
 	PNULL,  //meter_mode
 	PNULL, //get_status
 	_ov13850_StreamOn,
 	_ov13850_StreamOff,
-	PNULL,
+	_ov13850_cfg_otp,
 };
 
 
@@ -540,7 +532,7 @@ SENSOR_INFO_T g_ov13850_mipi_raw_info = {
 	SENSOR_AVDD_1800MV,	// iovdd
 	SENSOR_AVDD_1500MV,	// dvdd
 	1,			// skip frame num before preview
-	3,			// skip frame num before capture
+	5,			// skip frame num before capture
 	0,			// deci frame num during preview
 	0,			// deci frame num during video preview
 
@@ -550,11 +542,8 @@ SENSOR_INFO_T g_ov13850_mipi_raw_info = {
 	0,
 	0,
 	{SENSOR_INTERFACE_TYPE_CSI2, 4, 10, 0},
-
-#ifdef CONFIG_CAMERA_SENSOR_NEW_FEATURE
 	s_ov13850_video_info,
 	3,			// skip frame num while change setting
-#endif
 };
 
 LOCAL struct sensor_raw_info* Sensor_GetContext(void)
@@ -593,7 +582,7 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->af_bypass=0x00;
 	sensor_ptr->edge_bypass=0x00;
 	sensor_ptr->fcs_bypass=0x00;
-	sensor_ptr->css_bypass=0x01;
+	sensor_ptr->css_bypass=0x00;
 	sensor_ptr->saturation_bypass=0x00;
 	sensor_ptr->hdr_bypass=0x01;
 	sensor_ptr->glb_gain_bypass=0x01;
@@ -740,8 +729,21 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->ae.target_lum=120;
 	sensor_ptr->ae.target_zone=8;
 	sensor_ptr->ae.quick_mode=1;
-	sensor_ptr->ae.smart=0;
+	sensor_ptr->ae.smart=0x00;// bit0: denoise bit1: edge bit2: startion
 	sensor_ptr->ae.smart_rotio=255;
+	sensor_ptr->ae.smart_mode=0; // 0: gain 1: lum
+	sensor_ptr->ae.smart_base_gain=64;
+	sensor_ptr->ae.smart_wave_min=0;
+	sensor_ptr->ae.smart_wave_max=1023;
+	sensor_ptr->ae.smart_pref_min=0;
+	sensor_ptr->ae.smart_pref_max=255;
+	sensor_ptr->ae.smart_denoise_min_index=0;
+	sensor_ptr->ae.smart_denoise_max_index=254;
+	sensor_ptr->ae.smart_edge_min_index=0;
+	sensor_ptr->ae.smart_edge_max_index=6;
+	sensor_ptr->ae.smart_sta_low_thr=40;
+	sensor_ptr->ae.smart_sta_high_thr=120;
+	sensor_ptr->ae.smart_sta_rotio=128;
 	sensor_ptr->ae.ev[0]=0xd0;
 	sensor_ptr->ae.ev[1]=0xe0;
 	sensor_ptr->ae.ev[2]=0xf0;
@@ -792,47 +794,7 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->awb.r_gain[8]=0x400;
 	sensor_ptr->awb.g_gain[8]=0x400;
 	sensor_ptr->awb.b_gain[8]=0x400;
-	sensor_ptr->awb.cali_zone=0x40;
 	sensor_ptr->awb.target_zone=0x10;
-
-	/*awb cali*/
-	sensor_ptr->awb.cali_num=0;
-
-	sensor_ptr->awb.cali[0].x=140;
-	sensor_ptr->awb.cali[0].yt=241;
-	sensor_ptr->awb.cali[0].yb=212;
-
-	sensor_ptr->awb.cali[1].x=145;
-	sensor_ptr->awb.cali[1].yt=250;
-	sensor_ptr->awb.cali[1].yb=149;
-
-	sensor_ptr->awb.cali[2].x=152;
-	sensor_ptr->awb.cali[2].yt=254;
-	sensor_ptr->awb.cali[2].yb=136;
-
-	sensor_ptr->awb.cali[3].x=157;
-	sensor_ptr->awb.cali[3].yt=254;
-	sensor_ptr->awb.cali[3].yb=130;
-
-	sensor_ptr->awb.cali[4].x=163;
-	sensor_ptr->awb.cali[4].yt=245;
-	sensor_ptr->awb.cali[4].yb=126;
-
-	sensor_ptr->awb.cali[5].x=170;
-	sensor_ptr->awb.cali[5].yt=156;
-	sensor_ptr->awb.cali[5].yb=127;
-
-	sensor_ptr->awb.cali[6].x=175;
-	sensor_ptr->awb.cali[6].yt=157;
-	sensor_ptr->awb.cali[6].yb=130;
-
-	sensor_ptr->awb.cali[7].x=179;
-	sensor_ptr->awb.cali[7].yt=161;
-	sensor_ptr->awb.cali[7].yb=133;
-
-	sensor_ptr->awb.cali[8].x=184;
-	sensor_ptr->awb.cali[8].yt=166;
-	sensor_ptr->awb.cali[8].yb=135;
 
 	/*awb win*/
 	sensor_ptr->awb.win[0].x=135;
@@ -923,6 +885,73 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->awb.gain_convert[1].g=0x100;
 	sensor_ptr->awb.gain_convert[1].b=0x100;
 
+	//ov8825 awb param
+	sensor_ptr->awb.t_func.a = 274;
+	sensor_ptr->awb.t_func.b = -335;
+	sensor_ptr->awb.t_func.shift = 10;
+
+	sensor_ptr->awb.wp_count_range.min_proportion = 256 / 128;
+	sensor_ptr->awb.wp_count_range.max_proportion = 256 / 4;
+
+	sensor_ptr->awb.g_estimate.num = 4;
+	sensor_ptr->awb.g_estimate.t_thr[0] = 2000;
+	sensor_ptr->awb.g_estimate.g_thr[0][0] = 406;    //0.404
+	sensor_ptr->awb.g_estimate.g_thr[0][1] = 419;    //0.414
+	sensor_ptr->awb.g_estimate.w_thr[0][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[0][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[1] = 3000;
+	sensor_ptr->awb.g_estimate.g_thr[1][0] = 406;    //0.404
+	sensor_ptr->awb.g_estimate.g_thr[1][1] = 419;    //0.414
+	sensor_ptr->awb.g_estimate.w_thr[1][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[1][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[2] = 6500;
+	sensor_ptr->awb.g_estimate.g_thr[2][0] = 445;
+	sensor_ptr->awb.g_estimate.g_thr[2][1] = 478;
+	sensor_ptr->awb.g_estimate.w_thr[2][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[2][1] = 0;
+
+	sensor_ptr->awb.g_estimate.t_thr[3] = 20000;
+	sensor_ptr->awb.g_estimate.g_thr[3][0] = 407;
+	sensor_ptr->awb.g_estimate.g_thr[3][1] = 414;
+	sensor_ptr->awb.g_estimate.w_thr[3][0] = 255;
+	sensor_ptr->awb.g_estimate.w_thr[3][1] = 0;
+
+	sensor_ptr->awb.gain_adjust.num = 5;
+	sensor_ptr->awb.gain_adjust.t_thr[0] = 1600;
+	sensor_ptr->awb.gain_adjust.w_thr[0] = 192;
+	sensor_ptr->awb.gain_adjust.t_thr[1] = 2200;
+	sensor_ptr->awb.gain_adjust.w_thr[1] = 208;
+	sensor_ptr->awb.gain_adjust.t_thr[2] = 3500;
+	sensor_ptr->awb.gain_adjust.w_thr[2] = 256;
+	sensor_ptr->awb.gain_adjust.t_thr[3] = 10000;
+	sensor_ptr->awb.gain_adjust.w_thr[3] = 256;
+	sensor_ptr->awb.gain_adjust.t_thr[4] = 12000;
+	sensor_ptr->awb.gain_adjust.w_thr[4] = 128;
+
+	sensor_ptr->awb.light.num = 7;
+	sensor_ptr->awb.light.t_thr[0] = 2300;
+	sensor_ptr->awb.light.w_thr[0] = 2;
+	sensor_ptr->awb.light.t_thr[1] = 2850;
+	sensor_ptr->awb.light.w_thr[1] = 4;
+	sensor_ptr->awb.light.t_thr[2] = 4150;
+	sensor_ptr->awb.light.w_thr[2] = 8;
+	sensor_ptr->awb.light.t_thr[3] = 5500;
+	sensor_ptr->awb.light.w_thr[3] = 160;
+	sensor_ptr->awb.light.t_thr[4] = 6500;
+	sensor_ptr->awb.light.w_thr[4] = 192;
+	sensor_ptr->awb.light.t_thr[5] = 7500;
+	sensor_ptr->awb.light.w_thr[5] = 96;
+	sensor_ptr->awb.light.t_thr[6] = 8200;
+	sensor_ptr->awb.light.w_thr[6] = 8;
+
+	sensor_ptr->awb.steady_speed = 6;
+	sensor_ptr->awb.debug_level = 0;
+#endif
+	sensor_ptr->awb.alg_id = 0;
+	sensor_ptr->awb.smart_index = 4;
+#if 0
 	//bpc
 	sensor_ptr->bpc.flat_thr=80;
 	sensor_ptr->bpc.std_thr=20;
@@ -989,11 +1018,11 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	//GrGb
 	sensor_ptr->grgb.edge_thr=26;
 	sensor_ptr->grgb.diff_thr=80;
-	
+
 	//cfa
 	sensor_ptr->cfa.edge_thr=0x1a;
 	sensor_ptr->cfa.diff_thr=0x00;
-	
+
 	//cmc
 	sensor_ptr->cmc.matrix[0][0]=0x6f3;
 	sensor_ptr->cmc.matrix[0][1]=0x3e0a;
@@ -1004,7 +1033,7 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->cmc.matrix[0][6]=0x0d;
 	sensor_ptr->cmc.matrix[0][7]=0x3c03;
 	sensor_ptr->cmc.matrix[0][8]=0x7f0;
-	
+
 	//Gamma
 	sensor_ptr->gamma.axis[0][0]=0;
 	sensor_ptr->gamma.axis[0][1]=8;
@@ -1059,21 +1088,277 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->gamma.axis[1][23]=0xf0;
 	sensor_ptr->gamma.axis[1][24]=0xf6;
 	sensor_ptr->gamma.axis[1][25]=0xff;
-#endif
-	sensor_ptr->ae.smart=0x00;// bit0: denoise bit1: edge bit2: startion
-	sensor_ptr->ae.smart_rotio=255;
-	sensor_ptr->ae.smart_mode=0; // 0: gain 1: lum
-	sensor_ptr->ae.smart_base_gain=64;
-	sensor_ptr->ae.smart_wave_min=0;
-	sensor_ptr->ae.smart_wave_max=1023;
-	sensor_ptr->ae.smart_pref_min=0;
-	sensor_ptr->ae.smart_pref_max=255;
-	sensor_ptr->ae.smart_denoise_min_index=0;
-	sensor_ptr->ae.smart_denoise_max_index=254;
-	sensor_ptr->ae.smart_edge_min_index=0;
-	sensor_ptr->ae.smart_edge_max_index=7;
 
-#if 0
+	sensor_ptr->gamma.tab[0].axis[0][0]=0;
+	sensor_ptr->gamma.tab[0].axis[0][1]=8;
+	sensor_ptr->gamma.tab[0].axis[0][2]=16;
+	sensor_ptr->gamma.tab[0].axis[0][3]=24;
+	sensor_ptr->gamma.tab[0].axis[0][4]=32;
+	sensor_ptr->gamma.tab[0].axis[0][5]=48;
+	sensor_ptr->gamma.tab[0].axis[0][6]=64;
+	sensor_ptr->gamma.tab[0].axis[0][7]=80;
+	sensor_ptr->gamma.tab[0].axis[0][8]=96;
+	sensor_ptr->gamma.tab[0].axis[0][9]=128;
+	sensor_ptr->gamma.tab[0].axis[0][10]=160;
+	sensor_ptr->gamma.tab[0].axis[0][11]=192;
+	sensor_ptr->gamma.tab[0].axis[0][12]=224;
+	sensor_ptr->gamma.tab[0].axis[0][13]=256;
+	sensor_ptr->gamma.tab[0].axis[0][14]=288;
+	sensor_ptr->gamma.tab[0].axis[0][15]=320;
+	sensor_ptr->gamma.tab[0].axis[0][16]=384;
+	sensor_ptr->gamma.tab[0].axis[0][17]=448;
+	sensor_ptr->gamma.tab[0].axis[0][18]=512;
+	sensor_ptr->gamma.tab[0].axis[0][19]=576;
+	sensor_ptr->gamma.tab[0].axis[0][20]=640;
+	sensor_ptr->gamma.tab[0].axis[0][21]=768;
+	sensor_ptr->gamma.tab[0].axis[0][22]=832;
+	sensor_ptr->gamma.tab[0].axis[0][23]=896;
+	sensor_ptr->gamma.tab[0].axis[0][24]=960;
+	sensor_ptr->gamma.tab[0].axis[0][25]=1023;
+
+	sensor_ptr->gamma.tab[0].axis[1][0]=0x00;
+	sensor_ptr->gamma.tab[0].axis[1][1]=0x05;
+	sensor_ptr->gamma.tab[0].axis[1][2]=0x09;
+	sensor_ptr->gamma.tab[0].axis[1][3]=0x0e;
+	sensor_ptr->gamma.tab[0].axis[1][4]=0x13;
+	sensor_ptr->gamma.tab[0].axis[1][5]=0x1f;
+	sensor_ptr->gamma.tab[0].axis[1][6]=0x2a;
+	sensor_ptr->gamma.tab[0].axis[1][7]=0x36;
+	sensor_ptr->gamma.tab[0].axis[1][8]=0x40;
+	sensor_ptr->gamma.tab[0].axis[1][9]=0x58;
+	sensor_ptr->gamma.tab[0].axis[1][10]=0x68;
+	sensor_ptr->gamma.tab[0].axis[1][11]=0x76;
+	sensor_ptr->gamma.tab[0].axis[1][12]=0x84;
+	sensor_ptr->gamma.tab[0].axis[1][13]=0x8f;
+	sensor_ptr->gamma.tab[0].axis[1][14]=0x98;
+	sensor_ptr->gamma.tab[0].axis[1][15]=0xa0;
+	sensor_ptr->gamma.tab[0].axis[1][16]=0xb0;
+	sensor_ptr->gamma.tab[0].axis[1][17]=0xbd;
+	sensor_ptr->gamma.tab[0].axis[1][18]=0xc6;
+	sensor_ptr->gamma.tab[0].axis[1][19]=0xcf;
+	sensor_ptr->gamma.tab[0].axis[1][20]=0xd8;
+	sensor_ptr->gamma.tab[0].axis[1][21]=0xe4;
+	sensor_ptr->gamma.tab[0].axis[1][22]=0xea;
+	sensor_ptr->gamma.tab[0].axis[1][23]=0xf0;
+	sensor_ptr->gamma.tab[0].axis[1][24]=0xf6;
+	sensor_ptr->gamma.tab[0].axis[1][25]=0xff;
+
+	sensor_ptr->gamma.tab[1].axis[0][0]=0;
+	sensor_ptr->gamma.tab[1].axis[0][1]=8;
+	sensor_ptr->gamma.tab[1].axis[0][2]=16;
+	sensor_ptr->gamma.tab[1].axis[0][3]=24;
+	sensor_ptr->gamma.tab[1].axis[0][4]=32;
+	sensor_ptr->gamma.tab[1].axis[0][5]=48;
+	sensor_ptr->gamma.tab[1].axis[0][6]=64;
+	sensor_ptr->gamma.tab[1].axis[0][7]=80;
+	sensor_ptr->gamma.tab[1].axis[0][8]=96;
+	sensor_ptr->gamma.tab[1].axis[0][9]=128;
+	sensor_ptr->gamma.tab[1].axis[0][10]=160;
+	sensor_ptr->gamma.tab[1].axis[0][11]=192;
+	sensor_ptr->gamma.tab[1].axis[0][12]=224;
+	sensor_ptr->gamma.tab[1].axis[0][13]=256;
+	sensor_ptr->gamma.tab[1].axis[0][14]=288;
+	sensor_ptr->gamma.tab[1].axis[0][15]=320;
+	sensor_ptr->gamma.tab[1].axis[0][16]=384;
+	sensor_ptr->gamma.tab[1].axis[0][17]=448;
+	sensor_ptr->gamma.tab[1].axis[0][18]=512;
+	sensor_ptr->gamma.tab[1].axis[0][19]=576;
+	sensor_ptr->gamma.tab[1].axis[0][20]=640;
+	sensor_ptr->gamma.tab[1].axis[0][21]=768;
+	sensor_ptr->gamma.tab[1].axis[0][22]=832;
+	sensor_ptr->gamma.tab[1].axis[0][23]=896;
+	sensor_ptr->gamma.tab[1].axis[0][24]=960;
+	sensor_ptr->gamma.tab[1].axis[0][25]=1023;
+
+	sensor_ptr->gamma.tab[1].axis[1][0]=0x00;
+	sensor_ptr->gamma.tab[1].axis[1][1]=0x05;
+	sensor_ptr->gamma.tab[1].axis[1][2]=0x09;
+	sensor_ptr->gamma.tab[1].axis[1][3]=0x0e;
+	sensor_ptr->gamma.tab[1].axis[1][4]=0x13;
+	sensor_ptr->gamma.tab[1].axis[1][5]=0x1f;
+	sensor_ptr->gamma.tab[1].axis[1][6]=0x2a;
+	sensor_ptr->gamma.tab[1].axis[1][7]=0x36;
+	sensor_ptr->gamma.tab[1].axis[1][8]=0x40;
+	sensor_ptr->gamma.tab[1].axis[1][9]=0x58;
+	sensor_ptr->gamma.tab[1].axis[1][10]=0x68;
+	sensor_ptr->gamma.tab[1].axis[1][11]=0x76;
+	sensor_ptr->gamma.tab[1].axis[1][12]=0x84;
+	sensor_ptr->gamma.tab[1].axis[1][13]=0x8f;
+	sensor_ptr->gamma.tab[1].axis[1][14]=0x98;
+	sensor_ptr->gamma.tab[1].axis[1][15]=0xa0;
+	sensor_ptr->gamma.tab[1].axis[1][16]=0xb0;
+	sensor_ptr->gamma.tab[1].axis[1][17]=0xbd;
+	sensor_ptr->gamma.tab[1].axis[1][18]=0xc6;
+	sensor_ptr->gamma.tab[1].axis[1][19]=0xcf;
+	sensor_ptr->gamma.tab[1].axis[1][20]=0xd8;
+	sensor_ptr->gamma.tab[1].axis[1][21]=0xe4;
+	sensor_ptr->gamma.tab[1].axis[1][22]=0xea;
+	sensor_ptr->gamma.tab[1].axis[1][23]=0xf0;
+	sensor_ptr->gamma.tab[1].axis[1][24]=0xf6;
+	sensor_ptr->gamma.tab[1].axis[1][25]=0xff;
+
+	sensor_ptr->gamma.tab[2].axis[0][0]=0;
+	sensor_ptr->gamma.tab[2].axis[0][1]=8;
+	sensor_ptr->gamma.tab[2].axis[0][2]=16;
+	sensor_ptr->gamma.tab[2].axis[0][3]=24;
+	sensor_ptr->gamma.tab[2].axis[0][4]=32;
+	sensor_ptr->gamma.tab[2].axis[0][5]=48;
+	sensor_ptr->gamma.tab[2].axis[0][6]=64;
+	sensor_ptr->gamma.tab[2].axis[0][7]=80;
+	sensor_ptr->gamma.tab[2].axis[0][8]=96;
+	sensor_ptr->gamma.tab[2].axis[0][9]=128;
+	sensor_ptr->gamma.tab[2].axis[0][10]=160;
+	sensor_ptr->gamma.tab[2].axis[0][11]=192;
+	sensor_ptr->gamma.tab[2].axis[0][12]=224;
+	sensor_ptr->gamma.tab[2].axis[0][13]=256;
+	sensor_ptr->gamma.tab[2].axis[0][14]=288;
+	sensor_ptr->gamma.tab[2].axis[0][15]=320;
+	sensor_ptr->gamma.tab[2].axis[0][16]=384;
+	sensor_ptr->gamma.tab[2].axis[0][17]=448;
+	sensor_ptr->gamma.tab[2].axis[0][18]=512;
+	sensor_ptr->gamma.tab[2].axis[0][19]=576;
+	sensor_ptr->gamma.tab[2].axis[0][20]=640;
+	sensor_ptr->gamma.tab[2].axis[0][21]=768;
+	sensor_ptr->gamma.tab[2].axis[0][22]=832;
+	sensor_ptr->gamma.tab[2].axis[0][23]=896;
+	sensor_ptr->gamma.tab[2].axis[0][24]=960;
+	sensor_ptr->gamma.tab[2].axis[0][25]=1023;
+
+	sensor_ptr->gamma.tab[2].axis[1][0]=0x00;
+	sensor_ptr->gamma.tab[2].axis[1][1]=0x05;
+	sensor_ptr->gamma.tab[2].axis[1][2]=0x09;
+	sensor_ptr->gamma.tab[2].axis[1][3]=0x0e;
+	sensor_ptr->gamma.tab[2].axis[1][4]=0x13;
+	sensor_ptr->gamma.tab[2].axis[1][5]=0x1f;
+	sensor_ptr->gamma.tab[2].axis[1][6]=0x2a;
+	sensor_ptr->gamma.tab[2].axis[1][7]=0x36;
+	sensor_ptr->gamma.tab[2].axis[1][8]=0x40;
+	sensor_ptr->gamma.tab[2].axis[1][9]=0x58;
+	sensor_ptr->gamma.tab[2].axis[1][10]=0x68;
+	sensor_ptr->gamma.tab[2].axis[1][11]=0x76;
+	sensor_ptr->gamma.tab[2].axis[1][12]=0x84;
+	sensor_ptr->gamma.tab[2].axis[1][13]=0x8f;
+	sensor_ptr->gamma.tab[2].axis[1][14]=0x98;
+	sensor_ptr->gamma.tab[2].axis[1][15]=0xa0;
+	sensor_ptr->gamma.tab[2].axis[1][16]=0xb0;
+	sensor_ptr->gamma.tab[2].axis[1][17]=0xbd;
+	sensor_ptr->gamma.tab[2].axis[1][18]=0xc6;
+	sensor_ptr->gamma.tab[2].axis[1][19]=0xcf;
+	sensor_ptr->gamma.tab[2].axis[1][20]=0xd8;
+	sensor_ptr->gamma.tab[2].axis[1][21]=0xe4;
+	sensor_ptr->gamma.tab[2].axis[1][22]=0xea;
+	sensor_ptr->gamma.tab[2].axis[1][23]=0xf0;
+	sensor_ptr->gamma.tab[2].axis[1][24]=0xf6;
+	sensor_ptr->gamma.tab[2].axis[1][25]=0xff;
+
+	sensor_ptr->gamma.tab[3].axis[0][0]=0;
+	sensor_ptr->gamma.tab[3].axis[0][1]=8;
+	sensor_ptr->gamma.tab[3].axis[0][2]=16;
+	sensor_ptr->gamma.tab[3].axis[0][3]=24;
+	sensor_ptr->gamma.tab[3].axis[0][4]=32;
+	sensor_ptr->gamma.tab[3].axis[0][5]=48;
+	sensor_ptr->gamma.tab[3].axis[0][6]=64;
+	sensor_ptr->gamma.tab[3].axis[0][7]=80;
+	sensor_ptr->gamma.tab[3].axis[0][8]=96;
+	sensor_ptr->gamma.tab[3].axis[0][9]=128;
+	sensor_ptr->gamma.tab[3].axis[0][10]=160;
+	sensor_ptr->gamma.tab[3].axis[0][11]=192;
+	sensor_ptr->gamma.tab[3].axis[0][12]=224;
+	sensor_ptr->gamma.tab[3].axis[0][13]=256;
+	sensor_ptr->gamma.tab[3].axis[0][14]=288;
+	sensor_ptr->gamma.tab[3].axis[0][15]=320;
+	sensor_ptr->gamma.tab[3].axis[0][16]=384;
+	sensor_ptr->gamma.tab[3].axis[0][17]=448;
+	sensor_ptr->gamma.tab[3].axis[0][18]=512;
+	sensor_ptr->gamma.tab[3].axis[0][19]=576;
+	sensor_ptr->gamma.tab[3].axis[0][20]=640;
+	sensor_ptr->gamma.tab[3].axis[0][21]=768;
+	sensor_ptr->gamma.tab[3].axis[0][22]=832;
+	sensor_ptr->gamma.tab[3].axis[0][23]=896;
+	sensor_ptr->gamma.tab[3].axis[0][24]=960;
+	sensor_ptr->gamma.tab[3].axis[0][25]=1023;
+
+	sensor_ptr->gamma.tab[3].axis[1][0]=0x00;
+	sensor_ptr->gamma.tab[3].axis[1][1]=0x05;
+	sensor_ptr->gamma.tab[3].axis[1][2]=0x09;
+	sensor_ptr->gamma.tab[3].axis[1][3]=0x0e;
+	sensor_ptr->gamma.tab[3].axis[1][4]=0x13;
+	sensor_ptr->gamma.tab[3].axis[1][5]=0x1f;
+	sensor_ptr->gamma.tab[3].axis[1][6]=0x2a;
+	sensor_ptr->gamma.tab[3].axis[1][7]=0x36;
+	sensor_ptr->gamma.tab[3].axis[1][8]=0x40;
+	sensor_ptr->gamma.tab[3].axis[1][9]=0x58;
+	sensor_ptr->gamma.tab[3].axis[1][10]=0x68;
+	sensor_ptr->gamma.tab[3].axis[1][11]=0x76;
+	sensor_ptr->gamma.tab[3].axis[1][12]=0x84;
+	sensor_ptr->gamma.tab[3].axis[1][13]=0x8f;
+	sensor_ptr->gamma.tab[3].axis[1][14]=0x98;
+	sensor_ptr->gamma.tab[3].axis[1][15]=0xa0;
+	sensor_ptr->gamma.tab[3].axis[1][16]=0xb0;
+	sensor_ptr->gamma.tab[3].axis[1][17]=0xbd;
+	sensor_ptr->gamma.tab[3].axis[1][18]=0xc6;
+	sensor_ptr->gamma.tab[3].axis[1][19]=0xcf;
+	sensor_ptr->gamma.tab[3].axis[1][20]=0xd8;
+	sensor_ptr->gamma.tab[3].axis[1][21]=0xe4;
+	sensor_ptr->gamma.tab[3].axis[1][22]=0xea;
+	sensor_ptr->gamma.tab[3].axis[1][23]=0xf0;
+	sensor_ptr->gamma.tab[3].axis[1][24]=0xf6;
+	sensor_ptr->gamma.tab[3].axis[1][25]=0xff;
+
+	sensor_ptr->gamma.tab[4].axis[0][0]=0;
+	sensor_ptr->gamma.tab[4].axis[0][1]=8;
+	sensor_ptr->gamma.tab[4].axis[0][2]=16;
+	sensor_ptr->gamma.tab[4].axis[0][3]=24;
+	sensor_ptr->gamma.tab[4].axis[0][4]=32;
+	sensor_ptr->gamma.tab[4].axis[0][5]=48;
+	sensor_ptr->gamma.tab[4].axis[0][6]=64;
+	sensor_ptr->gamma.tab[4].axis[0][7]=80;
+	sensor_ptr->gamma.tab[4].axis[0][8]=96;
+	sensor_ptr->gamma.tab[4].axis[0][9]=128;
+	sensor_ptr->gamma.tab[4].axis[0][10]=160;
+	sensor_ptr->gamma.tab[4].axis[0][11]=192;
+	sensor_ptr->gamma.tab[4].axis[0][12]=224;
+	sensor_ptr->gamma.tab[4].axis[0][13]=256;
+	sensor_ptr->gamma.tab[4].axis[0][14]=288;
+	sensor_ptr->gamma.tab[4].axis[0][15]=320;
+	sensor_ptr->gamma.tab[4].axis[0][16]=384;
+	sensor_ptr->gamma.tab[4].axis[0][17]=448;
+	sensor_ptr->gamma.tab[4].axis[0][18]=512;
+	sensor_ptr->gamma.tab[4].axis[0][19]=576;
+	sensor_ptr->gamma.tab[4].axis[0][20]=640;
+	sensor_ptr->gamma.tab[4].axis[0][21]=768;
+	sensor_ptr->gamma.tab[4].axis[0][22]=832;
+	sensor_ptr->gamma.tab[4].axis[0][23]=896;
+	sensor_ptr->gamma.tab[4].axis[0][24]=960;
+	sensor_ptr->gamma.tab[4].axis[0][25]=1023;
+
+	sensor_ptr->gamma.tab[4].axis[1][0]=0x00;
+	sensor_ptr->gamma.tab[4].axis[1][1]=0x05;
+	sensor_ptr->gamma.tab[4].axis[1][2]=0x09;
+	sensor_ptr->gamma.tab[4].axis[1][3]=0x0e;
+	sensor_ptr->gamma.tab[4].axis[1][4]=0x13;
+	sensor_ptr->gamma.tab[4].axis[1][5]=0x1f;
+	sensor_ptr->gamma.tab[4].axis[1][6]=0x2a;
+	sensor_ptr->gamma.tab[4].axis[1][7]=0x36;
+	sensor_ptr->gamma.tab[4].axis[1][8]=0x40;
+	sensor_ptr->gamma.tab[4].axis[1][9]=0x58;
+	sensor_ptr->gamma.tab[4].axis[1][10]=0x68;
+	sensor_ptr->gamma.tab[4].axis[1][11]=0x76;
+	sensor_ptr->gamma.tab[4].axis[1][12]=0x84;
+	sensor_ptr->gamma.tab[4].axis[1][13]=0x8f;
+	sensor_ptr->gamma.tab[4].axis[1][14]=0x98;
+	sensor_ptr->gamma.tab[4].axis[1][15]=0xa0;
+	sensor_ptr->gamma.tab[4].axis[1][16]=0xb0;
+	sensor_ptr->gamma.tab[4].axis[1][17]=0xbd;
+	sensor_ptr->gamma.tab[4].axis[1][18]=0xc6;
+	sensor_ptr->gamma.tab[4].axis[1][19]=0xcf;
+	sensor_ptr->gamma.tab[4].axis[1][20]=0xd8;
+	sensor_ptr->gamma.tab[4].axis[1][21]=0xe4;
+	sensor_ptr->gamma.tab[4].axis[1][22]=0xea;
+	sensor_ptr->gamma.tab[4].axis[1][23]=0xf0;
+	sensor_ptr->gamma.tab[4].axis[1][24]=0xf6;
+	sensor_ptr->gamma.tab[4].axis[1][25]=0xff;
+
 	//uv div
 	sensor_ptr->uv_div.thrd[0]=252;
 	sensor_ptr->uv_div.thrd[1]=250;
@@ -1088,7 +1373,7 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->pref.y_thr=0x04;
 	sensor_ptr->pref.u_thr=0x04;
 	sensor_ptr->pref.v_thr=0x04;
-	
+
 	//bright
 	sensor_ptr->bright.factor[0]=0xd0;
 	sensor_ptr->bright.factor[1]=0xe0;
@@ -1106,7 +1391,7 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->bright.factor[13]=0x00;
 	sensor_ptr->bright.factor[14]=0x00;
 	sensor_ptr->bright.factor[15]=0x00;
-	
+
 	//contrast
 	sensor_ptr->contrast.factor[0]=0x10;
 	sensor_ptr->contrast.factor[1]=0x20;
@@ -1124,15 +1409,15 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->contrast.factor[13]=0x40;
 	sensor_ptr->contrast.factor[14]=0x40;
 	sensor_ptr->contrast.factor[15]=0x40;
-	
+
 	//hist
 	sensor_ptr->hist.mode;
 	sensor_ptr->hist.low_ratio;
 	sensor_ptr->hist.high_ratio;
-	
+
 	//auto contrast
 	sensor_ptr->auto_contrast.mode;
-	
+
 	//saturation
 	sensor_ptr->saturation.factor[0]=0x28;
 	sensor_ptr->saturation.factor[1]=0x30;
@@ -1151,9 +1436,44 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->saturation.factor[14]=0x40;
 	sensor_ptr->saturation.factor[15]=0x40;
 
+	//css
+	sensor_ptr->css.lum_thr=255;
+	sensor_ptr->css.chr_thr=2;
+	sensor_ptr->css.low_thr[0]=3;
+	sensor_ptr->css.low_thr[1]=4;
+	sensor_ptr->css.low_thr[2]=5;
+	sensor_ptr->css.low_thr[3]=6;
+	sensor_ptr->css.low_thr[4]=7;
+	sensor_ptr->css.low_thr[5]=8;
+	sensor_ptr->css.low_thr[6]=9;
+	sensor_ptr->css.low_sum_thr[0]=6;
+	sensor_ptr->css.low_sum_thr[1]=8;
+	sensor_ptr->css.low_sum_thr[2]=10;
+	sensor_ptr->css.low_sum_thr[3]=12;
+	sensor_ptr->css.low_sum_thr[4]=14;
+	sensor_ptr->css.low_sum_thr[5]=16;
+	sensor_ptr->css.low_sum_thr[6]=18;
+
 	//af info
-	sensor_ptr->af.max_step=1024;
-	sensor_ptr->af.stab_period=10;
+	sensor_ptr->af.max_step=0x3ff;
+	sensor_ptr->af.min_step=0;
+	sensor_ptr->af.max_tune_step=0;
+	sensor_ptr->af.stab_period=120;
+	sensor_ptr->af.alg_id=3;
+	sensor_ptr->af.rough_count=12;
+	sensor_ptr->af.af_rough_step[0]=320;
+	sensor_ptr->af.af_rough_step[2]=384;
+	sensor_ptr->af.af_rough_step[3]=448;
+	sensor_ptr->af.af_rough_step[4]=512;
+	sensor_ptr->af.af_rough_step[5]=576;
+	sensor_ptr->af.af_rough_step[6]=640;
+	sensor_ptr->af.af_rough_step[7]=704;
+	sensor_ptr->af.af_rough_step[8]=768;
+	sensor_ptr->af.af_rough_step[9]=832;
+	sensor_ptr->af.af_rough_step[10]=896;
+	sensor_ptr->af.af_rough_step[11]=960;
+	sensor_ptr->af.af_rough_step[12]=1023;
+	sensor_ptr->af.fine_count=4;
 
 	//edge
 	sensor_ptr->edge.info[0].detail_thr=0x00;
@@ -1179,11 +1499,11 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->edge.info[6].strength=40;
 
 	//emboss
-	sensor_ptr->emboss.step=0x00;
-	
+	sensor_ptr->emboss.step=0x02;
+
 	//global gain
 	sensor_ptr->global.gain=0x40;
-	
+
 	//chn gain
 	sensor_ptr->chn.r_gain=0x40;
 	sensor_ptr->chn.g_gain=0x40;
@@ -1191,30 +1511,31 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->chn.r_offset=0x00;
 	sensor_ptr->chn.r_offset=0x00;
 	sensor_ptr->chn.r_offset=0x00;
-#endif
 
-	sensor_ptr->af.max_step = 0x3ff;
-	sensor_ptr->af.min_step = 0;
-	sensor_ptr->af.stab_period = 100;
-	sensor_ptr->af.alg_id = 2;
-	sensor_ptr->af.rough_count = 17;
-	sensor_ptr->af.af_rough_step[0] = 0;
-	sensor_ptr->af.af_rough_step[1] = 64;
-	sensor_ptr->af.af_rough_step[2] = 128;
-	sensor_ptr->af.af_rough_step[3] = 192;
-	sensor_ptr->af.af_rough_step[4] = 256;
-	sensor_ptr->af.af_rough_step[5] = 320;
-	sensor_ptr->af.af_rough_step[6] = 384;
-	sensor_ptr->af.af_rough_step[7] = 448;
-	sensor_ptr->af.af_rough_step[8] = 512;
-	sensor_ptr->af.af_rough_step[9] = 576;
-	sensor_ptr->af.af_rough_step[10] = 640;
-	sensor_ptr->af.af_rough_step[11] = 704;
-	sensor_ptr->af.af_rough_step[12] = 768;
-	sensor_ptr->af.af_rough_step[13] = 832;
-	sensor_ptr->af.af_rough_step[14] = 896;
-	sensor_ptr->af.af_rough_step[15] = 960;
-	sensor_ptr->af.af_rough_step[16] = 1023;
+	sensor_ptr->edge.info[0].detail_thr=0x00;
+	sensor_ptr->edge.info[0].smooth_thr=0x30;
+	sensor_ptr->edge.info[0].strength=0;
+	sensor_ptr->edge.info[1].detail_thr=0x01;
+	sensor_ptr->edge.info[1].smooth_thr=0x20;
+	sensor_ptr->edge.info[1].strength=3;
+	sensor_ptr->edge.info[2].detail_thr=0x2;
+	sensor_ptr->edge.info[2].smooth_thr=0x10;
+	sensor_ptr->edge.info[2].strength=5;
+	sensor_ptr->edge.info[3].detail_thr=0x03;
+	sensor_ptr->edge.info[3].smooth_thr=0x05;
+	sensor_ptr->edge.info[3].strength=10;
+	sensor_ptr->edge.info[4].detail_thr=0x06;
+	sensor_ptr->edge.info[4].smooth_thr=0x05;
+	sensor_ptr->edge.info[4].strength=20;
+	sensor_ptr->edge.info[5].detail_thr=0x09;
+	sensor_ptr->edge.info[5].smooth_thr=0x05;
+	sensor_ptr->edge.info[5].strength=30;
+	sensor_ptr->edge.info[6].detail_thr=0x0c;
+	sensor_ptr->edge.info[6].smooth_thr=0x05;
+	sensor_ptr->edge.info[6].strength=40;
+	sensor_ptr->edge.info[7].detail_thr=0x0f;
+	sensor_ptr->edge.info[7].smooth_thr=0x05;
+	sensor_ptr->edge.info[7].strength=60;
 
 	/*normal*/
 	sensor_ptr->special_effect[0].matrix[0]=0x004d;
@@ -1321,16 +1642,17 @@ LOCAL uint32_t Sensor_ov13850_InitRawTuneInfo(void)
 	sensor_ptr->special_effect[7].y_shift=0xff00;
 	sensor_ptr->special_effect[7].u_shift=0xffe2;
 	sensor_ptr->special_effect[7].v_shift=0x0028;
+#endif
 
 	return rtn;
 }
-
 
 LOCAL uint32_t _ov13850_GetResolutionTrimTab(uint32_t param)
 {
 	SENSOR_PRINT("0x%x",  (uint32_t)s_ov13850_Resolution_Trim_Tab);
 	return (uint32_t) s_ov13850_Resolution_Trim_Tab;
 }
+
 LOCAL uint32_t _ov13850_PowerOn(uint32_t power_on)
 {
 	SENSOR_AVDD_VAL_E dvdd_val = g_ov13850_mipi_raw_info.dvdd_val;
@@ -1364,6 +1686,45 @@ LOCAL uint32_t _ov13850_PowerOn(uint32_t power_on)
 	return SENSOR_SUCCESS;
 }
 
+LOCAL uint32_t _ov13850_update_otp(void* param_ptr)
+{
+	uint16_t stream_value = 0;
+	uint32_t rtn = SENSOR_FAIL;
+
+	stream_value = Sensor_ReadReg(0x0100);
+	SENSOR_PRINT("stream_value = 0x%x  OV13850_OTP_CASE = %d\n", stream_value, OV13850_OTP_CASE);
+	if(1 != (stream_value & 0x01))
+	{
+		Sensor_WriteReg(0x0100, 0x01);
+		usleep(50 * 1000);
+	}
+
+	switch(OV13850_OTP_CASE){
+		case OV13850_UPDATE_LNC:
+			rtn = ov13850_update_otp_lenc();
+			break;
+		case OV13850_UPDATE_WB:
+			rtn = ov13850_update_otp_wb();
+			break;
+
+		case OV13850_UPDATE_LNC_WB:
+			rtn = ov13850_update_otp_lenc();
+			rtn = ov13850_update_otp_wb();
+			break;
+
+		case OV13850_UPDATE_VCM:
+
+			break;
+		default:
+			break;
+	}
+
+	if(1 != (stream_value & 0x01))
+		Sensor_WriteReg(0x0100, stream_value);
+
+	return rtn;
+}
+
 LOCAL uint32_t _ov13850_cfg_otp(uint32_t  param)
 {
 	uint32_t rtn=SENSOR_SUCCESS;
@@ -1379,19 +1740,43 @@ LOCAL uint32_t _ov13850_cfg_otp(uint32_t  param)
 	return rtn;
 }
 
-LOCAL uint32_t _ov13850_com_Identify_otp_1(void* param_ptr)
+LOCAL uint32_t _ov13850_Oflim_Identify_otp(void* param_ptr)
 {
+	struct otp_struct current_otp;
+	uint32_t i = 0;
+	uint32_t temp = 0;
+	uint16_t stream_value = 0;
 	uint32_t rtn=SENSOR_FAIL;
-	uint32_t param_id;
 
-	SENSOR_PRINT("SENSOR_OV13850: _ov13850_com_Identify_otp");
-
-	/*read param id from sensor omap*/
-	param_id=ov13850_check_otp_module_id();;
-
-	if(OV13850_RAW_PARAM_COM==param_id){
-		rtn=SENSOR_SUCCESS;
+	stream_value = Sensor_ReadReg(0x0100);
+	SENSOR_PRINT("stream_value = 0x%x\n", stream_value);
+	if(1 != (stream_value & 0x01))
+	{
+		Sensor_WriteReg(0x0100, 0x01);
+		usleep(50 * 1000);
 	}
+
+	// R/G and B/G of current camera module is read out from sensor OTP
+	// check first OTP with valid data
+	for(i=1;i<=3;i++) {
+		temp = ov13850_read_otp_info(i, &current_otp);
+		if(OV13850_RAW_PARAM_OFLIM == current_otp.module_integrator_id){
+			rtn=SENSOR_SUCCESS;
+			current_otp.index = i;
+			SENSOR_PRINT("This is OV13850 OFLIM Module ! index = %d\n", current_otp.index);
+			break;
+		}
+	}
+	if (i > 3) {
+		// no valid wb OTP data
+		SENSOR_PRINT("ov13850_check_otp_module_id no valid wb OTP data\n");
+		return 1;
+	}
+
+	if(1 != (stream_value & 0x01))
+		Sensor_WriteReg(0x0100, stream_value);
+
+	SENSOR_PRINT("read ov13850 otp  module_id = %x \n", current_otp.module_integrator_id);
 
 	return rtn;
 }
@@ -1655,7 +2040,6 @@ LOCAL uint32_t _ov13850_write_gain(uint32_t param)
 }
 
 LOCAL uint32_t _ov13850_write_af(uint32_t param)
-#if 1
 {
 	uint32_t ret_value = SENSOR_SUCCESS;
 	uint16_t  slave_addr = DW9714_VCM_SLAVE_ADDR;
@@ -1671,27 +2055,6 @@ LOCAL uint32_t _ov13850_write_af(uint32_t param)
 		ret_value, param, cmd_val[0], cmd_val[1]);
 	return ret_value;
 }
-#else
-{ 
-	uint32_t ret_value = SENSOR_SUCCESS;
-	uint8_t cmd_val[2] = {0x00};
-	uint16_t  slave_addr = 0;
-	uint16_t cmd_len = 0;
-
-	SENSOR_PRINT("SENSOR_OV5648: _write_af %d", param);
-	
-	slave_addr = DW9714_VCM_SLAVE_ADDR;
-	cmd_val[0] = (param&0xfff0)>>4;
-	cmd_val[1] = ((param&0x0f)<<4)|0x09;
-	cmd_len = 2;
-	ret_value = Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);
-
-	SENSOR_PRINT("SENSOR_OV13850: _write_af, ret =  %d, MSL:%x, LSL:%x\n", ret_value, cmd_val[0], cmd_val[1]);
-
-	return ret_value;
-}
-#endif
-
 
 LOCAL uint32_t _ov13850_BeforeSnapshot(uint32_t param)
 {
@@ -1722,9 +2085,11 @@ LOCAL uint32_t _ov13850_BeforeSnapshot(uint32_t param)
 	Sensor_SetMode(capture_mode);
 	Sensor_SetMode_WaitDone();
 
+	SENSOR_PRINT("SENSOR_ov13850: prv_linetime = %d   cap_linetime = %d\n", prv_linetime, cap_linetime);
+
 	if (prv_linetime == cap_linetime) {
 		SENSOR_PRINT("SENSOR_ov13850: prvline equal to capline");
-		goto CFG_INFO;
+		//goto CFG_INFO;
 	}
 
 	ret_h = (uint8_t) Sensor_ReadReg(0x380e);
@@ -1732,11 +2097,12 @@ LOCAL uint32_t _ov13850_BeforeSnapshot(uint32_t param)
 	capture_maxline = (ret_h << 8) + ret_l;
 
 	capture_exposure = preview_exposure * prv_linetime/cap_linetime;
-	capture_exposure *= 2;
+	//capture_exposure *= 2;
 
 	if(0 == capture_exposure){
 		capture_exposure = 1;
 	}
+	SENSOR_PRINT("SENSOR_ov13850: capture_exposure = %d   capture_maxline = %d\n", capture_exposure, capture_maxline);
 
 	if(capture_exposure > (capture_maxline - 4)){
 		capture_maxline = capture_exposure + 4;
@@ -1752,8 +2118,9 @@ LOCAL uint32_t _ov13850_BeforeSnapshot(uint32_t param)
 	Sensor_WriteReg(0x3502, ret_l);
 	Sensor_WriteReg(0x3501, ret_m);
 	Sensor_WriteReg(0x3500, ret_h);
+	usleep(200*1000);
 
-	CFG_INFO:
+CFG_INFO:
 	s_capture_shutter = _ov13850_get_shutter();
 	s_capture_VTS = _ov13850_get_VTS();
 	_ov13850_ReadGain(capture_mode);
@@ -1832,7 +2199,7 @@ LOCAL uint32_t _ov13850_set_shutter(int shutter)
 	return 0;
 }
 
-int _ov13850_get_gain16(void)
+LOCAL int _ov13850_get_gain16(void)
 {
 	// read gain, 16 = 1x
 	int gain16;
@@ -1843,7 +2210,7 @@ int _ov13850_get_gain16(void)
 	return gain16;
 }
 
-int _ov13850_set_gain16(int gain16)
+LOCAL int _ov13850_set_gain16(int gain16)
 {
 	// write gain, 16 = 1x
 	int temp;
@@ -1963,7 +2330,6 @@ LOCAL uint32_t _ov13850_ReadGain(uint32_t param)
 }
 
 LOCAL uint32_t _dw9174_SRCInit(uint32_t mode)
-#if 1
 {
 	uint8_t cmd_val[2] = {0x00};
 	uint16_t  slave_addr = 0;
@@ -2008,38 +2374,3 @@ LOCAL uint32_t _dw9174_SRCInit(uint32_t mode)
 
 	return ret_value;
 }
-#else
-{
-	uint8_t cmd_val[6] = {0x00};
-	uint16_t  slave_addr = 0;
-	uint16_t cmd_len = 0;
-	uint32_t ret_value = SENSOR_SUCCESS;	
-	
-	slave_addr = DW9714_VCM_SLAVE_ADDR;
-	
-	switch (mode) {
-		case 1:
-		break;
-		
-		case 2:
-		{			
-			cmd_val[0] = 0xec;
-			cmd_val[1] = 0xa3;
-			cmd_val[2] = 0xf2;
-			cmd_val[3] = 0x00;
-			cmd_val[4] = 0xdc;
-			cmd_val[5] = 0x51;			
-			cmd_len = 6;
-			Sensor_WriteI2C(slave_addr,(uint8_t*)&cmd_val[0], cmd_len);			
-		}
-		break;
-		
-		case 3:
-		break;
-		
-	}
-
-	return ret_value;
-}
-#endif
-
