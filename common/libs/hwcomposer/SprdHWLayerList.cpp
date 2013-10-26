@@ -441,6 +441,8 @@ bool SprdHWLayerList:: prepareOSDLayer(SprdHWLayer *l)
     struct sprdRect *srcRect = l->getSprdSRCRect();
     struct sprdRect *FBRect  = l->getSprdFBRect();
 
+    mRGBLayerFullScreenFlag = false;
+
     if (privateH == NULL)
     {
         return false;
