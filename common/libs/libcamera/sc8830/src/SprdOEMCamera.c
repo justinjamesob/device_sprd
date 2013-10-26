@@ -1655,6 +1655,7 @@ int camera_local_init(void)
 	g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
 
 	g_cxt->set_flag = 0x0;
+	g_cxt->ae_wait_stab = 0x0;
 
 	g_cxt->is_reset_if_cfg = 0;
 
@@ -1681,6 +1682,7 @@ int camera_local_deinit(void)
 	g_cxt->preview_status = CMR_IDLE;
 	g_cxt->capture_status = CMR_IDLE;
 	g_cxt->capture_raw_status  = CMR_IDLE;
+	g_cxt->ae_wait_stab = 0x0;
 
 	pthread_mutex_destroy (&g_cxt->cancel_mutex);
 	pthread_mutex_destroy (&g_cxt->af_cb_mutex);
@@ -2361,6 +2363,7 @@ int camera_start_preview_internal(void)
 	int                      ret = CAMERA_SUCCESS;
 	uint32_t                 sensor_mode = SENSOR_MODE_MAX;
 	SENSOR_MODE_INFO_T       *sensor_if_mode = NULL;
+	uint32_t                 isp_param = 1;
 
 	CMR_LOGV("preview format is %d", g_cxt->preview_fmt);
 
@@ -2417,6 +2420,12 @@ int camera_start_preview_internal(void)
 		CMR_LOGE("Failed to set sensor preview mode");
 		return -CAMERA_FAILED;
 	}
+#if 1
+	if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
+		camera_isp_ae_stab_set(1);
+		camera_isp_get_ae_stab(&isp_param);
+	}
+#endif
 	CMR_PRINT_TIME;
 	ret = camera_preview_init(g_cxt->preview_fmt);
 	if (ret) {
@@ -2462,6 +2471,7 @@ int camera_start_preview_internal(void)
 			}
 		}
 	}
+
 	g_cxt->v4l2_cxt.v4l2_state = V4L2_PREVIEW;
 	g_cxt->preview_status = CMR_PREVIEW;
 	ret = camera_af_init();
@@ -3291,6 +3301,9 @@ int camera_af_init(void)
 			CMR_LOGE("Faile to send one msg to camera af thread");
 		}
 
+	} else {
+		g_cxt->ae_wait_stab = 0x0;
+
 	}
 	return ret;
 }
@@ -4086,7 +4099,7 @@ int camera_isp_handle(uint32_t evt_type, uint32_t sub_type, void *data)
 	case ISP_AF_STAT_CALLBACK:
 		ret = camera_isp_af_stat(data);
 		break;
-	case ISP_AE_STAB_CALLBACK:
+	case ISP_FAST_AE_STAB_CALLBACK:
 		ret = camera_isp_ae_stab(data);
 		break;
 	default:
@@ -4568,6 +4581,7 @@ void *camera_af_thread_proc(void *data)
 
 			}
 			if (V4L2_SENSOR_FORMAT_RAWRGB == g_cxt->sn_cxt.sn_if.img_fmt) {
+#if 0
 				camera_isp_ae_stab_set(1);
 				ret = camera_isp_get_ae_stab(&isp_param);
 				CMR_LOGV("wait AE stable ....");
@@ -4577,6 +4591,7 @@ void *camera_af_thread_proc(void *data)
 				} else {
 					CMR_LOGV("wait AE stable OK");
 				}
+#endif
 			}
 			pthread_mutex_lock(&g_cxt->af_cb_mutex);
 			ret = camera_autofocus_start();
@@ -5700,7 +5715,7 @@ int camera_v4l2_preview_handle(struct frm_info *data)
 	g_cxt->pre_frm_cnt++;
 
 	if (IMG_SKIP_SW == g_cxt->skip_mode) {
-		if (g_cxt->pre_frm_cnt <= g_cxt->skip_num) {
+		if ((g_cxt->pre_frm_cnt <= g_cxt->skip_num) || (1 == g_cxt->ae_wait_stab)) {
 			CMR_LOGV("Ignore this frame, preview cnt %d, total skip num %d",
 				g_cxt->pre_frm_cnt, g_cxt->skip_num);
 			ret = cmr_v4l2_free_frame(data->channel_id, data->frame_id);
@@ -7584,6 +7599,8 @@ int camera_isp_start(uint32_t work_mode,uint32_t need_binning,SENSOR_MODE_INFO_T
 		g_cxt->isp_cxt.isp_state = ISP_COWORK;
 	}
 
+
+
 	return ret;
 }
 
@@ -7637,12 +7654,4 @@ int camera_isp_flash_ratio(SENSOR_FLASH_LEVEL_T *flash_level)
 	return ret;
 }
 
-int camera_isp_get_ae_stab(uint32_t *isp_param)
-{
-	int ret = CAMERA_SUCCESS;
 
-
-	ret = isp_ioctl(ISP_CTRL_GET_AE_STAB, (void *)isp_param);
-
-	return ret;
-}

@@ -356,10 +356,12 @@ status_t SprdCameraHardware::setPreviewWindow(preview_stream_ops *w)
 
 
     mPreviewWindow = w;
+    
 
     LOGV("%s: mPreviewWindow %p", __func__, mPreviewWindow);
 
     if (!w) {
+        mPreviewBufferUsage = PREVIEW_BUFFER_USAGE_DCAM;
         LOGE("preview window is NULL!");
         return NO_ERROR;
     }
@@ -722,6 +724,28 @@ status_t SprdCameraHardware::checkSetParameters(const SprdCameraParameters& para
 	return ret;
 }
 
+status_t SprdCameraHardware::checkSetParameters(const SprdCameraParameters& params)
+{
+	//wxz20120316: check the value of preview-fps-range. //CR168435
+	int min,max;
+	params.getPreviewFpsRange(&min, &max);
+	if((min > max) || (min < 0) || (max < 0)){
+		LOGE("Error to FPS range: min: %d, max: %d.", min, max);
+		return UNKNOWN_ERROR;
+	}
+
+	//check preview size
+	int w,h;
+	params.getPreviewSize(&w, &h);
+	if((w < 0) || (h < 0)){
+		LOGE("Error to preview size: w: %d, h: %d.", w, h);
+		mParameters.setPreviewSize(640, 480);
+		return UNKNOWN_ERROR;
+	}
+
+	return NO_ERROR;
+}
+
 status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 {
 	struct cmr_msg           message = {0, 0, 0, 0};
@@ -729,12 +753,17 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 	Mutex::Autolock          l(&mLock);
 	mParamLock.lock();
 
+	if (checkSetParameters(params)) {
+		mParamLock.unlock();
+		return UNKNOWN_ERROR;
+	}
+
 	if (0 == checkSetParameters(params, mSetParameters)) {
-		LOGV("same parameters with system, directly return!");
+		LOGV("setParameters same parameters with system, directly return!");
 		mParamLock.unlock();
 		return NO_ERROR;
 	} else if (SPRD_IDLE != getSetParamsState()) {
-		LOGV("set parameters is handling, backup the parameter!");
+		LOGV("setParameters is handling, backup the parameter!");
 		mSetParametersBak = params;
 		mBakParamFlag = 1;
 		mParamLock.unlock();
@@ -752,7 +781,7 @@ status_t SprdCameraHardware::setParameters(const SprdCameraParameters& params)
 		mParamLock.unlock();
 		return NO_ERROR;
 	}
-	if (mParamWait.waitRelative(mParamLock, 500000000)) {
+	if (mParamWait.waitRelative(mParamLock, SET_PARAM_TIMEOUT)) {
 		LOGE("setParameters wait timeout!");
 	} else {
 		LOGV("setParameters wait OK");
@@ -830,7 +859,11 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 	// FIXME: will this make a deep copy/do the right thing? String8 i
 	// should handle it
 	mParameters = params;
-	mParamWait.signal();
+	if (1 != mBakParamFlag) {
+		mParamWait.signal();
+	} else {
+		mBakParamFlag = 0;
+	}
 	LOGV("setParametersInternal param set OK.");
 	mParamLock.unlock();
 
@@ -909,12 +942,13 @@ SprdCameraParameters SprdCameraHardware::getParameters()
 {
 	LOGV("getParameters: E");
 	Mutex::Autolock          l(&mLock);
-
-	mParamLock.lock();
-	if (0 != checkSetParameters(mParameters, mUseParameters)) {
+	Mutex::Autolock          pl(&mParamLock);
+	if ((0 != checkSetParameters(mParameters, mSetParametersBak)) &&
+		(1 == mBakParamFlag)) {
+		mUseParameters = mSetParametersBak;
+	} else {
 		mUseParameters = mParameters;
 	}
-	mParamLock.unlock();
 
 	LOGV("getParameters: X");
 	return mUseParameters;
@@ -3818,61 +3852,56 @@ void * SprdCameraHardware::switch_monitor_thread_proc(void *p_data)
 	SprdCameraHardware *     obj = (SprdCameraHardware *)p_data;
 
 	while (1) {
-		ret = cmr_msg_get(obj->mSwitchMonitorMsgQueHandle, &message);
-		if (ret) {
+		ret = cmr_msg_timedget(obj->mSwitchMonitorMsgQueHandle, &message);
+		if (CMR_MSG_NO_OTHER_MSG == ret) {
+			if (obj->checkSetParameters(obj->mParameters, obj->mSetParametersBak) &&
+				obj->mBakParamFlag) {
+				obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
+				LOGV("switch_monitor_thread_proc, bak set");
+				obj->setParametersInternal(obj->mSetParametersBak);
+				obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+			}
+		} else if (NO_ERROR != ret) {
 			CMR_LOGE("Message queue destroyed");
 			break;
-		}
+		} else {
+			CMR_LOGE("message.msg_type 0x%x, sub-type 0x%x",
+				message.msg_type,
+				message.sub_msg_type);
 
-		CMR_LOGE("message.msg_type 0x%x, sub-type 0x%x",
-			message.msg_type,
-			message.sub_msg_type);
+			switch (message.msg_type) {
+			case CMR_EVT_SW_MON_INIT:
+				LOGV("switch monitor thread msg INITED!");
+				obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+				sem_post(&obj->mSwitchMonitorSyncSem);
+				break;
 
-		switch (message.msg_type) {
-		case CMR_EVT_SW_MON_INIT:
-			LOGV("switch monitor thread msg INITED!");
-			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
-			sem_post(&obj->mSwitchMonitorSyncSem);
-			break;
+			case CMR_EVT_SW_MON_SET_PARA:
+				LOGV("switch monitor thread msg SET_PARA!");
+				obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
+				obj->setParametersInternal(obj->mSetParameters);
+				obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
+				break;
 
-		case CMR_EVT_SW_MON_SET_PARA:
-			LOGV("switch monitor thread msg SET_PARA!");
-			obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
-			obj->setParametersInternal(obj->mSetParameters);
-			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
-			break;
+			case CMR_EVT_SW_MON_EXIT:
+				LOGV("switch monitor thread msg EXIT!\n");
+				exit_flag = 1;
+				sem_post(&obj->mSwitchMonitorSyncSem);
+				CMR_PRINT_TIME;
+				break;
 
-		case CMR_EVT_SW_MON_EXIT:
-			LOGV("switch monitor thread msg EXIT!\n");
-			exit_flag = 1;
-			sem_post(&obj->mSwitchMonitorSyncSem);
-			CMR_PRINT_TIME;
-			break;
+			default:
+				LOGE("Unsupported switch monitorMSG");
+				break;
+			}
 
-		default:
-			LOGE("Unsupported switch monitorMSG");
-			break;
-		}
-
-		if (1 == message.alloc_flag) {
-			if (message.data) {
-				free(message.data);
-				message.data = 0;
+			if (1 == message.alloc_flag) {
+				if (message.data) {
+					free(message.data);
+					message.data = 0;
+				}
 			}
 		}
-
-		if (obj->checkSetParameters(obj->mParameters, obj->mSetParametersBak) &&
-			obj->mBakParamFlag) {
-			LOGV("switch_monitor_thread_proc, ");
-			obj->mParamLock.lock();
-			obj->mSetParameters = obj->mSetParametersBak;
-			obj->mParamLock.unlock();
-			obj->setCameraState(SPRD_SET_PARAMS_IN_PROGRESS, STATE_SET_PARAMS);
-			obj->setParametersInternal(obj->mSetParameters);
-			obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
-			obj->mBakParamFlag = 0;
-		}
-
 		if (exit_flag) {
 			CMR_LOGI("switch monitor thread exit ");
 			break;

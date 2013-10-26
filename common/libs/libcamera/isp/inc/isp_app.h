@@ -52,10 +52,12 @@ enum isp_callback_cmd{
 	ISP_SKIP_FRAME_CALLBACK=0x00000300,
 	ISP_FLASH_AE_CALLBACK=0x00000400,
 	ISP_AE_BAPASS_CALLBACK=0x00000500,
-	ISP_AE_STAB_CALLBACK = 0x00000600,
-	ISP_AF_STAT_CALLBACK = 0x00000700,
-	ISP_AF_STAT_END_CALLBACK = 0x00000800,
-	ISP_AWB_STAT_CALLBACK = 0x00000900,
+	ISP_FAST_AE_STAB_CALLBACK = 0x00000600,
+	ISP_AE_STAB_CALLBACK = 0x00000700,
+	ISP_AF_STAT_CALLBACK = 0x00000800,
+	ISP_AF_STAT_END_CALLBACK = 0x00000900,
+	ISP_AWB_STAT_CALLBACK = 0x00000A00,
+	ISP_CONTINUE_AF_NOTICE_CALLBACK = 0x00000B00,
 	ISP_CALLBACK_CMD_MAX=0xffffffff
 };
 
@@ -236,12 +238,14 @@ enum isp_ctrl_cmd{
 	ISP_CTRL_AE_TOUCH,
 	ISP_CTRL_AE_INFO,
 	ISP_CTRL_SHARPNESS,
+	ISP_CTRL_GET_FAST_AE_STAB,
 	ISP_CTRL_GET_AE_STAB,
 	ISP_CTRL_GET_AWB_STAT,
 	ISP_CTRL_GET_AF_STAT,
 	ISP_CTRL_GAMMA,
 	ISP_CTRL_DENOISE,
 	ISP_CTRL_SMART_AE,
+	ISP_CTRL_CONTINUE_AF,
 	ISP_CTRL_MAX
 };
 
@@ -300,10 +304,21 @@ struct isp_af_notice{
 	uint32_t valid_win;
 };
 
+struct isp_continue_af_notice{
+	uint32_t af_valid;
+};
+
 struct isp_alg{
 	enum isp_alg_mode mode;
 	uint32_t flash_eb;
 	uint32_t flash_ratio;
+};
+
+struct isp_af_stat{
+	uint32_t bypass;
+	uint32_t mode;
+	struct isp_pos_rect win[9];
+	uint32_t valid_win;
 };
 
 struct isp_af_win{

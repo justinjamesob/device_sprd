@@ -98,6 +98,70 @@ int cmr_msg_get(unsigned int queue_handle, struct cmr_msg *message)
 	return CMR_MSG_SUCCESS;
 }
 
+int cmr_msg_timedget(unsigned int queue_handle, struct cmr_msg *message)
+{
+	struct cmr_msg_cxt *msg_cxt = (struct cmr_msg_cxt*)queue_handle;
+	struct timespec ts;
+	int    ret;
+
+        /* Posix mandates CLOCK_REALTIME here */
+        clock_gettime( CLOCK_REALTIME, &ts );
+	if (0 == queue_handle || NULL == message) {
+		return -CMR_MSG_PARAM_ERR;
+	}
+
+	MSG_CHECK_MSG_MAGIC(queue_handle);
+
+	clock_gettime(CLOCK_REALTIME, &ts);
+
+	/* Check it as per Posix */
+	if (ts.tv_sec < 0 ||
+		ts.tv_nsec < 0 ||
+		ts.tv_nsec >= 1000000000) {
+		return -CMR_MSG_PARAM_ERR;
+	}
+	/*wait for 200ms*/
+	ts.tv_nsec += CMR_MSG_POLLING_PERIOD;
+	if (ts.tv_nsec > 1000000000) {
+		ts.tv_sec += 1;
+		ts.tv_nsec -= 1000000000;
+	}
+
+	ret = sem_timedwait(&msg_cxt->msg_sem, &ts);
+
+	if (ret) {
+		CMR_LOGI("queue_handle 0x%x no message in a period, out", queue_handle);
+		return CMR_MSG_NO_OTHER_MSG;
+	}
+
+	pthread_mutex_lock(&msg_cxt->mutex);
+
+	if (msg_cxt->msg_number == 0) {
+		pthread_mutex_unlock(&msg_cxt->mutex);
+		CMR_LOGE("MSG underflow");
+		return CMR_MSG_UNDERFLOW;
+	} else {
+		if (msg_cxt->msg_read != msg_cxt->msg_write) {
+			*message = *msg_cxt->msg_read;
+			bzero(msg_cxt->msg_read, sizeof(struct cmr_msg));
+			msg_cxt->msg_read++;
+			if (msg_cxt->msg_read > msg_cxt->msg_head + msg_cxt->msg_count - 1) {
+				msg_cxt->msg_read = msg_cxt->msg_head;
+			}
+		}
+		msg_cxt->msg_number --;
+	}
+
+	pthread_mutex_unlock(&msg_cxt->mutex);
+
+	CMR_LOGI("queue_handle 0x%x, msg type 0x%x num %d cnt %d",
+		queue_handle,
+		message->msg_type,
+		msg_cxt->msg_number,
+		msg_cxt->msg_count);
+	return CMR_MSG_SUCCESS;
+}
+
 int cmr_msg_post(unsigned int queue_handle, struct cmr_msg *message)
 {
 	struct cmr_msg_cxt *msg_cxt = (struct cmr_msg_cxt*)queue_handle;

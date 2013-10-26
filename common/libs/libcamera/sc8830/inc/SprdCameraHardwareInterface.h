@@ -57,6 +57,7 @@ typedef struct sprd_camera_memory {
 
 
 #define MAX_MISCHEAP_NUM 1024
+#define SET_PARAM_TIMEOUT 500000000
 
 
 class SprdCameraHardware : public virtual RefBase {
@@ -171,6 +172,7 @@ private:
 	void                  freeCaptureMem();
 	uint32_t              getRedisplayMem();
 	void                  FreeReDisplayMem();
+	status_t              checkSetParameters(const SprdCameraParameters& params);
 	static void           camera_cb(camera_cb_type cb,
 					const void *client_data,
 					camera_func_type func,

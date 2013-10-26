@@ -276,8 +276,12 @@ struct camera_settings {
 	uint32_t                 auto_flash;
 	uint8_t                  bflash;
 	uint32_t                 slow_motion_mode;
+	uint32_t                 isp_alg_timeout;
 	sem_t                    isp_alg_sem;
+	pthread_mutex_t          isp_alg_mutex;
+	uint32_t                 isp_ae_stab_timeout;
 	sem_t                    isp_ae_stab_sem;
+	pthread_mutex_t          isp_ae_stab_mutex;
 };
 
 struct camera_context {
@@ -319,6 +323,7 @@ struct camera_context {
 	uint32_t                 af_inited;
 	pthread_mutex_t          af_cb_mutex;
 	uint32_t                 af_busy;
+	uint32_t                 ae_wait_stab;
 
 	camera_cb_f_type         camera_af_cb;
 	uint32_t                 zoom_level;
