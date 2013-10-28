@@ -209,6 +209,10 @@ static int start_rild(int modem)
 		if(!strcmp(phoneCount, "2")) {
 			property_set("ctl.start", "tril-daemon");
 			property_set("ctl.start", "tril-daemon1");
+        } else if(!strcmp(phoneCount, "3")) {
+            property_set("ctl.start", "tril-daemon");
+            property_set("ctl.start", "tril-daemon1");
+            property_set("ctl.start", "tril-daemon2");
 		} else {
 			property_set("ctl.start", "tril-daemon");
 		}
@@ -218,6 +222,10 @@ static int start_rild(int modem)
 		if(!strcmp(phoneCount, "2")) {
 			property_set("ctl.start", "wril-daemon");
 			property_set("ctl.start", "wril-daemon1");
+        } else if(!strcmp(phoneCount, "3")) {
+            property_set("ctl.start", "wril-daemon");
+            property_set("ctl.start", "wril-daemon1");
+            property_set("ctl.start", "wril-daemon2");
 		} else {
 			property_set("ctl.start", "wril-daemon");
 		}
