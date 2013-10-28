@@ -1148,19 +1148,15 @@ int camera_cap_post(void *data)
 		}
 
 		CMR_PRINT_TIME;
-
-		ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
+		g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+		ret = Sensor_StreamOff();
 		if (ret) {
-			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-			ret = Sensor_StreamOff();
-			if (ret) {
-				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
-			}
-			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-			if (ret) {
-				CMR_LOGE("Failed to stop IF , %d", ret);
-				return -CAMERA_FAILED;
-			}
+			CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+		}
+		ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+		if (ret) {
+			CMR_LOGE("Failed to stop IF , %d", ret);
+			return -CAMERA_FAILED;
 		}
 
 		if (ISP_COWORK == g_cxt->isp_cxt.isp_state) {
@@ -1315,18 +1311,15 @@ int camera_cap_post(void *data)
 				return -CAMERA_FAILED;
 			}
 			CMR_PRINT_TIME;
-			ret = Sensor_GetMode(&g_cxt->sn_cxt.previous_sensor_mode);
+			g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
+			ret = Sensor_StreamOff();
 			if (ret) {
-				g_cxt->sn_cxt.previous_sensor_mode = SENSOR_MODE_MAX;
-				ret = Sensor_StreamOff();
-				if (ret) {
-					CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
-				}
-				ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
-				if (ret) {
-					CMR_LOGE("Failed to stop IF , %d", ret);
-					return -CAMERA_FAILED;
-				}
+				CMR_LOGE("Failed to switch off the sensor stream, %d", ret);
+			}
+			ret = cmr_v4l2_if_decfg(&g_cxt->sn_cxt.sn_if);
+			if (ret) {
+				CMR_LOGE("Failed to stop IF , %d", ret);
+				return -CAMERA_FAILED;
 			}
 			CMR_PRINT_TIME;
 		/*	ret = camera_snapshot_stop_set();

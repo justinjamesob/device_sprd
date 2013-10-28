@@ -2880,7 +2880,7 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 				return false;
 		}
 		if (0 != mPreviewWindow->enqueue_buffer(mPreviewWindow, mPreviewBufferHandle[id])) {
-			LOGE("displayOneFrame: eddy Could not enqueue gralloc buffer!\n");
+			LOGE("displayOneFrame: Could not enqueue gralloc buffer!\n");
 			return false;
 		}
 	}
