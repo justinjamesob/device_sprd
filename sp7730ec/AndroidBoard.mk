@@ -3,6 +3,8 @@ LOCAL_PATH := $(call my-dir)
 $(call add-radio-file,modem_bins/wmodem.bin)
 $(call add-radio-file,modem_bins/wnvitem.bin)
 $(call add-radio-file,modem_bins/wdsp.bin)
+$(call add-radio-file,modem_bins/wcnmodem.bin)
+$(call add-radio-file,modem_bins/wcnnvitem.bin)
 
 ifeq ($(strip $(TARGET_VLX_ENABLE)),true)
 $(call add-radio-file,modem_bins/vmjaluna.bin)

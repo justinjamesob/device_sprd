@@ -5,7 +5,7 @@
 /data		ext4		/dev/block/platform/sprd-sdhci.3/by-name/userdata
 /cache		ext4		/dev/block/platform/sprd-sdhci.3/by-name/cache
 /misc 		emmc 		/dev/block/platform/sprd-sdhci.3/by-name/misc
-/boot		emmc		/dev/block/platform/sprd-sdhci.3/by-name/kenel
+/boot		emmc		/dev/block/platform/sprd-sdhci.3/by-name/boot
 /recovery	emmc		/dev/block/platform/sprd-sdhci.3/by-name/recovery
 
 /wmodem		emmc		/dev/block/platform/sprd-sdhci.3/by-name/wmodem			#/sdcard
