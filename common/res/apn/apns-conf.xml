@@ -14106,18 +14106,6 @@
         type="default"
         authtype="1"
     />
-    <apn carrier="Telkomsel WAP"
-        mcc="510"
-        mnc="10"
-        apn="telkomsel"
-        proxy="10.1.89.130"
-        port="8000"
-        server="http://wap.telkomsel.com"
-        user="wap"
-        password="wap123"
-        type="default"
-        authtype="1"
-    />
     <apn carrier="Telkomsel MMS"
         mcc="510"
         mnc="10"
@@ -14215,14 +14203,15 @@
         type="default,supl"
         authtype="1"
     />
-    <apn carrier="TATA DOCOMO DIVE-IN WAP"
+    <!-- Iran Rightel -->
+    <apn carrier="Rightel"
         mcc="432"
         mnc="20"
         apn="RighTel"
         type="default,supl"
         authtype="1"
     />
-    <apn carrier="TATA DOCOMO DIVE-IN WAP"
+    <apn carrier="RigTtel MMS"
         mcc="432"
         mnc="20"
         apn="RighTel-wap"
