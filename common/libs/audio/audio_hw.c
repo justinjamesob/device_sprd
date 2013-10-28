@@ -1069,6 +1069,15 @@ static int open_voip_codec_pcm(struct tiny_audio_device *adev)
                adev->pcm_modem_ul = NULL;
            }
        }
+
+	if( 0 != pcm_start(adev->pcm_modem_dl))
+	{
+		 ALOGE("voip pcm dl start unsucessfully");		    
+	}
+	if( 0 != pcm_start(adev->pcm_modem_ul))
+	{
+	    ALOGE("voip pcm ul start unsucessfully");		   
+	}   
     ALOGD("voip:open codec pcm out 2");
 
     ALOGE("voip:open voip_codec_pcm out");
