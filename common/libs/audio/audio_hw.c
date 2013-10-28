@@ -161,6 +161,8 @@
 /* sampling rate when using VX port for wide band */
 #define VX_WB_SAMPLING_RATE 16000
 
+#define RECORD_POP_COUNT    5   //5 * 29 ms
+
 #define AUDFIFO "/data/audiopara_tuning"
 
 struct pcm_config pcm_config_mm = {
@@ -373,6 +375,7 @@ struct tiny_stream_in {
     size_t ref_buf_size;
     size_t ref_frames_in;
     int read_status;
+    bool pop_mute;
 
     struct tiny_audio_device *dev;
     int active_rec_proc;
@@ -2617,6 +2620,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
         size_t bytes)
 {
     int ret = 0;
+    static int pop_count = 0;
     struct tiny_stream_in *in = (struct tiny_stream_in *)stream;
     struct tiny_audio_device *adev = in->dev;
     size_t frames_rq = bytes / audio_stream_frame_size(&stream->common);
@@ -2707,11 +2711,9 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
 
     /*BLUE_TRACE("in_read start.num_preprocessors=%d, resampler=%d",
       in->num_preprocessors, in->resampler);*/
-        if (in->resampler != NULL)
-        {
+    if (in->resampler != NULL) {
             ret = read_frames(in, buffer, frames_rq);/////////////get_next_buffer
-        }
-    else {
+    } else {
 #ifdef  AUDIO_MUX_PCM
         if(in->mux_pcm){
             ret = mux_pcm_read(in->mux_pcm, buffer, bytes);
@@ -2723,6 +2725,15 @@ static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
 #endif
         if (ret == 0 && in->active_rec_proc)
             aud_rec_do_process(buffer, bytes);
+    }
+
+    if(in->pop_mute) {
+        memset(buffer, 0, bytes);
+        // mute 240ms for pop
+        if(++pop_count >= RECORD_POP_COUNT) {
+            pop_count = 0;
+            in->pop_mute = false;
+        }
     }
 
 #ifdef AUDIO_DUMP_EX
@@ -3130,6 +3141,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     in->dev = ladev;
     in->standby = 1;
     in->device = devices;
+    in->pop_mute = true;
 
     *stream_in = &in->stream;
     BLUE_TRACE("Successfully, adev_open_input_stream.");
