@@ -546,20 +546,20 @@ void OverlayComposer::onClearOverlayComposerBuffer()
 
 void OverlayComposer::onDisplay()
 {
+    exhaustAllSem();
     sem_post(&displaySem);
+
+    /*
+     *  Sync thread.
+     *  return until OverlayNativeWindow::queueBuffer finished
+     * */
+    semWaitTimedOut(1000);
 }
 
 bool OverlayComposer::swapBuffers()
 {
-    //exhaustAllSem();
     eglSwapBuffers(mDisplay, mSurface);
 
-    /*
-     *  Sync thread. 
-     *  return until OverlayNativeWindow::queueBuffer finished
-     * */
-    //waiting here for PrimaryPlane post");
-    //semWaitTimedOut(1000);
 
     /* delete some layer object from list
      * Now, these object are useless
