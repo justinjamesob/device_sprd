@@ -17,7 +17,10 @@ PRODUCT_PACKAGES := \
 	libreference-ril_sp \
 	phoneserver \
 	akmd8975
-
+ifeq ($(USE_PROJECT_SEC),true)
+PRODUCT_PACKAGES += \
+	choose_secure
+endif
 else
 # for spreadtrum customer proprietories modules: only support direct copy
 
@@ -36,7 +39,10 @@ PROPMODS := \
 	system/lib/libreference-ril_sp.so \
 	system/bin/phoneserver \
 	system/bin/akmd8975
-
+ifeq ($(USE_PROJECT_SEC),true)
+PROPMODS += \
+	system/app/choose_secure.apk
+endif
 PRODUCT_COPY_FILES := $(foreach f,$(PROPMODS),vendor/sprd/proprietories/sp8830ec/$(f):$(f))
 
 endif

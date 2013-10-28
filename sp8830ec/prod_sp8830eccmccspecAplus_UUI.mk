@@ -146,7 +146,6 @@ ifeq ($(USE_PROJECT_SEC),true)
 # prebuild files
 PRODUCT_PACKAGES += \
         Permission.apk \
-        choose_secure \
 	framework-se-res.apk
 
 PRODUCT_COPY_FILES += \
