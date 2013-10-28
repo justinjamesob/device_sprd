@@ -53,7 +53,8 @@ extern SENSOR_INFO_T g_s5k4e1ga_mipi_raw_info;
 extern SENSOR_INFO_T g_hi351_mipi_yuv_info;
 extern SENSOR_INFO_T g_ov8830_mipi_raw_infoextern;
 #endif
-
+SENSOR_INFO_T g_GT2005_yuv_info;
+SENSOR_INFO_T g_GC0308_yuv_info;
 SENSOR_INFO_T g_GC2035_yuv_info;
 extern SENSOR_INFO_T g_ov5640_mipi_yuv_info;
 extern SENSOR_INFO_T g_ov8825_mipi_raw_info;
@@ -81,6 +82,7 @@ const SENSOR_INFO_T* main_sensor_infor_tab[]=
 	//&g_ov5648_mipi_raw_info,
 #endif
 #ifdef CONFIG_BACK_CAMERA_CCIR
+	&g_GT2005_yuv_info,
 	//&g_ov5640_yuv_info,
 	//&g_OV7675_yuv_info,
 	//&g_OV2655_yuv_info,
@@ -93,6 +95,7 @@ const SENSOR_INFO_T* main_sensor_infor_tab[]=
 const SENSOR_INFO_T* sub_sensor_infor_tab[]=
 {
 #ifdef CONFIG_FRONT_CAMERA_CCIR
+	&g_GC0308_yuv_info,
 	&g_GC2035_yuv_info,
 	//&g_OV7675_yuv_info,
 	//&g_GC0309_yuv_info,
