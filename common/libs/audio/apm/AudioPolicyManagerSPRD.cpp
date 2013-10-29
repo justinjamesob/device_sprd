@@ -392,7 +392,7 @@ status_t AudioPolicyManagerSPRD::startOutput(audio_io_handle_t output,
 
         // apply volume rules for current stream and device if necessary
         checkAndSetVolume(stream,
-                          mStreams[stream].getVolumeIndex((audio_devices_t)newDevice),
+                          mStreams[stream].getVolumeIndex(stream,(audio_devices_t)newDevice),
                           output,
                           newDevice);
 
