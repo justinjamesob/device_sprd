@@ -30,7 +30,7 @@ extern "C"
 #define SCENE_MODE_NIGHT                              1
 #define ISP_AE_STAB_TIMEOUT                           5 //sec
 #define ISP_ALG_TIMEOUT                               5 //sec
-#define EN_WAIT_AE_STAB                               0
+#define EN_WAIT_AE_STAB                               1
 
 enum cmr_focus_mode {
 	CAMERA_FOCUS_MODE_AUTO = 0,
