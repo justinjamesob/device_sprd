@@ -715,6 +715,9 @@ int cmr_scale_deinit(void)
 		return -ENODEV;
 	}
 
+	sem_wait(&scaler_sem);
+	sem_post(&scaler_sem);
+
 	pthread_mutex_lock(&scaler_cb_mutex);
 	if (NULL == scaler_evt_cb) {
 		pthread_mutex_unlock(&scaler_cb_mutex);
@@ -722,8 +725,7 @@ int cmr_scale_deinit(void)
 	} else {
 		pthread_mutex_unlock(&scaler_cb_mutex);
 	}
-	sem_wait(&scaler_sem);
-	sem_post(&scaler_sem);
+
 	/* thread should be killed before fd deinited */
 	ret = cmr_scale_kill_thread();
 	if (ret) {
