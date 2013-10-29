@@ -5,7 +5,8 @@ MALI := libUMP libEGL_mali.so libGLESv1_CM_mali.so libGLESv2_mali.so libMali.so 
 
 SPRD_FM_APP := FMPlayer
 
-
+#FFOS specific macros, may move into a new file someday
+ENABLE_LIBRECOVERY := true
 PRODUCT_PROPERTY_OVERRIDES := \
 	ro.moz.omx.hw.max_width=720 \
 	ro.moz.omx.hw.max_height=576
