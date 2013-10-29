@@ -2875,13 +2875,14 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			return false;
 		}
 	} else {
-		if (!isRecordingMode()) {
-			if (releasePreviewFrame())
-				return false;
-		}
 		if (0 != mPreviewWindow->enqueue_buffer(mPreviewWindow, mPreviewBufferHandle[id])) {
 			LOGE("displayOneFrame: Could not enqueue gralloc buffer!\n");
 			return false;
+		}
+
+		if (!isRecordingMode()) {
+			if (releasePreviewFrame())
+				return false;
 		}
 	}
 	return true;
