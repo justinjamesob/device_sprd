@@ -530,6 +530,10 @@ on property:ro.modem.w.enable=1
     symlink /dev/stty_w31 /dev/ts0710mux31
 
 
+on property:lmk.autocalc=false
+    write /sys/module/lowmemorykiller/parameters/adj 0,58,117,235,529,1000
+    write /sys/module/lowmemorykiller/parameters/minfree 3072,4623,6076,7529,9577,11030
+
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u
