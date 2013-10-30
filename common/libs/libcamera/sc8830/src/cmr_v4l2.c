@@ -68,7 +68,7 @@ enum dcam_parm_id {
 	CAPTURE_SKIP_NUM,
 	CAPTURE_SENSOR_SIZE,
 	CAPTURE_FRM_ID_BASE,
-
+	CAPTURE_SET_CROP,
 	PATH_FRM_DECI = 0x2000,
 	PATH_PAUSE    = 0x2001,
 	PATH_RESUME   = 0x2002,
@@ -304,18 +304,16 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 	ret = ioctl(fd, VIDIOC_S_PARM, &stream_parm);
 	CMR_LOGV("channel_id  %d, deci_factor %d, ret %d \n", config->channel_id, config->chn_deci_factor, ret);
 
+	buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	if (CHN_1 == cfg_id) {
-		buf_type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		chn_frm_num[1] = config->frm_num;
 	} else  if (CHN_2 == cfg_id) {
-		buf_type  = V4L2_BUF_TYPE_PRIVATE;
 		chn_frm_num[2] = config->frm_num;
 	} else {
 		/* CHN_0 */
-		buf_type  = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 		chn_frm_num[0] = config->frm_num;
 	}
-
+#if 0
 	/* firstly, set the crop rectangle PATH1 module, this should be called before VIDIOC_TRY_FMT called */
 	crop.c.left   = config->cfg.src_img_rect.start_x;
 	crop.c.top    = config->cfg.src_img_rect.start_y;
@@ -324,11 +322,23 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 	crop.type     = buf_type;
 	ret = ioctl(fd, VIDIOC_S_CROP, &crop);
 	CMR_RTN_IF_ERR(ret);
+#endif
+
+	stream_parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	stream_parm.parm.capture.capability = CAPTURE_SET_CROP;
+	stream_parm.parm.capture.extendedmode = config->channel_id;
+	stream_parm.parm.capture.reserved[0] = config->cfg.src_img_rect.start_x;
+	stream_parm.parm.capture.reserved[1] = config->cfg.src_img_rect.start_y;
+	stream_parm.parm.capture.reserved[2] = config->cfg.src_img_rect.width;
+	stream_parm.parm.capture.reserved[3] = config->cfg.src_img_rect.height;
+	ret = ioctl(fd, VIDIOC_S_PARM, &stream_parm);
+	CMR_RTN_IF_ERR(ret);
 
 	/* secondly,  check whether the output format described by config->cfg[cfg_id] can be supported by the low layer */
 	found = 0;
 	fmtdesc.index = 0;
-	fmtdesc.type = buf_type;
+	fmtdesc.type  = buf_type;
+	fmtdesc.flags = config->channel_id;
 	pxl_fmt = cmr_v4l2_get_4cc(config->cfg.dst_img_fmt);
 	while (0 == ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc)) {
 		if (fmtdesc.pixelformat == pxl_fmt) {
@@ -341,7 +351,8 @@ int cmr_v4l2_cap_cfg(struct cap_cfg *config)
 
 	if (found) {
 		bzero(&format, sizeof(struct v4l2_format));
-		format.type = buf_type;
+		format.type   = buf_type;
+		format.fmt.pix.colorspace = config->channel_id;
 		format.fmt.pix.width = config->cfg.dst_img_size.width;
 		format.fmt.pix.height = config->cfg.dst_img_size.height;
 		format.fmt.pix.pixelformat = pxl_fmt; //fourecc
@@ -380,13 +391,8 @@ int cmr_v4l2_buff_cfg (struct buffer_cfg *buf_cfg)
 
 	CMR_LOGV("%d %d 0x%x ", buf_cfg->channel_id, buf_cfg->count, buf_cfg->base_id);
 
-	if (CHN_1 == buf_cfg->channel_id) {
-		v4l2_buf.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	} else if (CHN_2 == buf_cfg->channel_id) {
-		v4l2_buf.type  = V4L2_BUF_TYPE_PRIVATE;
-	} else {
-		v4l2_buf.type  = V4L2_BUF_TYPE_VIDEO_OUTPUT;
-	}
+	v4l2_buf.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	v4l2_buf.flags = buf_cfg->channel_id;
 
 	/* firstly , set the base index for each channel */
 	stream_parm.type                      = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -556,15 +562,8 @@ int cmr_v4l2_free_frame(uint32_t channel_id, uint32_t index)
 	}
 	bzero(&v4l2_buf, sizeof(struct v4l2_buffer));
 	v4l2_buf.flags = CMR_V4L2_WRITE_FREE_FRAME;
+	v4l2_buf.type  = channel_id;
 	v4l2_buf.index = index;
-	if (CHN_0 == channel_id) {
-		v4l2_buf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
-	} else if (CHN_1 == channel_id) {
-		v4l2_buf.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	} else {
-		v4l2_buf.type  = V4L2_BUF_TYPE_PRIVATE;
-	}
-	//ret = ioctl(fd, VIDIOC_QBUF, &v4l2_buf);
 	ret = write(fd, &v4l2_buf, sizeof(struct v4l2_buffer));
 	if (ret) {
 		CMR_LOGE("Failed to free frame, %d", ret);
@@ -688,17 +687,9 @@ static void* cmr_v4l2_thread_proc(void* data)
 				if (CMR_V4L2_MAX == evt_id) {
 					continue;
 				}
-				if (V4L2_BUF_TYPE_VIDEO_CAPTURE == buf.type) {
-					frame.channel_id = CHN_1;
-					frm_num = chn_frm_num[CHN_1];
-				} else if (V4L2_BUF_TYPE_PRIVATE == buf.type) {
-					frame.channel_id = CHN_2;
-					frm_num = chn_frm_num[CHN_2];
-				} else if (V4L2_BUF_TYPE_VIDEO_OUTPUT == buf.type) {
-					frame.channel_id = CHN_0;
-					frm_num = chn_frm_num[CHN_0];
-				}
 
+				frame.channel_id = buf.type;
+				frm_num = chn_frm_num[buf.type];
 				frame.free = 0;
 				if (CMR_V4L2_TX_DONE == evt_id) {
 					if (frm_num == 0) {
