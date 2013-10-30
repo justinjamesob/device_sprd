@@ -54,6 +54,9 @@ extern int scaling_max_freq;
 extern int scaling_cur_freq;
 extern int gpu_level;
 static struct clk* gpu_clock = NULL;
+static struct clk* gpu_clock_i = NULL;
+static struct clk* clock_256m = NULL;
+static struct clk* clock_312m = NULL;
 static int max_div = GPU_MAX_DIVISION;
 const int min_div = GPU_MIN_DIVISION;
 #if GPU_FREQ_CONTROL
@@ -73,6 +76,9 @@ static void gpu_change_freq_div(void);
 _mali_osk_errcode_t mali_platform_init(void)
 {
 	gpu_clock = clk_get(NULL, "clk_gpu");
+	gpu_clock_i = clk_get(NULL, "clk_gpu_i");
+	clock_256m = clk_get(NULL, "clk_256m");
+	clock_312m = clk_get(NULL, "clk_312m");
 
 	gpuinfo_min_freq=52;
 	gpuinfo_max_freq=312;
@@ -81,6 +87,9 @@ _mali_osk_errcode_t mali_platform_init(void)
 	scaling_min_freq=85;
 
 	MALI_DEBUG_ASSERT(gpu_clock);
+	MALI_DEBUG_ASSERT(gpu_clock_i);
+	MALI_DEBUG_ASSERT(clock_256m);
+	MALI_DEBUG_ASSERT(clock_312m);
 
 	if(!gpu_power_on)
 	{
@@ -92,6 +101,8 @@ _mali_osk_errcode_t mali_platform_init(void)
 	if(!gpu_clock_on)
 	{
 		gpu_clock_on = 1;
+		clk_enable(gpu_clock_i);
+		clk_set_parent(gpu_clock,clock_256m);
 		clk_enable(gpu_clock);
 		udelay(300);
 	}
@@ -117,6 +128,7 @@ _mali_osk_errcode_t mali_platform_deinit(void)
 	{
 		gpu_clock_on = 0;
 		clk_disable(gpu_clock);
+		clk_disable(gpu_clock_i);
 	}
 	if(gpu_power_on)
 	{
@@ -144,6 +156,8 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 		if(!gpu_clock_on)
 		{
 			gpu_clock_on = 1;
+			clk_enable(gpu_clock_i);
+			clk_set_parent(gpu_clock,clock_256m);
 			clk_enable(gpu_clock);
 			udelay(300);
 		}
@@ -153,6 +167,7 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 		{
 			gpu_clock_on = 0;
 			clk_disable(gpu_clock);
+			clk_disable(gpu_clock_i);
 		}
 		if(gpu_power_on)
 		{
@@ -165,6 +180,7 @@ _mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode)
 		{
 			gpu_clock_on = 0;
 			clk_disable(gpu_clock);
+			clk_disable(gpu_clock_i);
 		}
 		if(gpu_power_on)
 		{
@@ -306,22 +322,22 @@ static void gpu_change_freq_div(void)
 			old_mali_freq_select=mali_freq_select;
 			switch(old_mali_freq_select)
 			{
-				case 0:
-					scaling_max_freq=GPU_LEVEL0_MAX;
-					mali_set_freq(0x0);
-					break;
-				case 2:
-					scaling_max_freq=GPU_LEVEL2_MAX;
-					mali_set_freq(0x2);
-					break;
 				case 3:
 					scaling_max_freq=GPU_LEVEL3_MAX;
-					mali_set_freq(0x3);
+					clk_disable(clock_256m);
+					clk_enable(clock_312m);
+					udelay(200);
+					clk_set_parent(gpu_clock,clock_312m);
 					break;
+				case 0:
 				case 1:
+				case 2:
 				default:
 					scaling_max_freq=GPU_LEVEL1_MAX;
-					mali_set_freq(0x1);
+					clk_disable(clock_312m);
+					clk_enable(clock_256m);
+					udelay(200);
+					clk_set_parent(gpu_clock,clock_256m);
 					break;
 			}
 
