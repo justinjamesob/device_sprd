@@ -1720,15 +1720,14 @@ int SprdCameraHardware::releasePreviewFrame()
 
 		if (0 != mPreviewWindow->dequeue_buffer(mPreviewWindow, &buffer_handle, &stride)) {
 			ret = -1;
-			LOGE("releasePreviewFrame: Could not dequeue gralloc buffer!\n");
+			LOGE("releasePreviewFrame fail: Could not dequeue gralloc buffer!\n");
 		} else {
 			free_buffer_id = getPreviewBufferID(buffer_handle);
-			if (mPreviewCancelBufHandle[free_buffer_id]  == mPreviewBufferHandle[free_buffer_id]) {
+			if (mPreviewCancelBufHandle[free_buffer_id] == mPreviewBufferHandle[free_buffer_id]) {
 				mPreviewCancelBufHandle[free_buffer_id] = NULL;
 			} else {
 				if (CAMERA_SUCCESS != camera_release_frame(free_buffer_id)) {
 					ret = -1;
-					LOGE("releasePreviewFrame: fail to camera_release_frame. id = %d.", free_buffer_id);
 				}
 			}
 		}
@@ -1779,6 +1778,7 @@ bool SprdCameraHardware::allocatePreviewMemByGraphics()
 			}
 			mPreviewCancelBufHandle[i] = mPreviewBufferHandle[i];
 		}
+		mCancelBufferEb = 1;
 	}
 	return 0;
 }
@@ -2875,9 +2875,16 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			return false;
 		}
 	} else {
-		if (0 != mPreviewWindow->enqueue_buffer(mPreviewWindow, mPreviewBufferHandle[id])) {
-			LOGE("displayOneFrame: Could not enqueue gralloc buffer!\n");
-			return false;
+		if (mCancelBufferEb && (mPreviewCancelBufHandle[id] == mPreviewBufferHandle[id])) {
+			LOGE("displayOneFrame fail: Could not enqueue cancel buffer!\n");
+			camera_release_frame(id);
+			return true;
+		} else {
+			if (0 != mPreviewWindow->enqueue_buffer(mPreviewWindow, mPreviewBufferHandle[id])) {
+				LOGE("displayOneFrame fail: Could not enqueue gralloc buffer!\n");
+				return false;
+			}
+			mCancelBufferEb = 0;
 		}
 
 		if (!isRecordingMode()) {

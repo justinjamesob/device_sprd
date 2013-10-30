@@ -1852,6 +1852,10 @@ int camera_stop_internal(void)
 
 	camera_isp_deinit();
 
+	camera_v4l2_deinit();
+
+	camera_sensor_deinit();
+
 	camera_prev_thread_deinit();
 
 	camera_cap_subthread_deinit();
@@ -1859,10 +1863,6 @@ int camera_stop_internal(void)
 	camera_cap_thread_deinit();
 
 	camera_cb_thread_deinit();
-
-	camera_v4l2_deinit();
-
-	camera_sensor_deinit();
 
 	camera_call_cb(CAMERA_EXIT_CB_DONE,
 			camera_get_client_data(),
