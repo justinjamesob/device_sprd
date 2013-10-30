@@ -20569,17 +20569,6 @@
         mmsc="http://mmsc.gprs.cw.com/"
         type="mms"
     />
-    <apn carrier="O2 wap"
-        mcc="234"
-        mnc="10"
-        apn="mobile.o2.co.uk"
-        proxy="193.113.200.195"
-        port="8080"
-        server="wap.o2.co.uk"
-        user="O2web"
-        password="O2web"
-        type="default,supl"
-    />
     <apn carrier="O2 Pay &amp; Go"
         mcc="234"
         mnc="10"
@@ -20629,16 +20618,6 @@
         type="default,supl"
     />
     <!-- UK(Bristol） Vodafone -->
-    <apn carrier="Vodafone wap"
-        mcc="234"
-        mnc="15"
-        apn="wap.vodafone.co.uk"
-        proxy="212.183.137.12"
-        port="8799"
-        server="live.vodafone.com"
-        user="wap"
-        type="default,supl"
-    />
     <apn carrier="Lebara"
         mcc="234"
         mnc="15"
@@ -20737,20 +20716,6 @@
         type="default"
     />
     <!-- UK(Bristol） T-Mobile -->
-    <apn carrier="T-Mobile"
-        mcc="234"
-        mnc="30"
-        apn="general.t-mobile.uk"
-        proxy="149.254.201.131"
-        port="8080"
-        mmsproxy="149.254.201.135"
-        mmsport="8080"
-        mmsc="http://mmsc.mms.02.co.uk:8002"
-        user="T-Mobile"
-        password="tm"
-        type="default,supl"
-        authtype="3"
-    />
     <apn carrier="EE Internet"
         mcc="234"
         mnc="30"
@@ -20805,15 +20770,6 @@
         type="default,supl,mms"
     />
     <!-- UK(Bristol） Orange -->
-    <apn carrier="Orange wap"
-        mcc="234"
-        mnc="33"
-        apn="orangewap"
-        proxy="192.168.71.35"
-        port="8080"
-        server="orangeworld.co.uk"
-        type="default,supl"
-    />
     <apn carrier="EE Internet"
         mcc="234"
         mnc="33"
