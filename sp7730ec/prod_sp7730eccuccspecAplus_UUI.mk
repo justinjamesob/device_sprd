@@ -56,7 +56,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.modem.wcn.diag=/dev/slog_wcn \
 	ro.modem.wcn.assert=/dev/spipe_wcn2 \
 	ro.modem.wcn.id=1 \
-	ro.modem.wcn.count=1
+	ro.modem.wcn.count=1 \
+    lmk.autocalc=false
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
   PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=1
