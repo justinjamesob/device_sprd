@@ -856,6 +856,7 @@ void SprdCameraHardware::stopRecording()
         camera_set_preview_mode(0);		
         ALOGV("stopRecording: X");
         ALOGV("mLock:stopRecording E.\n");
+        startPreviewInternal();
 }
 
 bool SprdCameraHardware::recordingEnabled() 
