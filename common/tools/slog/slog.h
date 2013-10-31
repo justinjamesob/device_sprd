@@ -14,7 +14,11 @@
 #ifndef _SLOG_H
 #define _SLOG_H
 
+#ifdef	LOG_TAG
+#undef	LOG_TAG
 #define LOG_TAG "slog"
+#endif
+
 #include <errno.h>
 #include <pthread.h>
 #include <utils/Log.h>
@@ -156,7 +160,7 @@ extern char top_logdir[MAX_NAME_LEN];
 extern char external_storage[MAX_NAME_LEN];
 extern struct slog_info *stream_log_head, *snapshot_log_head;
 extern struct slog_info *notify_log_head, *misc_log;
-extern pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid;
+extern pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid, kmemleak_tid;
 extern int slog_enable;
 extern int internal_log_size;
 extern int screenshot_enable;
@@ -172,6 +176,7 @@ extern void *notify_log_handler(void *arg);
 extern void *bt_log_handler(void *arg);
 extern void *tcp_log_handler(void *arg);
 extern void *uboot_log_handler(void *arg);
+extern void *kmemleak_handler(void *arg);
 extern void *modem_log_handler(void *arg);
 extern void *modem_dump_memory_handler(void *arg);
 extern int stream_log_handler_started;
@@ -179,6 +184,7 @@ extern int snapshot_log_handler_started;
 extern int notify_log_handler_started;
 extern int bt_log_handler_started;
 extern int tcp_log_handler_started;
+extern int kmemleak_handler_started;
 extern int modem_log_handler_started;
 extern int gen_config_string(char *buffer);
 extern void cp_file(char *path, char *new_path);

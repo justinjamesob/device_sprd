@@ -36,6 +36,7 @@ stream  modem   off     0       5
 stream  main    on      0       7
 stream  wifi    off     0       7
 stream  bt      off     0       7
+stream  kmemleak	on	0	7
 misc    misc    on      0       5
 
 #type   name            opt     level   inter   action
@@ -126,6 +127,25 @@ static void handle_sprd_debug( const char *state )
 	}
 }
 
+int enable_kmemleak = 0;
+static void handle_kmemleak(const char *state)
+{
+	if(!strncmp(state, "on", 2))
+	{
+		err_log("handle_kmemleak: on\n");
+		enable_kmemleak = 1;
+	}
+	else if(!strncmp(state, "off", 3))
+	{
+		err_log("handle_kmemleak: off\n");
+		enable_kmemleak = 0;
+	}
+	else
+	{
+	    debug_log("slog cmd kmemleak para error\n");
+	}
+}
+
 static void handle_watchdog( int state )
 {
 	char buffer[MAX_NAME_LEN];
@@ -187,6 +207,8 @@ int parse_3_entries(char *type)
 		handle_hprofs(pos3);
 	} else if(!strncmp(name, "sprd_debug", 10)) {
 		handle_sprd_debug(pos3);
+	} else if(!strncmp(name, "kmemleak", 8)) {
+		handle_kmemleak(pos3);
 	}
 
 
@@ -271,8 +293,10 @@ int parse_5_entries(char *type)
 			info->log_path = strdup("modem");
 		} else if(!strncmp(info->name, "bt", 2)) {
 			info->log_path = strdup("bt");
-		} else if(!strncmp(info->name, "tcp", 2)) {
+		} else if(!strncmp(info->name, "tcp", 3)) {
 			info->log_path = strdup("tcp");
+		} else if(!strncmp(info->name, "kmemleak", 8)) {
+			info->log_path = strdup("kmemleak");
 		} else {
 			info->log_path = strdup("android");
 		}

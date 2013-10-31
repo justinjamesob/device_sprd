@@ -1488,3 +1488,126 @@ void *uboot_log_handler(void *arg)
 	return NULL;
 }
 
+
+extern int enable_kmemleak;
+void *kmemleak_handler(void *arg)
+{
+	int i = 0;
+	int retry = 0;
+	int retry_open = 0;
+	int ret;
+	int n_read, n_write;
+	char writecmd[16];
+	char buf[1024];
+	int fd_ml = 0;
+	char buffer[MAX_NAME_LEN];
+	int fd_dmp;
+	struct slog_info *info = NULL,*kmemleak = NULL;
+
+	info = stream_log_head;
+	while(info){
+		if((info->state == SLOG_STATE_ON) && !strncmp(info->name, "kmemleak", 8)) {
+			kmemleak = info;
+			break;
+		}
+		info = info->next;
+	}
+
+	kmemleak_handler_started = 1;
+	memset(writecmd, 0, 16);
+	strcpy(writecmd, "scan");
+
+	while(1)
+	{
+		if(!enable_kmemleak)
+		{
+			debug_log("kmemleak disable\n");
+			sleep(60);
+			continue;
+		}
+
+		fd_ml = open("/sys/kernel/debug/kmemleak", O_RDWR);
+label0:
+		if(fd_ml == -1)
+		{
+			err_log("open device error, errno=%d\n", errno);
+			if(errno == ENOENT)
+			{
+				retry_open++;
+				sleep(10);
+				if(retry_open == 60)
+				{
+					err_log("need open kconfig support\n");
+					break;
+				}
+				continue;
+			}
+			else
+			{
+				break;
+			}
+		}
+		retry_open = 0;
+		n_write = write(fd_ml, (char *)writecmd, strlen((char *)writecmd));
+		if(n_write <= 0){
+			err_log("write device error, need rewrite, errno=%d\n", errno);
+			if(errno == EBUSY)
+			{
+				retry++;
+				close(fd_ml);
+				sleep(1);
+				if(retry == 4)
+				{
+					err_log("device always busy, exit\n");					
+					break;
+				}
+				fd_ml = open("/sys/kernel/debug/kmemleak", O_RDWR);
+				goto label0;
+			}
+	    }
+	    retry = 0;
+label1:
+		n_read = read(fd_ml, buf, 1024);
+		if(n_read > 0)
+		{
+			memset(buffer, 0, MAX_NAME_LEN);
+			sprintf(buffer, "%s/%s/%s", current_log_path, top_logdir, kmemleak->log_path);
+			ret = mkdir(buffer, S_IRWXU | S_IRWXG | S_IRWXO);
+			if (-1 == ret && (errno != EEXIST)){
+				err_log("mkdir %s failed.\n", buffer);
+				return NULL;
+			}
+			sprintf(buffer, "%s/%s/%s/%s_%d", current_log_path, top_logdir, kmemleak->log_path, kmemleak->log_basename, i);
+			fd_dmp = open((const char *)buffer, O_CREAT|O_RDWR, 0x666);
+			write_from_buffer(fd_dmp, buf, n_read);
+			while(n_read)
+			{
+label2:
+				n_read = read(fd_ml, buf, 1024);
+				if(n_read > 0)
+				{
+					write_from_buffer(fd_dmp, buf, n_read);
+				}
+				else if(n_read < 0)
+				{
+					err_log("1:fd=%d read %d is lower than 0\n", fd_ml, n_read);
+					sleep(1);
+					goto label2;
+				}
+			}
+			close(fd_dmp);
+		}
+		else if(n_read < 0)
+		{
+			err_log("2:fd=%d read %d is lower than 0\n", fd_ml, n_read);
+			sleep(1);
+			goto label1;
+		}
+		close(fd_ml);
+		fd_ml = 0;
+		sleep(60);
+		i++;
+	}
+	kmemleak_handler_started = 0;
+	return NULL;
+}

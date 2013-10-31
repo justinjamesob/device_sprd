@@ -9,6 +9,7 @@ var	sysdump		crashkey
 var	coredump	off
 var	hprofs		off
 var	sprd_debug	off
+var	kmemleak	off
 
 #type	name	state	size	level
 stream	kernel	on	0	7
@@ -19,6 +20,7 @@ stream	radio	on	0	0
 stream	modem	off	0	5
 stream	bt	off	0	7
 stream	tcp	off	0	7
+stream	kmemleak	off	0	7
 misc	misc	on	0	5
 
 #type	name		opt	level	inter	action

@@ -40,6 +40,7 @@ int snapshot_log_handler_started = 0;
 int notify_log_handler_started = 0;
 int bt_log_handler_started = 0;
 int tcp_log_handler_started = 0;
+int kmemleak_handler_started = 0;
 int modem_log_handler_started = 0;
 
 int internal_log_size = 5 * 1024; /*M*/
@@ -56,7 +57,7 @@ char external_path[MAX_NAME_LEN];
 struct slog_info *stream_log_head, *snapshot_log_head;
 struct slog_info *notify_log_head, *misc_log;
 
-pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, command_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid, uboot_log_tid;
+pthread_t stream_tid, snapshot_tid, notify_tid, sdcard_tid, command_tid, bt_tid, tcp_tid, modem_tid, modem_dump_memory_tid, uboot_log_tid, kmemleak_tid;
 
 static void handler_exec_cmd(struct slog_info *info, char *filepath)
 {
@@ -424,7 +425,8 @@ static int start_sub_threads()
 		pthread_create(&tcp_tid, NULL, tcp_log_handler, NULL);
 
 	pthread_create(&uboot_log_tid, NULL, uboot_log_handler, NULL);
-
+	if(!kmemleak_handler_started)
+		pthread_create(&kmemleak_tid, NULL, kmemleak_handler, NULL);
 	return 0;
 }
 
