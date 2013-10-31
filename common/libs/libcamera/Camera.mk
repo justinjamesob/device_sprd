@@ -253,6 +253,8 @@ LOCAL_SRC_FILES:= \
 	jpeg/jpeg_fw_8830/src/jpegdec_api.c  \
 	jpeg/jpeg_fw_8830/src/exif_writer.c  \
 	jpeg/jpeg_fw_8830/src/jpeg_stream.c \
+	isp/isp_app.c \
+	isp/isp_app_msg.c \
 	isp/isp_video.c \
 	isp/isp_param_tune_com.c \
 	isp/isp_param_tune_v0000.c \
