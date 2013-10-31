@@ -46,7 +46,9 @@ PRODUCT_PACKAGES += \
 	calibration_init \
 	nvm_daemon \
 	modemd\
-	engpc
+	engpc\
+       libengappjni \
+       Engapp
 
 # own copyright packages files
 PRODUCT_PACKAGES += \
