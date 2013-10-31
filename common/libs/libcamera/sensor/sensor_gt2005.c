@@ -1457,8 +1457,6 @@ static uint32_t set_GT2005_video_mode(uint32_t mode)
 
 	if(mode>2) return 0;
 
-	if(PNULL == sensor_reg_ptr) return 0;
-
 	for (i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) ||(0xFF != sensor_reg_ptr[i].reg_value) ; i++)
 		GT2005_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
 
@@ -1651,8 +1649,6 @@ static uint32_t set_image_effect(uint32_t effect_type)
 	SENSOR_REG_T* sensor_reg_ptr = (SENSOR_REG_T*)GT2005_image_effect_tab[effect_type];
 
 	if(effect_type>7) return 0;
-
-	if(PNULL == sensor_reg_ptr) return 0;
 
 	for (i = 0; (0xFF != sensor_reg_ptr[i].reg_addr) && (0xFF != sensor_reg_ptr[i].reg_value); i++)
 		GT2005_WriteReg(sensor_reg_ptr[i].reg_addr, sensor_reg_ptr[i].reg_value);
