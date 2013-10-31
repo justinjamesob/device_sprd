@@ -1473,6 +1473,16 @@ RESTART:
 		    adev->pcm_modem_dl = NULL;
 		    para->is_exit = 1;
 		}
+		if( 0 != pcm_start(adev->pcm_modem_dl))
+		{
+		    ALOGE("pcm dl start unsucessfully");		    
+		}
+		if( 0 != pcm_start(adev->pcm_modem_ul))
+		{
+		    ALOGE("pcm ul start unsucessfully");		   
+		}
+
+		
 		ALOGW("voice:START CALL,open pcm device...");
 		adev->call_start = 1;
 		SetParas_OpenHal_Incall(adev,para->vbpipe_fd);   //get sim card number
