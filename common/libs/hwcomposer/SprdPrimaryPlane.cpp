@@ -53,9 +53,6 @@ SprdPrimaryPlane::SprdPrimaryPlane(FrameBufferInfo *fbInfo, SprdBufferManager *B
       mDisplayFormat(-1),
       mPlaneDisable(false),
       mDirectDisplayFlag(false),
-      mPhyAddr(NULL),
-      mVirAddr(NULL),
-      mThreadID(-1),
       mDebugFlag(0),
       mDumpFlag(0)
 {
@@ -66,8 +63,6 @@ SprdPrimaryPlane::SprdPrimaryPlane(FrameBufferInfo *fbInfo, SprdBufferManager *B
     mContext = SprdDisplayPlane::getPlaneContext();
 
     open();
-
-    mThreadID = gettid();
 }
 
 SprdPrimaryPlane::~SprdPrimaryPlane()
@@ -126,14 +121,12 @@ void SprdPrimaryPlane::UpdatePrimaryLayer(SprdHWLayer *l)
     mHWLayer = l;
 
     mDirectDisplayFlag = false;
-
-    mPhyAddr = NULL;
-
-    mVirAddr = NULL;
 }
 
-bool SprdPrimaryPlane::SetDisplayParameters(hwc_layer_t *AndroidLayer)
+bool SprdPrimaryPlane::SetDirectDisplay(hwc_layer_t *AndroidLayer)
 {
+    mDirectDisplayFlag = true;
+
     if (AndroidLayer == NULL)
     {
         ALOGI_IF(mDebugFlag, "SprdHWLayer is NULL");
@@ -173,12 +166,6 @@ bool SprdPrimaryPlane::SetDisplayParameters(hwc_layer_t *AndroidLayer)
         mDirectDisplayFlag = false;
         return false;
     }
-
-    mDirectDisplayFlag = true;
-
-    mPhyAddr = (unsigned char *)(privateH->phyaddr);
-
-    mVirAddr = (char *)(privateH->base);
 
     return mDirectDisplayFlag;
 }
@@ -292,7 +279,6 @@ enum PlaneFormat SprdPrimaryPlane::getPlaneFormat()
 
 bool SprdPrimaryPlane::flush()
 {
-    int localThreadID = -1;
     enum PlaneFormat format;
     struct overlay_setting *BaseContext = &(mContext->BaseContext);
     char *CurrentOverlayVirAddr = NULL;
@@ -325,24 +311,14 @@ bool SprdPrimaryPlane::flush()
     BaseContext->rect.w = mFBInfo->fb_width;
     BaseContext->rect.h = mFBInfo->fb_height;
 
-
-    /*
-     *  Here, it is a workaround method.
-     *  Mali posting FrameBuffer in another thread of
-     *  OverlayComposer maybe access the resource released
-     *  by Android framework.
-     *  Just do the safely thread check.
-     *  We just permit directly displaying of OSD layer
-     *  is used in the same thread.
-     * */
-    localThreadID = gettid();
-
-    if ((mThreadID == localThreadID) &&
-        GetDirectDisplay() &&
-        (mPhyAddr != NULL && mVirAddr != NULL))
+    if (GetDirectDisplay())
     {
-        BaseContext->buffer = mPhyAddr;
-        CurrentOverlayVirAddr = mVirAddr;
+        hwc_layer_t *l = mHWLayer->getAndroidLayer();
+        const native_handle_t *pNativeHandle = l->handle;
+        struct private_handle_t *privateH = (struct private_handle_t *)pNativeHandle;
+
+        BaseContext->buffer = (unsigned char *)(privateH->phyaddr);
+        CurrentOverlayVirAddr = (char *)(privateH->base);
     }
     else
     {

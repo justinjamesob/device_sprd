@@ -219,7 +219,7 @@ int OverlayNativeWindow::queueBuffer(ANativeWindow* window,
 
     DisplayPlane->display(NULL, DisplayPlane->getPrimaryLayer());
 
-    postSem();
+    //postSem();
 
     const int index = self->mCurrentBufferIndex;
     self->front = static_cast<NativeBuffer*>(buffer);
