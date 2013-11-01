@@ -53,6 +53,7 @@ typedef struct sprd_camera_memory {
 	uint32_t phys_addr, phys_size;
 	void *handle;
 	void *data;
+	bool busy_flag;
 }sprd_camera_memory_t;
 
 
@@ -160,6 +161,7 @@ private:
 	void                  FreeCameraMem(void);
 	sprd_camera_memory_t* GetPmem(int buf_size, int num_bufs);
 	void                  FreePmem(sprd_camera_memory_t* camera_memory);
+	void                  clearPmem(sprd_camera_memory_t* camera_memory);
 	void                  setFdmem(uint32_t size);
 	void                  FreeFdmem(void);
 	uint32_t              getPreviewBufferID(buffer_handle_t *buffer_handle);
@@ -289,6 +291,16 @@ private:
 		                              uint32_t height,
 		                              uint32_t phy_addr,
 		                              char *virtual_addr);
+	void                            handleDataCallback(int32_t msg_type,
+						sprd_camera_memory_t *data, unsigned int index,
+						camera_frame_metadata_t *metadata, void *user,
+						uint32_t isPrev);
+	void                            handleDataCallbackTimestamp(int64_t timestamp,
+						int32_t msg_type,
+						sprd_camera_memory_t *data, unsigned int index,
+						void *user);
+	void                            cameraBakMemCheckAndFree();
+
 	bool                            iSDisplayCaptureFrame();
 	bool                            iSZslMode();
 	bool                            checkPreviewStateForCapture();
@@ -310,11 +322,17 @@ private:
 	Condition                       mStateWait;
 	Mutex                           mParamLock;
 	Condition                       mParamWait;
+	Mutex                           mCbPrevDataBusyLock;
+	Mutex                           mCbCapDataBusyLock;
 
 	uint32_t                        mPreviewHeapSize;
 	uint32_t                        mPreviewHeapNum;
 	uint32_t                        mPreviewDcamAllocBufferCnt;
 	sprd_camera_memory_t*           *mPreviewHeapArray;
+	sprd_camera_memory_t*           mPreviewHeapBak;
+	uint32_t                        mPreviewHeapBakUseFlag;
+	sprd_camera_memory_t*           mRawHeapBak;
+	uint32_t                        mRawHeapBakUseFlag;
 	uint32_t                        mPreviewHeapArray_phy[kPreviewBufferCount+kPreviewRotBufferCount+1];
 	uint32_t                        mPreviewHeapArray_vir[kPreviewBufferCount+kPreviewRotBufferCount+1];
 	buffer_handle_t                 *mPreviewBufferHandle[kPreviewBufferCount];

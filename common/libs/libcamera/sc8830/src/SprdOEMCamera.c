@@ -71,7 +71,7 @@ struct camera_context        *g_cxt = &cmr_cxt;
 #define USE_SENSOR_OFF_ON_FOR_HDR    1
 
 #define	bzero(b, len)		memset((b), '\0', (len))
-
+#define       FREE_PMEM_BAK_OEM               1
 
 //camera_takepic_step timestamp
 enum CAMERA_TAKEPIC_STEP {
@@ -2693,9 +2693,11 @@ camera_ret_code_type camera_stop_preview(void)
 {
 	CMR_MSG_INIT(message);
 	int                      ret = CAMERA_SUCCESS;
-
+#if FREE_PMEM_BAK_OEM
+#else
 	pthread_mutex_lock(&g_cxt->cb_mutex);
 	pthread_mutex_unlock(&g_cxt->cb_mutex);
+#endif
 	CMR_PRINT_TIME;
 	/*camera_flush_msg_queue();*/
 	message.msg_type = CMR_EVT_STOP;
