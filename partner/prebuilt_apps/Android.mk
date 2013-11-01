@@ -105,3 +105,12 @@ LOCAL_SRC_FILES := Permission.apk
 
 include $(BUILD_PREBUILT)
 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := choose_secure.apk
+LOCAL_MODULE_CLASS := APPS
+LOCAL_CERTIFICATE := PRESIGNED
+LOCAL_SRC_FILES := choose_secure.apk
+
+include $(BUILD_PREBUILT)
