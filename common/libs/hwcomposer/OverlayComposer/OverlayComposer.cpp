@@ -90,7 +90,7 @@ status_t OverlayComposer::readyToRun()
     sem_init(&doneSem, 0, 0);
     sem_init(&displaySem, 0, 0);
 
-    //InitSem();
+    InitSem();
 
     return NO_ERROR;
 }
@@ -378,7 +378,7 @@ void OverlayComposer::caculateLayerRect(hwc_layer_t  *l, struct LayerRect *rect,
     }
     else if (private_h->format == HAL_PIXEL_FORMAT_YCbCr_420_SP ||
              private_h->format == HAL_PIXEL_FORMAT_YCrCb_420_SP ||
-             private_h->format == HAL_PIXEL_FORMAT_YV12)
+             private_h->format != HAL_PIXEL_FORMAT_YV12)
     {
         rect->left = MAX(l->sourceCrop.left, 0);
         rect->top = MAX(l->sourceCrop.top, 0);

@@ -49,10 +49,6 @@ ifeq ($(strip $(TARGET_BOARD_PLATFORM)),sc8830)
 	LOCAL_CFLAGS += -DGSP_OUTPUT_USE_YUV420
 	LOCAL_CFLAGS += -DGSP_SCALING_UP_TWICE
 	# LOCAL_CFLAGS += -D_DMA_COPY_OSD_LAYER
-	#
-	# DIRECT_DISPLAY_SINGLE_OSD_LAYER need contiguous physcial address.
-	# At present, this condition cannot be satisfied.
-	# LOCAL_CFLAGS += DIRECT_DISPLAY_SINGLE_OSD_LAYER
 
 endif
 

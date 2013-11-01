@@ -671,21 +671,19 @@ int SprdUtil::composerLayers(SprdHWLayer *l1, SprdHWLayer *l2, struct bufferInfo
 
             gsp_cfg_info_phase1.layer0_info.des_rect.st_x = 0;
             gsp_cfg_info_phase1.layer0_info.des_rect.st_y = 0;
-            gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = gsp_cfg_info_phase1.layer0_info.clip_rect.rect_w;
-            gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = gsp_cfg_info_phase1.layer0_info.clip_rect.rect_h;
             if((gsp_cfg_info.layer0_info.rot_angle & 0x1) == 0) {
                 if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w) {
-                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = ((gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe);
+                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = (gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe;
                 }
                 if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h) {
-                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = ((gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe);
+                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = (gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe;
                 }
             } else {
                 if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_w * 4) < gsp_cfg_info.layer0_info.des_rect.rect_h) {
-                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = ((gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe);
+                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_w = (gsp_cfg_info.layer0_info.des_rect.rect_h + 7)/4 & 0xfffe;
                 }
                 if((gsp_cfg_info_phase1.layer0_info.clip_rect.rect_h * 4) < gsp_cfg_info.layer0_info.des_rect.rect_w) {
-                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = ((gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe);
+                    gsp_cfg_info_phase1.layer0_info.des_rect.rect_h = (gsp_cfg_info.layer0_info.des_rect.rect_w + 7)/4 & 0xfffe;
                 }
             }
             gsp_cfg_info_phase1.layer_des_info.pitch = gsp_cfg_info_phase1.layer0_info.des_rect.rect_w;
