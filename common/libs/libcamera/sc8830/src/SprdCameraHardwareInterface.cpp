@@ -46,6 +46,7 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////
 namespace android {
+#define FREE_PMEM_BAK 1
 
 #define STOP_PREVIEW_BEFORE_CAPTURE 0
 
@@ -230,6 +231,20 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 	memset(mPreviewBufferHandle, 0, kPreviewBufferCount * sizeof(void*));
 	memset(mPreviewCancelBufHandle, 0, kPreviewBufferCount * sizeof(void*));
 
+#if FREE_PMEM_BAK
+	mPreviewHeapBak = (sprd_camera_memory_t *)malloc(sizeof(*mPreviewHeapBak));
+	if(NULL == mPreviewHeapBak) {
+		LOGE("Fail to alloc bak preview heap, memory is NULL.");
+	}
+	memset(mPreviewHeapBak, 0, sizeof(*mPreviewHeapBak));
+	mPreviewHeapBakUseFlag = 0;
+	mRawHeapBak = (sprd_camera_memory_t *)malloc(sizeof(*mRawHeapBak));
+	if(NULL == mRawHeapBak) {
+		LOGE("Fail to alloc bak raw heap, memory is NULL.");
+	}
+	memset(mRawHeapBak, 0, sizeof(*mRawHeapBak));
+	mRawHeapBakUseFlag = 0;
+#endif
 	setCameraState(SPRD_INIT, STATE_CAMERA);
 
 	if (!mGrallocHal) {
@@ -254,7 +269,6 @@ SprdCameraHardware::SprdCameraHardware(int cameraId)
 SprdCameraHardware::~SprdCameraHardware()
 {
 	LOGV("closeCameraHardware: E cameraId: %d.", mCameraId);
-	switch_monitor_thread_deinit((void *)this);
 	LOGV("closeCameraHardware: X cameraId: %d.", mCameraId);
 }
 
@@ -270,6 +284,8 @@ void SprdCameraHardware::release()
 	LOGV("release:camera state = %s, preview state = %s, capture state = %s",
 		getCameraStateStr(getCameraState()), getCameraStateStr(getPreviewState()),
 		getCameraStateStr(getCaptureState()));
+
+	switch_monitor_thread_deinit((void *)this);
 
 	if (isCapturing()) {
 		cancelPictureInternal();
@@ -308,6 +324,36 @@ void SprdCameraHardware::release()
 	mMetadataHeap = NULL;
 	deinitCapture();
 
+#if FREE_PMEM_BAK
+	mCbPrevDataBusyLock.lock();
+	/*preview bak heap check and free*/
+	if (NULL == mPreviewHeapBak) {
+		LOGV("release mPreviewHeapBak NULL");
+	} else if (false == mPreviewHeapBak->busy_flag) {
+		LOGV("release free prev heap bak mem");
+		FreePmem(mPreviewHeapBak);
+		mPreviewHeapBak = NULL;
+	} else {
+		LOGE("release prev mem busy, this is unknown error!!!");
+	}
+	mPreviewHeapBakUseFlag = 0;
+	mCbPrevDataBusyLock.unlock();
+
+	mCbCapDataBusyLock.lock();
+	/* capture head check and free*/
+	if (NULL == mRawHeapBak) {
+		LOGV("release mRawHeapBak NULL");
+	} else if (false == mRawHeapBak->busy_flag) {
+		LOGV("release free raw heap bak mem");
+		FreePmem(mRawHeapBak);
+		mRawHeapBak = NULL;
+	} else {
+		LOGE("release cap mem busy, this is unknown error!!!");
+	}
+	mRawHeapBakUseFlag = 0;
+	mCbCapDataBusyLock.unlock();
+#endif
+
 	LOGV("release X");
 	LOGV("mLock:release X.\n");
 }
@@ -332,7 +378,7 @@ void SprdCameraHardware::stopPreview()
 {
 	LOGV("stopPreview: E");
 	Mutex::Autolock l(&mLock);
-    camera_set_stop_preview_mode(0);
+	camera_set_stop_preview_mode(0);
 	stopPreviewInternal();
 	setRecordingMode(false);
 	LOGV("stopPreview: X");
@@ -480,7 +526,6 @@ status_t SprdCameraHardware::takePicture()
 	if (SPRD_ERROR == mCameraState.capture_state) {
 		LOGE("takePicture in error status, deinit capture at first ");
 		deinitCapture();
-
 	} else if (SPRD_IDLE != mCameraState.capture_state) {
 		LOGE("take picture: action alread exist, direct return!");
 		return ALREADY_EXISTS;
@@ -488,12 +533,12 @@ status_t SprdCameraHardware::takePicture()
 
 	if (!iSZslMode()) {
 		//stop preview first for debug
-	    if (isPreviewing()) {
+		if (isPreviewing()) {
 			LOGV("call stopPreviewInternal in takePicture().");
 			camera_set_stop_preview_mode(0);
 			stopPreviewInternal();
-	    }
-	    LOGV("ok to stopPreviewInternal in takePicture. preview state = %d", getPreviewState());
+		}
+		LOGV("ok to stopPreviewInternal in takePicture. preview state = %d", getPreviewState());
 
 		if (isPreviewing()) {
 			LOGE("takePicture: stop preview error!, preview state = %d", getPreviewState());
@@ -503,15 +548,13 @@ status_t SprdCameraHardware::takePicture()
 			deinitCapture();
 			LOGE("takePicture initCapture failed. Not taking picture.");
 			return UNKNOWN_ERROR;
-	    }
+		}
 	}
 
 	//wait for last capture being finished
 	if (isCapturing()) {
 		WaitForCaptureDone();
 	}
-
-	LOGV("start to initCapture in takePicture.");
 
 	setCameraState(SPRD_INTERNAL_RAW_REQUESTED, STATE_CAPTURE);
     LOGV("INTERPOLATION::takePicture:mRawWidth=%d,mZoomLevel=%d",mRawWidth,mZoomLevel);
@@ -844,14 +887,14 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 	LOGV("setParametersInternal: mPreviewFormat=%d,mPictureFormat=%d.",mPreviewFormat,mPictureFormat);
 
 	if (0 == checkSetParameters(params, mParameters)) {
-		LOGV("same parameters with system, directly return!");
+		LOGV("setParametersInternal X: same parameters with system, directly return!");
 		mParamLock.unlock();
 		return NO_ERROR;
 	}
 
 	ret = checkSetParametersEnvironment();
 	if (NO_ERROR != ret) {
-		LOGV("invalid status , directly return!");
+		LOGE("setParametersInternal X: invalid status , directly return!");
 		mParamLock.unlock();
 		return NO_ERROR;
 	}
@@ -890,17 +933,25 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 	camera_cfg_rot_cap_param_reset();
 
 	if (camera_set_change_size(mRawWidth, mRawHeight, mPreviewWidth, mPreviewHeight)) {
-		camera_set_stop_preview_mode(1);
-		mPreviewCbLock.lock();
-		stopPreviewInternal();
-		mPreviewCbLock.unlock();
-		if (NO_ERROR != setPreviewWindow(mPreviewWindow)) {
-			return UNKNOWN_ERROR;
+		if (isPreviewing()) {
+			camera_set_stop_preview_mode(1);
+			mPreviewCbLock.lock();
+			stopPreviewInternal();
+			mPreviewCbLock.unlock();
+			if (NO_ERROR != setPreviewWindow(mPreviewWindow)) {
+				LOGE("setParametersInternal X: setPreviewWindow fail, unknown error!");
+				return UNKNOWN_ERROR;
+			}
+			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
+				LOGE("setParametersInternal X: change size startPreviewInternal fail, unknown error!");
+				return UNKNOWN_ERROR;
+			}
+		} else {
+			if (NO_ERROR != setPreviewWindow(mPreviewWindow)) {
+				LOGE("setParametersInternal X: setPreviewWindow fail, unknown error!");
+				return UNKNOWN_ERROR;
+			}
 		}
-		if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
-			return UNKNOWN_ERROR;
-		}
-
 	}
 
 	if ((1 == params.getInt("zsl")) &&
@@ -912,6 +963,7 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 			stopPreviewInternal();
 			mPreviewCbLock.unlock();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
+				LOGE("setParametersInternal X: open ZSL startPreviewInternal fail, unknown error!");
 				return UNKNOWN_ERROR;
 			}
 		}
@@ -925,6 +977,7 @@ status_t SprdCameraHardware::setParametersInternal(const SprdCameraParameters& p
 			stopPreviewInternal();
 			mPreviewCbLock.unlock();
 			if (NO_ERROR != startPreviewInternal(isRecordingMode())) {
+				LOGE("setParametersInternal X: close ZSL startPreviewInternal fail, unknown error!");
 				return UNKNOWN_ERROR;
 			}
 		}
@@ -1545,13 +1598,13 @@ sprd_camera_memory_t* SprdCameraHardware::GetCachePmem(int buf_size, int num_buf
 		return NULL;
 	}
 	memset(memory, 0, sizeof(*memory));
+	memory->busy_flag = false;
 
 	camera_memory_t *camera_memory;
 	int paddr, psize;
-        int  acc = buf_size *num_bufs ;
+	int  acc = buf_size *num_bufs ;
 
-
-        MemoryHeapIon *pHeapIon = new MemoryHeapIon("/dev/ion", acc ,0 , (1<<31) | ION_HEAP_CARVEOUT_MASK);
+	MemoryHeapIon *pHeapIon = new MemoryHeapIon("/dev/ion", acc ,0 , (1<<31) | ION_HEAP_CARVEOUT_MASK);
 
 	if (NULL == pHeapIon) {
 		goto getpmem_end;
@@ -1634,11 +1687,12 @@ getpmem_end:
 void SprdCameraHardware::FreePmem(sprd_camera_memory_t* memory)
 {
 	if(memory){
-		if(memory->camera_memory->release){
+		if (NULL == memory->camera_memory) {
+			LOGV("FreePmem memory->camera_memory is NULL");
+		} else if (memory->camera_memory->release) {
 			memory->camera_memory->release(memory->camera_memory);
 			memory->camera_memory = NULL;
-		}
-		else {
+		} else {
 			LOGE("fail to FreePmem: NULL is camera_memory->release.");
 		}
 
@@ -1648,9 +1702,29 @@ void SprdCameraHardware::FreePmem(sprd_camera_memory_t* memory)
 		}
 
 		free(memory);
-	}
-	else {
+	} else {
 		LOGV("FreePmem: NULL");
+	}
+}
+
+void SprdCameraHardware::clearPmem(sprd_camera_memory_t* memory)
+{
+	if(memory){
+		if (NULL == memory->camera_memory) {
+			LOGV("clearPmem memory->camera_memory is NULL");
+		} else if (memory->camera_memory->release) {
+			memory->camera_memory->release(memory->camera_memory);
+			memory->camera_memory = NULL;
+		} else {
+			LOGE("fail to clearPmem: NULL is camera_memory->release.");
+		}
+
+		if(memory->ion_heap) {
+			delete memory->ion_heap;
+			memory->ion_heap = NULL;
+		}
+	} else {
+		LOGV("clearPmem: NULL");
 	}
 }
 
@@ -1723,7 +1797,7 @@ int SprdCameraHardware::releasePreviewFrame()
 			LOGE("releasePreviewFrame fail: Could not dequeue gralloc buffer!\n");
 		} else {
 			free_buffer_id = getPreviewBufferID(buffer_handle);
-			if (mPreviewCancelBufHandle[free_buffer_id] == mPreviewBufferHandle[free_buffer_id]) {
+			if (mPreviewCancelBufHandle[free_buffer_id]  == mPreviewBufferHandle[free_buffer_id]) {
 				mPreviewCancelBufHandle[free_buffer_id] = NULL;
 			} else {
 				if (CAMERA_SUCCESS != camera_release_frame(free_buffer_id)) {
@@ -1888,13 +1962,34 @@ void SprdCameraHardware::FreeReDisplayMem()
 void SprdCameraHardware::freePreviewMem()
 {
 	uint32_t i;
-	LOGV("freePreviewMem s.");
+	LOGV("freePreviewMem E.");
 	FreeFdmem();
 
 	if (mPreviewHeapArray != NULL) {
 		for (i = 0; i < mPreviewDcamAllocBufferCnt; i++) {
+#if FREE_PMEM_BAK
+			mCbPrevDataBusyLock.lock();
+			if ((mPreviewHeapArray[i]) &&
+				(true == mPreviewHeapArray[i]->busy_flag)) {
+				LOGE("preview buffer is busy, skip, bakup and free later!");
+				if (NULL == mPreviewHeapBak->camera_memory) {
+					memcpy(mPreviewHeapBak, mPreviewHeapArray[i], sizeof(sprd_camera_memory));
+				} else {
+					LOGE("preview buffer not clear, unkown error!!!");
+					memcpy(mPreviewHeapBak, mPreviewHeapArray[i], sizeof(sprd_camera_memory));
+				}
+				mPreviewHeapBakUseFlag = 1;
+				memset(mPreviewHeapArray[i], 0, sizeof(*mPreviewHeapArray[i]));
+				free(mPreviewHeapArray[i]);
+			} else {
+				FreePmem(mPreviewHeapArray[i]);
+			}
+			mPreviewHeapArray[i] = NULL;
+			mCbPrevDataBusyLock.unlock();
+#else
 			FreePmem(mPreviewHeapArray[i]);
 			mPreviewHeapArray[i] = NULL;
+#endif
 		}
 		free(mPreviewHeapArray);
 		mPreviewHeapArray = NULL;
@@ -1903,7 +1998,7 @@ void SprdCameraHardware::freePreviewMem()
 	canclePreviewMem();
 	mPreviewHeapSize = 0;
 	mPreviewHeapNum = 0;
-	LOGV("freePreviewMem e.");
+	LOGV("freePreviewMem X.");
 }
 
 bool SprdCameraHardware::initPreview()
@@ -2035,8 +2130,31 @@ allocate_capture_mem_failed:
 
 void SprdCameraHardware::freeCaptureMem()
 {
-    FreePmem(mRawHeap);
-    mRawHeap = NULL;
+#if FREE_PMEM_BAK
+	mCbCapDataBusyLock.lock();
+	if (mRawHeap) {
+		if (true == mRawHeap->busy_flag) {
+			LOGE("freeCaptureMem, raw buffer is busy, skip, bakup and free later!");
+			if (NULL == mRawHeapBak->camera_memory) {
+				memcpy(mRawHeapBak, mRawHeap, sizeof(*mRawHeap));
+			} else {
+				LOGE("preview buffer not clear, unkown error!!!");
+				memcpy(mRawHeapBak, mRawHeap, sizeof(*mRawHeap));
+			}
+			mRawHeapBakUseFlag = 1;
+			memset(mRawHeap, 0, sizeof(*mRawHeap));
+			free(mRawHeap);
+		} else {
+			FreePmem(mRawHeap);
+		}
+	}
+	mRawHeap = NULL;
+	mCbCapDataBusyLock.unlock();
+#else
+	FreePmem(mRawHeap);
+	mRawHeap = NULL;
+#endif
+
     mRawHeapSize = 0;
 
     if (mMiscHeapSize > 0) {
@@ -2054,7 +2172,7 @@ void SprdCameraHardware::freeCaptureMem()
         }
         mMiscHeapNum = 0;
     }
-    //mJpegHeap = NULL;
+     //mJpegHeap = NULL;
 }
 
 
@@ -2193,6 +2311,9 @@ status_t SprdCameraHardware::startPreviewInternal(bool isRecording)
 	}
 	setRecordingMode(isRecording);
 
+#if FREE_PMEM_BAK
+	cameraBakMemCheckAndFree();
+#endif
 	if (!initPreview()) {
 		LOGE("startPreviewInternal X initPreview failed.  Not starting preview.");
 		deinitPreview();
@@ -2261,13 +2382,22 @@ void SprdCameraHardware::stopPreviewInternal()
 	}
 
 	WaitForPreviewStop();
+#if FREE_PMEM_BAK
+	cameraBakMemCheckAndFree();
+#endif
 	deinitPreview();
 
+
+#if FREE_PMEM_BAK
+	if (iSZslMode()) {
+		deinitCapture();
+	}
+#else
 	if (isCapturing()) {
 		WaitForCaptureDone();
 	}
 	deinitCapture();
-
+#endif
 	end_timestamp = systemTime();
 	LOGV("stopPreviewInternal X Time:%lld(ms).",(end_timestamp - start_timestamp)/1000000);
 	LOGV("stopPreviewInternal X Preview has stopped.");
@@ -2306,7 +2436,7 @@ bool SprdCameraHardware::iSDisplayCaptureFrame()
 		|| (CAMERA_ZSL_CONTINUE_SHOT_MODE == mCaptureMode)) {
 		ret = false;
 	}
-	LOGI("dislapy capture flag is %d.",ret);
+	LOGI("display capture flag is %d.",ret);
 	return ret;
 }
 
@@ -2891,6 +3021,7 @@ bool SprdCameraHardware::displayOneFrame(uint32_t width, uint32_t height, uint32
 			if (releasePreviewFrame())
 				return false;
 		}
+
 	}
 	return true;
 }
@@ -2930,19 +3061,103 @@ void SprdCameraHardware::receivePreviewFDFrame(camera_frame_type *frame)
     if(mMsgEnabled&CAMERA_MSG_PREVIEW_METADATA) {
         LOGV("smile capture msg is enabled.");
 		if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
-	        if(camera_get_rot_set()) {
-	            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,&metadata,mUser);
-	        } else {
-	            mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[offset]->camera_memory,0,&metadata,mUser);
+			uint32_t tmpIndex = offset;
+			if(camera_get_rot_set()) {
+				tmpIndex += kPreviewBufferCount;
 			}
+
+#if FREE_PMEM_BAK
+			handleDataCallback(CAMERA_MSG_PREVIEW_METADATA,
+				mPreviewHeapArray[tmpIndex],
+				0, &metadata, mUser, 1);
+#else
+			mData_cb(CAMERA_MSG_PREVIEW_METADATA,
+				mPreviewHeapArray[tmpIndex]->camera_memory,
+				0,&metadata,mUser);
+#endif
 		} else {
 			uint32_t dataSize = frame->dx * frame->dy * 3 / 2;
-			memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data, frame->buf_Virt_Addr, dataSize);
-			mData_cb(CAMERA_MSG_PREVIEW_METADATA,mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory,0,&metadata,mUser);
+			memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data,
+				frame->buf_Virt_Addr, dataSize);
+#if FREE_PMEM_BAK
+			handleDataCallback(CAMERA_MSG_PREVIEW_METADATA,
+				mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1],
+				0, &metadata, mUser, 1);
+#else
+			mData_cb(CAMERA_MSG_PREVIEW_METADATA,
+				mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory,
+				0,&metadata,mUser);
+#endif
 		}
-    } else {
-        LOGV("smile capture msg is disabled.");
-    }
+	} else {
+		LOGV("smile capture msg is disabled.");
+	}
+}
+
+void SprdCameraHardware::handleDataCallback(int32_t msg_type,
+		sprd_camera_memory_t *data, unsigned int index,
+		camera_frame_metadata_t *metadata, void *user,
+		uint32_t isPrev)
+{
+	if (isPrev) {
+		Mutex::Autolock l(&mCbPrevDataBusyLock);
+	} else {
+		Mutex::Autolock cl(&mCbCapDataBusyLock);
+	}
+	LOGV("handleDataCallback E");
+	data->busy_flag = true;
+	mData_cb(msg_type, data->camera_memory, index, metadata, user);
+	data->busy_flag = false;
+	LOGV("handleDataCallback X");
+}
+
+
+void SprdCameraHardware::handleDataCallbackTimestamp(int64_t timestamp,
+		int32_t msg_type,
+		sprd_camera_memory_t *data, unsigned int index,
+		void *user)
+{
+	Mutex::Autolock l(&mCbPrevDataBusyLock);
+	LOGV("handleDataCallbackTimestamp E");
+	data->busy_flag = true;
+	mData_cb_timestamp(timestamp, msg_type, data->camera_memory, index, user);
+	data->busy_flag = false;
+	LOGV("handleDataCallbackTimestamp X");
+}
+
+void SprdCameraHardware::cameraBakMemCheckAndFree()
+{
+	LOGV("cameraBakMemCheckkAndFree E");
+	if(NO_ERROR == mCbPrevDataBusyLock.tryLock()) {
+		/*preview bak heap check and free*/
+		if (NULL == mPreviewHeapBak) {
+			LOGV("cameraBakMemCheckkAndFree prev bak mem released");
+		} else if ((false == mPreviewHeapBak->busy_flag) &&
+			(1 == mPreviewHeapBakUseFlag)) {
+			LOGV("cameraBakMemCheckkAndFree free prev bak mem");
+			clearPmem(mPreviewHeapBak);
+			mPreviewHeapBakUseFlag = 0;
+			LOGV("cameraBakMemCheckkAndFree previewHeapBak free OK");
+		}
+		mCbPrevDataBusyLock.unlock();
+	}
+	LOGV("cameraBakMemCheckkAndFree prev pass");
+
+	if(NO_ERROR == mCbCapDataBusyLock.tryLock()) {
+		/* capture head check and free*/
+		if (NULL == mRawHeapBak) {
+			LOGV("cameraBakMemCheckkAndFree raw bak mem released");
+		} else if ((false == mRawHeapBak->busy_flag) &&
+			(1 == mRawHeapBakUseFlag)) {
+			LOGV("cameraBakMemCheckkAndFree free cap bak mem");
+			clearPmem(mRawHeapBak);
+			mRawHeapBakUseFlag = 0;
+			LOGV("cameraBakMemCheckkAndFree rawHeapBak free OK");
+		}
+		mCbCapDataBusyLock.unlock();
+	}
+
+	LOGV("cameraBakMemCheckkAndFree X");
 }
 
 void SprdCameraHardware::receivePreviewFrame(camera_frame_type *frame)
@@ -2984,15 +3199,32 @@ void SprdCameraHardware::receivePreviewFrame(camera_frame_type *frame)
 		LOGV("receivePreviewFrame mMsgEnabled: 0x%x",mMsgEnabled);
 		if (mMsgEnabled & CAMERA_MSG_PREVIEW_FRAME) {
 			if (PREVIEW_BUFFER_USAGE_DCAM == mPreviewBufferUsage) {
+				uint32_t tmpIndex = offset;
 				if(camera_get_rot_set()) {
-					mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory,0,NULL,mUser);
-				} else {
-					mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[offset]->camera_memory,0,NULL,mUser);
+					tmpIndex += kPreviewBufferCount;
 				}
+#if FREE_PMEM_BAK
+				handleDataCallback(CAMERA_MSG_PREVIEW_FRAME,
+					mPreviewHeapArray[tmpIndex],
+					0, NULL, mUser, 1);
+#else
+				mData_cb(CAMERA_MSG_PREVIEW_FRAME,
+					mPreviewHeapArray[tmpIndex]->camera_memory,
+					0,NULL,mUser);
+#endif
 			} else {
 				uint32_t dataSize = frame->dx * frame->dy * 3 / 2;
-				memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data, frame->buf_Virt_Addr, dataSize);
-				mData_cb(CAMERA_MSG_PREVIEW_FRAME,mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory,0,NULL,mUser);
+				memcpy(mPreviewHeapArray[mPreviewDcamAllocBufferCnt -1]->camera_memory->data,
+					frame->buf_Virt_Addr, dataSize);
+#if FREE_PMEM_BAK
+				handleDataCallback(CAMERA_MSG_PREVIEW_FRAME,
+					mPreviewHeapArray[mPreviewDcamAllocBufferCnt - 1],
+					0, NULL, mUser, 1);
+#else
+				mData_cb(CAMERA_MSG_PREVIEW_FRAME,
+				mPreviewHeapArray[mPreviewDcamAllocBufferCnt - 1]->camera_memory,
+				0,NULL,mUser);
+#endif
 			}
 		}
 
@@ -3008,7 +3240,7 @@ void SprdCameraHardware::receivePreviewFrame(camera_frame_type *frame)
 				}
 			}
 			/*LOGV("test slowmotion:%lld.",timestamp);*/
-			if(mIsStoreMetaData) {
+			if (mIsStoreMetaData) {
 				uint32_t *data = (uint32_t *)mMetadataHeap->data + offset * METADATA_SIZE / 4;
 				*data++ = kMetadataBufferTypeCameraSource;
 				*data++ = frame->buffer_phy_addr;
@@ -3018,14 +3250,23 @@ void SprdCameraHardware::receivePreviewFrame(camera_frame_type *frame)
 				*data++ = mPreviewWidth_trimx;
 				*data     = mPreviewHeight_trimy;
 				mData_cb_timestamp(timestamp, CAMERA_MSG_VIDEO_FRAME, mMetadataHeap, offset, mUser);
-			}
-			else {
+			} else {
 				//mData_cb_timestamp(timestamp, CAMERA_MSG_VIDEO_FRAME, mPreviewHeap->mBuffers[offset], mUser);
+				uint32_t tmpIndex = offset;
 				if(camera_get_rot_set()) {
-					mData_cb_timestamp(timestamp, CAMERA_MSG_VIDEO_FRAME, mPreviewHeapArray[kPreviewBufferCount+offset]->camera_memory, 0, mUser);
-				} else {
-					mData_cb_timestamp(timestamp, CAMERA_MSG_VIDEO_FRAME, mPreviewHeapArray[offset]->camera_memory, 0, mUser);
+					tmpIndex += kPreviewBufferCount;
 				}
+#if FREE_PMEM_BAK
+				handleDataCallbackTimestamp(timestamp,
+					CAMERA_MSG_VIDEO_FRAME,
+					mPreviewHeapArray[tmpIndex],
+					0, mUser);
+#else
+				mData_cb_timestamp(timestamp,
+					CAMERA_MSG_VIDEO_FRAME,
+					mPreviewHeapArray[tmpIndex]->camera_memory,
+					0, mUser);
+#endif
 			}
 		//LOGV("receivePreviewFrame: record index: %d, offset: %x, size: %x, frame->buf_Virt_Addr: 0x%x.", offset, off, size, (uint32_t)frame->buf_Virt_Addr);
 		} else {
@@ -3148,10 +3389,14 @@ callbackraw:
 			LOGV("mMsgEnabled: 0x%x, offset: %d.",mMsgEnabled, (uint32_t)offset);
 
 			if (mMsgEnabled & CAMERA_MSG_RAW_IMAGE) {
+#if FREE_PMEM_BAK
+				handleDataCallback(CAMERA_MSG_RAW_IMAGE, mRawHeap, offset, NULL, mUser, 0);
+#else
 				mData_cb(CAMERA_MSG_RAW_IMAGE, mRawHeap->camera_memory, offset, NULL, mUser);
+#endif
 			}
 
-			if(mMsgEnabled & CAMERA_MSG_RAW_IMAGE_NOTIFY) {
+			if (mMsgEnabled & CAMERA_MSG_RAW_IMAGE_NOTIFY) {
 				LOGV("mMsgEnabled & CAMERA_MSG_RAW_IMAGE_NOTIFY");
 				mNotify_cb(CAMERA_MSG_RAW_IMAGE_NOTIFY, 0,0,mUser);
 			}
@@ -3869,6 +4114,9 @@ void * SprdCameraHardware::switch_monitor_thread_proc(void *p_data)
 				obj->setParametersInternal(obj->mSetParametersBak);
 				obj->setCameraState(SPRD_IDLE, STATE_SET_PARAMS);
 			}
+#if FREE_PMEM_BAK
+			obj->cameraBakMemCheckAndFree();
+#endif
 		} else if (NO_ERROR != ret) {
 			CMR_LOGE("Message queue destroyed");
 			break;
