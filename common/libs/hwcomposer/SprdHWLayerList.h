@@ -94,7 +94,7 @@ class SprdHWLayer
 {
 public:
     SprdHWLayer()
-        : mAndroidLayer(0), mLayerType(LAYER_INVALIDE), mFormat(-1),
+        : mAndroidLayer(0), mLayerType(LAYER_INVALIDE), mFormat(0),
           mDebugFlag(0)
     {
 
@@ -139,11 +139,6 @@ public:
         mFormat = f;
     }
 
-    inline int getLayerFormat()
-    {
-        return mFormat;
-    }
-
     inline struct sprdRect *getSprdSRCRect()
     {
         return &srcRect;
@@ -158,9 +153,6 @@ public:
     {
         return &FBRect;
     }
-
-    bool checkRGBLayerFormat();
-    bool checkYUVLayerFormat();
 
 private:
     hwc_layer_t *mAndroidLayer;

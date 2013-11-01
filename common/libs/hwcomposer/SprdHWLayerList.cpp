@@ -42,42 +42,6 @@
 
 using namespace android;
 
-bool SprdHWLayer:: checkRGBLayerFormat()
-{
-    hwc_layer_t *layer = mAndroidLayer;
-    const native_handle_t *pNativeHandle = layer->handle;
-    struct private_handle_t *privateH = (struct private_handle_t *)pNativeHandle;
-
-    if (privateH->format != HAL_PIXEL_FORMAT_RGBA_8888 &&
-        privateH->format != HAL_PIXEL_FORMAT_RGBX_8888 &&
-        privateH->format != HAL_PIXEL_FORMAT_RGB_565)
-    {
-        return false;
-    }
-
-    setLayerFormat(privateH->format);
-
-    return true;
-
-}
-
-bool SprdHWLayer:: checkYUVLayerFormat()
-{
-    hwc_layer_t *layer = mAndroidLayer;
-    const native_handle_t *pNativeHandle = layer->handle;
-    struct private_handle_t *privateH = (struct private_handle_t *)pNativeHandle;
-
-    if (privateH->format != HAL_PIXEL_FORMAT_YCbCr_420_SP &&
-        privateH->format != HAL_PIXEL_FORMAT_YCrCb_420_SP &&
-        privateH->format != HAL_PIXEL_FORMAT_YV12)
-    {
-        return false;
-    }
-
-    setLayerFormat(privateH->format);
-
-    return true;
-}
 
 SprdHWLayerList::~SprdHWLayerList()
 {
@@ -303,8 +267,7 @@ Overlay:
         {
             for (int j = 0; j < LayerCount; j++)
             {
-                SprdHWLayer *SprdLayer = &(mLayerList[j]);
-                hwc_layer_t *l = SprdLayer->getAndroidLayer();
+                hwc_layer_t *l = &(mList->hwLayers[j]);
 
                 /*
                  *  OverlayComposer cannot handle the lrregular layer display frame,
@@ -316,20 +279,9 @@ Overlay:
                     SkipLayerFlag = true;
                 }
 
-                if (SprdLayer->getPlaneType() == PLANE_FRAMEBUFFER && SkipLayerFlag == false)
+                if (mLayerList[j].getPlaneType() == PLANE_FRAMEBUFFER && SkipLayerFlag == false)
                 {
-                    int format = SprdLayer->getLayerFormat();
-                    if (format == HAL_PIXEL_FORMAT_RGBA_8888 ||
-                        format == HAL_PIXEL_FORMAT_RGBX_8888 ||
-                        format == HAL_PIXEL_FORMAT_RGB_565)
-                    {
-                        SprdLayer->setLayerType(LAYER_OSD);
-                    }
-                    else
-                    {
-                        SprdLayer->setLayerType(LAYER_OVERLAY);
-                    }
-                    setOverlayFlag(SprdLayer, j);
+                    forceOverlay(&(mLayerList[j]));
                     FBLayerCount--;
                 }
             }
@@ -446,9 +398,10 @@ bool SprdHWLayerList:: prepareOSDLayer(SprdHWLayer *l)
         return false;
     }
 
-    if (!(l->checkRGBLayerFormat()))
+    if (privateH->format != HAL_PIXEL_FORMAT_RGBA_8888 &&
+        privateH->format != HAL_PIXEL_FORMAT_RGBX_8888 &&
+        privateH->format != HAL_PIXEL_FORMAT_RGB_565)
     {
-        ALOGI_IF(mDebugFlag, "prepareOSDLayer Cannot find RGB format layer Line:%d", __LINE__);
         return false;
     }
 
@@ -578,7 +531,9 @@ bool SprdHWLayerList:: prepareOverlayLayer(SprdHWLayer *l)
         return false;
     }
 
-    if (!(l->checkYUVLayerFormat()))
+    if (privateH->format != HAL_PIXEL_FORMAT_YCbCr_420_SP &&
+        privateH->format != HAL_PIXEL_FORMAT_YCrCb_420_SP &&
+        privateH->format != HAL_PIXEL_FORMAT_YV12)
     {
         ALOGI_IF(mDebugFlag, "prepareOverlayLayer L%d,color format:0x%08x,ret 0", __LINE__, privateH->format);
         return false;
