@@ -39,19 +39,25 @@
 #include "gralloc_priv.h"
 #include "Utility.h"
 
-#include "../SprdPrimaryPlane.h"
-#include "../SprdUtil.h"
-#include "SprdBufferManager.h"
 
-
+/* Overlay device info */
 typedef struct
 {
-    uint32_t phyAddr;
-    void *virAddr;
-    private_handle_t *bufHandle;
-    uint32_t bufferSize;
+    int fbfd;
+    unsigned int fb_width;
+    unsigned int fb_height;
     uint32_t stride;
-} GraphicBufferInfo;
+
+    uint32_t overlay_phy_addr;
+    void *overlay_v_addr;
+    uint32_t overlay_buf_size;
+
+    private_handle_t *bufHandle_1;
+    private_handle_t *bufHandle_2;
+
+    int overlay_gpu_flag;
+    int overlay_sur_flag;
+} overlayDevice_t;
 
 namespace android {
 // ----------------------------------------------------------------------------
@@ -86,17 +92,13 @@ class OverlayNativeWindow   //: public overlayNativeWindow
         LightRefBase<OverlayNativeWindow> >
 {
 public:
-    OverlayNativeWindow(SprdPrimaryPlane *displayPlane);
+    OverlayNativeWindow(overlayDevice_t* overlayDev);
     ~OverlayNativeWindow();
 
     bool Init();
 
 private:
-    SprdPrimaryPlane *mDisplayPlane;
-    unsigned int mWidth;
-    unsigned int mHeight;
-    int mFormat;
-    GraphicBufferInfo mGFXBufferInfo[NUM_FRAME_BUFFERS];
+    overlayDevice_t* mOverlayDev;
     int32_t mNumBuffers;
     int32_t mNumFreeBuffers;
     int32_t mBufferHead;
@@ -118,13 +120,15 @@ private:
     static int query(const ANativeWindow* window, int what, int* value);
     static int perform(ANativeWindow* window, int operation, ...);
 
-    static sp<NativeBuffer> CreateGraphicBuffer(GraphicBufferInfo *GFXBufferInfo, struct bufferInfo *buffer);
-    void DestroyGraphicBuffer(GraphicBufferInfo *GFXBuffer);
 
-    static private_handle_t *wrapBuffer(unsigned int w, unsigned int h,
-                                 int format, GraphicBufferInfo *GFXBufferInfo);
+
+    private_handle_t *wrapBuffer(unsigned int w, unsigned int h,
+                                 int format, int index);
 
     void unWrapBuffer(private_handle_t *h);
+
+    uint32_t getBufferPhyAddr(int index);
+    uint32_t getBufferVirAddr(int index);
 
     inline unsigned int round_up_to_page_size(unsigned int x)
     {
