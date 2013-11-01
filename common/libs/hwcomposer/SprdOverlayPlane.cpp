@@ -155,6 +155,23 @@ enum PlaneFormat SprdOverlayPlane::getPlaneFormat()
 {
     enum PlaneFormat format;
     int displayFormat = mDisplayFormat;
+    /*hwc_layer_t *l = mHWLayer->getAndroidLayer();
+
+    if (l && mHWLayer->GetDirectDisplay())
+    {
+        const native_handle_t *pNativeHandle = l->handle;
+        struct private_handle_t *privateH = (struct private_handle_t *)pNativeHandle;
+
+        if (privateH->format == HAL_PIXEL_FORMAT_RGB_565)
+        {
+            displayFormat = HAL_PIXEL_FORMAT_RGB_565;
+        }
+        else if (privateH->format == HAL_PIXEL_FORMAT_YCbCr_420_SP ||
+                 privateH->format == HAL_PIXEL_FORMAT_YCbCr_422_SP)
+        {
+            displayFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP;
+        }
+    }*/
 
     switch(displayFormat)
     {

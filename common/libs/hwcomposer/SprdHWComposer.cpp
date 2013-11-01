@@ -362,7 +362,7 @@ int SprdHWComposer:: commit(hwc_display_t dpy, hwc_surface_t sur, hwc_layer_list
 
                 if ( mForceOverlayFlag == false && OverlayLayer == NULL)
                 {
-                    mPrimaryPlane->SetDisplayParameters(AndroidLayer);
+                    mPrimaryPlane->SetDirectDisplay(AndroidLayer);
                 }
             }
         }

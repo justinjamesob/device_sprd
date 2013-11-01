@@ -92,7 +92,7 @@ public:
      *  not need to be transfomed.
      *  Here, let these layers displayed directly by SprdPrimaryPlane.
      * */
-    bool SetDisplayParameters(hwc_layer_t *AndroidLayer);
+    bool SetDirectDisplay(hwc_layer_t *AndroidLayer);
     SprdHWLayer *getPrimaryLayer();
 
     int getPlaneImageFormat();
@@ -114,9 +114,6 @@ private:
     int mDisplayFormat;
     bool mPlaneDisable;
     bool mDirectDisplayFlag;
-    unsigned char *mPhyAddr;
-    char *mVirAddr;
-    int mThreadID;
     int mDebugFlag;
     int mDumpFlag;
 
