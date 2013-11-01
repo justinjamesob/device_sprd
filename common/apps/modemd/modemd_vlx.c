@@ -75,18 +75,17 @@ int write_proc_file(char *file, int offset, char *string)
 	}
 
 	if (lseek(fd, offset, SEEK_SET) != offset) {
-		MODEMD_LOGE("Cant lseek file %s", file);
+		MODEMD_LOGE("Cant lseek file %s, error :%s", file, strerror(errno));
 		goto leave;
 	}
 
 	stringsize = strlen(string);
 	if (write(fd, string, stringsize) != stringsize) {
-		MODEMD_LOGE("Could not write %s in %s", string, file);
+		MODEMD_LOGE("Could not write %s in %s, error :%s", string, file, strerror(errno));
 		goto leave;
 	}
 
 	res = 0;
-	MODEMD_LOGD("Wrote %s in file %s, error: %s", string, file, strerror(errno));
 leave:
 	close(fd);
 

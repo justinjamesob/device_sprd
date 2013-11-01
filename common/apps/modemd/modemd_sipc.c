@@ -270,6 +270,7 @@ reconnect:
 				}
 				pthread_mutex_unlock(&w_state_mutex);
 			}
+                        close(soc_fd);
 			goto reconnect;
 		}
 		MODEMD_LOGD("%s: read numRead=%d, buf=%s", __func__, numRead, buf);
