@@ -110,7 +110,7 @@ PRODUCT_COPY_FILES := \
         device/sprd/common/res/spn/spn-conf.xml:system/etc/spn-conf.xml
 
 
-USE_PROJECT_SEC :=true
+USE_PROJECT_SEC :=false
 
 $(call inherit-product, frameworks/native/build/phone-HD720-dalvik-heap.mk)
 
