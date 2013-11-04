@@ -1,0 +1,34 @@
+
+/dev/sprd_dma_copy      0660     system      audio
+/dev/sprd_scale         0660     system      audio
+/dev/sprd_rotation      0660     system      audio
+/dev/sprd_dcam          0660     system      audio
+/dev/sprd_gsp         	0660     system      graphics
+/dev/sprd_isp           0660     system      audio
+/dev/sprd_vsp           0660     system      audio
+/dev/sprd_jpg           0660     system      audio
+/dev/sprd_sensor        0660     system      audio
+/dev/video0             0660     system      audio
+/dev/ion                0664     system      audio
+/dev/mali               0666     system      graphics
+/dev/ump                0666     system      graphics
+
+/dev/stty_td*           0660     radio       system
+/dev/slog_td            0666     system      system
+/dev/spipe_td*          0666     system      system
+/dev/slog_wcn           0666     system      system
+/dev/spipe_wcn*         0666     system      system
+
+/dev/block/mmcblk0p*    0660     system      system
+/dev/vser               0660     system      system
+/dev/ttyHS0             0600     bluetooth   bluetooth
+/dev/ttyGS*             0660     system      system
+
+/dev/Trout_FM           0660     system      audio
+/dev/ecompass_ctrl      0666     system      compass
+/dev/mxc622x            0666     system      input
+/dev/mmc31xx            0666     system      compass
+/dev/al3006_pls         0666     system      system
+/dev/lis3dh_acc         0660     system      system
+/dev/akm8975_dev        0660     system      system
+/dev/ts0710mux*         0660     radio       system

@@ -14,9 +14,5 @@
 # limitations under the License.
 #
 
-
-
-add_lunch_combo sp8830eccmccspecAplus_UUI-userdebug
-add_lunch_combo sp8830eccmccspecAbase_UUI-userdebug
-
+add_lunch_combo sp8830ecbase-userdebug
 

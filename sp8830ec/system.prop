@@ -14,3 +14,26 @@ persist.storage.type=1
 conn.connectivity_change_delay = 0
 
 ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
+
+ro.modem.count=1
+ro.modem.t.enable=1
+ro.modem.t.dev=/dev/cpt
+ro.modem.t.tty=/dev/stty_td
+ro.modem.t.eth=seth_td
+ro.modem.t.snd=1
+ro.modem.t.diag=/dev/slog_td
+ro.modem.t.loop=/dev/spipe_td0
+ro.modem.t.nv=/dev/spipe_td1
+ro.modem.t.assert=/dev/spipe_td2
+ro.modem.t.vbc=/dev/spipe_td6
+ro.modem.t.id=0
+ro.modem.t.count=1
+
+ro.modem.wcn.enable=1
+ro.modem.wcn.dev=/dev/cpwcn
+ro.modem.wcn.tty=/deiv/stty_wcn
+ro.modem.wcn.diag=/dev/slog_wcn
+ro.modem.wcn.assert=/dev/spipe_wcn2
+ro.modem.wcn.id=1
+ro.modem.wcn.count=1
+

@@ -1,7 +1,0 @@
-key 116   POWER             WAKE
-key 8     VOLUME_DOWN       WAKE
-key 24    VOLUME_UP         WAKE
-key 9     CAMERA
-key 107   ENDCALL           WAKE
-key 226   CALL              WAKE
-key 139   MENU              WAKE
