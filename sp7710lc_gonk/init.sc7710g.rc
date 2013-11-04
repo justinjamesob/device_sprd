@@ -117,8 +117,8 @@ on property:ksm.support=true
         write /sys/kernel/mm/ksm/run              1
 
 on property:zram.support=true
-    setprop zram.disksize 180
-    setprop sys.vm.swappiness 60
+    setprop zram.disksize 64
+    setprop sys.vm.swappiness 100
     start zram	
 
 service zram /system/xbin/zram.sh
