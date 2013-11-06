@@ -90,16 +90,16 @@ string ATProcesser::property_get(string key)
 {
     char value[256];
     memset(value, 0, sizeof(value));
-    //::property_get((char *)key.c_str(), value, "");
+    ::property_get((char *)key.c_str(), value, "");
     string cmdstring = string("getprop ") + key;
-    return this->shell(cmdstring,"r");
+    //return this->shell(cmdstring,"r");
     return string(value);
 }
 string ATProcesser::property_set(string key, string value)
 {
-    //::property_set((char *)key.c_str(), (char *)value.c_str());
+    ::property_set((char *)key.c_str(), (char *)value.c_str());
     string cmdstring = string("setprop ") + key + " " + value;
-    return this->shell(cmdstring,"r");
+    //return this->shell(cmdstring,"r");
     return "1";
 }
 

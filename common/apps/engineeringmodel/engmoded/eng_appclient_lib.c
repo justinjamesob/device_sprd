@@ -45,13 +45,14 @@
  #include <errno.h>
   
   #include "engopt.h"
+#include "engapi.h"
   #include "engclient.h"
   #include <cutils/sockets.h>
 
 #ifndef ENG_SOCKET_PORT
 #define ENG_SOCKET_PORT  65000
 #endif
-
+#if 0
 int  eng_close(int fd)
  {
    return close(fd);
@@ -67,16 +68,15 @@ int  eng_close(int fd)
      return write(fd, buf, len);
  }
 
- int eng_client_0(int port, int type)
+ int eng_client(char *name, int type)
   {
-     int fd;
-      fd = socket_local_client( "engineeringmodel",
-                           0, SOCK_STREAM);
-     if (fd < 0) {
-         LOGE("eng_client Unable to bind socket errno:%d[%s]", errno, strerror(errno));
-     }
- 
-      return fd;
+	int fd;
+	fd = socket_local_client(name, ANDROID_SOCKET_NAMESPACE_RESERVED, type);
+	if (fd < 0) {
+		printf("eng_client Unable to connect socket errno:%d[%s]", errno, strerror(errno));
+	}
+
+    return fd;
   }
 
 /*******************************************************************************
@@ -100,18 +100,18 @@ static int eng_at_handshake( int fd, int type)
 	if ( strncmp((const char*)data.buf,ENG_WELCOME,strlen(ENG_WELCOME)) == 0){
 		return 0;
 	}
-	LOGE("%s: handshake error", __FUNCTION__);
+	printf("%s: handshake error", __FUNCTION__);
 	return -1;
 }
 
-int eng_at_open(int type)
+int eng_at_open(char *name, int type)
 {
 	int counter=0;
 	int err=-1;
 	int soc_fd=-1;
 
 	//connect to server
-	soc_fd = eng_client_0(ENG_SOCKET_PORT, SOCK_STREAM);
+	soc_fd = eng_client(name, SOCK_STREAM);
 	if (soc_fd < 0) {
 		LOGE ("%s: opening engmode server socket failed", __FUNCTION__);
 		return err;
@@ -184,7 +184,7 @@ int eng_request(char *request, int requestlen, char *response, int *responselen)
 
     ENG_LOG("Run Engineer Mode PC2SERVER Client!\n");
 
-    fd = eng_at_open(0);
+    fd = eng_at_open("engtd",0);
     if(fd<0) {
         ENG_LOG("ENG Open Failed!\n");
         //exit(-1);
@@ -227,7 +227,7 @@ int eng_appctest(void)
 	
 	ENG_LOG("Run Engineer Mode PC2SERVER Client!\n");
 
-	fd = eng_at_open(0);
+	fd = eng_at_open("engtd",0);
 	
 	if(fd<0) {
 		ENG_LOG("ENG Open Failed!\n");
@@ -635,5 +635,46 @@ int eng_appctest(void)
 	
 }
 
+#endif
+
+int eng_request(char *request, int requestlen, char *response, int *responselen)
+{
+    //char cmdbuf[16];
+    char *cmdbuf = request;
+    int cmdlen = requestlen;
+
+    char readbuf[512];
+    int readlen;
+    int fd;
+
+    ENG_LOG("Run Engineer Mode PC2SERVER Client!\n");
+
+    fd = engapi_open(0);
+    if(fd<0) {
+        ENG_LOG("ENG Open Failed!\n");
+        //exit(-1);
+        goto exit;
+    }
+
+        if(cmdlen > 0) {
+            ENG_LOG("Write Command, fd=%d\n", fd);
+            if(engapi_write(fd, cmdbuf, cmdlen)!=cmdlen) {
+                ENG_LOG(" ENG AT WRITE Failed!\n");
+                //exit(-1);
+                goto exit;
+            }
+        }
+
+        memset(readbuf, 0, sizeof(readbuf));
+        readlen=engapi_read(fd, readbuf, 512);
+        memcpy(response, readbuf, readlen);
+        *responselen = readlen;
+        ENG_LOG("ENG AT READ: %s\n", readbuf);
+exit:
+    if (fd>0){
+        engapi_close(fd );
+    }
+    return 0;
+}
 
 
