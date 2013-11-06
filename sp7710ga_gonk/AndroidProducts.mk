@@ -18,4 +18,4 @@ ifneq ($(filter sp7710ga%, $(TARGET_PRODUCT)),)
 endif
 
 PRODUCT_MAKEFILES := $(LOCAL_DIR)/prod_sp7710ga_gonk.mk
-
+PRODUCT_MAKEFILES := $(LOCAL_DIR)/prod_sp7710gaplus_gonk.mk
