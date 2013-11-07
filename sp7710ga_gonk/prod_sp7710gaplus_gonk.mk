@@ -41,7 +41,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.modem.w.eth=veth \
 	ro.modem.w.id=0 \
 	ro.modem.w.count=2 \
-	ro.debuggable=0 
+	ro.debuggable=0 \
+	ro.moz.ril.numclients=2
 
 ifeq ($(TARGET_LOWCOST_SUPPORT),true)
   PRODUCT_PROPERTY_OVERRIDES += persist.sys.lowcost=true
