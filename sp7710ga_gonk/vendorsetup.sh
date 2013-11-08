@@ -15,4 +15,3 @@
 #
 
 add_lunch_combo sp7710ga_gonk-userdebug
-add_lunch_combo sp7710gaplus_gonk-userdebug
