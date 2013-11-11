@@ -8,15 +8,15 @@ PRODUCT_PACKAGES += \
 	Mms
 
 # graphics modules
-#PRODUCT_PACKAGES += \
-#	libUMP \
-#	libEGL_mali.so \
-#	libGLESv1_CM_mali.so \
-#	libGLESv2_mali.so \
-#	libMali.so \
-#	libboost.so \
-#	ump.ko \
-#	mali.ko
+PRODUCT_PACKAGES += \
+	libUMP \
+	libEGL_mali.so \
+	libGLESv1_CM_mali.so \
+	libGLESv2_mali.so \
+	libMali.so \
+	libboost.so \
+	ump.ko \
+	mali.ko
 
 # video modules
 #PRODUCT_PACKAGES += \
@@ -37,8 +37,8 @@ PRODUCT_PACKAGES += \
 	libaudio-resampler
 
 # sprd HAL modules
-#PRODUCT_PACKAGES += \
-#	gralloc.sc8830 \
+PRODUCT_PACKAGES += \
+	gralloc.sc8830 \
 #	hwcomposer.sc8830 \
 #	audio.primary.sc8830 \
 #	audio_policy.sc8830 \
@@ -88,8 +88,8 @@ PRODUCT_COPY_FILES += \
         frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
         frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
         frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
-    frameworks/native/data/etc/android.hardware.touchscreen.multitouch.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.xml \
-    frameworks/native/data/etc/android.hardware.touchscreen.xml:system/etc/permissions/android.hardware.touchscreen.xml \
+	frameworks/native/data/etc/android.hardware.touchscreen.multitouch.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.xml \
+	frameworks/native/data/etc/android.hardware.touchscreen.xml:system/etc/permissions/android.hardware.touchscreen.xml \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
