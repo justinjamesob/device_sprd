@@ -1868,7 +1868,7 @@ static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
     ret = str_parms_get_str(parms, AUDIO_PARAMETER_STREAM_ROUTING, value, sizeof(value));
     if (ret >= 0) {
         val = atoi(value);
-        if ((in->device != val) && (val != 0)) {
+        if (in->device != val) {
             in->device = val;
             adev->devices &= ~AUDIO_DEVICE_IN_ALL;
             adev->devices |= in->device;
