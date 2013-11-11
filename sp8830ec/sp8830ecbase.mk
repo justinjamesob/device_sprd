@@ -43,7 +43,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
 	libmllite.so \
 	libmplmpu.so \
-	libinvensense_hal
+	libinvensense_hal \
+	libUMP \
+	libEGL_mali.so \
+	libGLESv1_CM_mali.so \
+	libGLESv2_mali.so \
+	libMali.so \
+	ump.ko \
+	mali.ko
 
 # board-specific files
 PRODUCT_COPY_FILES += \
