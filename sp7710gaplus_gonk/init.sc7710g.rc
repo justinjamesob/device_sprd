@@ -160,7 +160,7 @@ service vcharged7 /bin/vcharged7
     oneshot
 
 service engservicew /system/bin/engservice -t 0
-    socket engw stream 660 system system
+    socket engw stream 777 system system
     class core
     user system
     group system
@@ -224,13 +224,6 @@ service rilproxy1 /system/bin/rilproxy -c 1
     user root
     group radio
 
-service wril-daemon2 /system/bin/rild_sp  -l /system/lib/libreference-ril_sp.so -m w -n 2
-    class core
-    socket rild2 stream 660 root radio
-    socket rild-debug2 stream 660 radio system
-    #disabled
-    user root
-    group radio cache inet misc audio sdcard_rw log shell
 
 service rilproxy2 /system/bin/rilproxy -c 2
     class core
