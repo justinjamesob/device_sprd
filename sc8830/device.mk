@@ -80,6 +80,7 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/open-source/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
 	vendor/sprd/open-source/libs/audio/audio_policy.conf:system/etc/audio_policy.conf \
 	vendor/sprd/open-source/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
+	vendor/sprd/open-source/apps/scripts/ext_data.sh:system/bin/ext_data.sh \
 	frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
 	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
 	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
