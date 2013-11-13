@@ -37,11 +37,11 @@ PRODUCT_PACKAGES += \
 	libaudio-resampler
 
 # sprd HAL modules
-#PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES += \
+	audio.primary.sc8830	\
+	audio_policy.default
 #	gralloc.sc8830 \
 #	hwcomposer.sc8830 \
-#	audio.primary.sc8830 \
-#	audio_policy.sc8830 \
 #	camera.sc8830 \
 #	lights.sc8830 \
 #	sensors.sc8830
