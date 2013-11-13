@@ -15,5 +15,6 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/sp8830ecbase.mk
+	$(LOCAL_DIR)/sp8830ecbase.mk \
+	$(LOCAL_DIR)/sp8830ecplus.mk
 

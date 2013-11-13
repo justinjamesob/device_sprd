@@ -15,4 +15,4 @@
 #
 
 add_lunch_combo sp8830ecbase-userdebug
-
+add_lunch_combo sp8830ecplus-userdebug
