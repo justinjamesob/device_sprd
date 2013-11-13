@@ -8,15 +8,15 @@ PRODUCT_PACKAGES += \
 	Mms
 
 # graphics modules
-#PRODUCT_PACKAGES += \
-#	libUMP \
-#	libEGL_mali.so \
-#	libGLESv1_CM_mali.so \
-#	libGLESv2_mali.so \
-#	libMali.so \
-#	libboost.so \
-#	ump.ko \
-#	mali.ko
+PRODUCT_PACKAGES += \
+	libUMP \
+	libEGL_mali.so \
+	libGLESv1_CM_mali.so \
+	libGLESv2_mali.so \
+	libMali.so \
+	libboost.so \
+	ump.ko \
+	mali.ko
 
 # video modules
 #PRODUCT_PACKAGES += \
@@ -40,7 +40,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	audio.primary.sc8830	\
 	audio_policy.default
-#	gralloc.sc8830 \
+	gralloc.sc8830 \
 #	hwcomposer.sc8830 \
 #	camera.sc8830 \
 #	lights.sc8830 \
