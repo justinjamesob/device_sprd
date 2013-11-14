@@ -18,8 +18,12 @@ on init
     symlink /storage/emulated/legacy /mnt/sdcard
     symlink /storage/emulated/legacy /storage/sdcard0
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
-    pipe 666 /dev/pipe/mmi.audio.ctrl
 
+    # Support audio loopback test
+    mkdir /dev/pipe 0755 system system
+    pipe 666 /dev/pipe/mmi.audio.ctrl
+    # Support audio parameter stored
+    mkdir /data/local/media 0777 media system
 
 on fs
     mount_all /fstab.sc8830
@@ -29,8 +33,6 @@ on post-fs
     insmod /system/lib/modules/ump.ko
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
-    chmod 0660 /productinfo/vbc_eq
-    chown media  system /productinfo/vbc_eq
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
