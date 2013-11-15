@@ -43,7 +43,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
 	libmllite.so \
 	libmplmpu.so \
-	libinvensense_hal
+	libinvensense_hal \
+	wpa_supplicant.conf \
+	2351_wifi_configure.ini
 
 # board-specific files
 PRODUCT_COPY_FILES += \
