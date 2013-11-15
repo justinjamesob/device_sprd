@@ -2247,7 +2247,7 @@ static int eng_servermodem_comm(eng_fdtype_t *fdtype)
 		{
 			break;
 		}
-		words += length;
+		words += words_len;
 
 	}while(words[0]!='\0');
 
