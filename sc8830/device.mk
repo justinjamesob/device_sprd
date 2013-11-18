@@ -75,6 +75,7 @@ PRODUCT_COPY_FILES += \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
 	vendor/sprd/open-source/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
+	vendor/sprd/open-source/res/productinfo/2351_connectivity_configure.ini:prodnv/2351_connectivity_configure.ini \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
 	vendor/sprd/open-source/libs/audio/apm/devicevolume.xml:system/etc/devicevolume.xml \
 	vendor/sprd/open-source/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
