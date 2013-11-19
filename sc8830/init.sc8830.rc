@@ -75,6 +75,9 @@ on boot
     chown system root /proc/cpwcn/modem
     chown system root /proc/cpwcn/dsp
 
+on charger
+    class_start core
+
 on property:ro.debuggable=1
     write /sys/kernel/debug/fatal_dump/enable 1
     setrlimit 4 -1 -1

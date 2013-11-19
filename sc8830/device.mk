@@ -49,6 +49,7 @@ PRODUCT_PACKAGES += \
 # misc modules
 PRODUCT_PACKAGES += \
 	sqlite3 \
+	charge \
 	e2fsck \
 	tinymix \
 	calibration_init \
