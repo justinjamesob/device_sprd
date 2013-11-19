@@ -42,8 +42,8 @@ PRODUCT_PACKAGES += \
 	audio_policy.default \
 	gralloc.sc8830 \
 	camera.sc8830 \
+	lights.sc8830 \
 #	hwcomposer.sc8830 \
-#	lights.sc8830 \
 #	sensors.sc8830
 
 # misc modules
