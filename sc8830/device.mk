@@ -59,7 +59,8 @@ PRODUCT_PACKAGES += \
 	modemassert \
 	nvitemd \
 	batterysrv \
-	refnotify
+	refnotify \
+	wcnd
 
 # general configs
 PRODUCT_COPY_FILES += \
