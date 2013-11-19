@@ -119,7 +119,7 @@ service engmodemclientt /system/bin/engmodemclient -t 1
     disabled
     oneshot
 
-service engpcclientt /system/bin/engpc -t 1 -a /dev/ttyGS0 -d /dev/ttyGS1
+service engpcclientt /system/bin/engpc -t 1
     class core
     user root
     group system radio shell
