@@ -104,6 +104,12 @@ service modemd /system/bin/modemd
     group system radio shell
     oneshot
 
+service wcnd /system/bin/wcnd
+    class core
+    user system
+    group system shell wifi inet
+    oneshot
+
 service engservicet /system/bin/engservice -t 1
     socket engtd stream 660 system system
     class core
