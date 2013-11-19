@@ -37,7 +37,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.com.android.dataroaming=false \
 	ro.msms.phone_count=2 \
 	persist.msms.phone_count=2 \
-	persist.msms.phone_default=0
+	persist.msms.phone_default=0 \
+	ro.modem.t.count=2
 
 # board-specific modules
 PRODUCT_PACKAGES += \

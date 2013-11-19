@@ -15,7 +15,6 @@ conn.connectivity_change_delay = 0
 
 ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
 
-ro.modem.count=1
 ro.modem.t.enable=1
 ro.modem.t.dev=/dev/cpt
 ro.modem.t.tty=/dev/stty_td
@@ -27,7 +26,6 @@ ro.modem.t.nv=/dev/spipe_td1
 ro.modem.t.assert=/dev/spipe_td2
 ro.modem.t.vbc=/dev/spipe_td6
 ro.modem.t.id=0
-ro.modem.t.count=1
 
 ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn
