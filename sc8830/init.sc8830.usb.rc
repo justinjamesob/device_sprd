@@ -6,6 +6,12 @@ on boot
     write /sys/class/android_usb/android0/f_rndis/vendorID 8
     write /sys/class/android_usb/android0/f_rndis/wceis 1
 
+on fs
+    mkdir /dev/usb-ffs 0770 shell shell
+    mkdir /dev/usb-ffs/adb 0770 shell shell
+    mount functionfs adb /dev/usb-ffs/adb uid=2000,gid=2000
+    write /sys/class/android_usb/android0/f_ffs/aliases adb
+
 on property:sys.usb.config=mtp
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 1782
@@ -94,7 +100,7 @@ on property:sys.usb.config=rndis,vser,adb
     write /sys/class/android_usb/android0/idVendor 1782
     write /sys/class/android_usb/android0/idProduct 5d25
     write /sys/class/android_usb/android0/f_gser/port_count 6
-    write /sys/class/android_usb/android0/functions rndis,adb,gser
+    write /sys/class/android_usb/android0/functions rndis,ffs,gser
     write /sys/class/android_usb/android0/bDeviceClass 0
     write /sys/class/android_usb/android0/enable 1
     start adbd
@@ -156,7 +162,7 @@ on property:sys.usb.config=mass_storage,adb,vser,gser
     write /sys/class/android_usb/android0/f_mass_storage/lun/file '\0'
     write /sys/class/android_usb/android0/f_mass_storage/lun/cdrom 0
     write /sys/class/android_usb/android0/f_mass_storage/lun/ro 0
-    write /sys/class/android_usb/android0/functions mass_storage,adb,gser6
+    write /sys/class/android_usb/android0/functions mass_storage,ffs,gser
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state $sys.usb.config
@@ -204,7 +210,8 @@ on property:sys.usb.config=adb,vser,gser
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 1782
     write /sys/class/android_usb/android0/idProduct 5d24
-    write /sys/class/android_usb/android0/functions adb,gser6
+    write /sys/class/android_usb/android0/f_gser/port_count 6
+    write /sys/class/android_usb/android0/functions ffs,gser
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state $sys.usb.config
