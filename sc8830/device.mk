@@ -28,8 +28,9 @@ PRODUCT_PACKAGES += \
 	libstagefright_sprd_h264dec \
 	libstagefright_sprd_h264enc \
 	libstagefright_sprd_vpxdec \
-#	libstagefright_soft_mjpgdec \
-#	libstagefright_sprd_aacdec \
+	libstagefright_soft_mjpgdec \
+	libstagefright_soft_imaadpcmdec \
+	libstagefright_sprd_aacdec
 #	libstagefright_sprd_mp3dec
 
 # default audio
