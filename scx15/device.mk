@@ -72,12 +72,10 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/init.scx15.rc:root/init.scx15.rc \
 	$(PLATDIR)/init.scx15.usb.rc:root/init.scx15.usb.rc \
 	$(PLATDIR)/ueventd.scx15.rc:root/ueventd.scx15.rc \
-	$(PLATDIR)/fstab.scx15:root/fstab.scx15 \
 	$(PLATDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
 	$(PLATDIR)/sci-keypad.kl:system/usr/keylayout/sci-keypad.kl \
 	$(PLATDIR)/media_codecs.xml:system/etc/media_codecs.xml \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
-	$(PLATDIR)/nvitem_td.cfg:system/etc/nvitem_td.cfg \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
 	vendor/sprd/open-source/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \

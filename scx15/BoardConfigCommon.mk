@@ -43,8 +43,7 @@ BOARD_SEPOLICY_UNION := \
        file_contexts
 
 # recovery configs
-TARGET_RECOVERY_FSTAB := device/sprd/scx15/recovery.fstab
-TARGET_RECOVERY_INITRC := device/sprd/scx15/recovery.rc
+TARGET_RECOVERY_INITRC := device/sprd/scx15/recovery/init.rc
 TARGET_RECOVERY_UI_LIB := librecovery_ui_sp8830
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBA_8888"
 
