@@ -15,9 +15,9 @@
 #
 
 TARGET_PLATFORM := sc8830
-PLATDIR := device/sprd/$(TARGET_PLATFORM)
+PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := sp8830ec
+TARGET_BOARD := scx35_sp8830ec
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -35,10 +35,10 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=1 \
-	persist.msms.phone_count=1 \
+	ro.msms.phone_count=2 \
+	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
-	ro.modem.t.count=1
+	ro.modem.t.count=2
 
 # board-specific modules
 PRODUCT_PACKAGES += \
@@ -57,7 +57,7 @@ $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 # Overrides
-PRODUCT_NAME := sp8830ecbase
+PRODUCT_NAME := scx35_sp8830ecplus
 PRODUCT_DEVICE := $(TARGET_BOARD)
 PRODUCT_MODEL := sp8830ec
 PRODUCT_BRAND := Spreadtrum

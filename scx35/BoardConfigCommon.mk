@@ -37,14 +37,14 @@ BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
 
 # config sepolicy
-BOARD_SEPOLICY_DIRS := device/sprd/sc8830/sepolicy
+BOARD_SEPOLICY_DIRS := device/sprd/scx35/sepolicy
 BOARD_SEPOLICY_UNION := \
        file.te \
        file_contexts
 
 # recovery configs
-TARGET_RECOVERY_FSTAB := device/sprd/sc8830/recovery.fstab
-TARGET_RECOVERY_INITRC := device/sprd/sc8830/recovery.rc
+TARGET_RECOVERY_FSTAB := device/sprd/scx35/recovery/recovery.fstab
+TARGET_RECOVERY_INITRC := device/sprd/scx35/recovery/init.rc
 TARGET_RECOVERY_UI_LIB := librecovery_ui_sp8830
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBA_8888"
 

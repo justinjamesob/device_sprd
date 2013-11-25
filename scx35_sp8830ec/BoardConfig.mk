@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
--include device/sprd/sc8830/BoardConfigCommon.mk
+-include device/sprd/scx35/BoardConfigCommon.mk
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp8830ec
