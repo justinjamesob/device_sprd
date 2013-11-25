@@ -88,6 +88,7 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-256-dalvik-heap.mk)
 
+USE_PROJECT_SEC :=false
 # include classified configs
 $(call inherit-product, $(BOARDDIR)/base.mk)
 $(call inherit-product, $(BOARDDIR)/proprietories.mk)
@@ -112,4 +113,12 @@ PRODUCT_LOCALES := zh_CN zh_TW en_US
 ifeq ($(MULTILANGUAGE_SUPPORT),true)
   PRODUCT_PACKAGES += $(MULTILANGUAGE_PRODUCT_PACKAGES)
   PRODUCT_LOCALES := zh_CN zh_TW en_US fr_BE in_ID hi_IN ru_RU es_ES vi_VN bn_BD th_TH te_IN
+endif
+ifeq ($(USE_PROJECT_SEC),true)
+USE_PROJECT_SEC_NATIVE :=true
+  PRODUCT_PROPERTY_OVERRIDES += \
+  persist.support.securetest=1
+  PRODUCT_PACKAGES += \
+        choose_secure \
+        framework-se-res.apk
 endif

@@ -115,6 +115,14 @@ PRODUCT_COPY_FILES := \
 	frameworks/native/data/etc/android.hardware.touchscreen.xml:system/etc/permissions/android.hardware.touchscreen.xml \
 	device/sprd/common/res/apn/apns-conf.xml:system/etc/apns-conf.xml
 
+ifeq ($(USE_PROJECT_SEC),true)
+# prebuild files
+PRODUCT_PACKAGES += \
+	Permission.apk 
+
+PRODUCT_COPY_FILES += \
+frameworks/base/core/java/com/sprd/telephonesec.db:/system/etc/telephonesec.db
+endif
 $(call inherit-product, $(BOARDDIR)/../common/apps/engineeringmodel/module.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm40181/device-bcm.mk)

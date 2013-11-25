@@ -110,6 +110,7 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-256-dalvik-heap.mk)
 
+USE_PROJECT_SEC :=false
 # include classified configs
 $(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 $(call inherit-product, $(BOARDDIR)/base.mk)
@@ -134,3 +135,11 @@ PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
 HAVE_WLAN_CU_FEATURE := true
+ifeq ($(USE_PROJECT_SEC),true)
+  USE_PROJECT_SEC_NATIVE :=true
+  PRODUCT_PROPERTY_OVERRIDES += \
+  persist.support.securetest=1
+  PRODUCT_PACKAGES += \
+        choose_secure \
+        framework-se-res.apk
+endif
