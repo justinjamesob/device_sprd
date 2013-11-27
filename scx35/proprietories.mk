@@ -28,6 +28,6 @@ PROPMODS := \
 	system/lib/libreference-ril_sp.so \
 	system/bin/phoneserver
 
-PRODUCT_COPY_FILES := $(foreach f,$(PROPMODS),vendor/sprd/proprietories/sp8830ec/$(f):$(f))
+PRODUCT_COPY_FILES := $(foreach f,$(PROPMODS),vendor/sprd/proprietories/scx35/$(f):$(f))
 
 endif
