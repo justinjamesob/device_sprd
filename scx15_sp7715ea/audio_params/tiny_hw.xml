@@ -1,5 +1,5 @@
 <!-- TinyHAL configuration file for GOD -->
-<tinyalsa-audio device="SC8830 audio">
+<tinyalsa-audio device="scx15 audio">
 
    <!-- We are able to have most of our routing static so do that -->
    <path>
