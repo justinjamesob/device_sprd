@@ -137,7 +137,7 @@ public:
     virtual status_t    storeMetaDataInBuffers(bool enable);
     SprdCameraHardware(int cameraId);
     virtual             ~SprdCameraHardware();	
-    inline  int         getCameraId() const;
+    int         getCameraId() const;
 
 	int flush_buffer(CameraFlushMemTypeEnum  type ,  void *v_addr, void *p_addr, int size);
 

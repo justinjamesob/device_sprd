@@ -1276,6 +1276,15 @@ static CameraInfo sCameraInfo3[] = {
     } 
 };
 
+
+#ifdef CONFIG_CAMERA_ROTATION_CAPTURE
+uint32_t getSensorFixRotation(int sensorId)
+{
+    //assert(0 == sensorId || 1 == sensorId);
+    return sCameraInfo[sensorId].orientation;
+}
+#endif
+
 void* SprdCameraHardware::get_preview_mem(uint32_t size,
                                                                                                                   uint32_t *phy_addr,
                                                                                                                   uint32_t index)

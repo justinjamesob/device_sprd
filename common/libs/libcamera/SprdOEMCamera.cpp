@@ -1885,8 +1885,8 @@ int camera_preview_init(void)
     	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;   
 	fmt.fmt.pix.width = g_dcam_dimensions.display_width;   
     	fmt.fmt.pix.height = g_dcam_dimensions.display_height;   
-    //V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV420 ！ Planar formats with 1/2 horizontal and vertical chroma resolution, also known as YUV 4:2:0   
-    //V4L2_PIX_FMT_YUYV ！ Packed format with 1/2 horizontal chroma resolution, also known as YUV 4:2:2   
+    //V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV420 \A1\AA Planar formats with 1/2 horizontal and vertical chroma resolution, also known as YUV 4:2:0   
+    //V4L2_PIX_FMT_YUYV \A1\AA Packed format with 1/2 horizontal chroma resolution, also known as YUV 4:2:2   
     //wxz: pixelformat support: V4L2_PIX_FMT_YUV420 and V4L2_PIX_FMT_RGB24;
     	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P; //V4L2_PIX_FMT_RGB32;//V4L2_PIX_FMT_RGB565X, //V4L2_PIX_FMT_YUYV; //wxz:TOOD
     	fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;   
@@ -2743,8 +2743,8 @@ int camera_capture_init(void)
     	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;   
 	fmt.fmt.pix.width = g_dcam_dimensions.picture_width;   
     	fmt.fmt.pix.height = g_dcam_dimensions.picture_height;   
-    //V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV420 ！ Planar formats with 1/2 horizontal and vertical chroma resolution, also known as YUV 4:2:0   
-    //V4L2_PIX_FMT_YUYV ！ Packed format with 1/2 horizontal chroma resolution, also known as YUV 4:2:2   
+    //V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV420 \A1\AA Planar formats with 1/2 horizontal and vertical chroma resolution, also known as YUV 4:2:0   
+    //V4L2_PIX_FMT_YUYV \A1\AA Packed format with 1/2 horizontal chroma resolution, also known as YUV 4:2:2   
     //wxz: pixelformat support: V4L2_PIX_FMT_YUV420 and V4L2_PIX_FMT_RGB24;
     	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;//V4L2_PIX_FMT_YUYV; //wxz:TOOD
     	fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;   
