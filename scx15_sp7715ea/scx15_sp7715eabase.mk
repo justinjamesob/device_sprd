@@ -42,7 +42,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.modem.w.count=1
 
 # board-specific modules
-#PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES += \
+        sensors.$(TARGET_PLATFORM)
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
