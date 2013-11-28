@@ -102,8 +102,6 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 
-$(call inherit-product, vendor/sprd/open-source/apps/engineeringmodel/module.mk)
-
 ifeq ($(TARGET_BUILD_VARIANT),user)
 	PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=1
 else
