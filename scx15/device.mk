@@ -42,6 +42,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	lights.scx15 \
 	gralloc.scx15 \
+	camera.scx15 \
 	audio.primary.scx15 \
 	audio_policy.default \
 #	gralloc.sc8830 \
