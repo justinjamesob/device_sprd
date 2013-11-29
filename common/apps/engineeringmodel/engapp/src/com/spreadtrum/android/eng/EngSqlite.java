@@ -181,6 +181,12 @@ public class EngSqlite {
 			}
 		}
 
+        @Override
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // TODO Auto-generated method stub
+            onUpgrade(db, oldVersion, newVersion);
+        }
+
     }
 
 }
