@@ -101,7 +101,7 @@ service engpcclient /system/bin/engpc
     group root
 
 #nvitemd
-service nvitemd_w /bin/nvitemd /dev/spipe_w1 /nvitem_w.cfg TRUE
+service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 /system/etc/nvitem_w.cfg TRUE
     class cali
     user root
     group root
