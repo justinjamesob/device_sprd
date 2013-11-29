@@ -21,7 +21,7 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx15/emmc/recovery.fstab
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := scx15_sp7715ea
-UBOOT_DEFCONFIG := spx15
+UBOOT_DEFCONFIG := sp7715ea
 KERNEL_DEFCONFIG := sp7715ea-native_defconfig
 
 # select camera 2M,3M,5M,8M

@@ -28,7 +28,7 @@ TARGET_BOARD_PLATFORM := scx15
 WITH_DEXPREOPT := true
 
 # config u-boot
-TARGET_NO_BOOTLOADER := true
+TARGET_NO_BOOTLOADER := false
 
 # config kernel
 TARGET_NO_KERNEL := false
