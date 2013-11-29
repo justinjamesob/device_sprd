@@ -45,10 +45,8 @@ PRODUCT_PACKAGES += \
 	camera.scx15 \
 	audio.primary.scx15 \
 	audio_policy.default \
-#	gralloc.sc8830 \
-#	camera.sc8830 \
 
-#	hwcomposer.sc8830 \
+	hwcomposer.scx15 \
 #	sensors.sc8830
 
 # misc modules
