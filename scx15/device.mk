@@ -45,8 +45,7 @@ PRODUCT_PACKAGES += \
 	camera.scx15 \
 	audio.primary.scx15 \
 	audio_policy.default \
-
-	hwcomposer.scx15 \
+	hwcomposer.scx15
 #	sensors.sc8830
 
 # misc modules
