@@ -25,7 +25,7 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_BOARD_PLATFORM := sc8830
 
 # Enable dex-preoptimization
-WITH_DEXPREOPT := true
+WITH_DEXPREOPT := false
 
 # config u-boot
 TARGET_NO_BOOTLOADER := false
