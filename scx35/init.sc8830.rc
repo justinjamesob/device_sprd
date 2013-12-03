@@ -40,6 +40,12 @@ on early-boot
     mkdir /data/local/media 0777 media system
 
 on boot
+    # SPRD: add for theme setting @{
+    mkdir /data/theme 0775 theme system
+    mkdir /data/theme/overlay 0775 theme system
+    mkdir /data/theme/additional 0775 theme system
+    mkdir /data/theme/default 0775 theme system
+    # @}
     chown system system /sys/class/backlight/sprd_backlight/brightness
 
     chown system system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
