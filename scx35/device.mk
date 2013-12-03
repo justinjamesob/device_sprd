@@ -56,6 +56,7 @@ PRODUCT_PACKAGES += \
 	charge \
 	e2fsck \
 	tinymix \
+	audio_vbc_eq \
 	calibration_init \
 	modemd \
 	engpc \
