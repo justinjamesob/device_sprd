@@ -41,8 +41,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msmslt=0 \
 	ro.modem.w.count=2 \
 	persist.sys.modem.diag=,gser \
-	sys.usb.gser.count=4 \
-	ro.ril.ecclist=112,911,*911,\#911,110,119,120
+	sys.usb.gser.count=4
 
 # board-specific modules
 #PRODUCT_PACKAGES += \

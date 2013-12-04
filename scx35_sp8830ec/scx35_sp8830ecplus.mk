@@ -38,8 +38,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.msms.phone_count=2 \
 	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
-	ro.modem.t.count=2 \
-	ro.ril.ecclist=112,911,*911,\#911,110,119,120
+	ro.modem.t.count=2
 
 # board-specific modules
 PRODUCT_PACKAGES += \
