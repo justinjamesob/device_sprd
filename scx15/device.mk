@@ -48,6 +48,11 @@ PRODUCT_PACKAGES += \
 	hwcomposer.scx15
 #	sensors.sc8830
 
+ifeq ($(strip $(TARGET_BOARD_CAMERA_HAL_VERSION_DUAL)),true)
+PRODUCT_PACKAGES += \
+	camera2.scx15
+endif
+
 # misc modules
 PRODUCT_PACKAGES += \
 	sqlite3 \
