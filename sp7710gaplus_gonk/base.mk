@@ -16,6 +16,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 
 # original apps copied from generic_no_telephony.mk
 PRODUCT_PACKAGES := \
+	librecovery \
 	DeskClock \
 	Bluetooth \
 	Calculator \
