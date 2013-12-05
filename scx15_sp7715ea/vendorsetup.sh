@@ -15,3 +15,5 @@
 #
 
 add_lunch_combo scx15_sp7715eabase-userdebug
+add_lunch_combo scx15_sp7715eaplus-userdebug
+add_lunch_combo scx15_sp7715eacuccspecAplus_UUI-userdebug
