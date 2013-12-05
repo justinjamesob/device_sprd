@@ -43,15 +43,11 @@ PRODUCT_PACKAGES += \
 	lights.scx15 \
 	gralloc.scx15 \
 	camera.scx15 \
+	camera2.scx15 \
 	audio.primary.scx15 \
 	audio_policy.default \
 	hwcomposer.scx15
 #	sensors.sc8830
-
-ifeq ($(strip $(TARGET_BOARD_CAMERA_HAL_VERSION_DUAL)),true)
-PRODUCT_PACKAGES += \
-	camera2.scx15
-endif
 
 # misc modules
 PRODUCT_PACKAGES += \
