@@ -41,12 +41,6 @@ on early-boot
     mkdir /data/local/media 0777 media system
 
 on boot
-    # SPRD: add for theme setting @{
-    mkdir /data/theme 0775 theme system
-    mkdir /data/theme/overlay 0775 theme system
-    mkdir /data/theme/additional 0775 theme system
-    mkdir /data/theme/default 0775 theme system
-    # @}
     chown system system /sys/class/backlight/sprd_backlight/brightness
 
     chown system system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
@@ -99,6 +93,15 @@ on property:ro.modem.t.count=1
 on property:ro.modem.t.count=2
     write /proc/sim/0 t
     write /proc/sim/1 t
+
+# SPRD: add for theme setting @{
+on property:universe_ui_support=true
+    start theme_init
+
+service theme_init /system/bin/theme_init.sh
+    disabled
+    oneshot
+# @}
 
 service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start
