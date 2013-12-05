@@ -19,6 +19,7 @@ on init
     # Support legacy paths
     symlink /storage/emulated/legacy /sdcard
     symlink /storage/emulated/legacy /mnt/sdcard
+    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
 on fs
     mount_all /fstab.scx15
