@@ -16,3 +16,5 @@
 
 add_lunch_combo scx35_sp8830ecbase-userdebug
 add_lunch_combo scx35_sp8830ecplus-userdebug
+add_lunch_combo scx35_sp8830eccmccspecAplus_UUI-userdebug
+

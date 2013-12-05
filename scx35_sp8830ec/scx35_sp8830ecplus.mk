@@ -46,6 +46,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM)
 
+PRODUCT_PACKAGES += \
+        VideoWallpaper \
+        SprdRamOptimzer
+
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
