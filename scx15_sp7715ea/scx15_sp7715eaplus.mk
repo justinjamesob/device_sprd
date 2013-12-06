@@ -45,8 +45,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM) \
-        Stk1
+        sensors.$(TARGET_PLATFORM)
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal

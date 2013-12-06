@@ -47,7 +47,8 @@ PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM)
 
 PRODUCT_PACKAGES += \
-        Stk1
+        VideoWallpaper \
+        SprdRamOptimzer
 
 # board-specific files
 PRODUCT_COPY_FILES += \
