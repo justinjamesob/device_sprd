@@ -43,9 +43,13 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4
 
+include device/sprd/common/product_packages.mk
+
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM)
+        sensors.$(TARGET_PLATFORM) \
+        Stk1
+
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
