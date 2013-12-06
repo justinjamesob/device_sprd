@@ -1,5 +1,6 @@
 on early-init
     start ueventd
+    start healthd
 
 on init
     export PATH /system/bin:/sbin
@@ -64,7 +65,13 @@ on adb_enable
     setprop sys.usb.config adb,vser,gser
 # @}
 
+on property:sys.powerctl=*
+   powerctl ${sys.powerctl}
+
 service ueventd /sbin/ueventd
+    critical
+
+service healthd /sbin/healthd -n
     critical
 
 service recovery /sbin/recovery

@@ -3,9 +3,8 @@ LOCAL_PATH := $(call my-dir)
 $(call add-radio-file,modem_bins/wmodem.bin)
 $(call add-radio-file,modem_bins/wnvitem.bin)
 $(call add-radio-file,modem_bins/wdsp.bin)
-
-# $(call add-radio-file,modem_bins/wcnnvitem.bin)
-# $(call add-radio-file,modem_bins/wcnmodem.bin)
+$(call add-radio-file,modem_bins/wcnnvitem.bin)
+$(call add-radio-file,modem_bins/wcnmodem.bin)
 
 # Compile U-Boot
 ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)
