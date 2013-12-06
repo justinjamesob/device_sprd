@@ -46,7 +46,8 @@ include device/sprd/common/product_packages.mk
 
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM)
+        sensors.$(TARGET_PLATFORM) \
+        fm.$(TARGET_PLATFORM)
 
 include device/sprd/common/product_packages.mk
 
