@@ -37,8 +37,9 @@ on init
     write /sys/class/android_usb/android0/iProduct "Gadget Serial"
     write /sys/class/android_usb/android0/iSerial 19761202
 
-on fs
-   mount_all /fstab.scx15
+# SPRD: move mount_all to cali mode
+#on fs
+#   mount_all /fstab.scx15
 
 on post-fs
     write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
@@ -101,6 +102,7 @@ on property:service.adb.root=1
 
 on cali
     class_start cali
+    mount_all /fstab.scx15
 
 service engpcclient /system/bin/engpc
     class cali
