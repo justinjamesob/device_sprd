@@ -36,10 +36,10 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=1 \
-	persist.msms.phone_count=1 \
+	ro.msms.phone_count=2 \
+	persist.msms.phone_count=2 \
 	persist.msmslt=0 \
-	ro.modem.w.count=1 \
+	ro.modem.w.count=2 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4
 
