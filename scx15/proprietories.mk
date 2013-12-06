@@ -6,12 +6,8 @@ OPENMAX := libomx_m4vh263dec_sw_sprd libomx_m4vh263dec_hw_sprd libomx_m4vh263enc
 	libomx_avcdec_hw_sprd libomx_avcdec_sw_sprd libomx_avcenc_hw_sprd libomx_vpxdec_hw_sprd	\
 	libstagefright_sprd_soft_mpeg4dec libstagefright_sprd_soft_h264dec
 
-PRODUCT_PACKAGES := \
-	$(OPENMAX) \
-	rild_sp \
-	libril_sp \
-	libreference-ril_sp \
-	phoneserver 
+# include PRODUCT_PACKAGES
+include device/sprd/common/product_packages.mk
 
 else
 # for spreadtrum customer proprietories modules: only support direct copy
