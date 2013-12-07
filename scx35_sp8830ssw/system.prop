@@ -29,4 +29,5 @@ ro.modem.w.nv=/dev/spipe_w1
 ro.modem.w.assert=/dev/spipe_w2
 ro.modem.w.vbc=/dev/spipe_w
 ro.modem.w.id=0
+camera.disable_zsl_mode=1
 
