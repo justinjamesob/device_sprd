@@ -2,7 +2,7 @@
 PRODUCT_PACKAGES += \
 	AudioProfile \
 	FMPlayer \
-	RamOptimizer \
+	SprdRamOptimizer \
 	VideoWallpaper \
 	FileExplorer \
 	NoteBook \
