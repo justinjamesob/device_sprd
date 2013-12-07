@@ -6,4 +6,5 @@ PRODUCT_PACKAGES += \
 	VideoWallpaper \
 	FileExplorer \
 	NoteBook \
-	libsprddm
+	libsprddm \
+	EngineerMode
