@@ -7,4 +7,5 @@ PRODUCT_PACKAGES += \
 	FileExplorer \
 	NoteBook \
 	libsprddm \
-	EngineerMode
+	EngineerMode \
+	DrmProvider
