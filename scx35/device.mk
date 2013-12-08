@@ -67,7 +67,9 @@ PRODUCT_PACKAGES += \
 	nvitemd \
 	batterysrv \
 	refnotify \
-	wcnd
+	wcnd \
+	libsprdstreamrecoder \
+	libvtmanager
 
 # general configs
 PRODUCT_COPY_FILES += \
