@@ -46,7 +46,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
-        fm.$(TARGET_PLATFORM)
+        fm.$(TARGET_PLATFORM) \
+        EngineerMode
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
