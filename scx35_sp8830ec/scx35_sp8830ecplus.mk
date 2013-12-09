@@ -50,7 +50,8 @@ PRODUCT_PACKAGES += \
         fm.$(TARGET_PLATFORM)
 
 PRODUCT_PACKAGES += \
-        Stk1
+        Stk1 \
+        CallFireWall
 
 # board-specific files
 PRODUCT_COPY_FILES += \
