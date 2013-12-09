@@ -53,6 +53,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	sqlite3 \
 	charge \
+	poweroff_alarm \
+	mplayer \
 	e2fsck \
 	tinymix \
 	audio_vbc_eq \
