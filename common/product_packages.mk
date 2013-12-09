@@ -8,4 +8,5 @@ PRODUCT_PACKAGES += \
 	NoteBook \
 	libsprddm \
 	EngineerMode \
-	DrmProvider
+	DrmProvider \
+       CallFireWall
