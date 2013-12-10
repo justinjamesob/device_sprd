@@ -26,6 +26,8 @@ on fs
     setprop ro.crypto.fuse_sdcard true
 
 on post-fs
+    chown system system /productinfo
+    chmod 0774 /productinfo
     insmod /system/lib/modules/ump.ko
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
@@ -78,6 +80,11 @@ on boot
 
 on charger
     class_start core
+
+on alarm
+    class_start core
+    start media
+    exec /bin/poweroff_alarm
 
 on property:ro.debuggable=1
     write /sys/kernel/debug/fatal_dump/enable 1

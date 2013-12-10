@@ -119,3 +119,5 @@ service iprenew_bnep0 /system/bin/dhcpcd -n
     disabled
     oneshot
 
+on alarm
+    insmod /system/lib/modules/focaltech_ts.ko
