@@ -101,8 +101,8 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 1
 
 on cali
-    class_start cali
     mount_all /fstab.sc8830
+    class_start cali
 
 service engpcclient /system/bin/engpc
     class cali
