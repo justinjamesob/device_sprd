@@ -40,7 +40,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msms.phone_default=0 \
 	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=6
+        sys.usb.gser.count=4
 
 include device/sprd/common/product_packages.mk
 
