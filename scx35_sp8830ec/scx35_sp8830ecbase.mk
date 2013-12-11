@@ -42,14 +42,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4
 
-include device/sprd/common/product_packages.mk
-
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM)
-
-include device/sprd/common/product_packages.mk
 
 # board-specific files
 PRODUCT_COPY_FILES += \
@@ -62,6 +58,8 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 
 # Overrides
 PRODUCT_NAME := scx35_sp8830ecbase

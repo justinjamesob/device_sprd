@@ -7,4 +7,3 @@ PRODUCT_NAME := scx35_sp8830eccmccspecAplus_UUI
 
 $(call inherit-product, vendor/sprd/operator/cmcc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
-$(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
