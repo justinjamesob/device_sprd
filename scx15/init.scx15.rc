@@ -17,8 +17,10 @@ on init
     export EMULATED_STORAGE_TARGET /storage/emulated
 
     # Support legacy paths
-    symlink /storage/emulated/legacy /sdcard
-    symlink /storage/emulated/legacy /mnt/sdcard
+    # move this to board level init @{
+    #symlink /storage/emulated/legacy /sdcard
+    #symlink /storage/emulated/legacy /mnt/sdcard
+    # @}
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
 on fs
@@ -110,7 +112,23 @@ service theme_init /system/bin/theme_init.sh
     oneshot
 # @}
 
-service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+# add for storage manage @{
+on property:persist.storage.type=1
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/media/temp_sd 0775 media_rw media_rw
+    start fuse_tempsd
+    start legacy_tempsd
+
+service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -l /data/media/temp_sd /storage/temp_sd
+    disabled
+
+service fuse_tempsd /system/bin/sdcard -u 1023 -g 1023 -l /data/media/temp_sd /storage/sdcard0
+    class late_start
+    disabled
+# @}
+
+# modify for physical external storage could be writable
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start
     disabled
 

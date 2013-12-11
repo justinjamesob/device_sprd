@@ -8,7 +8,6 @@ ro.product.hardware=CORSICA_VE_V1.0.0
 debug.hwui.render_dirty_regions=false
 
 persist.ttydev=ttyVUART0
-persist.storage.type=1
 
 # delay for ConnectivityChange broadcast (ms)
 conn.connectivity_change_delay = 0

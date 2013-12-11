@@ -30,7 +30,7 @@ PRODUCT_AAPT_CONFIG := hdpi xhdpi
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-	persist.sys.usb.config=mass_storage
+	persist.sys.usb.config=mtp
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
