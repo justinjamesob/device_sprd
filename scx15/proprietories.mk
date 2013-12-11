@@ -3,8 +3,8 @@ ifneq ($(shell ls -d vendor/sprd/proprietories-source 2>/dev/null),)
 # for spreadtrum internal proprietories modules: only support package module names
 
 OPENMAX := libomx_m4vh263dec_sw_sprd libomx_m4vh263dec_hw_sprd libomx_m4vh263enc_hw_sprd \
-	libomx_avcdec_hw_sprd libomx_avcdec_sw_sprd libomx_avcenc_hw_sprd libomx_vpxdec_hw_sprd	\
-	libstagefright_sprd_soft_mpeg4dec libstagefright_sprd_soft_h264dec
+	libomx_avcdec_hw_sprd libomx_avcdec_sw_sprd libomx_avcenc_hw_sprd libomx_vpxdec_hw_sprd \
+	libomx_aacdec_sprd libomx_mp3dec_sprd
 
 PRODUCT_PACKAGES := \
 	$(OPENMAX) \
@@ -24,8 +24,8 @@ PROPMODS := \
 	system/lib/libomx_avcdec_sw_sprd.so \
 	system/lib/libomx_avcenc_hw_sprd.so	\
 	system/lib/libomx_vpxdec_hw_sprd.so	\
-	system/lib/libstagefright_sprd_soft_mpeg4dec.so \
-	system/lib/libstagefright_sprd_soft_h264dec.so \
+	system/lib/libomx_aacdec_sprd \
+	system/lib/libomx_mp3dec_sprd \
 	system/bin/rild_sp \
 	system/lib/libril_sp.so \
 	system/lib/libreference-ril_sp.so \
