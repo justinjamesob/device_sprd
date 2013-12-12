@@ -101,6 +101,7 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 1
 
 on cali
+    ubiattach 0 ubipac
     mount_all /fstab.scx15
     class_start cali
 
