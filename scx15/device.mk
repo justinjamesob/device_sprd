@@ -48,7 +48,7 @@ PRODUCT_PACKAGES += \
 	camera.scx15 \
 	camera2.scx15 \
 	audio.primary.scx15 \
-	audio_policy.default \
+	audio_policy.scx15 \
 	hwcomposer.scx15
 #	sensors.sc8830
 
@@ -88,9 +88,7 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
 	vendor/sprd/open-source/res/productinfo/2351_connectivity_configure.ini:prodnv/2351_connectivity_configure.ini \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
-	vendor/sprd/open-source/libs/audio/apm/devicevolume.xml:system/etc/devicevolume.xml \
-	vendor/sprd/open-source/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
-	vendor/sprd/open-source/libs/audio/audio_policy.conf:system/etc/audio_policy.conf \
+	vendor/sprd/open-source/libs/audio/apm/audio_policy.conf:system/etc/audio_policy.conf \
 	vendor/sprd/open-source/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	vendor/sprd/open-source/apps/scripts/ext_data.sh:system/bin/ext_data.sh \
 	frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
