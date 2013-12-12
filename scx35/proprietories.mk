@@ -24,8 +24,8 @@ PROPMODS := \
 	system/lib/libomx_avcdec_sw_sprd.so \
 	system/lib/libomx_avcenc_hw_sprd.so	\
 	system/lib/libomx_vpxdec_hw_sprd.so	\
-	system/lib/libomx_aacdec_sprd \
-	system/lib/libomx_mp3dec_sprd \
+	system/lib/libomx_aacdec_sprd.so \
+	system/lib/libomx_mp3dec_sprd.so \
 	system/bin/rild_sp \
 	system/lib/libril_sp.so \
 	system/lib/libreference-ril_sp.so \
