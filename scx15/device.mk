@@ -70,7 +70,8 @@ PRODUCT_PACKAGES += \
 	refnotify \
 	wcnd \
 	libsprdstreamrecoder \
-	libvtmanager
+	libvtmanager  \
+	zram.sh
 
 # general configs
 PRODUCT_COPY_FILES += \

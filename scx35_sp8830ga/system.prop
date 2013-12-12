@@ -41,3 +41,7 @@ ro.digital.fm.support=1
 
 
 ro.config.ksm.support=true
+
+#zram config
+ro.config.zram.support=true
+ro.board_ram_size=mid
