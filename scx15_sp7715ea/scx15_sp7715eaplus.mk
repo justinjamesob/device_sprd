@@ -47,7 +47,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
-	fm.$(TARGET_PLATFORM)
+        fm.$(TARGET_PLATFORM) \
+        ValidationTools
 
 #	libmllite.so \
 #	libmplmpu.so \
