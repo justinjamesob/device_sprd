@@ -84,7 +84,7 @@ on charger
 on alarm
     class_start core
     start media
-    exec /bin/poweroff_alarm
+    exec /system/bin/poweroff_alarm
 
 on property:ro.debuggable=1
     write /sys/kernel/debug/fatal_dump/enable 1
