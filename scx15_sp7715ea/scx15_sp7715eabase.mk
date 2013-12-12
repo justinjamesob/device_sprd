@@ -47,6 +47,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM) \
+        ValidationTools \
         EngineerMode
 #	libmllite.so \
 #	libmplmpu.so \

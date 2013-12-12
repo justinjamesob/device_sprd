@@ -44,7 +44,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM)
+        sensors.$(TARGET_PLATFORM) \
+        ValidationTools
 
 # board-specific files
 PRODUCT_COPY_FILES += \
