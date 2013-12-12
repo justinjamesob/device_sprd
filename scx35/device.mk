@@ -43,7 +43,7 @@ PRODUCT_PACKAGES += \
 # sprd HAL modules
 PRODUCT_PACKAGES += \
 	audio.primary.sc8830 \
-	audio_policy.default \
+	audio_policy.sc8830 \
 	gralloc.sc8830 \
 	camera.sc8830 \
 	camera2.sc8830 \
@@ -90,9 +90,7 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
 	vendor/sprd/open-source/res/productinfo/2351_connectivity_configure.ini:prodnv/2351_connectivity_configure.ini \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
-	vendor/sprd/open-source/libs/audio/apm/devicevolume.xml:system/etc/devicevolume.xml \
-	vendor/sprd/open-source/libs/audio/apm/formatvolume.xml:system/etc/formatvolume.xml \
-	vendor/sprd/open-source/libs/audio/audio_policy.conf:system/etc/audio_policy.conf \
+	vendor/sprd/open-source/libs/audio/apm/audio_policy.conf:system/etc/audio_policy.conf \
 	vendor/sprd/open-source/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	vendor/sprd/open-source/apps/scripts/ext_data.sh:system/bin/ext_data.sh \
 	frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
