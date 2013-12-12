@@ -76,6 +76,18 @@ on boot
     chown system root /proc/cpt/modem
     chown system root /proc/cpt/dsp
 
+    chmod 660 /proc/cpw/wdtirq
+    chmod 660 /proc/cpw/stop
+    chmod 660 /proc/cpw/start
+    chmod 660 /proc/cpw/modem
+    chmod 660 /proc/cpw/dsp
+
+    chown system root /proc/cpw/wdtirq
+    chown system root /proc/cpw/stop
+    chown system root /proc/cpw/start
+    chown system root /proc/cpw/modem
+    chown system root /proc/cpw/dsp
+
     chmod 660 /proc/cpwcn/wdtirq
     chmod 660 /proc/cpwcn/stop
     chmod 660 /proc/cpwcn/start
@@ -110,6 +122,13 @@ on property:ro.modem.t.count=1
 on property:ro.modem.t.count=2
     write /proc/sim/0 t
     write /proc/sim/1 t
+
+on property:ro.modem.w.count=1
+    write /proc/sim/0 w
+
+on property:ro.modem.w.count=2
+    write /proc/sim/0 w
+    write /proc/sim/1 w
 
 # SPRD: add for theme setting @{
 on property:universe_ui_support=true
@@ -259,6 +278,51 @@ service slog /system/bin/slog -t
 service refnotify /system/bin/refnotify -t 0
     class main
     user root
+
+service refnotify_w /system/bin/refnotify -t 1
+    class main
+    user root
+
+on property:persist.modem.w.enable=1
+    symlink /dev/slog_w /dev/vbpipe0
+    symlink /dev/spipe_w1 /dev/vbpipe1
+    symlink /dev/spipe_w2 /dev/vbpipe2
+    symlink /dev/spipe_w3 /dev/vbpipe3
+    symlink /dev/spipe_w6 /dev/vbpipe6
+    symlink /dev/stty_w0 /dev/ts0710mux0
+    symlink /dev/stty_w1 /dev/ts0710mux1
+    symlink /dev/stty_w2 /dev/ts0710mux2
+    symlink /dev/stty_w3 /dev/ts0710mux3
+    symlink /dev/stty_w4 /dev/ts0710mux4
+    symlink /dev/stty_w5 /dev/ts0710mux5
+    symlink /dev/stty_w6 /dev/ts0710mux6
+    symlink /dev/stty_w7 /dev/ts0710mux7
+    symlink /dev/stty_w8 /dev/ts0710mux8
+    symlink /dev/stty_w9 /dev/ts0710mux9
+    symlink /dev/stty_w10 /dev/ts0710mux10
+    symlink /dev/stty_w11 /dev/ts0710mux11
+    symlink /dev/stty_w12 /dev/ts0710mux12
+    symlink /dev/stty_w13 /dev/ts0710mux13
+    symlink /dev/stty_w14 /dev/ts0710mux14
+    symlink /dev/stty_w15 /dev/ts0710mux15
+    symlink /dev/stty_w16 /dev/ts0710mux16
+    symlink /dev/stty_w17 /dev/ts0710mux17
+    symlink /dev/stty_w18 /dev/ts0710mux18
+    symlink /dev/stty_w19 /dev/ts0710mux19
+    symlink /dev/stty_w20 /dev/ts0710mux20
+    symlink /dev/stty_w21 /dev/ts0710mux21
+    symlink /dev/stty_w22 /dev/ts0710mux22
+    symlink /dev/stty_w23 /dev/ts0710mux23
+    symlink /dev/stty_w24 /dev/ts0710mux24
+    symlink /dev/stty_w25 /dev/ts0710mux25
+    symlink /dev/stty_w26 /dev/ts0710mux26
+    symlink /dev/stty_w27 /dev/ts0710mux27
+    symlink /dev/stty_w28 /dev/ts0710mux28
+    symlink /dev/stty_w29 /dev/ts0710mux29
+    symlink /dev/stty_w30 /dev/ts0710mux30
+    symlink /dev/stty_w31 /dev/ts0710mux31
+
+
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u

@@ -26,7 +26,7 @@ ro.modem.w.diag=/dev/slog_w
 ro.modem.w.loop=/dev/spipe_w0
 ro.modem.w.nv=/dev/spipe_w1
 ro.modem.w.assert=/dev/spipe_w2
-ro.modem.w.vbc=/dev/spipe_w
+ro.modem.w.vbc=/dev/spipe_w6
 ro.modem.w.id=0
 camera.disable_zsl_mode=1
 

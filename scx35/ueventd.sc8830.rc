@@ -13,6 +13,7 @@
 /dev/mali               0666     system      graphics
 
 /dev/stty_td*           0660     radio       system
+/dev/stty_w*            0660    radio       system
 /dev/slog_td            0666     system      system
 /dev/spipe_td*          0666     system      system
 /dev/stty_w*            0660     radio       system
@@ -27,6 +28,20 @@
 /dev/spipe_w8           0666     system      system
 /dev/slog_wcn           0666     system      system
 /dev/spipe_wcn*         0666     system      system
+/dev/vbpipe1            0660     system  system
+/dev/vbpipe0            0660     system  system
+/dev/vbpipe6            0660     media   audio
+
+/dev/slog_w            0666     system  system
+/dev/spipe_w0          0666     system  system
+/dev/spipe_w1          0666     system  system
+/dev/spipe_w2          0666     system  system
+/dev/spipe_w3          0666     system  system
+/dev/spipe_w4          0666     system  system
+/dev/spipe_w5          0666     system  system
+/dev/spipe_w6          0660     media   audio
+/dev/spipe_w8          0666     system  system
+
 
 /dev/block/mmcblk0p*    0660     system      system
 /dev/vser               0660     system      system
