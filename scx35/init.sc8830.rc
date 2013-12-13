@@ -48,6 +48,11 @@ on early-boot
     # Support audio parameter stored
     mkdir /data/local/media 0777 media system
 
+    # add for storage manage @{
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/media/temp_sd 0775 media_rw media_rw
+    # @}
+
 on boot
     chown system system /sys/class/backlight/sprd_backlight/brightness
 
@@ -118,10 +123,13 @@ service theme_init /system/bin/theme_init.sh
 
 # add for storage manage @{
 on property:persist.storage.type=1
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/media/temp_sd 0775 media_rw media_rw
-    start fuse_tempsd
     start legacy_tempsd
+
+on property:sys.tempsd.enable=1
+    start fuse_tempsd
+
+on property:sys.tempsd.enable=0
+    stop fuse_tempsd
 
 service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -l /data/media/temp_sd /storage/temp_sd
     disabled

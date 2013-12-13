@@ -4,6 +4,7 @@ on early-fs
     symlink /storage/emulated/legacy /sdcard
     symlink /storage/emulated/legacy /mnt/sdcard
     setprop persist.storage.type 2
+    setprop sys.tempsd.enable 0
 # @}
 
 on boot
