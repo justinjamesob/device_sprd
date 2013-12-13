@@ -48,7 +48,8 @@ PRODUCT_PACKAGES += \
 	camera.sc8830 \
 	camera2.sc8830 \
 	lights.sc8830 \
-	hwcomposer.sc8830
+	hwcomposer.sc8830 \
+	sprd_gsp.sc8830
 #	sensors.sc8830
 
 # misc modules
