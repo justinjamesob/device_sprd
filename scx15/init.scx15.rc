@@ -35,7 +35,6 @@ on fs
 on post-fs
     chown system system /productinfo
     chmod 0774 /productinfo
-    insmod /system/lib/modules/ump.ko
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
 
