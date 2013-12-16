@@ -8608,7 +8608,8 @@
         authtype="1"
     />
     <!--Bug#224205 -->
-    <apn carrier="MTNL Internet"
+    <!--Bug#234082 -->
+    <apn carrier="Idea Internet"
         mcc="404"
         mnc="04"
         apn="internet"
@@ -8872,7 +8873,8 @@
         authtype="1"
     />
     <!--Bug#224205-->
-    <apn carrier="MTNL WAP"
+    <!--Bug#234082 -->
+    <apn carrier="Idea WAP"
         mcc="404"
         mnc="04"
         apn="imis"
@@ -9137,7 +9139,8 @@
         authtype="1"
     />
     <!--Bug#224205 -->
-    <apn carrier="MTNL MMS"
+    <!--Bug#234082-->
+    <apn carrier="Idea MMS"
         mcc="404"
         mnc="04"
         apn="mmsc"
