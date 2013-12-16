@@ -44,7 +44,12 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	sys.usb.gser.count=4
 
 # board-specific modules
-#PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES += \
+	sensors.$(TARGET_PLATFORM) \
+	fm.$(TARGET_PLATFORM) \
+	ValidationTools \
+	EngineerMode
+
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
@@ -60,6 +65,8 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 
 # Overrides
 PRODUCT_NAME := scx15_corsica_ve
