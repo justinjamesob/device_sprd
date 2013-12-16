@@ -3,9 +3,9 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 # <src>                                         <mnt_point>  <type>  <mnt_flags and options>             <fs_mgr_flags>
 
-ubi0:system			/system			ubifs  rw,compr=none						wait
-ubi0:userdata		/data			ubifs  noatime,nosuid,nodev,compr=none		wait,encryptable=footer
-ubi0:cache			/cache			ubifs  noatime,nosuid,nodev,compr=none		wait
-ubi0:productinfo			/productinfo	ubifs  noatime,nosuid,nodev,compr=none		wait
+ubi0:system                     /system         ubifs  rw,compr=none                            wait
+ubi0:userdata                   /data           ubifs  noatime,nosuid,nodev,compr=none          wait,encryptable=footer
+ubi0:cache                      /cache          ubifs  noatime,nosuid,nodev,compr=none          wait
+ubi0:prodnv                     /productinfo    ubifs  noatime,nosuid,nodev,compr=none          wait
 
 /devices/platform/sprd-sdhci.0/mmc_host/mmc1      auto         vfat defaults voldmanaged=sdcard0:auto,noemulatedsd
