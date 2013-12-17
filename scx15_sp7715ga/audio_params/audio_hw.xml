@@ -12,14 +12,14 @@
 <i2s_for_btcall index="0"
 		switch="1" 
                 dst="internal"
-		cp0_ctl_file="/d/pin_switch/iis0_sys_sel/cp0_iis0"
-		cp1_ctl_file="/d/pin_switch/iis0_sys_sel/cp1_iis0"
-		cp2_ctl_file="/d/pin_switch/iis0_sys_sel/cp2_iis0"
-		ap_ctl_file="/d/pin_switch/iis0_sys_sel/ap_iis0"
-		cp0_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp0_iis0"
-		cp1_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp1_iis0"
-		cp2_bt_ctl_file="/d/pin_switch/bt_iis_sys_sel/cp2_iis0"
- 		ap_bt_ctl_file="/d/pin_switch/iis0_sys_sel/ap_iis0"
+		cp0_ctl_file="/proc/pin_switch/iis0_sys_sel/cp0_iis0"
+		cp1_ctl_file="/proc/pin_switch/iis0_sys_sel/cp1_iis0"
+		cp2_ctl_file="/proc/pin_switch/iis0_sys_sel/cp2_iis0"
+		ap_ctl_file="/proc/pin_switch/iis0_sys_sel/ap_iis0"
+		cp0_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp0_iis0"
+		cp1_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp1_iis0"
+		cp2_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp2_iis0"
+ 		ap_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/ap_iis0"
 />
 
 <i2s_for_extspeaker index="1" switch="0" dst="external" cp0_ctl_file="/d/pin_switch/iis-1" cp1_ctl_file="/d/pin_switch/iis-1"  cp2_ctl_file="/d/pin_switch/iis-1" ap_ctl_file="/d/pin_switch/iis-1" /> 
