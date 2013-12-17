@@ -66,6 +66,7 @@ $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
+$(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 
 # Overrides
 PRODUCT_NAME := scx15_sp7715eabase
