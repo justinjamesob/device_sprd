@@ -120,6 +120,13 @@ on property:ro.debuggable=1
 on property:ro.modem.w.count=1
     write /proc/sim/0 w
 
+
+on property:ro.config.ksm.support=true
+    write /sys/kernel/mm/ksm/pages_to_scan 100
+    write /sys/kernel/mm/ksm/sleep_millisecs 500
+    write /sys/kernel/mm/ksm/run   1
+
+
 # SPRD: add for theme setting @{
 on property:universe_ui_support=true
     start theme_init

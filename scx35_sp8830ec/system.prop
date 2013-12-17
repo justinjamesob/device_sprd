@@ -42,3 +42,5 @@ ro.digital.fm.support=1
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
+
+ro.config.ksm.support=true

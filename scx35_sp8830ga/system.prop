@@ -39,3 +39,5 @@ ro.modem.wcn.count=1
 camera.disable_zsl_mode=1
 ro.digital.fm.support=1
 
+
+ro.config.ksm.support=true
