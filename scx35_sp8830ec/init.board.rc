@@ -127,5 +127,19 @@ service iprenew_bnep0 /system/bin/dhcpcd -n
     disabled
     oneshot
 
+service engpcclientt /system/bin/engpc -t 1 -a /dev/ttyGS0 -d /dev/ttyGS1
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS2 -d /dev/ttyGS3
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
 on alarm
     insmod /system/lib/modules/focaltech_ts.ko
