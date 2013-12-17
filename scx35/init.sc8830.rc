@@ -178,27 +178,6 @@ service wcnd /system/bin/wcnd
     group system shell wifi inet
     oneshot
 
-service engpcclientt /system/bin/engpc -t 1 -a /dev/ttyGS0 -d /dev/ttyGS1
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientw /system/bin/engpc -t 0 -a /dev/ttyGS2 -d /dev/ttyGS3
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS4 -d /dev/ttyGS5
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
 service phoneserver_t /system/bin/phoneserver -m t
     class core
     user root
