@@ -8,7 +8,6 @@ ro.product.hardware=SP8830GA_V1.0.1
 debug.hwui.render_dirty_regions=false
 
 persist.ttydev=ttyVUART0
-persist.storage.type=1
 
 # delay for ConnectivityChange broadcast (ms)
 conn.connectivity_change_delay = 0
@@ -37,7 +36,6 @@ ro.modem.wcn.diag=/dev/slog_wcn
 ro.modem.wcn.assert=/dev/spipe_wcn2
 ro.modem.wcn.id=1
 ro.modem.wcn.count=1
+camera.disable_zsl_mode=1
+ro.digital.fm.support=1
 
-# SPRD: add low cost low memory @{
-ro.config.low_ram=true
-# @}
