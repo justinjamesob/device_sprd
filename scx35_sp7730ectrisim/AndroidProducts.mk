@@ -15,5 +15,5 @@
 #
 
 
-PRODUCT_MAKEFILES := $(LOCAL_DIR)/scx35_sp7730ectrisimcuccspecAplus_UUI.mk
+PRODUCT_MAKEFILES := $(LOCAL_DIR)/scx35_sp7730ectrisim.mk
 

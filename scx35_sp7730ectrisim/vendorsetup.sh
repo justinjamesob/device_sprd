@@ -16,5 +16,4 @@
 
 
 
-add_lunch_combo scx35_sp7730ectrisimcuccspecAplus_UUI-userdebug
-
+add_lunch_combo scx35_sp7730ectrisim-userdebug
