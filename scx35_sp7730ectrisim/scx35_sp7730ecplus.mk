@@ -17,7 +17,7 @@
 TARGET_PLATFORM := sc8830
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35_sp7730ec
+TARGET_BOARD := scx35_sp7730ectrisim
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -35,14 +35,14 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=2 \
-	persist.msms.phone_count=2 \
+	ro.msms.phone_count=3 \
+	persist.msms.phone_count=3 \
 	persist.msms.phone_default=0 \
-	ro.modem.t.count=2 \
+	ro.modem.t.count=3 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=6
 
-include device/sprd/common/product_packages.mk
+#include device/sprd/common/product_packages.mk
 
 # board-specific modules
 PRODUCT_PACKAGES += \
