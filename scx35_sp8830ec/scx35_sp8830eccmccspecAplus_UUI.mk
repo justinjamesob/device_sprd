@@ -5,5 +5,10 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp8830eccmccspecAplus_UUI
 
+# TODO The SprdLauncher2 is only used to test in sp8830ec, it will be removed
+# in future
+PRODUCT_PACKAGES += \
+    SprdLauncher2
+
 $(call inherit-product, vendor/sprd/operator/cmcc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
