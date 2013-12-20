@@ -42,7 +42,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=6
 
-include device/sprd/common/product_packages.mk
+#include device/sprd/common/product_packages.mk
 
 # board-specific modules
 PRODUCT_PACKAGES += \
