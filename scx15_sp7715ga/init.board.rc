@@ -1,4 +1,14 @@
 
+# add for physical external storage as primary @{
+on early-fs
+    mkdir /storage/temp_sd 0700 root root
+    export TEMP_STORAGE /storage/temp_sd
+    symlink /storage/sdcard0 /sdcard
+    symlink /storage/sdcard0 /mnt/sdcard
+    setprop persist.storage.type 1
+    setprop sys.tempsd.enable 1
+# @}
+
 on boot
 
     #write /sys/class/gpio/export 167

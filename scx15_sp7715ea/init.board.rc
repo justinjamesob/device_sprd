@@ -1,12 +1,10 @@
 
-# add for physical external storage as primary @{
+# add for emulated internal storage as primary @{
 on early-fs
-    mkdir /storage/temp_sd 0700 root root
-    export TEMP_STORAGE /storage/temp_sd
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
-    setprop persist.storage.type 1
-    setprop sys.tempsd.enable 1
+    symlink /storage/emulated/legacy /sdcard
+    symlink /storage/emulated/legacy /mnt/sdcard
+    setprop persist.storage.type 2
+    setprop sys.tempsd.enable 0
 # @}
 
 on boot
