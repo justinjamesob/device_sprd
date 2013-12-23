@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-TARGET_PLATFORM := sc8830
-PLATDIR := device/sprd/scx35
+TARGET_PLATFORM := scx35
+PLATDIR := device/sprd/$(TARGET_PLATFORM)
 
 TARGET_BOARD := scx35_sp8830ga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
@@ -40,11 +40,15 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msms.phone_default=0 \
 	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=6
+        sys.usb.gser.count=4
+
+# include device/sprd/common/product_packages.mk
 
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM)
+        sensors.$(TARGET_PLATFORM) \
+        fm.$(TARGET_PLATFORM) \
+        ValidationTools
 
 # board-specific files
 PRODUCT_COPY_FILES += \
