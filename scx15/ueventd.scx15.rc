@@ -49,3 +49,4 @@
 /dev/ts0710mux*         0660     radio       system
 /dev/ltr_558als         0664     system      system
 /dev/st480              0664     system      system
+/dev/sttybt0            0660     bluetooth   bluetooth
