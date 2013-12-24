@@ -447,7 +447,7 @@ service servicemanager /system/bin/servicemanager
     onrestart restart zygote
     onrestart restart media
     onrestart restart surfaceflinger
-    onrestart restart drm
+#    onrestart restart drm
 
 service vold /system/bin/vold
     class core
@@ -484,10 +484,10 @@ service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-sys
     onrestart restart media
     onrestart restart netd
 
-service drm /system/bin/drmserver
-    class main
-    user drm
-    group drm system inet drmrpc sdcard_r
+#service drm /system/bin/drmserver
+#    class main
+#    user drm
+#    group drm system inet drmrpc sdcard_r
 
 service media /system/bin/mediaserver
     class main
@@ -517,9 +517,9 @@ service bluetoothd /system/bin/bluetoothd -n
     group bluetooth net_bt_admin misc
     disabled
 
-service installd /system/bin/installd
-    class main
-    socket installd stream 600 system system
+#service installd /system/bin/installd
+#    class main
+#    socket installd stream 600 system system
 
 service flash_recovery /system/etc/install-recovery.sh
     class main
