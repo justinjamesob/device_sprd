@@ -63,6 +63,7 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
+$(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk) 
 
 # Overrides
 PRODUCT_NAME := scx35_sp7730ecplus
