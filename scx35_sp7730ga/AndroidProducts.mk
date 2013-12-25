@@ -18,3 +18,5 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7730gabase.mk \
 	$(LOCAL_DIR)/scx35_sp7730gaplus.mk
 
+# SPRD: Add LowCost switcher for cutting rom size
+TARGET_LOWCOST_SUPPORT := true
