@@ -19,12 +19,19 @@ on boot
     chown root system /sys/class/gpio/gpio168/value
     chmod 0664 /sys/class/gpio/gpio168/value
 
+    chmod 666 /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth system /proc/bluetooth/sleep/proto
+# bluetooth LPM
+#    chmod 0220 /proc/bluetooth/sleep/lpm
+#    chmod 0220 /proc/bluetooth/sleep/btwrite
+#    chown bluetooth bluetooth /proc/bluetooth/sleep/lpm
+#    chown bluetooth bluetooth /proc/bluetooth/sleep/btwrite
+    insmod /system/lib/modules/bcmdhd.ko
     mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
     mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
@@ -57,15 +64,6 @@ service opush /system/bin/sdptool add --channel=12 OPUSH
     oneshot
 
 service pbap /system/bin/sdptool add --channel=19 PBAP
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm --no2bytes \
-    --tosleep 50000 --baudrate 3000000 --use_baudrate_for_download  \
-	--patchram /system/bin/bcm4330.hcd /dev/ttyS0
-    class main
     user bluetooth
     group bluetooth net_bt_admin
     disabled
