@@ -9,3 +9,8 @@ $(call inherit-product, vendor/sprd/operator/cmcc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk) 
+
+# SprdLauncher2
+PRODUCT_PACKAGES += \
+        SprdLauncher2
+
