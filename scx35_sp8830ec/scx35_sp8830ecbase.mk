@@ -65,10 +65,6 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 
-# SprdLauncher2
-PRODUCT_PACKAGES += \
-        SprdLauncher2
-
 # Overrides
 PRODUCT_NAME := scx35_sp8830ecbase
 PRODUCT_DEVICE := $(TARGET_BOARD)
