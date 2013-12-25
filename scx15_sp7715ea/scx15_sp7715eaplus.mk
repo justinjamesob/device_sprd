@@ -70,6 +70,10 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
+# SprdLauncher2
+PRODUCT_PACKAGES += \
+        SprdLauncher2
+
 # Overrides
 PRODUCT_NAME := scx15_sp7715eaplus
 PRODUCT_DEVICE := $(TARGET_BOARD)
