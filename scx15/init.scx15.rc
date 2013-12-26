@@ -54,11 +54,6 @@ on early-boot
     # Support audio parameter stored
     mkdir /data/local/media 0777 media system
 
-    # add for storage manage @{
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/media/temp_sd 0775 media_rw media_rw
-    # @}
-
     chmod 660 /proc/cpt/wdtirq
     chmod 660 /proc/cpt/stop
     chmod 660 /proc/cpt/start
