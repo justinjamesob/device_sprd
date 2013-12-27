@@ -26,7 +26,7 @@ PRODUCT_AAPT_CONFIG := hdpi
 PRODUCT_PROPERTY_OVERRIDES := \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
-	persist.msms.phone_count=1 \
+	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
         lmk.autocalc=false \
         ksm.support=false    \
@@ -34,14 +34,14 @@ PRODUCT_PROPERTY_OVERRIDES := \
         zram_for_android.enable=false \
         ro.build.product.lowmem=1 \
         ro.callfirewall.disabled=true \
-	ro.msms.phone_count=1 \
+	ro.msms.phone_count=2 \
 	ro.modem.count=1 \
 	ro.modem.w.enable=1 \
 	ro.modem.w.tty=/dev/ts0710mux \
 	ro.modem.w.eth=veth \
 	ro.modem.w.id=0 \
-	ro.modem.w.count=1 \
-	ro.debuggable=0 
+	ro.modem.w.count=2 \
+	ro.debuggable=0
 
 ifeq ($(TARGET_LOWCOST_SUPPORT),true)
   PRODUCT_PROPERTY_OVERRIDES += persist.sys.lowcost=true

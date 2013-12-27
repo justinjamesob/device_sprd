@@ -11,7 +11,9 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.moz.omx.hw.max_width=720 \
 	ro.moz.omx.hw.max_height=576 \
 	ro.moz.ril.query_icc_count=true \
-	ro.moz.mute.call.to_ril=true
+	ro.moz.mute.call.to_ril=true \
+	ro.moz.ril.numclients=2 \
+        ro.moz.ril.data_reg_on_demand=true
 
 # original apps copied from generic_no_telephony.mk
 PRODUCT_PACKAGES := \
