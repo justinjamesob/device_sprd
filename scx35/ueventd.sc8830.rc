@@ -47,6 +47,8 @@
 /dev/vser               0660     system      system
 /dev/ttyHS0             0600     bluetooth   bluetooth
 /dev/ttyGS*             0660     system      system
+/dev/gpsctl            0660     system  system
+/dev/ttyS3             0660     system  system
 
 /dev/Trout_FM           0660     system      audio
 /dev/ecompass_ctrl      0666     system      compass

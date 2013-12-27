@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+#marvell gps
+PRODUCT_MARVELL_GPS_UART := uart3
 
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp8830ssw.mk
