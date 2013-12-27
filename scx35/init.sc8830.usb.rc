@@ -5,6 +5,7 @@ on boot
     write /sys/class/android_usb/android0/f_rndis/manufacturer Spreadtrum
     write /sys/class/android_usb/android0/f_rndis/vendorID 8
     write /sys/class/android_usb/android0/f_rndis/wceis 1
+    write /sys/class/android_usb/android0/f_mass_storage/board_support_luns 1
 
 on fs
     mkdir /dev/usb-ffs 0770 shell shell
@@ -63,7 +64,7 @@ on property:sys.usb.config=rndis,adb
     write /sys/class/android_usb/android0/idProduct 5d21
     write /sys/class/android_usb/android0/f_gser/port_count ${sys.usb.gser.count}
     write /sys/class/android_usb/android0/functions ${sys.usb.config}${persist.sys.modem.diag}
-    write /sys/class/android_usb/android0/bDeviceClass 224
+    write /sys/class/android_usb/android0/bDeviceClass 0
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state $sys.usb.config
@@ -71,7 +72,7 @@ on property:sys.usb.config=rndis,adb
 on property:sys.usb.config=cdrom
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 1782
-    write /sys/class/android_usb/android0/idProduct 5d30
+    write /sys/class/android_usb/android0/idProduct 5d03
     write /sys/class/android_usb/android0/functions mass_storage
     write /sys/class/android_usb/android0/f_mass_storage/lun/file '\0'
     write /sys/class/android_usb/android0/f_mass_storage/lun/cdrom 1
@@ -83,7 +84,7 @@ on property:sys.usb.config=cdrom
 on property:sys.usb.config=cdrom,adb
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 1782
-    write /sys/class/android_usb/android0/idProduct 5d30
+    write /sys/class/android_usb/android0/idProduct 5d24
     write /sys/class/android_usb/android0/f_gser/port_count ${sys.usb.gser.count}
     write /sys/class/android_usb/android0/functions mass_storage,adb${persist.sys.modem.diag}
     write /sys/class/android_usb/android0/f_mass_storage/lun/file '\0'
