@@ -48,6 +48,7 @@ PRODUCT_PACKAGES += \
 	audio.primary.scx15 \
 	audio_policy.scx15 \
 	hwcomposer.scx15
+#	sprd_gsp.scx15
 #	sensors.sc8830
 
 # misc modules
