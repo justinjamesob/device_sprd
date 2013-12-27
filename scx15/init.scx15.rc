@@ -139,6 +139,15 @@ on property:ro.debuggable=1
 on property:ro.modem.w.count=1
     write /proc/sim/0 w
 
+on property:ro.modem.w.count=2
+    write /proc/sim/0 w
+    write /proc/sim/1 w
+
+on property:ro.modem.w.count=3
+    write /proc/sim/0 w
+    write /proc/sim/1 w
+    write /proc/sim/2 w
+
 
 on property:ro.config.ksm.support=true
     write /sys/kernel/mm/ksm/pages_to_scan 100
@@ -236,6 +245,14 @@ service tril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     user root
     group radio cache inet misc audio sdcard_rw log
 
+service tril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m t -n 2
+    class core
+    socket rild2 stream 660 root radio
+    socket rild-debug2 stream 660 radio system
+    disabled
+    user root
+    group radio cache inet misc audio sdcard_rw log
+
 #wcdma rild service
 service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 0
     class core
@@ -249,6 +266,14 @@ service wril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     class core
     socket rild1 stream 660 root radio
     socket rild-debug1 stream 660 radio system
+    disabled
+    user root
+    group radio cache inet misc audio sdcard_rw log shell
+
+service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 2
+    class core
+    socket rild2 stream 660 root radio
+    socket rild-debug2 stream 660 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
