@@ -48,6 +48,10 @@ public class LogSetting extends PreferenceActivity implements OnSharedPreference
     private static final String KEY_DSP_LOG = "dsplog_enable";
     private static final String KEY_IQ_LOG= "iq_log_enable";
     private static final int DLG_MANUAL_PANIC = 1;
+    //add for bug 252284
+    private static final String KEY_MODEM_ARM_LOG= "modemlog_enable";
+    private CheckBoxPreference modemARMPrefs;
+
     private CheckBoxPreference kdumpPrefs;
     //<--
 
@@ -80,6 +84,7 @@ public class LogSetting extends PreferenceActivity implements OnSharedPreference
         iqLogPrefs = (CheckBoxPreference)findPreference(KEY_IQ_LOG);
         /*Add 20130530 spreadst of 171854 add dump iq checkbox end*/
         DspPrefs = (ListPreference)findPreference(KEY_DSP_LOG);
+        modemARMPrefs = (CheckBoxPreference)findPreference(KEY_MODEM_ARM_LOG); //add for bug 252284
 	/* initilize modem communication */
     	mEf = new engfetch();
     	mSocketID = mEf.engopen();
@@ -119,6 +124,7 @@ public class LogSetting extends PreferenceActivity implements OnSharedPreference
         //modified by yingmin.piao for #Bug189515 kdump switch 20130715 -->
         kdumpPrefs.setChecked(LogSettingGetLogState(LOG_KDUMP) == 1);
         //<--
+        modemARMPrefs.setChecked(LogSettingGetLogState(LOG_MODEM) == 1);  //add for bug 252284
         oldDSPValue = LogSettingGetLogState(LOG_DSP);
         updataDSPOption(oldDSPValue);
         super.onStart();

@@ -22,11 +22,11 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
     private static final boolean DEBUG=Debug.isDebug();
 
     public static final String PREFS_NAME = "ENGINEERINGMODEL";
-
+    /* set Slog on Services
     private int mSocketID = 0;
     private engfetch mEf;
     private String mATline;
-    private String mATResponse;
+    private String mATResponse;*/
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -59,7 +59,9 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
             /* Modify 20130311 Spreadst of 127737 start the slog when boot start */
             String mode = SystemProperties.get("ro.product.hardware");
             if(mode!=null){// && mode.contains("77")){
-                atSlog(context);
+                //modify 20130916 for 203306 ANR
+                //atSlog(context);
+                context.startService(new Intent(context, SetSlogService.class));
             }
             /* Modify 20130311 Spreadst of 127737 start the slog when boot end */
         }
@@ -69,19 +71,22 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
             if (intent.getExtra("modem_stat").equals("modem_alive")) {
                 String mode = SystemProperties.get("ro.product.hardware");
                 if (mode != null){// && mode.contains("77")) {
-                    while(!atSlog(context)){
+                    //modify 20130916 for 203306 ANR
+                    /*while(!atSlog(context)){
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                    }
+                    }*/
+                    context.startService(new Intent(context, SetSlogService.class));
                 }
             }
         }
         // 2013/4/23@spreast for bug138559 end
     }
 
+    /* set Slog on Service
     private boolean atSlog(Context context) {
         mEf = new engfetch();
         mSocketID = mEf.engopen();
@@ -96,7 +101,7 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
 
         ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
         DataOutputStream outputBufferStream = new DataOutputStream(outputBuffer);
-        /*Modify 20130527 spreadst of 166285:close the modem log in user-version start*/
+        /*Modify 20130527 spreadst of 166285:close the modem log in user-version start*i/
         if(DEBUG) Log.d(TAG, "Engmode socket open, id:" + mSocketID);
 
         if (state == 1) {
@@ -108,7 +113,7 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
             mATline = String.format("%d,%d,%s", engconstents.ENG_AT_NOHANDLE_CMD, 1, "AT+SLOG=3");
             if(DEBUG) Log.d(TAG, "set persist.sys.modem_slog 0");
         }
-        /*Modify 20130527 spreadst of 166285:close the modem log in user-version end*/
+        /*Modify 20130527 spreadst of 166285:close the modem log in user-version end*i/
         try {
             outputBufferStream.writeBytes(mATline);
         } catch (IOException e) {
@@ -127,7 +132,7 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
         if (mATResponse.contains("OK")) {
             return true;
         }
-        /* Modify 20130311 Spreadst of 127737 start the slog when boot start */
+        /* Modify 20130311 Spreadst of 127737 start the slog when boot start *i/
 //        if (mATResponse.contains("OK")) {
 //            Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
 //        } else {
@@ -135,6 +140,6 @@ public class AutoAnswerReceiver extends BroadcastReceiver {
 //        }
         mEf.engclose(mSocketID);
         return false;
-        /* Modify 20130311 Spreadst of 127737 start the slog when boot end  */
-    }
+        /* Modify 20130311 Spreadst of 127737 start the slog when boot end  *i/
+    }*/
 }

@@ -304,6 +304,7 @@
 	</receiver>
 
        <service android:name="AutoAnswerService" android:enabled="true" />
+       <service android:name="SetSlogService" android:enabled="true" />
 
        <activity android:name="VideoType" android:label="Video Type" android:screenOrientation="portrait"/>
        <activity android:name="DebugParam" android:label="Debug Param" android:screenOrientation="portrait"/>
