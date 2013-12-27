@@ -17,4 +17,4 @@
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx15_sp6815gabase.mk \
 	$(LOCAL_DIR)/scx15_sp6815gaplus.mk \
-	$(LOCAL_DIR)/scx15_sp6815gacmccspecAplus_UUI.mk
+	$(LOCAL_DIR)/scx15_sp6815gaplus_UUI.mk

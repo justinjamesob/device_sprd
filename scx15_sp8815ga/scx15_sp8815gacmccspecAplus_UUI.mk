@@ -1,5 +1,3 @@
--include vendor/sprd/operator/cucc/specA/res/boot/boot_res.mk
-
 include device/sprd/scx15_sp8815ga/scx15_sp8815gaplus.mk
 
 PRODUCT_NAME := scx15_sp8815gacmccspecAplus_UUI
