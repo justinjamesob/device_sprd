@@ -8,17 +8,6 @@ on early-fs
 # @}
 
 on boot
-    write /sys/class/gpio/export 167
-    write /sys/class/gpio/gpio167/direction out
-    write /sys/class/gpio/gpio167/value 1
-    chown root system /sys/class/gpio/gpio167/value
-    chmod 0664 /sys/class/gpio/gpio167/value
-
-    write /sys/class/gpio/export 168
-    write /sys/class/gpio/gpio168/direction out
-    chown root system /sys/class/gpio/gpio168/value
-    chmod 0664 /sys/class/gpio/gpio168/value
-
     chmod 666 /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
@@ -44,6 +33,17 @@ on boot
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.interface wlan0
+
+# Marvell GPS
+# create filesystem for gps
+    chown system system /proc/driver/gps
+    chown system system /proc/driver/sirf
+
+    mkdir /data/system 0770 system system
+    mkdir /data/system/gps 0771 system system
+    mkdir /data/system/gps/mrvlgps 0771 system system
+    mkdir /data/system/gps/mrvlgps/rxn 0771 system system
+    mkdir /data/system/gps/mrvlgps/rxn/RXN 0771 system system
 
 service hfag /system/bin/sdptool add --channel=10 HFAG
     user bluetooth
