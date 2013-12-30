@@ -40,6 +40,18 @@ on boot
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.interface wlan0
 
+    mkdir /data/system 0770 system system
+
+    # Marvell GPS
+    chown system system /proc/driver/gps
+    chown system system /proc/driver/sirf
+
+    # create filesystem for gps
+    mkdir /data/system/gps 0771 system system
+    mkdir /data/system/gps/mrvlgps 0771 system system
+    mkdir /data/system/gps/mrvlgps/rxn 0771 system system
+    mkdir /data/system/gps/mrvlgps/rxn/RXN 0771 system system
+
 service hfag /system/bin/sdptool add --channel=10 HFAG
     user bluetooth
     group bluetooth net_bt_admin
