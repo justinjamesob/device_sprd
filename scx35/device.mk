@@ -78,13 +78,10 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/init.sc8830.rc:root/init.sc8830.rc \
 	$(PLATDIR)/init.sc8830.usb.rc:root/init.sc8830.usb.rc \
 	$(PLATDIR)/ueventd.sc8830.rc:root/ueventd.sc8830.rc \
-	$(PLATDIR)/fstab.sc8830:root/fstab.sc8830 \
 	$(PLATDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
 	$(PLATDIR)/sci-keypad.kl:system/usr/keylayout/sci-keypad.kl \
 	$(PLATDIR)/media_codecs.xml:system/etc/media_codecs.xml \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
-	$(PLATDIR)/nvitem_td.cfg:system/etc/nvitem_td.cfg \
-	$(PLATDIR)/nvitem_w.cfg:system/etc/nvitem_w.cfg \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
 	vendor/sprd/open-source/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \

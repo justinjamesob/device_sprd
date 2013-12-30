@@ -16,6 +16,9 @@
 
 -include device/sprd/scx35/BoardConfigCommon.mk
 
+# emmc fstab
+TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
+
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp8830ssw
 UBOOT_DEFCONFIG := sp8830ssw
