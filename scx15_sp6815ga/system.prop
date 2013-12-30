@@ -17,17 +17,17 @@ ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
 # Default ecclist
 ro.ril.ecclist=112,911,#911,*911,119,110,120
 
-persist.modem.w.enable=1
-ro.modem.w.dev=/dev/cpw
-ro.modem.w.tty=/dev/stty_w
-ro.modem.w.eth=seth_w
-ro.modem.w.snd=2
-ro.modem.w.diag=/dev/slog_w
-ro.modem.w.loop=/dev/spipe_w0
-ro.modem.w.nv=/dev/spipe_w1
-ro.modem.w.assert=/dev/spipe_w2
-ro.modem.w.vbc=/dev/spipe_w6
-ro.modem.w.id=0
+persist.modem.t.enable=1
+ro.modem.t.dev=/dev/cpt
+ro.modem.t.tty=/dev/stty_td
+ro.modem.t.eth=seth_td
+ro.modem.t.snd=1
+ro.modem.t.diag=/dev/slog_td
+ro.modem.t.loop=/dev/spipe_td0
+ro.modem.t.nv=/dev/spipe_td1
+ro.modem.t.assert=/dev/spipe_td2
+ro.modem.t.vbc=/dev/spipe_td6
+ro.modem.t.id=0
 
 ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn

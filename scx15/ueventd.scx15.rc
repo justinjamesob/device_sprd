@@ -14,7 +14,7 @@
 
 /dev/stty_td*           0660     radio       system
 /dev/stty_w*            0660    radio       system
-## /dev/slog_td            0666     system      system
+/dev/slog_td            0666     system      system
 /dev/spipe_td*          0666     system      system
 /dev/slog_wcn           0666     system      system
 /dev/spipe_wcn*         0666     system      system
