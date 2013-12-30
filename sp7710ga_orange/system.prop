@@ -24,5 +24,9 @@ ro.installer.limitpercent=85
 # Add Porperty for orange
 ro.support.orange=true
 
+# To enable the function will cause you to use related third party software.
+# If you and/or your client need to use the above-mentioned third party software,
+# you shall be required to pay royalty to the related third party to get the authorized license.
+
 #if our product support VT
-ro.device.support.vt=1
+ro.device.support.vt=0

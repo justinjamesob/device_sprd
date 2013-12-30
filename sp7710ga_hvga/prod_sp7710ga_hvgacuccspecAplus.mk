@@ -34,7 +34,6 @@ PRODUCT_PROPERTY_OVERRIDES := \
         ro.build.product.lowmem=1 \
 	universe_ui_support=true \
         ro.callfirewall.disabled=true \
-	ro.device.support.vt=0 \
 	ro.msms.phone_count=2 \
 	ro.modem.count=1 \
 	ro.modem.w.enable=1 \
