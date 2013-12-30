@@ -40,7 +40,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.msms.phone_count=3 \
 	persist.msms.phone_count=3 \
 	persist.msms.phone_default=0 \
-	ro.modem.t.count=3 \
+	ro.modem.w.count=3 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=6
 
