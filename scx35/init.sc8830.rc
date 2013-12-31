@@ -49,6 +49,10 @@ on post-fs
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
 
+on post-fs-data
+    # Set indication (checked by vold) that we have finished this action
+    setprop vold.post_fs_data_done 1
+
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
