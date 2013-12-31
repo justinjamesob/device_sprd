@@ -116,6 +116,11 @@ service engpcclient /system/bin/engpc
     group root
 
 #nvitemd
+service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 /system/etc/nvitem_td.cfg TRUE
+    class cali
+    user root
+    group root
+
 service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 /system/etc/nvitem_w.cfg TRUE
     class cali
     user root
