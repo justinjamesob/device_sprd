@@ -1,5 +1,5 @@
 <!-- TinyHAL configuration file for GOD -->
-<tinyalsa-audio device="SC8830 audio">
+<tinyalsa-audio device="scx15 audio">
 
    <!-- We are able to have most of our routing static so do that -->
    <path>
@@ -13,13 +13,9 @@
      <!-- DAC->Speaker -->
      <ctl name="SPKL Playback Volume" val="10" />
      <ctl name="SPKR Playback Volume" val="10" />
-     <ctl name="DACL Playback Volume" val="5" />
-     <ctl name="DACR Playback Volume" val="5" />
 
      <!-- DAC->Earpiece -->
      <ctl name="EAR Playback Volume" val="10" />
-     <ctl name="DACL Playback Volume" val="5" />
-     <ctl name="DACR Playback Volume" val="5" />
 
      <!-- ADC ->(main mic)  -->
      <ctl name="ADCL Capture Volume" val="12" />
@@ -62,6 +58,19 @@
 <private name="internal PA">
   <func name="Inter PA Config" val="304" />
 </private>
+
+<private name="spk mute">
+  <func name="Speaker Mute" val="0" />
+</private>
+
+<private name="earpiece mute">
+  <func name="Earpiece Mute" val="0" />
+</private>
+
+<private name="hp mute">
+  <func name="HeadPhone Mute" val="0" />
+</private>
+
 
 <!-- END OF MUST NOT modify private field directly -->
 
@@ -142,7 +151,7 @@
 <device name="digital-fm">
   <path name="on">
      <ctl name="Digital FM Function" val="1" />
-     <ctl name="AD IISMUX" val="2" />
+     <ctl name="AD IISMUX" val="1" />
   </path>
   <path name="off">
      <ctl name="Digital FM Function" val="0" />
@@ -193,4 +202,5 @@
    <path name="off">
    </path>
 </device>
+
 </tinyalsa-audio>
