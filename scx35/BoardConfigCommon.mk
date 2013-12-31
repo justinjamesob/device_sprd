@@ -77,3 +77,5 @@ USE_SPRD_HWCOMPOSER  := true
 USE_OPENGL_RENDERER := true
 USE_OVERLAY_COMPOSER_GPU := true
 
+# ota
+TARGET_RELEASETOOLS_EXTENSIONS := vendor/sprd/open-source/tools/ota
