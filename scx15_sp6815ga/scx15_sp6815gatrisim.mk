@@ -17,7 +17,7 @@
 TARGET_PLATFORM := scx15
 PLATDIR := device/sprd/$(TARGET_PLATFORM)
 
-TARGET_BOARD := scx15_sp7715ea
+TARGET_BOARD := scx15_sp6815ga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -70,9 +70,9 @@ $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # Overrides
-PRODUCT_NAME := scx15_sp7715eatrisim
+PRODUCT_NAME := scx15_sp6815gatrisim
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp7715ea
+PRODUCT_MODEL := sp6815ga
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 

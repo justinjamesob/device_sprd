@@ -17,4 +17,4 @@
 add_lunch_combo scx15_sp6815gabase-userdebug
 add_lunch_combo scx15_sp6815gaplus-userdebug
 add_lunch_combo scx15_sp6815gaplus_UUI-userdebug
-add_lunch_combo scx15_sp6815eatrisim-userdebug
+add_lunch_combo scx15_sp6815gatrisim-userdebug
