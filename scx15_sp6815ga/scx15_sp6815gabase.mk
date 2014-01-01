@@ -27,7 +27,7 @@ $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-PRODUCT_AAPT_CONFIG := hdpi xhdpi
+PRODUCT_AAPT_CONFIG := hdpi
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
@@ -38,7 +38,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.com.android.dataroaming=false \
 	ro.msms.phone_count=1 \
 	persist.msms.phone_count=1 \
-	persist.msmslt=0 \
+	persist.msms.phone_default=0 \
 	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4
@@ -47,12 +47,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM) \
-        ValidationTools \
-        EngineerMode
-#	libmllite.so \
-#	libmplmpu.so \
-#	libinvensense_hal
-#
+        ValidationTools
+
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
