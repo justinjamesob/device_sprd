@@ -5,11 +5,6 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp8830gacmccspecAplus_UUI
 
-# TODO The SprdLauncher2 is only used to test in sp8830ec, it will be removed
-# in future
-PRODUCT_PACKAGES += \
-    SprdLauncher2
-
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
