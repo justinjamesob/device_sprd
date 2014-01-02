@@ -1,0 +1,2 @@
+allow untrusted_app apk_data_file:dir getattr;
+allow untrusted_app app_data_file:file execute;

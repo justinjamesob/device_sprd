@@ -1,0 +1,2 @@
+allow zygote property_socket:sock_file write;
+allow zygote system_prop:property_service set;
