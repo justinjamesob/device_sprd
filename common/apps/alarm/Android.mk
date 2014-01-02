@@ -1,5 +1,5 @@
 # Copyright 2005 The Android Open Source Project
-
+ifeq ($(strip $(SPRDROID4.0_DEV)),true)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -88,4 +88,4 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_REQUIRED_MODULES := alarm_res
 
 include $(BUILD_EXECUTABLE)
-
+endif
