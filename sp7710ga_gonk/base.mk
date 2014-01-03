@@ -58,8 +58,6 @@ PRODUCT_PACKAGES += \
     libstagefright_sprd_mp3dec
 
 # prebuild files
-PRODUCT_PACKAGES += \
-    ES_File_Explorer.apk
 
 PRODUCT_PACKAGES += \
 	modem_control\
@@ -138,4 +136,3 @@ $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm40181/device-bcm.mk)
 $(call inherit-product, $(BOARDDIR)/../common/apps/modemassert/module.mk)
 $(call inherit-product, device/sprd/partner/ublox/device-ublox-gps.mk)
-$(call inherit-product, device/sprd/partner/nmi/device-nmi-atv.mk)
