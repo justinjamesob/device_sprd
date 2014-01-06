@@ -36,23 +36,22 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=1 \
-	persist.msms.phone_count=1 \
+	ro.msms.phone_count=2 \
+	persist.msms.phone_count=2 \
 	persist.msmslt=0 \
-	ro.modem.w.count=1 \
+	ro.modem.w.count=2 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4 \
-        persist.support.oplpnn=true \
-        persist.support.cphsfirst=false
-	ro.sf.lcd_density=240 \
-	ro.sf.lcd_width=54 \
-	ro.sf.lcd_height=96
+        wcdma.sim.slot.cfg=true \
+	ro.sf.lcd_density=160 \
+	ro.sf.lcd_width=32 \
+	ro.sf.lcd_height=48
+
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
-        fm.$(TARGET_PLATFORM) \
-        ValidationTools \
-        EngineerMode
+	fm.$(TARGET_PLATFORM) \
+        ValidationTools
 
 #	libmllite.so \
 #	libmplmpu.so \
@@ -70,12 +69,12 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
-$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # Overrides
-PRODUCT_NAME := scx15_sp7715gabase
+PRODUCT_NAME := scx15_sp7715gaplushvga
 PRODUCT_DEVICE := $(TARGET_BOARD)
 PRODUCT_MODEL := sp7715ga
 PRODUCT_BRAND := Spreadtrum

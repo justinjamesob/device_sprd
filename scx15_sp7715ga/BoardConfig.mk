@@ -20,9 +20,15 @@
 TARGET_RECOVERY_FSTAB := device/sprd/scx15/nand/recovery.fstab
 
 # board configs
+
 TARGET_BOOTLOADER_BOARD_NAME := scx15_sp7715ga
-UBOOT_DEFCONFIG := sp7715ga
+ifeq ($(TARGET_PRODUCT), scx15_sp7715gaplushvga)
+KERNEL_DEFCONFIG := sp7715ga-native-hvga_defconfig
+UBOOT_DEFCONFIG := sp7715ga-hvga
+else
 KERNEL_DEFCONFIG := sp7715ga-native_defconfig
+UBOOT_DEFCONFIG := sp7715ga
+endif
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 2M

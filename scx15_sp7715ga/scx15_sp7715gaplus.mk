@@ -45,7 +45,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
         wcdma.sim.slot.cfg=true \
         persist.support.oplpnn=true \
         persist.support.cphsfirst=false
-
+	ro.sf.lcd_density=240 \
+	ro.sf.lcd_width=54 \
+	ro.sf.lcd_height=96
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
