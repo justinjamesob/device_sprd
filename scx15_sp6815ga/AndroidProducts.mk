@@ -14,6 +14,11 @@
 # limitations under the License.
 #
 
+# SPRD: Add LowCost switcher for cutting rom size
+ifneq ($(filter scx15_sp6815ga%, $(TARGET_PRODUCT)),)
+  TARGET_LOWCOST_SUPPORT := true
+endif
+
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx15_sp6815gabase.mk \
 	$(LOCAL_DIR)/scx15_sp6815gaplus.mk \
