@@ -1,4 +1,5 @@
 -include vendor/sprd/operator/cucc/specA/res/boot/boot_res.mk
+$(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 
 include device/sprd/scx15_sp7715ea/scx15_sp7715eaplus.mk
 
