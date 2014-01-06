@@ -5,7 +5,6 @@ LOCAL_SRC_FILES:= \
 	mplayer.cpp
 
 LOCAL_SHARED_LIBRARIES := \
-	libandroid_runtime \
 	libutils \
 	libbinder \
 	libcutils \
