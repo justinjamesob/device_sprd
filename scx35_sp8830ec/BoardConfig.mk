@@ -22,7 +22,11 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp8830ec
 UBOOT_DEFCONFIG := sp8830ec
+ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+KERNEL_DEFCONFIG := sp8830ec-dt_defconfig
+else
 KERNEL_DEFCONFIG := sp8830ec-native_defconfig
+endif
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
