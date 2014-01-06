@@ -6,8 +6,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 PRODUCT_PACKAGES += \
 	Dialer \
 	Mms	\
-	stk
-
+	Stk
 
 # graphics modules
 PRODUCT_PACKAGES += \
