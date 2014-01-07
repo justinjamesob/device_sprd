@@ -73,7 +73,7 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 # Overrides
 PRODUCT_NAME := scx15_sp7715eaplus
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp7715ea
+PRODUCT_MODEL := SP7710
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
