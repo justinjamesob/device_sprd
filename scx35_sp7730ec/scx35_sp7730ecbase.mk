@@ -43,16 +43,13 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msms.phone_default=0 \
 	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=6
-
-include device/sprd/common/product_packages.mk
+        sys.usb.gser.count=4
 
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
-        fm.$(TARGET_PLATFORM)
-
-include device/sprd/common/product_packages.mk
+        fm.$(TARGET_PLATFORM) \
+        ValidationTools
 
 # board-specific files
 PRODUCT_COPY_FILES += \
@@ -65,7 +62,11 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
-$(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk) 
+
+$(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
+$(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
+$(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 
 # Overrides
 PRODUCT_NAME := scx35_sp7730ecbase
