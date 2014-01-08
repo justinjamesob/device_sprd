@@ -39,6 +39,22 @@ on boot
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.interface wlan0
 
+    mkdir /data/cg/ 0777 system system
+    mkdir /data/cg/online 0777 system system
+    mkdir /data/cg/supl 0777 system system
+    chmod 777 /dev/ttyV1
+    chmod 777 /dev/ttyV0
+    chmod 777 /system/etc/GPSenseEngine.xml
+    chmod 777 /system/etc/HiMap.db
+    chmod 777 /system/bin/GPSenseEngine
+    setprop gps.port ttyV1
+
+service GPSenseEngine /system/bin/GPSenseEngine
+     class main
+     user root
+     group root
+     disabled
+
 service hfag /system/bin/sdptool add --channel=10 HFAG
     user bluetooth
     group bluetooth net_bt_admin
