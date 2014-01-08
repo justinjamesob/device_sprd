@@ -46,8 +46,8 @@ on fs
     ubiattach 0 ubipac
 
 on post-fs
-    write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
-    write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot1/force_ro 0
+    write /sys/devices/platform/sprd-sdhci-shark.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
+    write /sys/devices/platform/sprd-sdhci-shark.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot1/force_ro 0
     chown system system /productinfo/adc.bin
 
 on boot
