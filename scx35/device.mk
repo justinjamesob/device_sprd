@@ -62,6 +62,7 @@ PRODUCT_PACKAGES += \
 	calibration_init \
 	modemd \
 	engpc \
+	modem_control\
 	libengappjni \
 	Engapp \
 	modemassert \
