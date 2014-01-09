@@ -44,7 +44,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.modem.w.count=2 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4 \
-        wcdma.sim.slot.cfg=true
+        wcdma.sim.slot.cfg=true \
+        persist.support.oplpnn=true \
+        persist.support.cphsfirst=false
 
 # board-specific modules
 PRODUCT_PACKAGES += \
