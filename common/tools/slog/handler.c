@@ -34,6 +34,85 @@
 
 #include "slog.h"
 
+#define FD_TIME "/sys/kernel/debug/power/sprd_timestamp"
+static int get_timezone()
+{
+	time_t time_utc;
+	struct tm tm_local, tm_gmt;
+	int time_zone;
+
+	time_utc = time(NULL);
+	localtime_r(&time_utc, &tm_local);
+	gmtime_r(&time_utc, &tm_gmt);
+	time_zone = tm_local.tm_hour - tm_gmt.tm_hour;
+	if (time_zone < -12) {
+		time_zone += 24;
+	} else if (time_zone > 12) {
+		time_zone -= 24;
+	}
+
+	err_log("UTC: %02d-%02d-%02d %02d:%02d:%02d",
+				tm_gmt.tm_year % 100,
+				tm_gmt.tm_mon + 1,
+				tm_gmt.tm_mday,
+				tm_gmt.tm_hour,
+				tm_gmt.tm_min,
+				tm_gmt.tm_sec);
+
+	err_log("LOCAL: %02d-%02d-%02d %02d:%02d:%02d",
+				tm_local.tm_year % 100,
+				tm_local.tm_mon + 1,
+				tm_local.tm_mday,
+				tm_local.tm_hour,
+				tm_local.tm_min,
+				tm_local.tm_sec);
+
+	return time_zone;
+}
+
+static void write_modem_timestamp(struct slog_info *info, char *buffer)
+{
+	int fd, ret;
+	FILE *fp;
+	int time_zone;
+	struct modem_timestamp *mts;
+
+	if (strncmp(info->name, "modem", 5)) {
+		return;
+	}
+
+	mts = calloc(1, sizeof(struct modem_timestamp));
+	fd = open(FD_TIME, O_RDWR);
+	if( fd < 0 ){
+		err_log("Unable to open time stamp device '%s'", FD_TIME);
+		free(mts);
+		return;
+	}
+	ret = read(fd, (char*)mts + 4, 12);
+	if(ret < 12) {
+		close(fd);
+		free(mts);
+		return;
+	}
+	close(fd);
+
+	mts->magic_number = 0x12345678;
+	time_zone = get_timezone();
+	mts->tv.tv_sec += time_zone * 3600;
+	err_log("%lx, %lx, %lx, %lx", mts->magic_number, mts->tv.tv_sec, mts->tv.tv_usec, mts->sys_cnt);
+
+	fp = fopen(buffer, "a+b");
+	if(fp == NULL) {
+		err_log("open file %s failed!", buffer);
+		free(mts);
+		exit(0);
+	}
+	fwrite(mts, sizeof(struct modem_timestamp), 1, fp);
+	fclose(fp);
+
+	free(mts);
+}
+
 static void gen_logfile(char *filename, struct slog_info *info)
 {
 	int ret;
@@ -412,6 +491,7 @@ static int gen_outfd(struct slog_info *info)
 	char buffer[MAX_NAME_LEN];
 
 	gen_logfile(buffer, info);
+	write_modem_timestamp(info, buffer);
 	fd = open(buffer, O_WRONLY | O_CREAT, S_IRUSR | S_IRGRP | S_IROTH);
 	if(fd < 0){
 		err_log("Unable to open file %s.",buffer);
