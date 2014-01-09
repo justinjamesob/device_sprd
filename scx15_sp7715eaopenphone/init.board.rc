@@ -44,8 +44,7 @@ on boot
     chmod 777 /dev/ttyV1
     chmod 777 /dev/ttyV0
     chmod 777 /system/etc/GPSenseEngine.xml
-    chmod 777 /data/cg/online/HiMap.db
-    chmod 777 /data/cg/online/Almanac.cg
+    chmod 777 /system/etc/HiMap.db
     chmod 777 /system/bin/GPSenseEngine
     setprop gps.port ttyV1
 
