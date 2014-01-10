@@ -60,6 +60,7 @@
         <item>"mobile_ims,11,0,2,60000,true"</item>
         <item>"mobile_cbs,12,0,2,60000,true"</item>
         <item>"wifi_p2p,13,1,0,-1,true"</item>
+        <item>"mobile_stk,16,0,3,60000,true"</item>
         <item>"mobile,100,0,0,-1,true"</item>
         <item>"mobile0_mms,102,0,2,60000,true"</item>
         <item>"mobile0_supl,103,0,2,60000,true"</item>
@@ -67,6 +68,7 @@
         <item>"mobile0_fota,110,0,2,60000,true"</item>
         <item>"mobile0_ims,111,0,2,60000,true"</item>
         <item>"mobile0_cbs,112,0,2,60000,true"</item>
+        <item>"mobile_stk,116,0,3,60000,true"</item>
         <item>"mobile,200,0,0,-1,true"</item>
         <item>"mobile1_mms,202,0,2,60000,true"</item>
         <item>"mobile1_supl,203,0,2,60000,true"</item>
@@ -74,6 +76,7 @@
         <item>"mobile1_fota,210,0,2,60000,true"</item>
         <item>"mobile1_ims,211,0,2,60000,true"</item>
         <item>"mobile1_cbs,212,0,2,60000,true"</item>
+        <item>"mobile_stk,216,0,3,60000,true"</item>
         <item>"mobile,300,0,0,-1,true"</item>
         <item>"mobile2_mms,302,0,2,60000,true"</item>
         <item>"mobile2_supl,303,0,2,60000,true"</item>
@@ -81,6 +84,7 @@
         <item>"mobile2_fota,310,0,2,60000,true"</item>
         <item>"mobile2_ims,311,0,2,60000,true"</item>
         <item>"mobile2_cbs,312,0,2,60000,true"</item>
+        <item>"mobile_stk,316,0,3,60000,true"</item>
         <item>"bluetooth,7,7,2,-1,true"</item>
     </string-array>
 
