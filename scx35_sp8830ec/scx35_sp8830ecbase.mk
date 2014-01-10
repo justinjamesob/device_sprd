@@ -74,3 +74,6 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
+
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
