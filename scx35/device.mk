@@ -64,7 +64,6 @@ PRODUCT_PACKAGES += \
 	engpc \
 	modem_control\
 	libengappjni \
-	Engapp \
 	modemassert \
 	nvitemd \
 	batterysrv \
