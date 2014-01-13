@@ -225,7 +225,7 @@ service modemd /system/bin/modemd
 service wcnd /system/bin/wcnd
     class core
     user system
-    group system shell wifi inet
+    group system shell wifi inet net_bt_stack
     oneshot
 
 service phoneserver_t /system/bin/phoneserver -m t
