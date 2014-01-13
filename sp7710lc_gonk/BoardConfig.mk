@@ -31,15 +31,11 @@ endif
 
 # config u-boot
 TARGET_NO_BOOTLOADER := false
-UBOOT_DEFCONFIG := sp7710g2
+UBOOT_DEFCONFIG := sp7710g2_hvga_128
 
 # config kernel
+KERNEL_DEFCONFIG := sp7710ga-native-hvga-128_defconfig
 
-ifeq ($(TARGET_HVGA_ENABLE), true)
-KERNEL_DEFCONFIG := sp7710ga-native-hvga_defconfig
-else
-KERNEL_DEFCONFIG := sp7710ga-native_defconfig
-endif
 USES_UNCOMPRESSED_KERNEL := true
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
