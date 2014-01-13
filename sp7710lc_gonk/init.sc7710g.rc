@@ -119,7 +119,7 @@ on property:ksm.support=true
 
 on property:zram.support=true
     setprop zram.disksize 64
-    setprop sys.vm.swappiness 100
+    setprop sys.vm.swappiness 60
     start zram	
 
 service zram /system/xbin/zram.sh
