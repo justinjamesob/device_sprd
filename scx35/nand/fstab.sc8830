@@ -8,4 +8,4 @@
 /dev/ubi0_cache                      /cache          ubifs  noatime,nosuid,nodev,compr=lzo          wait
 /dev/ubi0_prodnv                     /productinfo    ubifs  noatime,nosuid,nodev,compr=lzo          wait
 
-/devices/platform/sprd-sdhci.0/mmc_host/mmc1      auto         vfat defaults voldmanaged=sdcard0:auto,noemulatedsd
+/devices/platform/sprd-sdhci.0/mmc_host/mmc0      auto         vfat defaults voldmanaged=sdcard0:auto,noemulatedsd
