@@ -143,6 +143,12 @@ struct slog_cmd {
 	char content[MAX_LINE_LEN];
 };
 
+struct modem_timestamp {
+        long unsigned int magic_number;       /* magic number for verify the structure */
+        struct timeval tv;      /* clock time, seconds since 1970.01.01 */
+        long unsigned int sys_cnt;            /* modem's time */
+};
+
 /* var */
 extern char *config_log_path, *current_log_path;
 extern char top_logdir[MAX_NAME_LEN];
