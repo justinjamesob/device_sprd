@@ -244,8 +244,7 @@ service phoneserver_w /system/bin/phoneserver -m w
 
 service batterysrv /bin/batterysrv
     class core
-    user system
-    group system shell
+    user root
     oneshot
 
 service charge /bin/charge
