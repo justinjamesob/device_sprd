@@ -16,7 +16,7 @@ on early-init
     pipe 666 /dev/rpipe/ril.vt.2
 
 on init
-    mkdir /productinfo 0774 system system
+    mkdir /productinfo 0771 system system
     mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
     mkdir /storage/sdcard0 0700 root root
     mkdir /mnt/shell/emulated 0700 shell shell
@@ -45,7 +45,7 @@ on fs
 
 on post-fs
     chown system system /productinfo
-    chmod 0774 /productinfo
+    chmod 0771 /productinfo
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
 
