@@ -43,6 +43,7 @@
 /dev/spipe_w8          0660     system  system
 
 
+/dev/ubi0_*             0660     system      system
 /dev/block/mmcblk0p*    0660     system      system
 /dev/vser               0660     system      system
 /dev/ttyHS0             0600     bluetooth   bluetooth

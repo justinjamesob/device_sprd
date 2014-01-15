@@ -12,7 +12,7 @@ persist.ttydev=ttyVUART0
 # delay for ConnectivityChange broadcast (ms)
 conn.connectivity_change_delay = 0
 
-ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
+ro.product.partitionpath=/dev/ubi0_
 
 # Default ecclist
 ro.ril.ecclist=112,911,#911,*911
