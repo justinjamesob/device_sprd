@@ -38,9 +38,17 @@ BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
 
 # config sepolicy
 BOARD_SEPOLICY_DIRS := device/sprd/scx35/sepolicy
+
 BOARD_SEPOLICY_UNION := \
        file.te \
-       file_contexts
+       file_contexts \
+       healthd.te \
+       init_shell.te \
+       installd.te \
+       netd.te \
+       untrusted_app.te \
+       vold.te \
+       zygote.te
 
 # recovery configs
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/recovery/recovery.fstab
