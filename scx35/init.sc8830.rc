@@ -34,6 +34,12 @@ on init
     # @}
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
+# SPRD: add for OTG usb disk @{
+    mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
+    mkdir /storage/usbdisk 0000 system system
+    symlink /storage/usbdisk /mnt/usbdisk
+# @}
+
 on fs
     ubiattach 0 ubipac
     mount_all /fstab.sc8830
@@ -202,6 +208,10 @@ service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -l /data/media/temp_sd 
     disabled
 
 service fuse_tempsd /system/bin/sdcard -u 1023 -g 1023 -l /data/media/temp_sd /storage/sdcard0
+    class late_start
+    disabled
+
+service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
     class late_start
     disabled
 # @}
