@@ -102,9 +102,9 @@
         <EncoderProfile quality="high" fileFormat="mp4" duration="60">
             <Video codec="h264"
                    bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
+                   width="1280"
+                   height="720"
+                   frameRate="30" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -125,9 +125,9 @@
         <EncoderProfile quality="timelapsehigh" fileFormat="mp4" duration="60">
             <Video codec="h264"
                    bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
+                   width="1280"
+                   height="720"
+                   frameRate="30" />
             <Audio codec="aac"
                    bitRate="96000"
                    sampleRate="44100"
@@ -319,54 +319,6 @@
                    width="1280"
                    height="720"
                    frameRate="30" />
-            <!-- audio setting is ignored -->
-            <Audio codec="aac"
-                   bitRate="96000"
-                   sampleRate="44100"
-                   channels="1" />
-        </EncoderProfile>
-
-        <EncoderProfile quality="1080p" fileFormat="mp4" duration="60">
-            <Video codec="h264"
-                   bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
-            <Audio codec="aac"
-                   bitRate="96000"
-                   sampleRate="44100"
-                   channels="1" />
-        </EncoderProfile>
-        <EncoderProfile quality="1080p" fileFormat="mp4" duration="60">
-            <Video codec="m4v"
-                   bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
-            <Audio codec="aac"
-                   bitRate="96000"
-                   sampleRate="44100"
-                   channels="1" />
-        </EncoderProfile>
-
-        <EncoderProfile quality="timelapse1080p" fileFormat="mp4" duration="60">
-            <Video codec="h264"
-                   bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
-            <!-- audio setting is ignored -->
-            <Audio codec="aac"
-                   bitRate="96000"
-                   sampleRate="44100"
-                   channels="1" />
-        </EncoderProfile>
-        <EncoderProfile quality="timelapse1080p" fileFormat="mp4" duration="60">
-            <Video codec="m4v"
-                   bitRate="16000000"
-                   width="1920"
-                   height="1088"
-                   frameRate="25" />
             <!-- audio setting is ignored -->
             <Audio codec="aac"
                    bitRate="96000"
@@ -644,21 +596,21 @@
          or query the capabilities of the codec at all if it is disabled
     -->
     <VideoEncoderCap name="h264" enabled="true"
-        minBitRate="16000" maxBitRate="32000000"
-        minFrameWidth="176" maxFrameWidth="1920"
-        minFrameHeight="144" maxFrameHeight="1088"
+        minBitRate="16000" maxBitRate="16000000"
+        minFrameWidth="176" maxFrameWidth="1280"
+        minFrameHeight="144" maxFrameHeight="720"
         minFrameRate="15" maxFrameRate="60" />
 
     <VideoEncoderCap name="h263" enabled="true"
-        minBitRate="16000" maxBitRate="32000000"
-        minFrameWidth="176" maxFrameWidth="1920"
-        minFrameHeight="144" maxFrameHeight="1088"
+        minBitRate="16000" maxBitRate="16000000"
+        minFrameWidth="176" maxFrameWidth="1280"
+        minFrameHeight="144" maxFrameHeight="720"
         minFrameRate="15" maxFrameRate="60" />
 
     <VideoEncoderCap name="m4v" enabled="true"
-        minBitRate="16000" maxBitRate="32000000"
-        minFrameWidth="176" maxFrameWidth="1920"
-        minFrameHeight="144" maxFrameHeight="1088"
+        minBitRate="16000" maxBitRate="16000000"
+        minFrameWidth="176" maxFrameWidth="1280"
+        minFrameHeight="144" maxFrameHeight="720"
         minFrameRate="15" maxFrameRate="60" />
 
     <AudioEncoderCap name="aac" enabled="true"
