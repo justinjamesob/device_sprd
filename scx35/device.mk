@@ -80,6 +80,7 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/ueventd.sc8830.rc:root/ueventd.sc8830.rc \
 	$(PLATDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
 	$(PLATDIR)/sci-keypad.kl:system/usr/keylayout/sci-keypad.kl \
+	$(PLATDIR)/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
 	$(PLATDIR)/media_codecs.xml:system/etc/media_codecs.xml \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
