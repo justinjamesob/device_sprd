@@ -38,6 +38,8 @@ on fs
     ubiattach 0 ubipac
     mount_all /fstab.scx15
     setprop ro.crypto.fuse_sdcard true
+    symlink /system/res /res
+    symlink /system/bin /bin
 
 #Allow others to read fb devices
     chmod 664 /dev/graphics/fb0
