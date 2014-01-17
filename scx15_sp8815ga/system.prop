@@ -42,3 +42,7 @@ ro.digital.fm.support=1
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
+
+#zram config
+ro.config.zram.support=true
+ro.board_ram_size=low
