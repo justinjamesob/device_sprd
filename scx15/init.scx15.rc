@@ -148,6 +148,9 @@ on property:ro.debuggable=1
     write /sys/kernel/debug/fatal_dump/enable 1
     mkdir /data/corefile
     chmod 777 /data/corefile
+    chmod 777 /sys/kernel/debug/sc2711-regulator/vddarm/voltage
+    chmod 777 /sys/kernel/debug/sc2711-regulator/vddcore/voltage
+    chmod 777 /sys/kernel/debug
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
 
