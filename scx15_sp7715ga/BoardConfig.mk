@@ -26,9 +26,15 @@ ifeq ($(TARGET_PRODUCT), scx15_sp7715gaplushvga)
 KERNEL_DEFCONFIG := sp7715ga-native-hvga_defconfig
 UBOOT_DEFCONFIG := sp7715ga-hvga
 else
-KERNEL_DEFCONFIG := sp7715ga-native_defconfig
-UBOOT_DEFCONFIG := sp7715ga
+       ifeq ($(TARGET_PRODUCT), scx15_sp7715gacuccspecAplus_UUIhvga)
+       KERNEL_DEFCONFIG := sp7715ga-native-hvga_defconfig
+       UBOOT_DEFCONFIG := sp7715ga-hvga
+       else
+       KERNEL_DEFCONFIG := sp7715ga-native_defconfig
+       UBOOT_DEFCONFIG := sp7715ga
+       endif
 endif
+
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 2M
