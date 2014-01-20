@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-TARGET_PLATFORM := scx35
-PLATDIR := device/sprd/$(TARGET_PLATFORM)
+TARGET_PLATFORM := sc8830
+PLATDIR := device/sprd/scx35
 
 TARGET_BOARD := scx35_sp8830ga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
