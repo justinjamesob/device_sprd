@@ -18,5 +18,4 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx15_sp7715eabase.mk \
 	$(LOCAL_DIR)/scx15_sp7715eaplus.mk \
 	$(LOCAL_DIR)/scx15_sp7715eacuccspecAplus_UUI.mk \
-	$(LOCAL_DIR)/scx15_sp7715eaplus_dt.mk \
-	$(LOCAL_DIR)/scx15_sp7715eatrisim.mk
+	$(LOCAL_DIR)/scx15_sp7715eaplus_dt.mk

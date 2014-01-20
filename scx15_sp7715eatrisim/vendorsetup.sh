@@ -13,8 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-add_lunch_combo scx15_sp7715eabase-userdebug
-add_lunch_combo scx15_sp7715eaplus-userdebug
-add_lunch_combo scx15_sp7715eacuccspecAplus_UUI-userdebug
-add_lunch_combo scx15_sp7715eaplus_dt-userdebug
+add_lunch_combo scx15_sp7715eatrisim-userdebug
