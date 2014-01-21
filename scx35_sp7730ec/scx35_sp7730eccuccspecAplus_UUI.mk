@@ -1,4 +1,4 @@
--include vendor/sprd/operator/cucc/specA/res/boot/boot_res_qhd.mk
+-include vendor/sprd/operator/cucc/specA/res/boot/boot_res.mk
 
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp7730ec/scx35_sp7730ecplus.mk
