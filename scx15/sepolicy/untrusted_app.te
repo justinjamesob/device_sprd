@@ -1,2 +1,4 @@
 allow untrusted_app apk_data_file:dir getattr;
 allow untrusted_app app_data_file:file execute;
+allow untrusted_app system_data_file:file append;
+allow untrusted_app init:unix_stream_socket {read write getattr getopt};

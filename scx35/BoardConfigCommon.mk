@@ -43,9 +43,12 @@ BOARD_SEPOLICY_UNION := \
        file.te \
        file_contexts \
        healthd.te \
+       init.te \
        init_shell.te \
        installd.te \
        netd.te \
+       shell.te \
+       system.te \
        untrusted_app.te \
        vold.te \
        zygote.te

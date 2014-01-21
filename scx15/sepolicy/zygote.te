@@ -4,3 +4,4 @@ allow zygote platform_app_data_file:dir search;
 allow zygote platform_app_data_file:file {open read getattr append};
 allow zygote proc:file append;
 allow zygote cpuctl_device:dir search;
+allow zygote servicemanager:binder transfer;
