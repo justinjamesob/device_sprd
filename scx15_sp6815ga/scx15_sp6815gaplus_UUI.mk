@@ -8,3 +8,6 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 # SprdLauncher1
 PRODUCT_PACKAGES += \
          SprdLauncher1
+
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.device.support.geocode=false
