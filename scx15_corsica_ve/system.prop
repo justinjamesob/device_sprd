@@ -37,4 +37,4 @@ ro.modem.wcn.assert=/dev/spipe_wcn2
 ro.modem.wcn.id=1
 ro.modem.wcn.count=1
 camera.disable_zsl_mode=1
-
+persist.sys.engpc.disable=1
