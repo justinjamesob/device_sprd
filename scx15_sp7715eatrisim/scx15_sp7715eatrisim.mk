@@ -17,7 +17,7 @@
 TARGET_PLATFORM := scx15
 PLATDIR := device/sprd/$(TARGET_PLATFORM)
 
-TARGET_BOARD := scx15_sp7715ea
+TARGET_BOARD := scx15_sp7715eatrisim
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -41,7 +41,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msmslt=0 \
 	ro.modem.w.count=3 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=4 \
+        sys.usb.gser.count=6 \
         persist.support.oplpnn=true \
         persist.support.cphsfirst=false
 
@@ -51,6 +51,7 @@ PRODUCT_PACKAGES += \
         fm.$(TARGET_PLATFORM) \
         ValidationTools \
         EngineerMode
+
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
@@ -67,14 +68,14 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
-$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # Overrides
 PRODUCT_NAME := scx15_sp7715eatrisim
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp7715ea
+PRODUCT_MODEL := sp7715eatrisim
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
