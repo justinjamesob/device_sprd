@@ -1,3 +1,5 @@
+-include vendor/sprd/operator/cucc/specA/res/boot/boot_res.mk
+
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp7730ga/scx35_sp7730gaplus.mk
 
