@@ -16,3 +16,4 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 PRODUCT_PACKAGES += \
         SprdLauncher2
 
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
