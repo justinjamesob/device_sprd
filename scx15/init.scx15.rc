@@ -161,7 +161,7 @@ on property:ro.modem.t.count=2
     write /proc/sim/0 t
     write /proc/sim/1 t
 
-on property:ro.modem.t.count=2
+on property:ro.modem.t.count=3
     write /proc/sim/0 t
     write /proc/sim/1 t
     write /proc/sim/2 t
