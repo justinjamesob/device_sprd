@@ -1,5 +1,7 @@
 include device/sprd/scx15_sp6815ga/scx15_sp6815gaplus.mk
 
+PRODUCT_THEME_PACKAGES := SimpleStyle
+
 PRODUCT_NAME := scx15_sp6815gaplus_UUI
 
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)

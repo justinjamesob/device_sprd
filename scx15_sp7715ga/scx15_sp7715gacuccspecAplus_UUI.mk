@@ -1,5 +1,7 @@
 -include vendor/sprd/operator/cucc/specA/res/boot/boot_res_fwvga.mk
 
+PRODUCT_THEME_PACKAGES := SimpleStyle
+
 $(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 
 include device/sprd/scx15_sp7715ga/scx15_sp7715gaplus.mk

@@ -1,6 +1,8 @@
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp8830ga/scx35_sp8830gaplus.mk
 
+PRODUCT_THEME_PACKAGES := SimpleStyle
+
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp8830gacmccspecAplus_UUI
