@@ -29,4 +29,5 @@ ro.modem.w.assert=/dev/spipe_w2
 ro.modem.w.vbc=/dev/spipe_w6
 ro.modem.w.id=0
 camera.disable_zsl_mode=1
+persist.sys.engpc.disable=1
 
