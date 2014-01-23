@@ -1,6 +1,7 @@
 include device/sprd/scx15_sp6815ga/scx15_sp6815gaplus.mk
 
 PRODUCT_THEME_PACKAGES := SimpleStyle
+PRODUCT_THEME_FLAGS := shrink
 
 PRODUCT_NAME := scx15_sp6815gaplus_UUI
 
@@ -23,3 +24,4 @@ PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=en
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=US
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
