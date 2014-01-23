@@ -24,5 +24,5 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx15_sp7715gaplus.mk \
 	$(LOCAL_DIR)/scx15_sp7715gaplushvga.mk \
 	$(LOCAL_DIR)/scx15_sp7715gacuccspecAplus_UUI.mk \
-	$(LOCAL_DIR)/scx15_sp7715gacuccspecAplus_UUIhvga.mk
+	$(LOCAL_DIR)/scx15_sp7715gaplus_UUIhvga.mk
 

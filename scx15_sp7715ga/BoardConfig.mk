@@ -26,7 +26,7 @@ ifeq ($(TARGET_PRODUCT), scx15_sp7715gaplushvga)
 KERNEL_DEFCONFIG := sp7715ga-native-hvga_defconfig
 UBOOT_DEFCONFIG := sp7715ga-hvga
 else
-       ifeq ($(TARGET_PRODUCT), scx15_sp7715gacuccspecAplus_UUIhvga)
+       ifeq ($(TARGET_PRODUCT), scx15_sp7715gaplus_UUIhvga)
        KERNEL_DEFCONFIG := sp7715ga-native-hvga_defconfig
        UBOOT_DEFCONFIG := sp7715ga-hvga
        else

@@ -18,5 +18,5 @@ add_lunch_combo scx15_sp7715gabase-userdebug
 add_lunch_combo scx15_sp7715gaplus-userdebug
 add_lunch_combo scx15_sp7715gaplushvga-userdebug
 add_lunch_combo scx15_sp7715gacuccspecAplus_UUI-userdebug
-add_lunch_combo scx15_sp7715gacuccspecAplus_UUIhvga-userdebug
+add_lunch_combo scx15_sp7715gaplus_UUIhvga-userdebug
 
