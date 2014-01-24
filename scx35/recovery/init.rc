@@ -41,10 +41,6 @@ on init
 #on fs
 #   mount_all /fstab.sc8830
 
-# SPRD: add for support ubi
-on fs
-    ubiattach 0 ubipac
-
 on post-fs
     write /sys/devices/platform/sprd-sdhci-shark.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
     write /sys/devices/platform/sprd-sdhci-shark.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot1/force_ro 0
@@ -110,8 +106,7 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 1
 
 on cali
-    # SPRD: move this to action "on fs" for support ubi
-    # ubiattach 0 ubipac
+    ubiattach 0 ubipac
     mount_all /fstab.sc8830
     class_start cali
 
