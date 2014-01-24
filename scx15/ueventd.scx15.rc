@@ -58,3 +58,4 @@
 /dev/ltr_558als         0664     system      system
 /dev/st480              0664     system      system
 /dev/sttybt0            0660     bluetooth   bluetooth
+/dev/board_type         0664     system      system

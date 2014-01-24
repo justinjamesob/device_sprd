@@ -73,6 +73,7 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_7715.mk)
 
 # Overrides
 PRODUCT_NAME := scx15_sp7715gatrisim
