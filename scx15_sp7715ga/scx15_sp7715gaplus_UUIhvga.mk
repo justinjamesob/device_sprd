@@ -8,10 +8,10 @@ PRODUCT_NAME := scx15_sp7715gaplus_UUIhvga
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
-# In CUCC, we won't add PinyinIME into PRODUCT_PACKAGES
+# We won't add PinyinIME into PRODUCT_PACKAGES as request.
 PRODUCT_PACKAGES := $(filter-out PinyinIME, $(PRODUCT_PACKAGES))
 
-PRODUCT_PACKAGES += IDooIME_CMCC
+PRODUCT_PACKAGES += IDooIME
 
 # SprdLauncher2
 PRODUCT_PACKAGES += \

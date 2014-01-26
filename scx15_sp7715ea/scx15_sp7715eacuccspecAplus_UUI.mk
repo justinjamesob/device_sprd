@@ -15,8 +15,8 @@ PRODUCT_PACKAGES += \
         SprdLauncher1
 
 # SprdLauncher2
-PRODUCT_PACKAGES += \
-        SprdLauncher2
+#PRODUCT_PACKAGES += \
+#        SprdLauncher2
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
