@@ -101,7 +101,7 @@
         </EncoderProfile>
         <EncoderProfile quality="high" fileFormat="mp4" duration="60">
             <Video codec="h264"
-                   bitRate="16000000"
+                   bitRate="8000000"
                    width="1280"
                    height="720"
                    frameRate="30" />
@@ -124,7 +124,7 @@
         </EncoderProfile>
         <EncoderProfile quality="timelapsehigh" fileFormat="mp4" duration="60">
             <Video codec="h264"
-                   bitRate="16000000"
+                   bitRate="8000000"
                    width="1280"
                    height="720"
                    frameRate="30" />
