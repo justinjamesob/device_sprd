@@ -47,3 +47,6 @@ ro.config.ksm.support=true
 #zram config
 ro.config.zram.support=true
 ro.board_ram_size=low
+# SPRD: add for mount cache to sdcard @{
+persist.sys.mount2sd_enable = true
+# @}
