@@ -5,8 +5,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 # sprd telephony
 PRODUCT_PACKAGES += \
 	Dialer \
-	Mms	\
-	Stk
+	Mms
 
 # graphics modules
 PRODUCT_PACKAGES += \
