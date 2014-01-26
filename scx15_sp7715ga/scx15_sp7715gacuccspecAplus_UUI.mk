@@ -1,6 +1,7 @@
 -include vendor/sprd/operator/cucc/specA/res/boot/boot_res_fwvga.mk
 
 PRODUCT_THEME_PACKAGES := SimpleStyle
+PRODUCT_THEME_FLAGS := shrink
 
 $(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 

@@ -53,6 +53,9 @@ PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
 	fm.$(TARGET_PLATFORM)
 
+-include vendor/sprd/open-source/common_packages.mk
+-include vendor/sprd/open-source/plus_special_packages.mk
+
 #	libmllite.so \
 #	libmplmpu.so \
 #	libinvensense_hal
@@ -68,8 +71,6 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
-$(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
-$(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # Overrides
