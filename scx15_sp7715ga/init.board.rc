@@ -1,4 +1,8 @@
 
+# add for mount cache to sdcard @{
+on init
+    mkdir /cache2 0770 system cache
+# @}
 # add for physical external storage as primary @{
 on early-fs
     mkdir /storage/temp_sd 0700 root root
@@ -8,7 +12,6 @@ on early-fs
     setprop persist.storage.type 1
     setprop sys.tempsd.enable 1
 # @}
-
 on boot
 
     #write /sys/class/gpio/export 167
