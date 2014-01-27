@@ -5,6 +5,12 @@ cache			/cache			ubifs	defaults	defaults
 misc			/misc			ubi		defaults	defaults
 boot			/boot			ubi		defaults	defaults
 recovery		/recovery		ubi		defaults	defaults
+tdmodem			/tdmodem		ubi		defaults	defaults
+tddsp			/tddsp			ubi 	defaults	defaults
+tdfixnv1		/tdfixnv1		ubi		defaults	defaults
+tdfixnv2		/tdfixnv2		ubi		defaults	defaults
+tdruntimenv1	/tdruntimenv1	ubi		defaults	defaults
+tdruntimenv2	/tdruntimenv2	ubi		defaults	defaults
 wmodem			/wmodem			ubi		defaults	defaults
 wdsp			/wdsp			ubi 	defaults	defaults
 wfixnv1			/wfixnv1		ubi		defaults	defaults
