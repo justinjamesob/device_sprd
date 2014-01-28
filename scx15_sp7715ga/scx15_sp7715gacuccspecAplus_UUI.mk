@@ -18,3 +18,5 @@ PRODUCT_PACKAGES += \
         SprdLauncher2
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
+PRODUCT_PACKAGES := $(filter-out PinyinIME, $(PRODUCT_PACKAGES))
