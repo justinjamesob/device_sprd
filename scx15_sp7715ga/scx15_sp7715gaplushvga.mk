@@ -20,6 +20,8 @@ PLATDIR := device/sprd/$(TARGET_PLATFORM)
 TARGET_BOARD := scx15_sp7715ga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
+PRODUCT_LCD_TYPE := hvga
+
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/nand/nand_device.mk)
@@ -72,7 +74,7 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
         $(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_cu_hvga.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
