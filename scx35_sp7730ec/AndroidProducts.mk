@@ -17,4 +17,4 @@
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7730ecbase.mk \
 	$(LOCAL_DIR)/scx35_sp7730ecplus.mk \
-	$(LOCAL_DIR)/scx35_sp7730eccuccspecAplus_UUI.mk
+	$(LOCAL_DIR)/scx35_sp7730eccuccspecBplus_UUI.mk
