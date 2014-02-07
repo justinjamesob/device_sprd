@@ -7,7 +7,7 @@ LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp7730ec/scx35_sp7730ecplus
 
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
-PRODUCT_NAME := scx35_sp7730eccuccspecAplus_UUI
+PRODUCT_NAME := scx35_sp7730eccuccspecBplus_UUI
 
 $(call inherit-product-if-exists, vendor/sprd/operator/cucc/specB.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
