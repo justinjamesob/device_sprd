@@ -141,6 +141,15 @@ service iprenew_bnep0 /system/bin/dhcpcd -n
     class main
     disabled
     oneshot
+    
+service dhcpcd_bt-pan /system/bin/dhcpcd -BKLG
+   disabled
+   oneshot
+
+
+service iprenew_bt-pan /system/bin/dhcpcd -n
+    disabled
+    oneshot    
 
 service engpcclientw /system/bin/engpc -t 0 -a /dev/ttyGS0 -d /dev/ttyGS1
     class core
