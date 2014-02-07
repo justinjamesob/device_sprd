@@ -9,7 +9,7 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp7730eccuccspecAplus_UUI
 
-$(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)
+$(call inherit-product-if-exists, vendor/sprd/operator/cucc/specB.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
