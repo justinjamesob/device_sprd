@@ -56,7 +56,8 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
-	$(BOARDDIR)/goodix_ts.idc:system/usr/idc/goodix_ts.idc
+	$(BOARDDIR)/goodix_ts.idc:system/usr/idc/goodix_ts.idc \
+	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
