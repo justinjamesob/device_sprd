@@ -42,6 +42,8 @@ BOARD_SEPOLICY_DIRS := device/sprd/scx35/sepolicy
 BOARD_SEPOLICY_UNION := \
        file.te \
        file_contexts \
+       seapp_contexts \
+       theme.te \
        healthd.te \
        init.te \
        init_shell.te \
