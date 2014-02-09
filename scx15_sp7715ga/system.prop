@@ -50,3 +50,6 @@ ro.board_ram_size=low
 # SPRD: add for mount cache to sdcard @{
 persist.sys.mount2sd_enable = true
 # @}
+
+# Using "Secure USB debugging"
+ro.adb.secure=1

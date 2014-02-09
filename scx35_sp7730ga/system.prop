@@ -50,3 +50,6 @@ ro.board_ram_size=mid
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
+
+# Using "Secure USB debugging"
+ro.adb.secure=1

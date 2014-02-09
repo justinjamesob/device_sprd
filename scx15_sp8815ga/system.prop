@@ -47,3 +47,6 @@ ro.config.low_ram=true
 #zram config
 ro.config.zram.support=true
 ro.board_ram_size=low
+
+# Using "Secure USB debugging"
+ro.adb.secure=1
