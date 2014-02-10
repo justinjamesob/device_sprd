@@ -31,5 +31,5 @@ PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=en
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=US
 
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 

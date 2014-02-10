@@ -21,5 +21,5 @@ PRODUCT_PACKAGES += \
 #PRODUCT_PACKAGES += \
 #        SprdLauncher2
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
