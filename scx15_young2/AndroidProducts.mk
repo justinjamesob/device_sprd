@@ -15,5 +15,5 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx15_fame2.mk
+	$(LOCAL_DIR)/scx15_young2.mk
 

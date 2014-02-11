@@ -20,9 +20,9 @@
 TARGET_RECOVERY_FSTAB := device/sprd/scx15/emmc/recovery.fstab
 
 # board configs
-TARGET_BOOTLOADER_BOARD_NAME := scx15_fame2
-UBOOT_DEFCONFIG := fame2
-KERNEL_DEFCONFIG := fame2-native_defconfig
+TARGET_BOOTLOADER_BOARD_NAME := scx15_young2
+UBOOT_DEFCONFIG := young2
+KERNEL_DEFCONFIG := young2-native_defconfig
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M

@@ -17,7 +17,7 @@
 TARGET_PLATFORM := scx15
 PLATDIR := device/sprd/$(TARGET_PLATFORM)
 
-TARGET_BOARD := scx15_fame2
+TARGET_BOARD := scx15_young2
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -80,9 +80,9 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 
 # Overrides
-PRODUCT_NAME := scx15_fame2
+PRODUCT_NAME := scx15_young2
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := fame2
+PRODUCT_MODEL := young2
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
