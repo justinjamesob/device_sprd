@@ -10,7 +10,7 @@
 /dev/sprd_sensor        0660     system      audio
 /dev/video0             0660     system      audio
 /dev/ion                0666     system      graphics
-/dev/mali               0666     system      graphics
+/dev/mali0              0666     system      graphics
 
 /dev/stty_td*           0660     radio       system
 /dev/stty_w*            0660    radio       system
