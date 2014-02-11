@@ -28,6 +28,7 @@ $(call inherit-product, $(PLATDIR)/proprietories.mk)
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 PRODUCT_AAPT_CONFIG := hdpi
+PRODUCT_CHARACTERISTICS := tablet
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
