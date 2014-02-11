@@ -125,7 +125,8 @@ PRODUCT_MODEL := sp7710ga_orange
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
-
+#For the following languages:Gujarati,Punjabi,Tibetan
+#Please customers prepare the corresponding font to replace Gujarati.ttf, Punjabi.ttf, Tibetan.ttf
 PRODUCT_LOCALES := zh_CN zh_TW en_US
 HAVE_WLAN_CU_FEATURE := true
 ifeq ($(USE_PROJECT_SEC),true)
