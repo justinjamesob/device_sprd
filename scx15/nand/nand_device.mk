@@ -5,5 +5,6 @@ PRODUCT_COPY_FILES += \
 # SPRD:add for mount cache to sdcard @{
 PRODUCT_PACKAGES += \
     mke2fs \
-    mkcached.sh
+    mkcached.sh \
+	busybox
 # @}
