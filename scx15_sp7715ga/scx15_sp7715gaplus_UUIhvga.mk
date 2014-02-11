@@ -1,3 +1,5 @@
+-include vendor/sprd/operator/cucc/specA/res/boot/boot_res_hvga.mk
+
 PRODUCT_THEME_PACKAGES := SimpleStyle
 PRODUCT_THEME_FLAGS := shrink
 
