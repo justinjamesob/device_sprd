@@ -10,6 +10,9 @@ $(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false
+
 # SprdLauncher1
 PRODUCT_PACKAGES += \
         SprdLauncher1
