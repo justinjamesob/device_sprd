@@ -11,7 +11,9 @@ $(call add-radio-file,modem_bins/wdsp.bin)
 ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)
 
 INSTALLED_UBOOT_TARGET := $(PRODUCT_OUT)/u-boot.bin
+INSTALLED_CHIPRAM_TARGET := $(PRODUCT_OUT)/u-boot-spl-16k.bin
 -include u-boot/AndroidUBoot.mk
+-include chipram/AndroidChipram.mk
 
 INSTALLED_RADIOIMAGE_TARGET += $(PRODUCT_OUT)/u-boot.bin
 INSTALLED_RADIOIMAGE_TARGET += $(PRODUCT_OUT)/u-boot-spl-16k.bin
