@@ -15,6 +15,7 @@ $(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false \
         ro.homekey.physical=true
 
 # SprdLauncher1
