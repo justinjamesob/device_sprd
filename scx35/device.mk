@@ -89,7 +89,6 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/open-source/res/productinfo/default_connectivity_configure.ini:system/etc/connectivity_configure.ini \
 	vendor/sprd/open-source/res/productinfo/connectivity_calibration.ini:prodnv/connectivity_calibration.ini \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
-	vendor/sprd/open-source/libs/audio/apm/audio_policy.conf:system/etc/audio_policy.conf \
 	vendor/sprd/open-source/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	vendor/sprd/open-source/apps/scripts/ext_data.sh:system/bin/ext_data.sh \
 	vendor/sprd/open-source/apps/scripts/ext_kill.sh:system/bin/ext_kill.sh \

@@ -61,6 +61,7 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
+	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
     	vendor/sprd/partner/marvell/L2000/gps.default.so:system/lib/hw/gps.default.so \
 	vendor/sprd/partner/marvell/L2000/libagps_hal.so:system/lib/libagps_hal.so \
 	vendor/sprd/partner/marvell/L2000/rom.bin:system/etc/rom.bin \
