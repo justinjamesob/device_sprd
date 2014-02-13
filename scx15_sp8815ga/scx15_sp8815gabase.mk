@@ -43,7 +43,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4 \
         persist.support.oplpnn=true \
-        persist.support.cphsfirst=false
+        persist.support.cphsfirst=false \
+	lmk.autocalc=false
 
 # board-specific modules
 PRODUCT_PACKAGES += \

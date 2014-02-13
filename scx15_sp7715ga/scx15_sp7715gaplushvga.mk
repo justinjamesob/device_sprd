@@ -49,7 +49,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.support.cphsfirst=false \
 	ro.sf.lcd_density=160 \
 	ro.sf.lcd_width=32 \
-	ro.sf.lcd_height=48
+	ro.sf.lcd_height=48 \
+	lmk.autocalc=false
 
 # board-specific modules
 PRODUCT_PACKAGES += \

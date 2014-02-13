@@ -50,6 +50,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=240 \
 	ro.sf.lcd_width=54 \
 	ro.sf.lcd_height=96 \
+	lmk.autocalc=false \
 	ro.moz.ril.query_icc_count=true \
 	ro.moz.mute.call.to_ril=true \
 	ro.moz.ril.numclients=2 \
