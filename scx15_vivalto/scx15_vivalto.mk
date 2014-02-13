@@ -72,7 +72,11 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/partner/marvell/L2000/RXNdata/license.key:system/etc/license.key \
 	vendor/sprd/partner/marvell/L2000/RXNdata/security.key:system/etc/security.key \
 	vendor/sprd/partner/marvell/L2000/RXNdata/MSLConfig.txt:system/etc/MSLConfig.txt \
-	vendor/sprd/partner/marvell/L2000/RXNdata/rxn_config_data:system/etc/rxn_config_data
+	vendor/sprd/partner/marvell/L2000/RXNdata/rxn_config_data:system/etc/rxn_config_data \
+	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
+	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
+	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+	frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
