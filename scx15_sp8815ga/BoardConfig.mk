@@ -39,6 +39,8 @@ TARGET_BOARD_FRONT_CAMERA_INTERFACE := ccir
 
 #select camera zsl cap mode
 TARGET_BOARD_CAMERA_CAPTURE_MODE := false
+#select continuous auto focus
+TARGET_BOARD_CAMERA_CAF := true
 
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
