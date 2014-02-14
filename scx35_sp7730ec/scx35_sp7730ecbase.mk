@@ -21,6 +21,7 @@ TARGET_BOARD := scx35_sp7730ec
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_7730.mk)
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
@@ -74,7 +75,6 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
-$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_7730.mk)
 
 # Overrides
 PRODUCT_NAME := scx35_sp7730ecbase
