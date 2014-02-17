@@ -5,6 +5,8 @@ PRODUCT_THEME_FLAGS := shrink
 
 PRODUCT_NAME := scx15_sp6815gaplus_UUI
 
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
@@ -22,8 +24,6 @@ endif
 #Default language when first Boot
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=en
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=US
-
-DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 # We won't add PinyinIME into PRODUCT_PACKAGES as request.
 PRODUCT_PACKAGES := $(filter-out PinyinIME, $(PRODUCT_PACKAGES))

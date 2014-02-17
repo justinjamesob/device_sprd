@@ -7,6 +7,8 @@ include device/sprd/scx15_sp7715ga/scx15_sp7715gaplushvga.mk
 
 PRODUCT_NAME := scx15_sp7715gaplus_UUIhvga
 
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
@@ -29,7 +31,4 @@ endif
 #Default language when first Boot
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=en
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=US
-
-
-DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 

@@ -9,6 +9,8 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp7730eccuccspecBplus_UUI
 
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
 $(call inherit-product-if-exists, vendor/sprd/operator/cucc/specB.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
@@ -25,5 +27,3 @@ PRODUCT_PACKAGES += \
 # SprdLauncher2
 #PRODUCT_PACKAGES += \
 #        SprdLauncher2
-
-DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay

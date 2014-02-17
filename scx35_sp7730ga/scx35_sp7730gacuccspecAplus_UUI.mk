@@ -12,6 +12,8 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp7730gacuccspecAplus_UUI
 
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+
 $(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
@@ -20,6 +22,4 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 # SprdLauncher2
 PRODUCT_PACKAGES += \
         SprdLauncher2
-
-DEVICE_PACKAGE_OVERLAYS += $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
