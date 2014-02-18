@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 The Android Open-Source Project
+# Copyright (C) 2007 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx15_corsica_ve.mk \
-	$(LOCAL_DIR)/scx15_corsica_ve_0_1_A.mk
+include device/sprd/scx15_corsica_ve/scx15_corsica_ve.mk
+PRODUCT_NAME := scx15_corsica_ve_0_1_A
+BOARD_TSP_CONFIG := true
 

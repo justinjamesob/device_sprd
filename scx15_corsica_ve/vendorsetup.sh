@@ -15,3 +15,4 @@
 #
 
 add_lunch_combo scx15_corsica_ve-userdebug
+add_lunch_combo scx15_corsica_ve_0_1_A-userdebug
