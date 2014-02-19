@@ -70,7 +70,8 @@ PRODUCT_PACKAGES += \
 	wcnd \
 	libsprdstreamrecoder \
 	libvtmanager  \
-	zram.sh
+	zram.sh \
+	bdt
 
 # general configs
 PRODUCT_COPY_FILES += \
