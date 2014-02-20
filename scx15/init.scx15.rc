@@ -42,6 +42,7 @@ on init
 on fs
     ubiattach 0 ubipac
     mount_all /fstab.scx15
+    mount pstore pstore /sys/fs/pstore
     setprop ro.crypto.fuse_sdcard true
     symlink /system/res /res
     symlink /system/bin /bin
