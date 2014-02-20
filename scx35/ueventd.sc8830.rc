@@ -59,4 +59,6 @@
 /dev/ts0710mux*         0660     radio       system
 /dev/ltr_558als         0664     system      system
 /dev/sttybt0            0660     bluetooth   bluetooth
-/dev/board_type         0664     system      system
+/dev/board_type         0660     bluetooth   system
+/dev/ttyV0		0660     system      system
+/dev/ttyV1		0660     system      system

@@ -46,8 +46,8 @@ on boot
     mkdir /data/cg/ 0777 system system
     mkdir /data/cg/online 0777 system system
     mkdir /data/cg/supl 0777 system system
-    chmod 777 /dev/ttyV1
-    chmod 777 /dev/ttyV0
+    chmod 660 /dev/ttyV1
+    chmod 660 /dev/ttyV0
     chmod 777 /system/etc/GPSenseEngine.xml
     chmod 777 /system/etc/HiMap.db
     chmod 777 /system/bin/GPSenseEngine
