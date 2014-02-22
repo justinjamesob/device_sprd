@@ -16,5 +16,6 @@
 
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx15_corsica_ve.mk \
-	$(LOCAL_DIR)/scx15_corsica_ve_0_1_A.mk
+	$(LOCAL_DIR)/scx15_corsica_ve_0_1_A.mk \
+	$(LOCAL_DIR)/scx15_corsica_ve_dt.mk
 

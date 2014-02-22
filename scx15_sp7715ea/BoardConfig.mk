@@ -25,7 +25,7 @@ UBOOT_DEFCONFIG := sp7715ea
 ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
 KERNEL_DEFCONFIG := sp7715ea-dt_defconfig
 else
-KERNEL_DEFCONFIG := sp7715ea-native_defconfig
+KERNEL_DEFCONFIG := corsica_ve-native_dt_defconfig 
 endif
 
 # select camera 2M,3M,5M,8M

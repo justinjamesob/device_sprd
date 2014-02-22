@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 The Android Open Source Project
+# Copyright (C) 2007 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-add_lunch_combo scx15_corsica_ve-userdebug
-add_lunch_combo scx15_corsica_ve_0_1_A-userdebug
-add_lunch_combo scx15_corsica_ve_dt-userdebug
+include device/sprd/scx15_corsica_ve/scx15_corsica_ve.mk
+PRODUCT_NAME := scx15_corsica_ve_dt
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true

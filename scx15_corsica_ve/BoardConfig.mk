@@ -23,10 +23,14 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx15/emmc/recovery.fstab
 TARGET_BOOTLOADER_BOARD_NAME := scx15_corsica_ve
 UBOOT_DEFCONFIG := corsica_ve
 
+ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+KERNEL_DEFCONFIG := corsica_ve-native_dt_defconfig
+else
 ifeq ($(strip $(BOARD_TSP_CONFIG)),true)
 KERNEL_DEFCONFIG := corsica_ve_0_1_A-native_defconfig
 else
 KERNEL_DEFCONFIG := corsica_ve-native_defconfig
+endif
 endif
 
 # select camera 2M,3M,5M,8M
