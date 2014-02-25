@@ -39,6 +39,8 @@ on init
     # @}
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
+    start watchdogd
+
 on fs
     ubiattach 0 ubipac
     mount_all /fstab.scx15
@@ -416,3 +418,8 @@ service srtd /system/xbin/srtd
     user root
     group root
     oneshot
+
+# Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
+service watchdogd /sbin/watchdogd 10 20
+    class core
+    seclabel u:r:watchdogd:s0
