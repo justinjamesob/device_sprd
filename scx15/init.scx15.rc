@@ -61,7 +61,7 @@ on post-fs
 
 on post-fs-data
     copy /system/etc/bluetooth/bt_stack.conf /data/misc/bluedroid/bt_stack.conf
-    chown bluetooth bluetooth /data/misc/bluedroid/bt_stack.conf
+    chown bluetooth system /data/misc/bluedroid/bt_stack.conf
     chmod 0640 /data/misc/bluedroid/bt_stack.conf
 
     # Set indication (checked by vold) that we have finished this action
