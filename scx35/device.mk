@@ -107,3 +107,6 @@ else
 	PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=0
 endif
 
+# add GPS engineer mode apk
+PRODUCT_PACKAGES += \
+        SGPS
