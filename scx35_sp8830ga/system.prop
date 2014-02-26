@@ -54,8 +54,5 @@ ro.board_ram_size=mid
 ro.config.low_ram=true
 # @}
 
-# Using "Secure USB debugging"
-ro.adb.secure=1
-
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false

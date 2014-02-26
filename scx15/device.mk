@@ -105,8 +105,14 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
-	PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=1
+PRODUCT_PROPERTY_OVERRIDES += \
+	persist.sys.sprd.modemreset=1 \
+	ro.adb.secure=1
+
 else
-	PRODUCT_PROPERTY_OVERRIDES += persist.sys.sprd.modemreset=0
-endif
+PRODUCT_PROPERTY_OVERRIDES += \
+	persist.sys.sprd.modemreset=0 \
+	ro.adb.secure=0
+
+endif # TARGET_BUILD_VARIANT == user
 

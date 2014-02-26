@@ -54,8 +54,5 @@ ro.config.ksm.support=true
 ro.config.zram.support=true
 ro.board_ram_size=mid
 
-# Using "Secure USB debugging"
-ro.adb.secure=1
-
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
