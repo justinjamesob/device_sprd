@@ -17,7 +17,7 @@
 TARGET_PLATFORM := sc8830
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35_sp8830ssw
+TARGET_BOARD := scx35_kanas_w
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # copy media_profiles.xml before calling device.mk,
@@ -75,9 +75,9 @@ $(call inherit-product, vendor/sprd/partner/marvell/device-marvell-gps.mk)
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830.mk)
 
 # Overrides
-PRODUCT_NAME := scx35_sp8830ssw
+PRODUCT_NAME := scx35_kanas_w
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp8830ssw
+PRODUCT_MODEL := kanas_w
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
