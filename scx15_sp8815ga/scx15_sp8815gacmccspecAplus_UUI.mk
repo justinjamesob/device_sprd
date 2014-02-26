@@ -1,3 +1,5 @@
+-include vendor/sprd/operator/cmcc/specA/res/boot/boot_res_fwvga.mk
+
 include device/sprd/scx15_sp8815ga/scx15_sp8815gaplus.mk
 
 PRODUCT_NAME := scx15_sp8815gacmccspecAplus_UUI
