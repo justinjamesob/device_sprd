@@ -23,3 +23,5 @@ PRODUCT_PACKAGES += \
 #PRODUCT_PACKAGES += \
 #        SprdLauncher2
 
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)

@@ -23,3 +23,6 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 PRODUCT_PACKAGES += \
         SprdLauncher2
 
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
+
