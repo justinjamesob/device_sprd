@@ -1,3 +1,5 @@
+-include vendor/sprd/operator/cmcc/specA/res/boot/boot_res_qhd.mk
+
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp8830ga/scx35_sp8830gaplus.mk
 
