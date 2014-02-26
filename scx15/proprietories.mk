@@ -11,7 +11,8 @@ PRODUCT_PACKAGES := \
 	rild_sp \
 	libril_sp \
 	libreference-ril_sp \
-	phoneserver 
+	phoneserver  \
+	akmd8963
 
 else
 # for spreadtrum customer proprietories modules: only support direct copy
