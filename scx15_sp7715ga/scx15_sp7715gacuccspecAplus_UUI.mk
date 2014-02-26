@@ -20,3 +20,6 @@ PRODUCT_PACKAGES += \
         SprdLauncher2
 
 PRODUCT_PACKAGES := $(filter-out PinyinIME, $(PRODUCT_PACKAGES))
+
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)

@@ -16,3 +16,5 @@ $(call inherit-product, vendor/sprd/operator/cmcc/specA.mk)
 $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
