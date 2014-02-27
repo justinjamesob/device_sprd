@@ -13,6 +13,7 @@ on early-fs
 # @}
 
 on boot
+    insmod /system/lib/modules/focaltech_ts.ko
 
     #write /sys/class/gpio/export 167
     #write /sys/class/gpio/gpio167/direction out
@@ -169,3 +170,5 @@ service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS2 -d /dev/ttyGS3
     group system radio shell
     disabled
     oneshot
+on alarm
+    insmod /system/lib/modules/focaltech_ts.ko
