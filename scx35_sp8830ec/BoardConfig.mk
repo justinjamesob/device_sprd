@@ -28,6 +28,8 @@ else
 KERNEL_DEFCONFIG := sp8830ec-native_defconfig
 endif
 
+TARGET_GPU_BASE_FREQ := 256
+
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
 TARGET_BOARD_NO_FRONT_SENSOR := true

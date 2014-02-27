@@ -28,6 +28,8 @@ else
 KERNEL_DEFCONFIG := sp7715ea-native_defconfig
 endif
 
+TARGET_GPU_BASE_FREQ := 256
+
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
 TARGET_BOARD_FRONT_CAMERA_ROTATION := true
