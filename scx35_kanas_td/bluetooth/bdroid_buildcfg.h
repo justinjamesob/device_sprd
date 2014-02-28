@@ -17,7 +17,7 @@
 #ifndef _BDROID_BUILDCFG_H
 #define _BDROID_BUILDCFG_H
 
-#define BTM_DEF_LOCAL_NAME   "sp8830ssw Nexus"
+#define BTM_DEF_LOCAL_NAME   "kanas_td Nexus"
 #define BTA_DISABLE_DELAY 1000 /* in milliseconds */
 
 #endif
