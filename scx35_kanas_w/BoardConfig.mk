@@ -22,7 +22,11 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := kanas_w
 UBOOT_DEFCONFIG := kanas_w
-KERNEL_DEFCONFIG := kanas_w-native_defconfig
+ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+   KERNEL_DEFCONFIG := kanas_w_dt-native_defconfig
+else
+   KERNEL_DEFCONFIG := kanas_w-native_defconfig
+endif
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M

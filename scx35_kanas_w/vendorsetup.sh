@@ -15,3 +15,4 @@
 #
 
 add_lunch_combo scx35_kanas_w-userdebug
+add_lunch_combo scx35_kanas_w_dt-userdebug
