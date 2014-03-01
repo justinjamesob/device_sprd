@@ -16,6 +16,8 @@
 
 -include device/sprd/scx35/BoardConfigCommon.mk
 
+TARGET_RECOVERY_INITRC := $(TARGET_RECOVERY_INITRC) device/sprd/scx35_kanas_w/init.board-recovery.rc
+
 # emmc fstab
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 

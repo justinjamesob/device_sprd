@@ -1,3 +1,5 @@
+import /init.board-recovery.rc
+
 on early-init
     start ueventd
     start healthd
