@@ -54,6 +54,14 @@ on boot
     chmod 777 /system/bin/GPSenseEngine
     setprop gps.port ttyV1
 
+    chown system system /sys/class/compass/akm8963/enable_acc
+    chown system system /sys/class/compass/akm8963/enable_mag
+    chown system system /sys/class/compass/akm8963/enable_ori
+    chown system system /sys/class/compass/akm8963/delay_acc
+    chown system system /sys/class/compass/akm8963/delay_mag
+    chown system system /sys/class/compass/akm8963/delay_ori
+    chown system system /sys/class/compass/akm8963/accel
+
 service GPSenseEngine /system/bin/GPSenseEngine
      class main
      user root
@@ -152,6 +160,9 @@ service dhcpcd_bt-pan /system/bin/dhcpcd -BKLG
    disabled
    oneshot
 
+service akmd /system/bin/akmd8963 -m 2
+    class main
+    oneshot
 
 service iprenew_bt-pan /system/bin/dhcpcd -n
     disabled

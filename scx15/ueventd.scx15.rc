@@ -61,3 +61,4 @@
 /dev/board_type         0660     bluetooth   system
 /dev/ttyV0		0660     system      system
 /dev/ttyV1		0660     system      system
+/dev/akm8963_dev        0660     system      system
