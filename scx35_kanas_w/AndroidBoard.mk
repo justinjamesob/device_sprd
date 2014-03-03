@@ -29,3 +29,7 @@ $(file) : $(TARGET_PREBUILT_KERNEL) | $(ACP)
 	$(transform-prebuilt-to-target)
 
 endif # End of Kernel
+
+ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+-include vendor/sprd/open-source/tools/dt/generate_dt_image.mk
+endif

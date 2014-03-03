@@ -17,5 +17,5 @@
 PRODUCT_MARVELL_GPS_UART := uart3
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx35_kanas_w.mk
-
+	$(LOCAL_DIR)/scx35_kanas_w.mk \
+	$(LOCAL_DIR)/scx35_kanas_w_dt.mk
