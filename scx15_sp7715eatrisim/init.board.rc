@@ -10,9 +10,13 @@ on early-fs
     setprop sys.tempsd.enable 0
 # @}
 
-on boot
+
+# add for board-relative touch screen driver for
+# alarm mode and normal mode.
+on post-fs
     insmod /system/lib/modules/focaltech_ts.ko
 
+on boot
     #write /sys/class/gpio/export 167
     #write /sys/class/gpio/gpio167/direction out
     #write /sys/class/gpio/gpio167/value 1
@@ -168,5 +172,3 @@ service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS2 -d /dev/ttyGS3
     group system radio shell
     disabled
     oneshot
-on alarm
-    insmod /system/lib/modules/focaltech_ts.ko
