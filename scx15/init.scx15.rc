@@ -170,6 +170,7 @@ on property:ro.debuggable=1
     chmod 777 /sys/kernel/debug
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
+    wirte /sys/module/smsg/parameters/debug_enable 1
 
 on property:ro.modem.t.count=1
     write /proc/sim/0 t
