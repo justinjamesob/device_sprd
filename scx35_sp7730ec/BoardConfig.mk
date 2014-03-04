@@ -32,6 +32,10 @@ TARGET_BOARD_NO_FRONT_SENSOR := true
 TARGET_BOARD_CAMERA_FLASH_CTRL := false
 
 TARGET_BOARD_BACK_CAMERA_INTERFACE := mipi
+
+#select continuous auto focus
+TARGET_BOARD_CAMERA_CAF := true
+
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 
