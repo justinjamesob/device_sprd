@@ -10,11 +10,6 @@ PRODUCT_NAME := scx35_sp8830eccmccspecAplus_UUI
 PRODUCT_PROPERTY_OVERRIDES += \
         ro.homekey.physical=true
 
-# TODO The SprdLauncher2 is only used to test in sp8830ec, it will be removed
-# in future
-PRODUCT_PACKAGES += \
-    SprdLauncher2
-
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
