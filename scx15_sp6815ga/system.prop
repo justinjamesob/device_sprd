@@ -38,7 +38,7 @@ ro.modem.wcn.id=1
 ro.modem.wcn.count=1
 camera.disable_zsl_mode=1
 ro.digital.fm.support=1
-persist.sys.engpc.disable=1
+persist.sys.engpc.disable=0
 #zram config
 ro.config.zram.support=true
 ro.board_ram_size=low
