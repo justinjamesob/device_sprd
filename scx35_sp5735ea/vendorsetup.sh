@@ -15,3 +15,6 @@
 #
 
 add_lunch_combo scx35_sp5735eabase-userdebug
+add_lunch_combo scx35_sp5735eaplus-userdebug
+add_lunch_combo scx35_sp5735eabase_UUI-userdebug
+add_lunch_combo scx35_sp5735eaplus_UUI-userdebug

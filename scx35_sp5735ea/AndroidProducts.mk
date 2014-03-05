@@ -15,5 +15,8 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx35_sp5735eabase.mk
+	$(LOCAL_DIR)/scx35_sp5735eabase.mk \
+	$(LOCAL_DIR)/scx35_sp5735eaplus.mk \
+	$(LOCAL_DIR)/scx35_sp5735eabase_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp5735eaplus_UUI.mk
 
