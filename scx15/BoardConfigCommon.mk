@@ -64,7 +64,7 @@ USE_CAMERA_STUB := true
 #zsl capture
 ## TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 #android zsl capture
-TARGET_BOARD_CAMERA_ANDROID_ZSL_MODE := true
+TARGET_BOARD_CAMERA_ANDROID_ZSL_MODE := false
 #back camera rotation capture
 TARGET_BOARD_BACK_CAMERA_ROTATION := false
 #front camera rotation capture
