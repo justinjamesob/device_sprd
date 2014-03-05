@@ -43,7 +43,6 @@ on init
 #on fs
 #   mount_all /fstab.scx15
 
-
 on post-fs
     write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot0/force_ro 0
     write /sys/devices/platform/sprd-sdhci.3/mmc_host/mmc0/mmc0:0001/block/mmcblk0/mmcblk0boot1/force_ro 0
@@ -84,6 +83,7 @@ service healthd /sbin/healthd -n
     critical
 
 service recovery /sbin/recovery
+    class recovery
     user root
     group root
 
@@ -107,6 +107,10 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 0
     restart adbd
     write /sys/class/android_usb/android0/enable 1
+
+on normal
+    class_start recovery
+    trigger adb_enable
 
 on cali
     ubiattach 0 ubipac

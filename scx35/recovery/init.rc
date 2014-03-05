@@ -83,6 +83,7 @@ service healthd /sbin/healthd -n
     critical
 
 service recovery /sbin/recovery
+    class recovery
     user root
     group root
 
@@ -106,6 +107,10 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 0
     restart adbd
     write /sys/class/android_usb/android0/enable 1
+
+on normal
+    class_start recovery
+    trigger adb_enable
 
 on cali
     ubiattach 0 ubipac
