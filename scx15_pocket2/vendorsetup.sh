@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-add_lunch_combo scx15_star2-userdebug
+add_lunch_combo scx15_pocket2-userdebug
