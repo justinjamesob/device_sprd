@@ -15,5 +15,5 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx15_star2.mk
+	$(LOCAL_DIR)/scx15_pocket2.mk
 
