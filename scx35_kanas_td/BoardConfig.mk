@@ -16,6 +16,8 @@
 
 -include device/sprd/scx35/BoardConfigCommon.mk
 
+TARGET_RECOVERY_INITRC := $(TARGET_RECOVERY_INITRC) device/sprd/scx35_kanas_td/init.board-recovery.rc
+
 # emmc fstab
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 
@@ -28,8 +30,8 @@ TARGET_GPU_BASE_FREQ := 256
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
-TARGET_BOARD_NO_FRONT_SENSOR := false
-TARGET_BOARD_CAMERA_FLASH_CTRL := false
+TARGET_BOARD_NO_FRONT_SENSOR := true
+TARGET_BOARD_CAMERA_FLASH_CTRL := true
 TARGET_BOARD_BACK_CAMERA_INTERFACE := mipi
 TARGET_BOARD_FRONT_CAMERA_INTERFACE := ccir
 
