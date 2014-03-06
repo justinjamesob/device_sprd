@@ -12,6 +12,9 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp7730gacuccspecAplus_UUI
 
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.surpport.50ksearch=0
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 $(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)

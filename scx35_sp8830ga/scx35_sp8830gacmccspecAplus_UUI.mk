@@ -13,6 +13,9 @@ PRODUCT_NAME := scx35_sp8830gacmccspecAplus_UUI
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.surpport.50ksearch=0
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 $(call inherit-product, vendor/sprd/operator/cmcc/specA.mk)

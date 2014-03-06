@@ -15,7 +15,8 @@ PRODUCT_PACKAGES += \
          SprdLauncher1
 
 PRODUCT_PROPERTY_OVERRIDES += \
-	ro.device.support.geocode=false
+	ro.device.support.geocode=false \
+        persist.surpport.50ksearch=0
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
 ifeq ($(MULTILANGUAGE_SUPPORT),true)

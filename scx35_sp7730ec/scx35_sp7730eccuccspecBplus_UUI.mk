@@ -18,7 +18,8 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.support.vt=false \
-        ro.homekey.physical=true
+        ro.homekey.physical=true \
+        persist.surpport.50ksearch=0
 
 # SprdLauncher1
 PRODUCT_PACKAGES += \

@@ -8,7 +8,8 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 PRODUCT_NAME := scx35_sp8830eccmccspecAplus_UUI
 
 PRODUCT_PROPERTY_OVERRIDES += \
-        ro.homekey.physical=true
+        ro.homekey.physical=true \
+        persist.surpport.50ksearch=0
 
 PRODUCT_PACKAGES += \
     SprdLauncher1

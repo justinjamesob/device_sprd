@@ -13,7 +13,8 @@ $(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 PRODUCT_PROPERTY_OVERRIDES += \
-        persist.sys.support.vt=false
+        persist.sys.support.vt=false \
+        persist.surpport.50ksearch=0
 
 # SprdLauncher1
 PRODUCT_PACKAGES += \

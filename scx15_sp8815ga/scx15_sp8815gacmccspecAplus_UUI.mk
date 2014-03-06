@@ -4,6 +4,9 @@ include device/sprd/scx15_sp8815ga/scx15_sp8815gaplus.mk
 
 PRODUCT_NAME := scx15_sp8815gacmccspecAplus_UUI
 
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.surpport.50ksearch=0
+
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
