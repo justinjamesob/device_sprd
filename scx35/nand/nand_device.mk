@@ -8,3 +8,6 @@ PRODUCT_PACKAGES += \
     mkcached.sh \
 	busybox
 # @}
+
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.storage.flash_type=1
