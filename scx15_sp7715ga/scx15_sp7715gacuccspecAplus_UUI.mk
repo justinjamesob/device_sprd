@@ -20,6 +20,7 @@ PRODUCT_PACKAGES += \
         SprdLauncher2
 
 PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
 PRODUCT_PACKAGES := $(filter-out PinyinIME, $(PRODUCT_PACKAGES))

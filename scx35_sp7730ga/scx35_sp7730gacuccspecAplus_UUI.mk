@@ -13,6 +13,7 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 PRODUCT_NAME := scx35_sp7730gacuccspecAplus_UUI
 
 PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay

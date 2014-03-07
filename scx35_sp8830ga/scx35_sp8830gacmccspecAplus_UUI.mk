@@ -14,6 +14,7 @@ PRODUCT_PACKAGES += \
     SprdLauncher1
 
 PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay

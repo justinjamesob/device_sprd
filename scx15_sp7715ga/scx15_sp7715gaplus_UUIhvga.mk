@@ -23,6 +23,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.device.support.geocode=false \
+        persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US

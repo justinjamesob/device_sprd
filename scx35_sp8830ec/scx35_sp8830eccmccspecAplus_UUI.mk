@@ -9,6 +9,7 @@ PRODUCT_NAME := scx35_sp8830eccmccspecAplus_UUI
 
 PRODUCT_PROPERTY_OVERRIDES += \
         ro.homekey.physical=true \
+        persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
 PRODUCT_PACKAGES += \
