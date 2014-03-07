@@ -31,11 +31,21 @@ ro.modem.w.nv=/dev/spipe_w1
 ro.modem.w.assert=/dev/spipe_w2
 ro.modem.w.vbc=/dev/spipe_w6
 ro.modem.w.id=0
+
+persist.modem.t.enable=0
+ro.modem.t.dev=/dev/cpt
+ro.modem.t.tty=/dev/stty_td
+ro.modem.t.eth=seth_td
+ro.modem.t.snd=1
+ro.modem.t.diag=/dev/slog_td
+ro.modem.t.loop=/dev/spipe_td0
+ro.modem.t.nv=/dev/spipe_td1
+ro.modem.t.assert=/dev/spipe_td2
+ro.modem.t.vbc=/dev/spipe_td6
+ro.modem.t.id=0
+
 camera.disable_zsl_mode=1
 persist.sys.engpc.disable=1
-
-# Using "Secure USB debugging"
-ro.adb.secure=1
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
