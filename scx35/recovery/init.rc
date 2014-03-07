@@ -1,4 +1,4 @@
-import /init.board-recovery.rc
+import /init.recovery.board.rc
 
 on early-init
     start ueventd
@@ -116,6 +116,8 @@ on cali
     ubiattach 0 ubipac
     mount_all /fstab.sc8830
     class_start cali
+    insmod /system/lib/modules/mali.ko
+    insmod /system/lib/modules/trout_fm.ko
 
 service engpcclient /system/bin/engpc
     class cali
