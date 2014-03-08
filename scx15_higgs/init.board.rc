@@ -149,7 +149,7 @@ service iprenew_bnep0 /system/bin/dhcpcd -n
     disabled
     oneshot
 
-service engpcclientw /system/bin/engpc -t 0 -a /dev/ttyGS0 -d /dev/ttyGS1
+service engpcclientt /system/bin/engpc -t 1 -a /dev/ttyGS0 -d /dev/ttyGS1
     class core
     user root
     group system radio shell
