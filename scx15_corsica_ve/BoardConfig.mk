@@ -96,6 +96,6 @@ TARGET_CACHEIMAGES_SPARSE_EXT_DISABLED := false
 TARGET_PRODNVIMAGES_SPARSE_EXT_DISABLED := true
 
 # to enable SPRD SW DITHER, set this field to true
-USE_SPRD_DITHER := false
+USE_SPRD_DITHER := true
 # audio configs
 #BOARD_USES_SS_VOIP := true
