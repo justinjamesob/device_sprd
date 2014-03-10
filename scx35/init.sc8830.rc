@@ -334,16 +334,18 @@ service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     group radio cache inet misc audio sdcard_rw log shell
 
 #nvitemd
-service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 /system/etc/nvitem_td.cfg FALSE
+service nvitemd_td /system/bin/nvitemd t 0
     class core
     user root
+    disabled
     group system radio shell
     oneshot
 
-service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 /system/etc/nvitem_w.cfg FALSE
+service nvitemd_w /system/bin/nvitemd w 0
     class core
     user root
     group system radio shell
+    disabled
     oneshot
 
 service slog /system/bin/slog -t
@@ -363,6 +365,10 @@ on property:persist.modem.w.enable=1
     symlink /dev/spipe_w2 /dev/vbpipe2
     symlink /dev/spipe_w3 /dev/vbpipe3
     symlink /dev/spipe_w6 /dev/vbpipe6
+    start nvitemd_w
+
+on property:persist.modem.t.enable=1
+    start nvitemd_td
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u

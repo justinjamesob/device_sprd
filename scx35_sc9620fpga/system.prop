@@ -28,6 +28,9 @@ ro.modem.t.nv=/dev/spipe_td1
 ro.modem.t.assert=/dev/spipe_td2
 ro.modem.t.vbc=/dev/spipe_td6
 ro.modem.t.id=0
+ro.modem.t.fixnv_size=0x40000
+ro.modem.t.runnv_size=0x60000
+ro.modem.t.nvp=td
 
 ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn

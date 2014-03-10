@@ -122,15 +122,24 @@ service engpcclient /system/bin/engpc
     user root
     group root
 
-#nvitemd
-service nvitemd_td /system/bin/nvitemd /dev/spipe_td1 /system/etc/nvitem_td.cfg TRUE
-    class cali
-    user root
-    group root
 
-service nvitemd_w /system/bin/nvitemd /dev/spipe_w1 /system/etc/nvitem_w.cfg TRUE
+#nvitemd
+service nvitemd_td /system/bin/nvitemd t 1
     class cali
     user root
     group root
+    disabled
+
+service nvitemd_w /system/bin/nvitemd w 1
+    class cali
+    user root
+    group root
+    disabled
+
+on property:persist.modem.w.enable=1
+    start nvitemd_w
+
+on property:persist.modem.t.enable=1
+    start nvitemd_td
 
 
