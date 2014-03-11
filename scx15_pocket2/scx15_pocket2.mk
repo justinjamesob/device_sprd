@@ -17,7 +17,7 @@
 TARGET_PLATFORM := scx15
 PLATDIR := device/sprd/$(TARGET_PLATFORM)
 
-TARGET_BOARD := scx15_star2
+TARGET_BOARD := scx15_pocket2
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -86,9 +86,9 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
 
 # Overrides
-PRODUCT_NAME := scx15_star2
+PRODUCT_NAME := scx15_pocket2
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := star2
+PRODUCT_MODEL := pocket2
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
