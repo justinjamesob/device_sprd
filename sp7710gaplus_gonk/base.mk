@@ -13,8 +13,10 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.moz.ril.query_icc_count=true \
 	ro.moz.mute.call.to_ril=true \
 	ro.moz.ril.numclients=2 \
-        ro.moz.ril.data_reg_on_demand=true\
-        ro.moz.ril.radio_off_wo_card=true
+    ro.moz.ril.data_reg_on_demand=true\
+    ro.moz.ril.radio_off_wo_card=true\
+    ro.moz.ril.0.network_types = gsm,wcdma\
+    ro.moz.ril.1.network_types = gsm
 
 # original apps copied from generic_no_telephony.mk
 PRODUCT_PACKAGES := \
