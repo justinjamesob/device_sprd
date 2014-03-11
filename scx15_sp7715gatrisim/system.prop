@@ -55,3 +55,7 @@ ro.board_ram_size=low
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
+
+# SPRD: add support gps @{
+ro.config.support_gps=false
+# @}
