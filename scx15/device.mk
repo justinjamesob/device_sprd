@@ -108,12 +108,14 @@ PRODUCT_COPY_FILES += \
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.sprd.modemreset=1 \
-	ro.adb.secure=1
+	ro.adb.secure=1 \
+	persist.sys.sprd.wcnreset=1
 
 else
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.sprd.modemreset=0 \
-	ro.adb.secure=0
+	ro.adb.secure=0 \
+	persist.sys.sprd.wcnreset=0
 
 endif # TARGET_BUILD_VARIANT == user
 
