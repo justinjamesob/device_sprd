@@ -48,6 +48,11 @@ on fs
     setprop ro.crypto.fuse_sdcard true
     symlink /system/res /res
     symlink /system/bin /bin
+# make b2g binary executable
+    chmod 0755 /system/b2g/b2g
+    chmod 0755 /system/b2g/plugin-container
+    chmod 0755 /system/b2g/updater
+    mount ubifs /dev/ubi0_system /system ro remount
 
 #Allow others to read fb devices
     chmod 660 /dev/graphics/fb0
