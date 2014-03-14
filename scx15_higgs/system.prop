@@ -34,7 +34,6 @@ ro.modem.t.nvp=td
 
 
 camera.disable_zsl_mode=1
-persist.sys.engpc.disable=1
 
 # Using "Secure USB debugging"
 #ro.adb.secure=1

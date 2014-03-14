@@ -35,7 +35,6 @@ ro.modem.w.fixnv_size=0x40000
 ro.modem.w.runnv_size=0x60000
 ro.modem.w.nvp=w
 camera.disable_zsl_mode=1
-persist.sys.engpc.disable=1
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
