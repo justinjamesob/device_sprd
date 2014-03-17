@@ -44,7 +44,6 @@ ro.modem.wcn.id=1
 ro.modem.wcn.count=1
 camera.disable_zsl_mode=1
 ro.digital.fm.support=1
-persist.sys.engpc.disable=0
 
 
 ro.config.ksm.support=true
