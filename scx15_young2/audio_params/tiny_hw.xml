@@ -62,6 +62,11 @@
 <private name="internal PA">
   <func name="Inter PA Config" val="304" />
 </private>
+
+<private name="internal HP PA">
+  <func name="Inter HP PA Config" val="7489" />
+</private>
+
 <private name="Aud Loop in VBC Switch">
   <func name="Aud Loop in VBC Switch" val="0" />
 </private>

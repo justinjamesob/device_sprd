@@ -59,6 +59,10 @@
   <func name="Inter PA Config" val="304" />
 </private>
 
+<private name="internal HP PA">
+  <func name="Inter HP PA Config" val="7489" />
+</private>
+
 <private name="spk mute">
   <func name="Speaker Mute" val="0" />
 </private>
