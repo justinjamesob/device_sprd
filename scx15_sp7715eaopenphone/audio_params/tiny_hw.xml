@@ -63,6 +63,10 @@
   <func name="Inter PA Config" val="304" />
 </private>
 
+<private name="internal HP PA">
+  <func name="Inter HP PA Config" val="7489" />
+</private>
+
 <!-- END OF MUST NOT modify private field directly -->
 
 <device name="builtin-mic">
