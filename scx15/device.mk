@@ -117,3 +117,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 endif # TARGET_BUILD_VARIANT == user
 
++# b2g things
++PRODUCT_COPY_FILES += \
++  device/sprd/scx15/volume.cfg:system/etc/volume.cfg
++
+
