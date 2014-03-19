@@ -83,7 +83,7 @@ $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_con
 # Overrides
 PRODUCT_NAME := scx15_sp7715gatrisim
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := SP7710
+PRODUCT_MODEL := SC7715A
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
