@@ -79,7 +79,7 @@ $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 # Overrides
 PRODUCT_NAME := scx35_sp7730ecbase
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := SC7730A
+PRODUCT_MODEL := SP7730A
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
