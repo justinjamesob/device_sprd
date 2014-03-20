@@ -33,6 +33,9 @@ TARGET_BOARD_CAMERA_FLASH_CTRL := false
 TARGET_BOARD_BACK_CAMERA_INTERFACE := ccir
 TARGET_BOARD_FRONT_CAMERA_INTERFACE := ccir
 
+# select camera not support flash
+TARGET_BOARD_CAMERA_NO_FLASH_DEV := true
+
 #select camera zsl cap mode
 TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 
