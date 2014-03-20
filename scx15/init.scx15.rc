@@ -280,6 +280,19 @@ service charge /bin/charge
     user root
     oneshot
 
+service rilproxy1 /system/bin/rilproxy -c 1
+    class core
+    socket rilproxy1 stream 660 root system
+    user root
+    group radio
+
+
+service rilproxy2 /system/bin/rilproxy -c 2
+    class core
+    socket rilproxy2 stream 660 root system
+    user root
+    group radio
+
 #td rild service
 service tril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m t -n 0
     class core
@@ -308,24 +321,24 @@ service tril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
 #wcdma rild service
 service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 0
     class core
-    socket wrild stream 660 root radio
-    socket wrild-debug stream 660 radio system
+    socket rild stream 660 root radio
+    socket rild-debug stream 660 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
 service wril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 1
     class core
-    socket wrild1 stream 660 root radio
-    socket wrild-debug1 stream 660 radio system
+    socket rild1 stream 660 root radio
+    socket rild-debug1 stream 660 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
 service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 2
     class core
-    socket wrild2 stream 660 root radio
-    socket wrild-debug2 stream 660 radio system
+    socket rild2 stream 660 root radio
+    socket rild-debug2 stream 660 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell

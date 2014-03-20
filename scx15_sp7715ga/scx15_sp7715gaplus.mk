@@ -33,6 +33,8 @@ PRODUCT_AAPT_CONFIG := hdpi
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
+ENABLE_LIBRECOVERY := true
+
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
@@ -47,7 +49,15 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.support.cphsfirst=false \
 	ro.sf.lcd_density=240 \
 	ro.sf.lcd_width=54 \
-	ro.sf.lcd_height=96
+	ro.sf.lcd_height=96 \
+	ro.moz.ril.query_icc_count=true \
+	ro.moz.mute.call.to_ril=true \
+	ro.moz.ril.numclients=2 \
+        ro.moz.ril.data_reg_on_demand=true\
+        ro.moz.ril.radio_off_wo_card=true\
+        ro.moz.ril.0.network_types = gsm,wcdma\
+        ro.moz.ril.1.network_types = gsm
+
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
