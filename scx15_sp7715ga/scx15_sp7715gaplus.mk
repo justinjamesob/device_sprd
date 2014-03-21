@@ -64,6 +64,10 @@ PRODUCT_PACKAGES += \
 	fm.$(TARGET_PLATFORM) \
         ValidationTools
 
+# for Gecko to support bluedroid stack
+PRODUCT_PACKAGES += \
+	bluetooth.default
+
 # Additional product packages
 -include vendor/sprd/open-source/common_packages.mk
 -include vendor/sprd/open-source/plus_special_packages.mk
