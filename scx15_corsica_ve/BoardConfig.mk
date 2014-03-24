@@ -33,7 +33,9 @@ KERNEL_DEFCONFIG := corsica_ve-native_defconfig
 endif
 endif
 
-TARGET_GPU_BASE_FREQ := 64
+TARGET_GPU_DFS_MAX_FREQ := 64000
+TARGET_GPU_DFS_MIN_FREQ := 64000
+
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
