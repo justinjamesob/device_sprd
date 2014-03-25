@@ -8,8 +8,8 @@ PRODUCT_NAME := scx15_sp7715eacuccspecAplus_UUI
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-$(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)
-$(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
+include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+include vendor/sprd/operator/cucc/specA.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 PRODUCT_PROPERTY_OVERRIDES += \
