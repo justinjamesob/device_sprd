@@ -137,10 +137,14 @@ on boot
 on charger
     class_start core
 
+service poweroffalarm /system/bin/poweroff_alarm
+    disabled
+    oneshot
+
 on alarm
     class_start core
     start media
-    exec /system/bin/poweroff_alarm
+    start poweroffalarm
 
 on property:ro.board_ram_size=min
     setprop zram.disksize 64
