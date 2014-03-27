@@ -2,7 +2,7 @@
 
 $(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 
-PRODUCT_THEME_PACKAGES := SimpleStyle
+PRODUCT_THEME_PACKAGES := SimpleStyle HelloColor
 PRODUCT_THEME_FLAGS := shrink
 
 # export original make file
@@ -18,9 +18,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-$(call inherit-product-if-exists, vendor/sprd/operator/cucc/specA.mk)
-$(call inherit-product-if-exists, vendor/sprd/UniverseUI/ThemeRes/universeui.mk)
-$(call inherit-product-if-exists, frameworks/base/data/videos/VideoPackageForUUI.mk)
+
+include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+include vendor/sprd/operator/cucc/specA.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # SprdLauncher2
