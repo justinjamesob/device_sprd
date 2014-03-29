@@ -22,4 +22,5 @@ endif
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7730ggabase.mk \
 	$(LOCAL_DIR)/scx35_sp7730ggaplus.mk \
+	$(LOCAL_DIR)/scx35_sp7730ggacuccspecAplus_UUI.mk
 	
