@@ -24,6 +24,9 @@ BOARDDIR := device/sprd/$(TARGET_BOARD)
 # because we want to use our file, not the common one
 PRODUCT_COPY_FILES += $(BOARDDIR)/media_profiles.xml:system/etc/media_profiles.xml
 
+# call connectivity_configure_8830g.mk before calling device.mk
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830g.mk)
+
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
@@ -70,7 +73,6 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
-$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830.mk)
 
 # Overrides
 PRODUCT_NAME := scx35_sp8830geabase
