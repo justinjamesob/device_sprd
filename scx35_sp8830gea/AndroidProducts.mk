@@ -18,4 +18,5 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp8830geabase.mk \
 	$(LOCAL_DIR)/scx35_sp8830geaplus.mk \
 	$(LOCAL_DIR)/scx35_sp8830geaplus_dt.mk \
-	$(LOCAL_DIR)/scx35_sp8830geacmccspecAplus_UUI.mk
+	$(LOCAL_DIR)/scx35_sp8830geacmccspecAplus_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp8830geacmccspecAplus_UUI_dt.mk
