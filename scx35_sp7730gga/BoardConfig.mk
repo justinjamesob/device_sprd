@@ -22,7 +22,11 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx35/nand/recovery.fstab
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp7730gga
 UBOOT_DEFCONFIG := sp7730gga
+ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+KERNEL_DEFCONFIG := sp7730gga-dt_defconfig
+else
 KERNEL_DEFCONFIG := sp7730gga-native_defconfig
+endif
 
 TARGET_GPU_DFS_MAX_FREQ := 256000
 TARGET_GPU_DFS_MIN_FREQ := 256000
