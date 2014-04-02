@@ -9,7 +9,7 @@ on early-fs
     symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
     setprop persist.storage.type 1
-    setprop sys.tempsd.enable 0
+    setprop sys.tempsd.enable 1
 # @}
 
 on boot
