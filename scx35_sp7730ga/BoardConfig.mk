@@ -15,6 +15,7 @@
 #
 
 -include device/sprd/scx35/BoardConfigCommon.mk
+-include device/sprd/scx35/nand/BoardConfigNand.mk
 
 # nand fstab
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/nand/recovery.fstab
