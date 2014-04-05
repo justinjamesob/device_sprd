@@ -251,6 +251,13 @@ service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -w 1052 -d /mnt/media_rw
 service sdcard /system/bin/sdcard -u 1023 -g 1023 -w 1051 -l /data/media /mnt/shell/emulated
     class late_start
 
+#modem_control
+service modem_control  /system/bin/modem_control
+    class core
+    user root
+    group system radio shell
+    oneshot
+
 service modemd /system/bin/modemd
     class core
     user system
@@ -271,6 +278,13 @@ service phoneserver_t /system/bin/phoneserver -m t
     oneshot
 
 service phoneserver_w /system/bin/phoneserver -m w
+    class core
+    user root
+    group radio system shell
+    disabled
+    oneshot
+
+service phoneserver_l /system/bin/phoneserver -m l
     class core
     user root
     group radio system shell
@@ -337,6 +351,15 @@ service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
+#lte rild service
+service lril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m l -n 0
+    class core
+    socket lrild stream 660 root radio
+    socket lrild-debug stream 660 radio system
+    disabled
+    user root
+    group radio cache inet misc audio sdcard_rw log shell
+
 #nvitemd
 service nvitemd_td /system/bin/nvitemd t 0
     class core
@@ -346,6 +369,27 @@ service nvitemd_td /system/bin/nvitemd t 0
     oneshot
 
 service nvitemd_w /system/bin/nvitemd w 0
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service nvitemd_l /system/bin/nvitemd l 0
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service nvitemd_lf /system/bin/nvitemd lf 0
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service nvitemd_tl /system/bin/nvitemd tl 0
     class core
     user root
     group system radio shell
@@ -371,8 +415,17 @@ on property:persist.modem.w.enable=1
     symlink /dev/spipe_w6 /dev/vbpipe6
     start nvitemd_w
 
-on property:persist.modem.t.enable=1
+on property:persist.radio.modem.t.enable=1
     start nvitemd_td
+
+on property:persist.radio.modem.l.enable=1
+    start nvitemd_l
+
+on property:persist.modem.lf.enable=1
+    start nvitemd_lf
+
+on property:persist.modem.tl.enable=1
+    start nvitemd_tl
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u

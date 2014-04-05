@@ -34,24 +34,38 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
 PRODUCT_PROPERTY_OVERRIDES += \
-	keyguard.no_require_sim=true \
-	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=1 \
-	persist.msms.phone_count=1 \
-	persist.msms.phone_default=0 \
-	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=4
+        sys.usb.gser.count=8 \
+        keyguard.no_require_sim=true \
+        ro.com.android.dataroaming=false \
+        ro.msms.phone_count=2 \
+        persist.msms.phone_count=1 \
+        ro.msms.phoneinstance_count=1 \
+        persist.msms.phone_default=0 \
+        persist.radio.ssda.mode=svlte \
+        ro.modem.external.enable=1 \
+	persist.radio.modem.t.enable=1 \
+        persist.radio.modem.t.cs=1 \
+        persist.radio.modme.t.ps=1 \
+        persist.radio.modem.t.rsim=0 \
+        persist.radio.modem.l.enable=1 \
+        persist.radio.modem.l.cs=0 \
+        persist.radio.modem.l.ps=1 \
+        persist.radio.modem.l.rsim=1
 
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM) \
-        ValidationTools
+        ValidationTools \
+        libmllite.so \
+        libmplmpu.so \
+        libinvensense_hal
 
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
+	$(BOARDDIR)/audio_params/tiny_hw_lineincall.xml:system/etc/tiny_hw_lineincall.xml \
 	$(BOARDDIR)/audio_params/tiny_hw.xml:system/etc/tiny_hw.xml \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
@@ -62,7 +76,7 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)

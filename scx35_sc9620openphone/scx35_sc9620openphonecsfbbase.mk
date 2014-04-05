@@ -17,7 +17,7 @@
 TARGET_PLATFORM := sc8830
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35_sc9620fpga
+TARGET_BOARD := scx35_sc9620openphone
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
@@ -34,20 +34,34 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
 PRODUCT_PROPERTY_OVERRIDES += \
-	keyguard.no_require_sim=true \
-	ro.com.android.dataroaming=false \
-	ro.msms.phone_count=1 \
-	persist.msms.phone_count=1 \
-	persist.msms.phone_default=0 \
-	ro.modem.t.count=1 \
         persist.sys.modem.diag=,gser \
-        sys.usb.gser.count=4
+        sys.usb.gser.count=4 \
+        keyguard.no_require_sim=true \
+        ro.com.android.dataroaming=false \
+        ro.msms.phone_count=2 \
+        persist.msms.phone_count=1 \
+        ro.msms.phoneinstance_count=1 \
+        persist.msms.phone_default=0 \
+        persist.radio.ssda.mode=svlte \
+        ro.modem.count=2 \
+        persist.radio.modem.t.enable=1 \
+        persist.radio.modem.t.cs=1 \
+        persist.radio.modme.t.ps=1 \
+        persist.radio.modem.t.rsim=0 \
+        persist.radio.modem.l.enable=1 \
+        persist.radio.modem.l.cs=0 \
+        persist.radio.modem.l.ps=1 \
+        persist.radio.modem.l.rsim=1 \
+        persist.radio.ssda.mode=csfb
 
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM) \
-        ValidationTools
+        ValidationTools \
+        libmllite.so \
+        libmplmpu.so \
+        libinvensense_hal
 
 # board-specific files
 PRODUCT_COPY_FILES += \
@@ -57,13 +71,9 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
-	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
-	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
-	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
-	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
-	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
+	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
@@ -72,9 +82,9 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
 
 # Overrides
-PRODUCT_NAME := scx35_sc9620fpgabase
+PRODUCT_NAME := scx35_sc9620openphonecsfbbase
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sc9620fpga
+PRODUCT_MODEL := sc9620openphone
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 

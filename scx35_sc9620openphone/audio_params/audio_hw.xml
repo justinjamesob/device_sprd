@@ -2,12 +2,11 @@
 <audio device="sc8830-audio">
 <!-- the profile -->
 <modem num="2">
-	<cp name="t" pipe="/dev/spipe_td6" vbchannel="1" />
-	<cp name="w" pipe="/dev/spipe_w6" vbchannel="0" />
+	<cp name="t" pipe="/dev/spimux21" vbchannel="1" />
 </modem>
 
-<voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="1" />
-<voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="1" />
+<voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="0" />
+<voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="0" />
 
 <i2s_for_btcall index="0"
 		switch="1" 

@@ -119,11 +119,22 @@ on cali
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
 
+service console /system/bin/sh
+    console
+    class cali
+    user root
+    group root
+
 service engpcclient /system/bin/engpc
     class cali
     user root
     group root
 
+#modem_control
+service modem_control  /system/bin/modem_control
+    class cali
+    user root
+    group root
 
 #nvitemd
 service nvitemd_td /system/bin/nvitemd t 1
@@ -138,10 +149,39 @@ service nvitemd_w /system/bin/nvitemd w 1
     group root
     disabled
 
+service nvitemd_l /system/bin/nvitemd l 1
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service nvitemd_lf /system/bin/nvitemd lf 1
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
+service nvitemd_tl /system/bin/nvitemd tl 1
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
 on property:persist.modem.w.enable=1
     start nvitemd_w
 
-on property:persist.modem.t.enable=1
+on property:persist.radio.modem.t.enable=1
     start nvitemd_td
 
+on property:persist.radio.modem.l.enable=1
+    start nvitemd_l
+
+on property:persist.modem.lf.enable=1
+    start nvitemd_lf
+
+on property:persist.modem.tl.enable=1
+    start nvitemd_tl
 
