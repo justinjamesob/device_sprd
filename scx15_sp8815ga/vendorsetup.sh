@@ -17,3 +17,4 @@
 add_lunch_combo scx15_sp8815gabase-userdebug
 add_lunch_combo scx15_sp8815gaplus-userdebug
 add_lunch_combo scx15_sp8815gacmccspecAplus_UUI-userdebug
+add_lunch_combo scx15_sp8815gacmccspec2plus_UUI-userdebug
