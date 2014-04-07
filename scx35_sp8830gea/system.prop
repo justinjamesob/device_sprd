@@ -17,7 +17,7 @@ ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
 # Default ecclist
 ro.ril.ecclist=112,911,#911,*911,119,110,120
 
-persist.radio.modem.t.enable=1
+persist.modem.t.enable=1
 ro.modem.t.dev=/dev/cpt
 ro.modem.t.tty=/dev/stty_td
 ro.modem.t.eth=seth_td

@@ -35,7 +35,7 @@ ro.modem.w.fixnv_size=0x40000
 ro.modem.w.runnv_size=0x60000
 ro.modem.w.nvp=w
 
-persist.radio.modem.t.enable=0
+persist.modem.t.enable=0
 ro.modem.t.dev=/dev/cpt
 ro.modem.t.tty=/dev/stty_td
 ro.modem.t.eth=seth_td

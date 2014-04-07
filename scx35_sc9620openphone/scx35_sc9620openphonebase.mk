@@ -44,14 +44,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.msms.phone_default=0 \
         persist.radio.ssda.mode=svlte \
         ro.modem.external.enable=1 \
-	persist.radio.modem.t.enable=1 \
-        persist.radio.modem.t.cs=1 \
-        persist.radio.modme.t.ps=1 \
-        persist.radio.modem.t.rsim=0 \
-        persist.radio.modem.l.enable=1 \
-        persist.radio.modem.l.cs=0 \
-        persist.radio.modem.l.ps=1 \
-        persist.radio.modem.l.rsim=1
+	persist.modem.t.enable=1 \
+        persist.modem.t.cs=1 \
+        persist.modme.t.ps=1 \
+        persist.modem.t.rsim=0 \
+        persist.modem.l.enable=1 \
+        persist.modem.l.cs=0 \
+        persist.modem.l.ps=1 \
+        persist.modem.l.rsim=1
 
 # board-specific modules
 PRODUCT_PACKAGES += \
