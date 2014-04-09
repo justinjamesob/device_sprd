@@ -3,7 +3,8 @@ LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sc9620openphone/scx35_sc962
 
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
-PRODUCT_NAME := scx35_sc9620openphonebase_UUI
+PRODUCT_NAME := scx35_sc9620basecmccspec5_UUI
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+include vendor/sprd/operator/cmcc/spec5.mk
 
