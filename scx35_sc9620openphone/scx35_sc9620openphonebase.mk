@@ -72,6 +72,10 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
 	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
+	$(BOARDDIR)/imei_config/imei1.txt:prodnv/imei1.txt \
+	$(BOARDDIR)/imei_config/imei2.txt:prodnv/imei2.txt \
+	$(BOARDDIR)/imei_config/imei3.txt:prodnv/imei3.txt \
+	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt \
 	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
