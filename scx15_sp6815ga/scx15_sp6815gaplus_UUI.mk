@@ -7,7 +7,9 @@ PRODUCT_NAME := scx15_sp6815gaplus_UUI
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
+PRODUCT_VIDEO_WALLPAPERS := none
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # SprdLauncher1

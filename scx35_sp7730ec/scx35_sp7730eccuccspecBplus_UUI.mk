@@ -11,9 +11,9 @@ PRODUCT_NAME := scx35_sp7730eccuccspecBplus_UUI
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-
-include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cucc/specB.mk
+include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 PRODUCT_PROPERTY_OVERRIDES += \
