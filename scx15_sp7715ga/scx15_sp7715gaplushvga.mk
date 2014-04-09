@@ -58,6 +58,9 @@ PRODUCT_PACKAGES += \
 	fm.$(TARGET_PLATFORM) \
         ValidationTools
 
+# Remove video wallpaper application and resources
+PRODUCT_VIDEO_WALLPAPERS := none
+
 # Additional product packages
 -include vendor/sprd/open-source/common_packages.mk
 -include vendor/sprd/open-source/plus_special_packages.mk

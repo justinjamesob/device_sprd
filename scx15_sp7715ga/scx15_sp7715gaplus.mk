@@ -65,6 +65,8 @@ PRODUCT_PACKAGES += \
 	fm.$(TARGET_PLATFORM) \
         ValidationTools
 
+# Remove video wallpaper application and resources
+PRODUCT_VIDEO_WALLPAPERS := none
 # for Gecko to support bluedroid stack
 PRODUCT_PACKAGES += \
 	bluetooth.default

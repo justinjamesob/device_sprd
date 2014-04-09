@@ -13,11 +13,15 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_THEME_PAKCAGES := SimpleStyle
 PRODUCT_THEME_FLAGS := shrink
+PRODUCT_VIDEO_WALLPAPERS := none
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+PRODUCT_VIDEO_WALLPAPERS := none
+
 include vendor/sprd/operator/cmcc/specA.mk
+include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 #security support config

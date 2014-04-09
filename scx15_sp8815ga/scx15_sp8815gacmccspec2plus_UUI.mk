@@ -16,8 +16,8 @@ PRODUCT_THEME_FLAGS := shrink
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec2.mk
+include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 #security support config

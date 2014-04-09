@@ -74,6 +74,9 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
 	frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml
 
+# Remove video wallpaper application and resources
+PRODUCT_VIDEO_WALLPAPERS := none
+
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
