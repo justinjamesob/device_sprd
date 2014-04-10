@@ -391,10 +391,12 @@ service slog /system/bin/slog -t
 
 service refnotify /system/bin/refnotify -t 0
     class main
+    disabled
     user root
 
 service refnotify_w /system/bin/refnotify -t 1
     class main
+    disabled
     user root
 
 on property:persist.modem.w.enable=1
@@ -402,9 +404,11 @@ on property:persist.modem.w.enable=1
     symlink /dev/spipe_w2 /dev/vbpipe2
     symlink /dev/spipe_w3 /dev/vbpipe3
     symlink /dev/spipe_w6 /dev/vbpipe6
+    start refnotify_w
     start nvitemd_w
 
 on property:persist.modem.t.enable=1
+    start refnotify
     start nvitemd_td
 
 on property:persist.modem.l.enable=1
