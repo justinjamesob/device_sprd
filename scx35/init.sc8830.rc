@@ -41,8 +41,6 @@ on init
     # @}
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
-    start watchdogd
-
 # SPRD: add for OTG usb disk @{
     mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
     mkdir /storage/usbdisk 0000 system system
@@ -468,12 +466,6 @@ service srtd /system/xbin/srtd
     user root
     group root
     oneshot
-
-
-# Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
-service watchdogd /sbin/watchdogd 10 20
-    class core
-    seclabel u:r:watchdogd:s0
 
 service engmoded /system/bin/engmoded
     class main
