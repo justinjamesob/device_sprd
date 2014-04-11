@@ -20,9 +20,21 @@
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 
 # board configs
+
 TARGET_BOOTLOADER_BOARD_NAME := sp5735c2ea
-UBOOT_DEFCONFIG := sp5735c2ea
-KERNEL_DEFCONFIG := sp5735c2ea_defconfig
+ifeq ($(TARGET_PRODUCT), scx35_sp5735c2eaplus_wvga_UUI)
+KERNEL_DEFCONFIG := sp5735c2ea-native-wvga_defconfig
+UBOOT_DEFCONFIG := sp5735c2ea-wvga
+
+else
+       ifeq ($(TARGET_PRODUCT), scx35_sp5735c2eaplus_wsvga_UUI)
+       KERNEL_DEFCONFIG := sp5735c2ea-native-wsvga_defconfig
+       UBOOT_DEFCONFIG := sp5735c2ea-wsvga
+       else
+       KERNEL_DEFCONFIG := sp5735c2ea_defconfig
+       UBOOT_DEFCONFIG := sp5735c2ea
+       endif
+endif
 
 TARGET_GPU_BASE_FREQ := 256
 

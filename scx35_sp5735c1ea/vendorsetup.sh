@@ -18,3 +18,5 @@ add_lunch_combo scx35_sp5735c1eabase-userdebug
 add_lunch_combo scx35_sp5735c1eaplus-userdebug
 add_lunch_combo scx35_sp5735c1eabase_UUI-userdebug
 add_lunch_combo scx35_sp5735c1eaplus_UUI-userdebug
+add_lunch_combo scx35_sp5735c1eaplus_wsvga_UUI-userdebug
+add_lunch_combo scx35_sp5735c1eaplus_wvga_UUI-userdebug

@@ -1,9 +1,9 @@
-include device/sprd/scx35_sp5735c1ea/scx35_sp5735c1eabase.mk
+include device/sprd/scx35_sp5735c1ea/scx35_sp5735c1eaplus.mk
 
 PRODUCT_THEME_PACKAGES := SimpleStyle
 PRODUCT_THEME_FLAGS := shrink
 
-PRODUCT_NAME := scx35_sp5735c1eabase_UUI
+PRODUCT_NAME := scx35_sp5735c1eaplus_wvga_UUI
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 

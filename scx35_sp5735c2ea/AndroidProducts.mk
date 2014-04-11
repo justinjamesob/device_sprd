@@ -17,4 +17,9 @@
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp5735c2eabase.mk \
 	$(LOCAL_DIR)/scx35_sp5735c2eaplus.mk \
+	$(LOCAL_DIR)/scx35_sp5735c2eabase_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp5735c2eaplus_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp5735c2eaplus_wsvga_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp5735c2eaplus_wvga_UUI.mk
+
 
