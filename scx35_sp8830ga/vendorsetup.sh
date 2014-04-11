@@ -18,3 +18,4 @@ add_lunch_combo scx35_sp8830gabase-userdebug
 add_lunch_combo scx35_sp8830gaplus-userdebug
 add_lunch_combo scx35_sp8830gacmccspecAplus_UUI-userdebug
 add_lunch_combo scx35_sp8830gacmccspec5plus_UUI-userdebug
+add_lunch_combo scx35_sp8830gacmccspec4plus_UUI-userdebug
