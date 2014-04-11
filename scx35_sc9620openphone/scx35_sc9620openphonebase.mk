@@ -20,6 +20,9 @@ PLATDIR := device/sprd/scx35
 TARGET_BOARD := scx35_sc9620openphone
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
+# call connectivity_configure_9620.mk before calling device.mk
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_9620.mk)
+
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
