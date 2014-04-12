@@ -72,7 +72,7 @@ PRODUCT_COPY_FILES += \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
-$(call inherit-product, vendor/sprd/partner/sprd_gps/device-sprd-gps.mk)
+$(call inherit-product, vendor/sprd/gps/CellGuide_2351/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830.mk)
 
