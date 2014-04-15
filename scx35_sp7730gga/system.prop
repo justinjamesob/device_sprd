@@ -52,3 +52,6 @@ ro.board_ram_size=mid
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
+
+#if our product not support drm,set as false
+drm.service.enabled=false
