@@ -63,6 +63,7 @@ PRODUCT_PACKAGES += \
 	calibration_init \
 	modemd \
 	engpc \
+	dns6 \
 	modem_control\
 	libengappjni \
 	nvitemd \
@@ -96,6 +97,7 @@ PRODUCT_COPY_FILES += \
 	vendor/sprd/open-source/apps/scripts/ext_kill.sh:system/bin/ext_kill.sh \
 	vendor/sprd/open-source/apps/scripts/inputfreq.sh:system/bin/inputfreq.sh \
 	vendor/sprd/open-source/apps/scripts/recoveryfreq.sh:system/bin/recoveryfreq.sh \
+	vendor/sprd/open-source/apps/scripts/bih_config.sh:system/bin/bih_config.sh \
 	frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
 	frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
 	frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
