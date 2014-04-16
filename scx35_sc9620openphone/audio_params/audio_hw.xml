@@ -15,10 +15,17 @@
 		cp1_ctl_file="/proc/pin_switch/iis0_sys_sel/cp1_iis0"
 		cp2_ctl_file="/proc/pin_switch/iis0_sys_sel/cp2_iis0"
 		ap_ctl_file="/proc/pin_switch/iis0_sys_sel/ap_iis0"
-		cp0_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp0_iis0"
-		cp1_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp1_iis0"
+		cp0_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/rsv_f"
+		cp1_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/rsv_f"
 		cp2_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/cp2_iis0"
  		ap_bt_ctl_file="/proc/pin_switch/bt_iis_sys_sel/ap_iis0"
+		cp0_iis1_ctl_file="/proc/pin_switch/iis1_sys_sel/cp0_iis1"
+		cp1_iis1_ctl_file="/proc/pin_switch/iis1_sys_sel/cp1_iis1"
+		cp2_iis1_ctl_file="/proc/pin_switch/iis1_sys_sel/cp2_iis1"
+		ap_iis1_ctl_file="/proc/pin_switch/iis1_sys_sel/ap_iis1"
+		iis01_loop_file="/proc/pin_switch/iis01_loop_sel"
+		iis12_loop_file="/proc/pin_switch/iis12_loop_sel"
+		iis13_loop_file="/proc/pin_switch/iis13_loop_sel"
 />
 
 <i2s_for_extspeaker index="1" switch="0" dst="external" cp0_ctl_file="/d/pin_switch/iis-1" cp1_ctl_file="/d/pin_switch/iis-1"  cp2_ctl_file="/d/pin_switch/iis-1" ap_ctl_file="/d/pin_switch/iis-1" /> 
