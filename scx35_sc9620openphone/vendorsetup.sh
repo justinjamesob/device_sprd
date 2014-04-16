@@ -17,4 +17,5 @@
 add_lunch_combo scx35_sc9620openphonebase-userdebug
 add_lunch_combo scx35_sc9620openphonecsfbbase-userdebug
 add_lunch_combo scx35_sc9620basecmccspec5_UUI-userdebug
+add_lunch_combo scx35_sc9620openphonecsfbbase_UUI-userdebug
 
