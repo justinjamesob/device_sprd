@@ -74,11 +74,11 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
-	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
+	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
 	$(BOARDDIR)/imei_config/imei1.txt:prodnv/imei1.txt \
 	$(BOARDDIR)/imei_config/imei2.txt:prodnv/imei2.txt \
 	$(BOARDDIR)/imei_config/imei3.txt:prodnv/imei3.txt \
-	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt \
+	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
