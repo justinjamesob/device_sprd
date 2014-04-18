@@ -54,4 +54,4 @@ ro.config.low_ram=true
 # @}
 
 #if our product not support drm,set as false
-drm.service.enabled=false
+drm.service.enabled=true
