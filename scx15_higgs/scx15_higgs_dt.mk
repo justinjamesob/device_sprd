@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include device/sprd/scx15_higgs/scx15_higgs.mk
-PRODUCT_NAME := scx15_higgs_dt
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
+include device/sprd/scx15_higgs/scx15_higgs.mk
+PRODUCT_NAME := scx15_higgs_dt

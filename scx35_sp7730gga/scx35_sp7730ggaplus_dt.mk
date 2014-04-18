@@ -20,6 +20,9 @@ PLATDIR := device/sprd/scx35
 TARGET_BOARD := scx35_sp7730gga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true
+
 # copy media_profiles.xml before calling device.mk,
 # because we want to use our file, not the common one
 PRODUCT_COPY_FILES += $(BOARDDIR)/media_profiles.xml:system/etc/media_profiles.xml
@@ -81,6 +84,3 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
-
-BOARD_KERNEL_PAGESIZE := 2048
-BOARD_KERNEL_SEPARATED_DT := true

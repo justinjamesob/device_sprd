@@ -20,6 +20,9 @@ PLATDIR := device/sprd/scx35
 TARGET_BOARD := scx35_sp8830ec
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true
+
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
@@ -84,6 +87,3 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
-
-BOARD_KERNEL_PAGESIZE := 2048
-BOARD_KERNEL_SEPARATED_DT := true

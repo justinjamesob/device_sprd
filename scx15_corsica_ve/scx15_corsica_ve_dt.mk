@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include device/sprd/scx15_corsica_ve/scx15_corsica_ve.mk
-PRODUCT_NAME := scx15_corsica_ve_dt
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
+include device/sprd/scx15_corsica_ve/scx15_corsica_ve.mk
+PRODUCT_NAME := scx15_corsica_ve_dt
