@@ -2,7 +2,8 @@
 <audio device="sc8830-audio">
 <!-- the profile -->
 <modem num="2">
-	<cp name="t" pipe="/dev/spimux21" vbchannel="1" />
+    <cp name="t" pipe="/dev/spimux21" vbchannel="1" />
+    <cp name="csfb" pipe="/dev/sdiomux21" vbchannel="1" />
 </modem>
 
 <voip modem="t" pipe="/dev/spipe_td4" vbchannel="1" enable="0" />

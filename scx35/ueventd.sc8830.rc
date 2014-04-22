@@ -66,4 +66,5 @@
 /dev/sdiomux*           0660     radio       system
 /dev/spimux*            0660     radio       system
 /dev/spimux21           0666     media       audio
+/dev/sdiomux21          0666     media       audio
 /dev/akm8963_dev        0660     system      system
