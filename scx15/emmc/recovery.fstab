@@ -11,6 +11,12 @@
 /dev/block/platform/sprd-sdhci.3/by-name/tdfixnv2		/tdfixnv2		emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tdruntimenv1	/tdruntimenv1	emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tdruntimenv2	/tdruntimenv2	emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/ltemodem		/ltemodem		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/ltedsp			/ltedsp			emmc 	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/ltefixnv1		/ltefixnv1		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/ltefixnv2		/ltefixnv2		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/lteruntimenv1	/lteruntimenv1	emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/lteruntimenv2	/lteruntimenv2	emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wmodem			/wmodem			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wdsp			/wdsp			emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wfixnv1		/wfixnv1		emmc	defaults	defaults

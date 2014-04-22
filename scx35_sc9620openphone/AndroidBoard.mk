@@ -1,5 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 
+$(call add-radio-file,modem_bins/ltemodem.bin)
+$(call add-radio-file,modem_bins/ltenvitem.bin)
+$(call add-radio-file,modem_bins/ltedsp.bin)
 $(call add-radio-file,modem_bins/tdmodem.bin)
 $(call add-radio-file,modem_bins/tdnvitem.bin)
 $(call add-radio-file,modem_bins/tddsp.bin)

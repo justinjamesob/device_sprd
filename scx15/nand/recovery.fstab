@@ -11,6 +11,12 @@ tdfixnv1		/tdfixnv1		ubi		defaults	defaults
 tdfixnv2		/tdfixnv2		ubi		defaults	defaults
 tdruntimenv1	/tdruntimenv1	ubi		defaults	defaults
 tdruntimenv2	/tdruntimenv2	ubi		defaults	defaults
+ltemodem		/ltemodem		ubi		defaults	defaults
+ltedsp			/ltedsp			ubi 	defaults	defaults
+ltefixnv1		/ltefixnv1		ubi		defaults	defaults
+ltefixnv2		/ltefixnv2		ubi		defaults	defaults
+lteruntimenv1	/lteruntimenv1	ubi		defaults	defaults
+lteruntimenv2	/lteruntimenv2	ubi		defaults	defaults
 wmodem			/wmodem			ubi		defaults	defaults
 wdsp			/wdsp			ubi 	defaults	defaults
 wfixnv1			/wfixnv1		ubi		defaults	defaults
