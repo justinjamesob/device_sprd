@@ -50,20 +50,8 @@ ro.modem.l.nv=/dev/sdiomux20
 ro.modem.l.fixnv_size=0x20000
 ro.modem.l.runnv_size=0x40000
 ro.modem.l.nvp=l_
-
-persist.modem.lf.enable=0
-ro.modem.lf.nv=/dev/sdiomux20
-ro.modem.lf.fixnv_size=0x20000
-ro.modem.lf.runnv_size=0x40000
 ro.modem.lf.nvp=lf_
-
-persist.modem.tl.enable=0
-ro.modem.tl.nv=/dev/sdiomux20
-ro.modem.tl.fixnv_size=0x20000
-ro.modem.tl.runnv_size=0x40000
 ro.modem.tl.nvp=tl_
-
-
 
 ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn
