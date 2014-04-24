@@ -386,20 +386,6 @@ service nvitemd_l /system/bin/nvitemd l 0
     disabled
     oneshot
 
-service nvitemd_lf /system/bin/nvitemd lf 0
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service nvitemd_tl /system/bin/nvitemd tl 0
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
 service slog /system/bin/slog -t
     class main
     user root
@@ -424,12 +410,6 @@ on property:persist.modem.t.enable=1
 
 on property:persist.modem.l.enable=1
     start nvitemd_l
-
-on property:persist.modem.lf.enable=1
-    start nvitemd_lf
-
-on property:persist.modem.tl.enable=1
-    start nvitemd_tl
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u
