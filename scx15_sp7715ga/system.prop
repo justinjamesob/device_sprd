@@ -62,3 +62,6 @@ ro.btwifisoftap.coexist=false
 # SPRD: add support gps @{
 ro.config.support_gps=false
 # @}
+
+# hotspot development
+ro.hotspot.enabled=1

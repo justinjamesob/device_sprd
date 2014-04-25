@@ -50,3 +50,6 @@ ro.config.low_ram=true
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
+
+# hotspot development
+ro.hotspot.enabled=1

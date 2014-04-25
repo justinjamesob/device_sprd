@@ -61,3 +61,6 @@ ro.btwifisoftap.coexist=false
 
 #if our product not support drm,set as false
 drm.service.enabled=false
+
+# hotspot development
+ro.hotspot.enabled=1
