@@ -467,3 +467,7 @@ service srtd /system/xbin/srtd
 service watchdogd /sbin/watchdogd 10 20
     class core
     seclabel u:r:watchdogd:s0
+
+service engmoded /system/bin/engmoded
+    class main
+    user root
