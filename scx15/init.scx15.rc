@@ -331,7 +331,7 @@ service tril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
 service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 0
     class core
     socket rild stream 660 root radio
-    socket rild-debug stream 660 radio system
+    socket rild-debug stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
@@ -339,7 +339,7 @@ service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m
 service wril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 1
     class core
     socket rild1 stream 660 root radio
-    socket rild-debug1 stream 660 radio system
+    socket rild-debug1 stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
