@@ -1,14 +1,5 @@
 
-# add for emulated internal storage as primary @{
-on early-fs
-    export EXTERNAL_STORAGE /storage/emulated/legacy
-    export SECONDARY_STORAGE /storage/sdcard0
-
-    symlink /storage/emulated/legacy /sdcard
-    symlink /storage/emulated/legacy /mnt/sdcard
-    setprop persist.storage.type 2
-    setprop sys.tempsd.enable 0
-# @}
+import /init.storage.rc
 
 on boot
     chmod 666 /dev/ttyS0
