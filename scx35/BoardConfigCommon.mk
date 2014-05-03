@@ -92,3 +92,6 @@ USE_OVERLAY_COMPOSER_GPU := true
 
 # ota
 TARGET_RELEASETOOLS_EXTENSIONS := vendor/sprd/open-source/tools/ota
+
+#BQB test
+USE_SPRD_BQBTEST := true
