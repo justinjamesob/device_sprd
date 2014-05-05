@@ -112,7 +112,8 @@ on boot
     chown wifi wifi /data/misc/wifi/fwpath
     rmdir /data/system/wpa_supplicant
     mkdir /data/misc/dhcp 0770 dhcp dhcp
-    chown dhcp dhcp /data/misc/dhcp
+#to observe dnsmasq.leases file for dhcp information
+    chown dhcp system /data/misc/dhcp
     setprop wifi.interface wlan0
 
     mkdir /data/cg/ 0777 system system
