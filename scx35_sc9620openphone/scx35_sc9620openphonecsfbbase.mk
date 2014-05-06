@@ -53,7 +53,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.modem.l.cs=0 \
         persist.modem.l.ps=1 \
         persist.modem.l.rsim=1 \
-        persist.radio.ssda.mode=csfb
+        persist.radio.ssda.mode=csfb \
+        persist.radio.ssda.testmode=7
 
 # board-specific modules
 PRODUCT_PACKAGES += \

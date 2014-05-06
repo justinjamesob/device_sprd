@@ -44,6 +44,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.msms.phone_count=1 \
         persist.msms.phone_default=0 \
         persist.radio.ssda.mode=svlte \
+        persist.radio.ssda.testmode=0 \
         ro.modem.external.enable=1 \
         persist.modem.l.nvp=l_ \
 	persist.modem.t.enable=1 \
