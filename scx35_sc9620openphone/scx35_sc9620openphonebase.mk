@@ -65,6 +65,15 @@ PRODUCT_PACKAGES += \
         libmplmpu.so \
         libinvensense_hal
 
+# NFC packages
+PRODUCT_PACKAGES += \
+        libnfc-nci \
+        libnfc_nci_jni \
+        nfc_nci_pn547.default \
+        NfcNci \
+        Tag \
+        com.android.nfc_extras
+
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
@@ -81,7 +90,15 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt \
 	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
-	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
+	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+	frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+        external/libnfc-nci/libpn547_fw.so:system/vendor/firmware/libpn547_fw.so \
+        external/libnfc-nci/halimpl/pn547/libnfc-nxp.conf:system/etc/libnfc-nxp.conf \
+        external/libnfc-nci/halimpl/pn547/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
+        packages/apps/Nfc/nci/route.xml:system/etc/param/route.xml \
+        frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
+        frameworks/native/data/etc/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
+        frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)

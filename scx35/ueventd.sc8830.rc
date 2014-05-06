@@ -74,3 +74,4 @@
 /dev/sdiomux25          0660     media       audio
 /dev/sdiomux26          0660     media       audio
 /dev/akm8963_dev        0660     system      system
+/dev/pn544               0660     nfc         nfc
