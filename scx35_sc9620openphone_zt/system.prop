@@ -95,4 +95,5 @@ ro.product.manufacturer=Coolpad
 ro.yulong.version.software=4.4.001.P1.8019
 ro.yulong.version.hardware=P1
 ro.build.display.id=4.4.001.P1.8019
+ro.product.board.customer=cgmobile
 # cg end
