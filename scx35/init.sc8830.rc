@@ -149,6 +149,7 @@ service poweroffalarm /system/bin/poweroff_alarm
 
 on alarm
     class_start core
+    start drm
     start media
     start poweroffalarm
 
