@@ -16,6 +16,7 @@
 
 TARGET_PLATFORM := sc8830
 PLATDIR := device/sprd/scx35
+OPERATOR_OVERLAY := vendor/sprd/operator/operator_res/operatorname_overlay
 
 TARGET_BOARD := scx35_sp7730ectrisim
 BOARDDIR := device/sprd/$(TARGET_BOARD)
@@ -26,7 +27,7 @@ $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
-DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
 
 PRODUCT_AAPT_CONFIG := hdpi
 

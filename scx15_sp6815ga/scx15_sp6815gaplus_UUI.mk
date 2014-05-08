@@ -5,7 +5,7 @@ PRODUCT_THEME_FLAGS := shrink
 
 PRODUCT_NAME := scx15_sp6815gaplus_UUI
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
 
 PRODUCT_VIDEO_WALLPAPERS := none
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk

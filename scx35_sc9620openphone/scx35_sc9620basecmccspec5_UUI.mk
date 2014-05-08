@@ -8,7 +8,7 @@ PRODUCT_NAME := scx35_sc9620basecmccspec5_UUI
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec5.mk
