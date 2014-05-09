@@ -133,6 +133,12 @@ export PRODUCTION=1
 export MOZILLA_OFFICIAL=1
 export GAIA_DISTRIBUTION_DIR=$(PWD)/device/sprd/scx15_sp7715ga/
 
+export LOCALE_BASEDIR=$(PWD)/gaia-l10n/
+export LOCALES_FILE=$(PWD)/device/sprd/scx15/languages.json
+export GAIA_DEFAULT_LOCALE=en-US
+export GAIA_KEYBOARD_LAYOUTS=en,bn-Avro,bn-Probhat
+
+
 ifeq ($(TARGET_BUILD_VARIANT), user)
 export NOFTU=0
 else
