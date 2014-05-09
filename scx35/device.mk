@@ -111,6 +111,19 @@ TARGET_APN_VERSION := $(shell cat frameworks/base/core/res/res/xml/apns.xml|grep
 PRODUCT_COPY_FILES += \
 	vendor/sprd/operator/operator_res/apn/apns-conf_$(TARGET_APN_VERSION).xml:system/etc/apns-conf.xml
 
+ifeq ($(strip $(USE_SPRD_WCN)),true)
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.modem.wcn.enable=1 \
+	ro.modem.wcn.dev=/dev/cpwcn \
+	ro.modem.wcn.tty=/deiv/stty_wcn \
+	ro.modem.wcn.diag=/dev/slog_wcn \
+	ro.modem.wcn.assert=/dev/spipe_wcn2 \
+	ro.modem.wcn.id=1 \
+	ro.modem.wcn.count=1 \
+	camera.disable_zsl_mode=1 \
+	ro.digital.fm.support=1
+endif
+
 ifeq ($(TARGET_BUILD_VARIANT),user)
 
 PRODUCT_PROPERTY_OVERRIDES += \

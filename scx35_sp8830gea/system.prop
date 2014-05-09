@@ -35,16 +35,6 @@ ro.modem.t.id=0
 ro.modem.t.fixnv_size=0x40000
 ro.modem.t.runnv_size=0x60000
 
-ro.modem.wcn.enable=1
-ro.modem.wcn.dev=/dev/cpwcn
-ro.modem.wcn.tty=/deiv/stty_wcn
-ro.modem.wcn.diag=/dev/slog_wcn
-ro.modem.wcn.assert=/dev/spipe_wcn2
-ro.modem.wcn.id=1
-ro.modem.wcn.count=1
-camera.disable_zsl_mode=1
-ro.digital.fm.support=1
-
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}

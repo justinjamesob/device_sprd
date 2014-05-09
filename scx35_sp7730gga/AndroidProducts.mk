@@ -19,6 +19,9 @@ ifneq ($(filter scx35_sp7730gga%, $(TARGET_PRODUCT)),)
   TARGET_LOWCOST_SUPPORT := true
 endif
 
+#use sprd's four(wifi bt gps fm) integrated one chip
+USE_SPRD_WCN := true
+
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7730ggabase.mk \
 	$(LOCAL_DIR)/scx35_sp7730ggaplus.mk \

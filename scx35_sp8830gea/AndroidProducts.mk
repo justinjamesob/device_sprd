@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+#use sprd's four(wifi bt gps fm) integrated one chip
+USE_SPRD_WCN := true
+
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp8830geabase.mk \
 	$(LOCAL_DIR)/scx35_sp8830geaplus.mk \
