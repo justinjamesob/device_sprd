@@ -6,7 +6,7 @@ include device/sprd/scx15_sp7715ea/scx15_sp7715eaplus.mk
 
 PRODUCT_NAME := scx15_sp7715eacuccspecAplus_UUI
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
 
 include vendor/sprd/operator/cucc/specA.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
