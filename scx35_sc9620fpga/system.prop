@@ -43,14 +43,14 @@ camera.disable_zsl_mode=1
 ro.digital.fm.support=1
 
 # SPRD: add low cost low memory @{
-ro.config.low_ram=true
+#ro.config.low_ram=true
 # @}
 
 ro.config.ksm.support=true
 
 #zram config
-ro.config.zram.support=true
-ro.board_ram_size=mid
+#ro.config.zram.support=true
+#ro.board_ram_size=mid
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
