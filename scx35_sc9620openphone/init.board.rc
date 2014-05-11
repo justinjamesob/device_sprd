@@ -15,10 +15,6 @@ on early-fs
 on post-fs
     insmod /system/lib/modules/focaltech_ts.ko
 
-on post-fs-data
-    mkdir /data/nfc
-    mkdir /system/etc/param
-
 on boot
     chown system system /dev/iio:device0
     chown system system /sys/bus/iio/devices/trigger0/name
