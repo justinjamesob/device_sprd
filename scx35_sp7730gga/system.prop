@@ -52,3 +52,6 @@ drm.service.enabled=true
 
 # hotspot development
 ro.hotspot.enabled=1
+
+# this product does not support bt and softap coexist
+ro.btwifisoftap.coexist=false
