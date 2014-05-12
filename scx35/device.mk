@@ -86,6 +86,7 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/media_codecs.xml:system/etc/media_codecs.xml \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
+	vendor/sprd/open-source/res/apn/apns-conf.xml:system/etc/apns-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
 	vendor/sprd/open-source/res/productinfo/default_connectivity_configure.ini:system/etc/connectivity_configure.ini \
 	vendor/sprd/open-source/res/productinfo/connectivity_calibration.ini:prodnv/connectivity_calibration.ini \
@@ -105,11 +106,6 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
-
-TARGET_APN_VERSION := $(shell cat frameworks/base/core/res/res/xml/apns.xml|grep "<apns version"|cut -d \" -f 2)
-
-PRODUCT_COPY_FILES += \
-	vendor/sprd/operator/operator_res/apn/apns-conf_$(TARGET_APN_VERSION).xml:system/etc/apns-conf.xml
 
 ifeq ($(strip $(USE_SPRD_WCN)),true)
 PRODUCT_PROPERTY_OVERRIDES += \

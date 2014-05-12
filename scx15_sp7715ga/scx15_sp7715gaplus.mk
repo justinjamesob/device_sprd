@@ -16,7 +16,6 @@
 
 TARGET_PLATFORM := scx15
 PLATDIR := device/sprd/$(TARGET_PLATFORM)
-OPERATOR_OVERLAY := vendor/sprd/operator/operator_res/operatorname_overlay
 
 TARGET_BOARD := scx15_sp7715ga
 BOARDDIR := device/sprd/$(TARGET_BOARD)
@@ -26,7 +25,7 @@ $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/nand/nand_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
-DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
+DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 PRODUCT_AAPT_CONFIG := hdpi
 

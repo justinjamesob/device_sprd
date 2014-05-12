@@ -17,7 +17,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.support.vt=false \
         persist.surpport.50ksearch=0
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 include vendor/sprd/operator/cmcc/specA.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk

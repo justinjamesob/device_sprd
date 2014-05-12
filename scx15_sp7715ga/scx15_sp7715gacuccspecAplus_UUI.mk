@@ -9,7 +9,7 @@ include device/sprd/scx15_sp7715ga/scx15_sp7715gaplus.mk
 
 PRODUCT_NAME := scx15_sp7715gacuccspecAplus_UUI
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 PRODUCT_VIDEO_WALLPAPERS := none
 
 include vendor/sprd/operator/cucc/specA.mk
