@@ -38,12 +38,14 @@
 </debug>
 
 <dumpmusic  num="16"  dump_switch = "0x0" dump_path="/data/local/media/" total_switch="ON">
-	<dump_play  index="0" item_name ="music.dump0"  dump_file_name ="dump0.pcm"  switch="0" />
-	<dump_play  index="1" item_name ="music.dump1"  dump_file_name ="dump1.pcm"  switch="0" />
+	<dump_play  index="0" item_name ="music.dump0"  dump_file_name ="dump_music_before_express.pcm"  switch="0" />
+	<dump_play  index="1" item_name ="music.dump1"  dump_file_name ="dump_music_before_vbc.pcm"  switch="0" />
+	<dump_play  index="2" item_name ="music.dump2"  dump_file_name ="dump_mix_vaudio.pcm"  switch="0" />
+	<dump_play  index="3" item_name ="music.dump3"  dump_file_name ="dump_voip_write.pcm"  switch="0" />
+	<dump_play  index="4" item_name ="music.dump4"  dump_file_name ="dump_bt_sco_write.pcm"  switch="0" />
 
-	<dump_record index="8" item_name ="record.dump0" dump_file_name ="dump_r0.pcm" switch="0" />
-	<dump_record index="9" item_name ="record.dump1" dump_file_name ="dump_r1.pcm" switch="0" />
-
+	<dump_record index="8" item_name ="record.dump0" dump_file_name ="dump_record_after_vbc.pcm" switch="0" />
+	<dump_record index="9" item_name ="record.dump1" dump_file_name ="dump_record_after_express" switch="0" />
 </dumpmusic>
 </audio>
 
