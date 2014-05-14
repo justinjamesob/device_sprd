@@ -5,4 +5,8 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sc9620openphonecsfbbase_UUI
 
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false
+
+
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
