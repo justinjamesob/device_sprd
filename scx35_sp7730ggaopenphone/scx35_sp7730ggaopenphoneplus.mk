@@ -54,7 +54,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
         fm.$(TARGET_PLATFORM) \
-        ValidationTools
+        ValidationTools \
+	Validator \
+        se_nena_nenamark2_5 \
+        VoiceCycle \
+        libnena_jni.so
 
 # board-specific files
 PRODUCT_COPY_FILES += \
