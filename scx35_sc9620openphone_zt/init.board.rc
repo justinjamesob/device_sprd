@@ -281,7 +281,7 @@ service rilproxy-daemon /system/bin/rilproxyd
 
 #set bih
 on property:persist.radio.start_bih=true
-   start bih_cfg
+    start bih_cfg
 service bih_cfg /system/bin/bih_config.sh -d
     class core
     user root
