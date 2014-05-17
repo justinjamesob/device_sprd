@@ -16,3 +16,6 @@ DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec5.mk
 
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
+
