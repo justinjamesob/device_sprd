@@ -83,7 +83,7 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
