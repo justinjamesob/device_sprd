@@ -125,3 +125,26 @@ endif # TARGET_BUILD_VARIANT == user
 # add GPS engineer mode apk
 PRODUCT_PACKAGES += \
         SGPS
+# b2g things
+#PRODUCT_COPY_FILES += \
+#  device/sprd/scx15/volume.cfg:system/etc/volume.cfg
+
+
+# Gecko/Gaia need below export value
+export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools/assets
+export PRODUCTION=1
+export MOZILLA_OFFICIAL=1
+export GAIA_DISTRIBUTION_DIR=$(PWD)/device/sprd/scx35_sp7730ec/
+
+export LOCALE_BASEDIR=$(PWD)/gaia-l10n/
+export LOCALES_FILE=$(PWD)/device/sprd/scx35/languages.json
+export GAIA_DEFAULT_LOCALE=en-US
+export GAIA_KEYBOARD_LAYOUTS=en,bn-Avro,bn-Probhat
+
+
+ifeq ($(TARGET_BUILD_VARIANT), user)
+export NOFTU=0
+else
+export NOFTU=1
+endif
+
