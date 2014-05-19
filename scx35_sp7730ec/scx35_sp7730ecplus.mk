@@ -28,6 +28,7 @@ $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
+
 PRODUCT_AAPT_CONFIG := hdpi
 
 # Remove xhdpi
@@ -35,6 +36,8 @@ PRODUCT_AAPT_CONFIG := hdpi
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
+
+ENABLE_LIBRECOVERY := true
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
@@ -45,7 +48,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.modem.w.count=2 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=4 \
-        ro.homekey.physical=true
+        ro.homekey.physical=true \
+	ro.moz.ril.query_icc_count=true \
+	ro.moz.mute.call.to_ril=true \
+	ro.moz.ril.numclients=2 \
+        ro.moz.ril.data_reg_on_demand=true\
+        ro.moz.ril.radio_off_wo_card=true\
+        ro.moz.ril.0.network_types = gsm,wcdma\
+        ro.moz.ril.1.network_types = gsm
 
 # board-specific modules
 PRODUCT_PACKAGES += \
@@ -53,6 +63,9 @@ PRODUCT_PACKAGES += \
         fm.$(TARGET_PLATFORM) \
         ValidationTools
 
+# for Gecko to support bluedroid stack
+PRODUCT_PACKAGES += \
+	bluetooth.default
 -include vendor/sprd/open-source/common_packages.mk
 -include vendor/sprd/open-source/plus_special_packages.mk
 

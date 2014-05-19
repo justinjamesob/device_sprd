@@ -54,6 +54,11 @@ on fs
     setprop ro.crypto.fuse_sdcard true
 	symlink /system/res /res
 	symlink /system/bin /bin
+# make b2g binary executable
+    chmod 0755 /system/b2g/b2g
+    chmod 0755 /system/b2g/plugin-container
+    chmod 0755 /system/b2g/updater
+    mount ubifs /dev/ubi0_system /system ro remount
 
 #Allow others to read fb devices
     chmod 660 /dev/graphics/fb0
@@ -287,6 +292,19 @@ service charge /bin/charge
     user root
     oneshot
 
+service rilproxy1 /system/bin/rilproxy -c 1
+    class core
+    socket rilproxy1 stream 660 root system
+    user root
+    group radio
+
+
+service rilproxy2 /system/bin/rilproxy -c 2
+    class core
+    socket rilproxy2 stream 660 root system
+    user root
+    group radio
+
 #td rild service
 service tril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m t -n 0
     class core
@@ -315,24 +333,24 @@ service tril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
 #wcdma rild service
 service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 0
     class core
-    socket wrild stream 660 root radio
-    socket wrild-debug stream 660 radio system
+    socket rild stream 660 root radio
+    socket rild-debug stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
 service wril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 1
     class core
-    socket wrild1 stream 660 root radio
-    socket wrild-debug1 stream 660 radio system
+    socket rild1 stream 660 root radio
+    socket rild-debug1 stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
 service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m w -n 2
     class core
-    socket wrild2 stream 660 root radio
-    socket wrild-debug2 stream 660 radio system
+    socket rild2 stream 660 root radio
+    socket rild-debug2 stream 660 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
@@ -447,3 +465,7 @@ service srtd /system/xbin/srtd
 service watchdogd /sbin/watchdogd 10 20
     class core
     seclabel u:r:watchdogd:s0
+
+service engmoded /system/bin/engmoded
+    class main
+    user root
