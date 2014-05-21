@@ -37,11 +37,23 @@ CAMERA_SUPPORT_SIZE := 8M
 FRONT_CAMERA_SUPPORT_SIZE := 3M
 TARGET_BOARD_NO_FRONT_SENSOR := false
 TARGET_BOARD_CAMERA_FLASH_CTRL := false
+
+#face detect
+TARGET_BOARD_CAMERA_FACE_DETECT := false
+
+#snesor interface
 TARGET_BOARD_BACK_CAMERA_INTERFACE := mipi
 TARGET_BOARD_FRONT_CAMERA_INTERFACE := ccir
 
+#select camera zsl cap mode
+TARGET_BOARD_CAMERA_CAPTURE_MODE := false
+
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
+
+#select mipi d-phy mode(none, phya, phyb, phyab)
+TARGET_BOARD_FRONT_CAMERA_MIPI := none
+TARGET_BOARD_BACK_CAMERA_MIPI := phyab
 
 # select WCN
 BOARD_HAVE_BLUETOOTH := true
