@@ -5,7 +5,7 @@ PRODUCT_THEME_FLAGS := shrink
 
 PRODUCT_NAME := scx35_sp5735eaplus_UUI
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
