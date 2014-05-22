@@ -126,8 +126,8 @@ endif # TARGET_BUILD_VARIANT == user
 PRODUCT_PACKAGES += \
         SGPS
 # b2g things
-#PRODUCT_COPY_FILES += \
-#  device/sprd/scx15/volume.cfg:system/etc/volume.cfg
+PRODUCT_COPY_FILES += \
+  device/sprd/scx15/volume.cfg:system/etc/volume.cfg
 
 
 # Gecko/Gaia need below export value
