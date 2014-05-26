@@ -9,7 +9,7 @@ include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp7730eccuccspecBplus_UUI
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/operator/cucc/specB.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
