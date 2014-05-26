@@ -178,8 +178,8 @@ on property:ro.debuggable=1
     chmod 777 /data/corefile
     chmod 777 /sys/kernel/debug/sc2713-regulator/vddarm/voltage
     chmod 777 /sys/kernel/debug/sc2713-regulator/vddcore/voltage
-    chmod 777 /sys/kernel/debug/sc2713s-regulator/dcdcarm/voltage
-    chmod 777 /sys/kernel/debug/sc2713s-regulator/dcdccore/voltage
+    chmod 777 /sys/kernel/debug/sprd-regulator/vddarm/voltage
+    chmod 777 /sys/kernel/debug/sprd-regulator/vddcore/voltage
     chmod 777 /sys/kernel/debug
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
