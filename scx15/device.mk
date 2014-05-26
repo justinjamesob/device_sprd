@@ -122,10 +122,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 endif # TARGET_BUILD_VARIANT == user
 
-# b2g things
-PRODUCT_COPY_FILES += \
-  device/sprd/scx15/volume.cfg:system/etc/volume.cfg
-
 # Gecko/Gaia need below export value
 export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools/assets
 export PRODUCTION=1
