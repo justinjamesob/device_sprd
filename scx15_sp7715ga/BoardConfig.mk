@@ -18,7 +18,7 @@
 -include device/sprd/scx15/nand/BoardConfigNand.mk
 
 # nand fstab
-GET_RECOVERY_FSTAB := device/sprd/scx15/nand/fstab.scx15
+TARGET_RECOVERY_FSTAB := device/sprd/scx15/nand/recovery.fstab
 
 # board configs
 
