@@ -140,6 +140,8 @@
 	<pga name="Linein Boost" bit="6" />
 	<pga name="VBC ADCL DG Set" bit="8" />
 	<pga name="VBC ADCL DG Switch" bit="15" />
+	<pga name="VBC ADC23L DG Set" bit="8" />
+	<pga name="VBC ADC23L DG Switch" bit="15" />
 </profile>
 
 <profile name="capture-r">
@@ -150,6 +152,8 @@
 	<pga name="Linein Boost" bit="6" />
 	<pga name="VBC ADCR DG Set" bit="8" />
 	<pga name="VBC ADCR DG Switch" bit="15" />
+	<pga name="VBC ADC23R DG Set" bit="8" />
+	<pga name="VBC ADC23R DG Switch" bit="15" />
 </profile>
 
 <profile name="voice-capture-l">
@@ -266,11 +270,28 @@
 		<attr max="127" inverse="0" />
 	</mixer>
 
+	<mixer name="VBC ADC23L DG Set">
+		<attr max="127" inverse="0" />
+	</mixer>
+
+	<mixer name="VBC ADC23R DG Set">
+		<attr max="127" inverse="0" />
+	</mixer>
+
+
 	<mixer name="VBC ADCL DG Switch">
 		<attr max="1" inverse="0" />
 	</mixer>
 
 	<mixer name="VBC ADCR DG Switch">
+		<attr max="1" inverse="0" />
+	</mixer>
+
+	<mixer name="VBC ADC23L DG Switch">
+		<attr max="1" inverse="0" />
+	</mixer>
+
+	<mixer name="VBC ADC23R DG Switch">
 		<attr max="1" inverse="0" />
 	</mixer>
 	<mixer name="VBC STR DG Set">
