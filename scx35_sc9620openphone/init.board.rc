@@ -13,15 +13,12 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/accl_matrix
     chown system system /sys/bus/iio/devices/iio:device0/buffer/length
     chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
-    chown system system /sys/bus/iio/devices/iio:device0/compass_enable
-    chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
     chown system system /sys/bus/iio/devices/iio:device0/dmp_on
     chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
     chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
     chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
     chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
     chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_scale
-    chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
     chown system system /sys/bus/iio/devices/iio:device0/key
     chown system system /sys/bus/iio/devices/iio:device0/power_state
     chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
@@ -31,9 +28,6 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
-    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
     chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
     chown system system /sys/bus/iio/devices/iio:device0/temperature
     chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
@@ -44,15 +38,12 @@ on boot
     chmod 0664 /sys/bus/iio/devices/iio:device0/accl_matrix
     chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/length
     chmod 0664 /sys/bus/iio/devices/iio:device0/buffer/enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/compass_enable
-    chmod 0664 /sys/bus/iio/devices/iio:device0/compass_matrix
     chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_on
     chmod 0664 /sys/bus/iio/devices/iio:device0/dmp_int_on
     chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_enable
     chmod 0664 /sys/bus/iio/devices/iio:device0/gyro_matrix
     chmod 0664 /sys/bus/iio/devices/iio:device0/in_accel_scale
     chmod 0664 /sys/bus/iio/devices/iio:device0/in_anglvel_scale
-    chmod 0664 /sys/bus/iio/devices/iio:device0/in_magn_scale
     chmod 0664 /sys/bus/iio/devices/iio:device0/key
     chmod 0664 /sys/bus/iio/devices/iio:device0/power_state
     chmod 0664 /sys/bus/iio/devices/iio:device0/sampling_frequency
@@ -62,9 +53,6 @@ on boot
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
-    chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
     chmod 0664 /sys/bus/iio/devices/iio:device0/temperature
     chmod 0664 /sys/bus/iio/devices/iio:device0/trigger/current_trigger
