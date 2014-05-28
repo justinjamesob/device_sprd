@@ -106,6 +106,10 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.moz.omx.hw.max_width=1080 \
+	ro.moz.omx.hw.max_height=720
+
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.sprd.modemreset=1 \
