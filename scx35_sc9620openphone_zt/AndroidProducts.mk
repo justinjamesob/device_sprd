@@ -14,4 +14,6 @@
 # limitations under the License.
 #
 
-PRODUCT_MAKEFILES := $(LOCAL_DIR)/scx35_sc9620basecmccspec5_UUI_zt.mk
+PRODUCT_MAKEFILES := $(LOCAL_DIR)/scx35_sc9620basecmccspec5_UUI_zt.mk \
+    $(LOCAL_DIR)/scx35_sc9620basecmccspec3_UUI_zt.mk
+
