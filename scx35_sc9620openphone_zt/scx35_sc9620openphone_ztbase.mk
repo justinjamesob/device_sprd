@@ -23,6 +23,10 @@ BOARDDIR := device/sprd/$(TARGET_BOARD)
 # call connectivity_configure_9620.mk before calling device.mk
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_9620_zt.mk)
 
+# copy for zt, it should be before inherit device.mk.
+PRODUCT_COPY_FILES += \
+	$(PLATDIR)/media_profiles_zt.xml:system/etc/media_profiles.xml
+
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
