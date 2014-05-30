@@ -3,9 +3,7 @@ ro.sf.lcd_density=240
 ro.sf.lcd_width=54
 ro.sf.lcd_height=96
 ro.opengles.version=131072
-# cg start
-#ro.product.hardware=SC9620OPENPHONE_V1.0.1
-# cg end
+ro.product.hardware=SC9620OPENPHONE_V1.0.1
 
 debug.hwui.render_dirty_regions=false
 
@@ -76,27 +74,11 @@ ro.config.low_ram=true
 #ro.config.ksm.support=true
 
 #zram config
-#ro.config.zram.support=true
-#ro.board_ram_size=mid
+ro.config.zram.support=true
+ro.board_ram_size=mid
 
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
 
 # hotspot development
 ro.hotspot.enabled=1
-
-# cg start
-ro.product.hardware=P1
-ro.product.cg_version=4.4.001.P1.8019
-ro.cg.product.device=Coolpad 8019
-ro.product.releasetime=2014-05-04
-ro.product.model=Coolpad 8019
-ro.product.brand=Coolpad
-ro.product.name=Coolpad 8019
-ro.product.device=Coolpad 8019
-ro.product.manufacturer=Coolpad
-ro.yulong.version.software=4.4.001.P1.8019
-ro.yulong.version.hardware=P1
-ro.build.display.id=4.4.001.P1.8019
-ro.product.board.customer=cgmobile
-# cg end
