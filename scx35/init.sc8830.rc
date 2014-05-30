@@ -228,20 +228,19 @@ service theme_init /system/bin/theme_init.sh
 on property:persist.storage.type=1
     start legacy_tempsd
 
-#on property:sys.tempsd.enable=1
-#    start fuse_tempsd
-#
-#on property:sys.tempsd.enable=0
-#    stop fuse_tempsd
+on property:sys.internal.emulated=0
+    stop sdcard
 
 service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -w 1051 -l /data/media/temp_sd /storage/temp_sd
     disabled
 
-#service fuse_tempsd /system/bin/sdcard -u 1023 -g 1023 -w 1051 -l /data/media/temp_sd /storage/sdcard0
-#    class late_start
-#    disabled
-
+# add for otg usbdisk
 service fuse_usbdisk /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/usbdisk /storage/usbdisk
+    class late_start
+    disabled
+
+# add for physical internal storage
+service fuse_internalsd /system/bin/sdcard -u 1023 -g 1023 -w 1051 -d /mnt/media_rw/internalsd /storage/internalsd
     class late_start
     disabled
 # @}

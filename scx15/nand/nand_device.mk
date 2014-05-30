@@ -14,3 +14,12 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.storage.flash_type=1
+
+ifndef STORAGE_INTERNAL
+  STORAGE_INTERNAL := emulated
+endif
+ifndef STORAGE_PRIMARY
+  STORAGE_PRIMARY := external
+endif
+
+-include $(PLATDIR)/storage_device.mk

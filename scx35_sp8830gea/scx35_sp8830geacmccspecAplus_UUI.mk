@@ -3,6 +3,13 @@
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp8830gea/scx35_sp8830geaplus.mk
 
+ifndef STORAGE_INTERNAL
+  STORAGE_INTERNAL := emulated
+endif
+ifndef STORAGE_PRIMARY
+  STORAGE_PRIMARY := internal
+endif
+
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
 PRODUCT_NAME := scx35_sp8830geacmccspecAplus_UUI
