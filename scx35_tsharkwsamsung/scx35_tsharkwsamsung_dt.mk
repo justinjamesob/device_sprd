@@ -32,7 +32,7 @@ $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_con
 
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
-$(call inherit-product, $(PLATDIR)/nand/nand_device.mk)
+$(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
