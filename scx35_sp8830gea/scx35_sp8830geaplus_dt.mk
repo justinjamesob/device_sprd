@@ -30,13 +30,6 @@ PRODUCT_COPY_FILES += $(BOARDDIR)/media_profiles.xml:system/etc/media_profiles.x
 # call connectivity_configure_8830g.mk before calling device.mk
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830g.mk)
 
-ifndef STORAGE_INTERNAL
-  STORAGE_INTERNAL := physical
-endif
-ifndef STORAGE_PRIMARY
-  STORAGE_PRIMARY := external
-endif
-
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
