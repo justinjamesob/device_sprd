@@ -77,7 +77,10 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/imei_config/imei1.txt:prodnv/imei1.txt \
 	$(BOARDDIR)/imei_config/imei2.txt:prodnv/imei2.txt \
 	$(BOARDDIR)/imei_config/imei3.txt:prodnv/imei3.txt \
-	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt
+	$(BOARDDIR)/imei_config/imei4.txt:prodnv/imei4.txt \
+	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
+	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
+	frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_9620.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
