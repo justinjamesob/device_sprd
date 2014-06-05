@@ -17,7 +17,7 @@
 TARGET_PLATFORM := sc8830
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35_sp7730gga_lc
+TARGET_BOARD := scx35_sp7731gga_lc
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # copy media_profiles.xml before calling device.mk,
@@ -53,7 +53,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
         sys.usb.gser.count=4 \
 	ro.sf.lcd_width=54 \
 	ro.sf.lcd_height=96 \
-	ro.board_ram_size=mid
+	lmk.autocalc=false \
+        ro.board_ram_size=low
 
 # board-specific modules
 PRODUCT_PACKAGES += \
@@ -79,7 +80,7 @@ $(call inherit-product, vendor/sprd/gps/CellGuide_2351/device-sprd-gps.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # Overrides
-PRODUCT_NAME := scx35_sp7730gga_lcplus
+PRODUCT_NAME := scx35_sp7731gga_lcplus
 PRODUCT_DEVICE := $(TARGET_BOARD)
 PRODUCT_MODEL := SP7730A
 PRODUCT_BRAND := Spreadtrum

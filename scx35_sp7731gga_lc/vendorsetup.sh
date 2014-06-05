@@ -14,5 +14,5 @@
 # limitations under the License.
 #
 
-add_lunch_combo scx35_sp7730gga_lcplus-userdebug
-add_lunch_combo scx35_sp7730gga_lcplus_UUIFWVGA-userdebug
+add_lunch_combo scx35_sp7731gga_lcplus-userdebug
+add_lunch_combo scx35_sp7731gga_lcplus_UUIFWVGA-userdebug

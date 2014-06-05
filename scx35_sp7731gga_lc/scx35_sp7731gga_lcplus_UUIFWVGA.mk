@@ -6,11 +6,11 @@ PRODUCT_THEME_PACKAGES := SimpleStyle HelloColor
 PRODUCT_THEME_FLAGS := shrink
 
 # export original make file
-LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp7730gga_lc/scx35_sp7730gga_lcplus.mk
+LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sp7731gga_lc/scx35_sp7731gga_lcplus.mk
 
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
-PRODUCT_NAME := scx35_sp7730gga_lcplus_UUIFWVGA
+PRODUCT_NAME := scx35_sp7731gga_lcplus_UUIFWVGA
 
 PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.support.vt=false \
