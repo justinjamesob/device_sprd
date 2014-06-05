@@ -18,6 +18,10 @@ on fs
     mount functionfs adb /dev/usb-ffs/adb uid=2000,gid=2000
     write /sys/class/android_usb/android0/f_ffs/aliases adb
 
+on property:ro.bootmode=iq
+    setprop persist.sys.modem.diag ${persist.sys.modem.diag},vser
+    rm data/property/persist.sys.modem.diag
+
 on property:sys.usb.config=mtp
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 1782
@@ -123,3 +127,14 @@ on property:sys.usb.config=mass_storage,adb
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state $sys.usb.config
+
+on property:sys.usb.config=vser
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/bcdDevice 2427
+    write /sys/class/android_usb/android0/idVendor 1782
+    write /sys/class/android_usb/android0/idProduct 4d00
+    write /sys/class/android_usb/android0/functions vser
+    write /sys/class/android_usb/android0/iManufacturer Spreadtrum
+    write /sys/class/android_usb/android0/iProduct "Gadget Serial"
+    write /sys/class/android_usb/android0/iSerial 19761202
+    write /sys/class/android_usb/android0/enable 1
