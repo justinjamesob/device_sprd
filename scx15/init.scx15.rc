@@ -140,6 +140,8 @@ on boot
 
 on charger
     class_start core
+    start console
+    start slog
 
 service poweroffalarm /system/bin/poweroff_alarm
     disabled
@@ -147,7 +149,10 @@ service poweroffalarm /system/bin/poweroff_alarm
 
 on alarm
     class_start core
+    start drm
     start media
+    start console
+    start slog
     start poweroffalarm
 
 on property:ro.board_ram_size=min
