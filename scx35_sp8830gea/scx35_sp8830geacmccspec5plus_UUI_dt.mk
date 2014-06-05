@@ -12,7 +12,7 @@ endif
 
 include $(LOCAL_ORIGINAL_PRODUCT_MAKEFILE)
 # Rename product name and we can lunch it
-PRODUCT_NAME := scx35_sp8830geacmccspecAplus_UUI_dt
+PRODUCT_NAME := scx35_sp8830geacmccspec5plus_UUI_dt
 
 PRODUCT_PROPERTY_OVERRIDES += \
         ro.homekey.physical=true \
@@ -24,8 +24,8 @@ PRODUCT_PACKAGES += \
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
-include vendor/sprd/operator/cmcc/specA.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
+include vendor/sprd/operator/cmcc/spec5.mk
 
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
