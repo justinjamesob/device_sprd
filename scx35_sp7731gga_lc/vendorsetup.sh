@@ -15,4 +15,6 @@
 #
 
 add_lunch_combo scx35_sp7731gga_lcplus-userdebug
+add_lunch_combo scx35_sp7731gga_lcplus_dt-userdebug
 add_lunch_combo scx35_sp7731gga_lcplus_UUIFWVGA-userdebug
+add_lunch_combo scx35_sp7731gga_lcplus_UUIFWVGA_dt-userdebug

@@ -24,5 +24,7 @@ USE_SPRD_WCN := true
 
 PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7731gga_lcplus.mk \
-	$(LOCAL_DIR)/scx35_sp7731gga_lcplus_UUIFWVGA.mk
+	$(LOCAL_DIR)/scx35_sp7731gga_lcplus_dt.mk \
+	$(LOCAL_DIR)/scx35_sp7731gga_lcplus_UUIFWVGA.mk \
+	$(LOCAL_DIR)/scx35_sp7731gga_lcplus_UUIFWVGA_dt.mk
 	
