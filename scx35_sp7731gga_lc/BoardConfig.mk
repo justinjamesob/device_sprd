@@ -21,12 +21,12 @@
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/nand/recovery.fstab
 
 # board configs
-TARGET_BOOTLOADER_BOARD_NAME := sp7730gga_lc
-UBOOT_DEFCONFIG := sp7730gga_lc
+TARGET_BOOTLOADER_BOARD_NAME := sp7731gga_lc
+UBOOT_DEFCONFIG := sp7731gga_lc
 ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
-KERNEL_DEFCONFIG := sp7730gga_lc-dt_defconfig
+KERNEL_DEFCONFIG := sp7731gga_lc-dt_defconfig
 else
-KERNEL_DEFCONFIG := sp7730gga_lc-native_defconfig
+KERNEL_DEFCONFIG := sp7731gga_lc-native_defconfig
 endif
 
 TARGET_GPU_DFS_MAX_FREQ := 384000

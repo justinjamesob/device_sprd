@@ -15,7 +15,7 @@
 #
 
 # SPRD: Add LowCost switcher for cutting rom size
-ifneq ($(filter scx35_sp7730gga_lc%, $(TARGET_PRODUCT)),)
+ifneq ($(filter scx35_sp7731gga_lc%, $(TARGET_PRODUCT)),)
   TARGET_LOWCOST_SUPPORT := true
 endif
 
@@ -23,6 +23,6 @@ endif
 USE_SPRD_WCN := true
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx35_sp7730gga_lcplus.mk \
-	$(LOCAL_DIR)/scx35_sp7730gga_lcplus_UUIFWVGA.mk
+	$(LOCAL_DIR)/scx35_sp7731gga_lcplus.mk \
+	$(LOCAL_DIR)/scx35_sp7731gga_lcplus_UUIFWVGA.mk
 	

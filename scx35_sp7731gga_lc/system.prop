@@ -2,7 +2,7 @@
 ro.sf.lcd_density=240
 
 ro.opengles.version=131072
-ro.product.hardware=SP7730GGA_LC_V1.0.0
+ro.product.hardware=SP7731GGA_LC_V1.0.0
 
 debug.hwui.render_dirty_regions=false
 

@@ -406,6 +406,10 @@ service refnotify_w /system/bin/refnotify -t 1
     disabled
     user root
 
+on property:lmk.autocalc=false
+    write /sys/module/lowmemorykiller/parameters/adj 0,1,3,5,9,15
+    write /sys/module/lowmemorykiller/parameters/minfree 1024,2462,3569,4676,6766,7873
+
 on property:persist.modem.w.enable=1
     symlink /dev/spipe_w1 /dev/vbpipe1
     symlink /dev/spipe_w2 /dev/vbpipe2
