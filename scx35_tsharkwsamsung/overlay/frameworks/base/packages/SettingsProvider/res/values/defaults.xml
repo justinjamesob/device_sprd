@@ -18,5 +18,5 @@
 -->
 <resources>
     <!-- Default screen brightness, from 0 to 255.  102 is 40%. -->
-    <integer name="def_screen_brightness">25</integer>
+    <integer name="def_screen_brightness">160</integer>
 </resources>
