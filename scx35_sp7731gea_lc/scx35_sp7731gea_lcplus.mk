@@ -25,8 +25,8 @@ BOARDDIR := device/sprd/$(TARGET_BOARD)
 PRODUCT_COPY_FILES += $(BOARDDIR)/media_profiles.xml:system/etc/media_profiles.xml
 
 ifeq ($(strip $(USE_SPRD_WCN)),true)
-# call connectivity_configure_7730g.mk before calling device.mk
-$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_7730g.mk)
+# call connectivity_configure_7731g.mk before calling device.mk
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_7731g.mk)
 endif
 
 # include general common configs
