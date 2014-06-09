@@ -307,6 +307,7 @@ service tril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m
     class core
     socket trild stream 660 root radio
     socket trild-debug stream 660 radio system
+    socket trild-oem stream 666 root system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log
@@ -315,6 +316,7 @@ service tril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     class core
     socket trild1 stream 660 root radio
     socket trild-debug1 stream 660 radio system
+    socket trild-oem1 stream 666 root system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log
@@ -323,6 +325,7 @@ service tril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     class core
     socket trild2 stream 660 root radio
     socket trild-debug2 stream 660 radio system
+    socket trild-oem2 stream 666 root system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log
@@ -332,6 +335,8 @@ service wril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m
     class core
     socket rild stream 660 root radio
     socket rild-debug stream 666 radio system
+    socket wrild-oem stream 666 root system
+
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
@@ -340,6 +345,7 @@ service wril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     class core
     socket rild1 stream 660 root radio
     socket rild-debug1 stream 666 radio system
+    socket wrild-oem1 stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
@@ -348,6 +354,7 @@ service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
     class core
     socket rild2 stream 660 root radio
     socket rild-debug2 stream 660 radio system
+    socket wrild-oem2 stream 666 radio system
     disabled
     user root
     group radio cache inet misc audio sdcard_rw log shell
@@ -457,6 +464,7 @@ service srtd /system/xbin/srtd
     user root
     group root
     oneshot
+
 
 # Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
 service watchdogd /sbin/watchdogd 10 20
