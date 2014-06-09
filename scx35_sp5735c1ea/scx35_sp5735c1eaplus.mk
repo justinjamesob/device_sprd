@@ -20,6 +20,18 @@ PLATDIR := device/sprd/scx35
 TARGET_BOARD := scx35_sp5735c1ea
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
+
+ifndef ENABLE_OTG_USBDISK
+  ENABLE_OTG_USBDISK := true
+endif
+ifndef STORAGE_INTERNAL
+  STORAGE_INTERNAL := emulated
+endif
+ifndef STORAGE_PRIMARY
+  STORAGE_PRIMARY := internal
+endif
+
+
 # include general common configs
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_5735.mk)
 $(call inherit-product, $(PLATDIR)/device.mk)
