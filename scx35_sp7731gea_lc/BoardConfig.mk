@@ -50,6 +50,9 @@ TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 
+#image angle in different project
+TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 180
+
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := phyb
 TARGET_BOARD_BACK_CAMERA_MIPI := phya
