@@ -68,6 +68,7 @@ PRODUCT_PACKAGES += \
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
+       $(BOARDDIR)/init.recovery.board.rc:root/init.recovery.board.rc \
 	$(BOARDDIR)/audio_params/tiny_hw.xml:system/etc/tiny_hw.xml \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
