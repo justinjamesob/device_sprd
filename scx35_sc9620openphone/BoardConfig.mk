@@ -39,6 +39,9 @@ TARGET_BOARD_CAMERA_FACE_DETECT := false
 TARGET_BOARD_BACK_CAMERA_INTERFACE := mipi
 TARGET_BOARD_FRONT_CAMERA_INTERFACE := ccir
 
+#capture uv denoise
+TARGET_BOARD_CAMERA_CAPTURE_DENOISE := true
+
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 #image angle in different project
