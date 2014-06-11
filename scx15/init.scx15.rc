@@ -47,13 +47,16 @@ on fs
     ubiattach 0 ubipac
     mount_all /fstab.scx15
     mount pstore pstore /sys/fs/pstore
-    setprop ro.crypto.fuse_sdcard true
+    #setprop ro.crypto.fuse_sdcard true
     symlink /system/res /res
     symlink /system/bin /bin
 
 #Allow others to read fb devices
     chmod 660 /dev/graphics/fb0
     chmod 660 /dev/fb0
+#internal scard
+    mkdir /mnt/internal-sdcard  0774    system  system
+    mount ubifs /dev/ubi0_media /mnt/internal-sdcard    nosuid nodev
 
 on post-fs
     chown system system /productinfo
