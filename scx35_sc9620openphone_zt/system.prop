@@ -53,8 +53,8 @@ ro.modem.l.nv=/dev/sdiomux20
 ro.modem.l.fixnv_size=0x20000
 ro.modem.l.runnv_size=0x40000
 ro.modem.l.nvp=l_
-ro.modem.lf.nvp=lf_
-ro.modem.tl.nvp=tl_
+ro.modem.lf.nvp=l_
+ro.modem.tl.nvp=l_
 
 ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn
