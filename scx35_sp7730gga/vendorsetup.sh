@@ -20,3 +20,4 @@ add_lunch_combo scx35_sp7730ggaplus_dt-userdebug
 add_lunch_combo scx35_sp7730ggacuccspecAplus_UUI-userdebug
 add_lunch_combo scx35_sp7730ggacuccspecAplus_UUI_dt-userdebug
 add_lunch_combo scx35_sp7730ggacuccspecBplus_UUI-userdebug
+add_lunch_combo scx35_sp7730ggaplus_UUI-userdebug
