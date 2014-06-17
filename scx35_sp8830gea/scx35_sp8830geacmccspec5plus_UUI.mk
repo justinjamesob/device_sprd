@@ -24,6 +24,9 @@ PRODUCT_PACKAGES += \
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
+# That means the cmcc preloadapp will not be built into current products
+TARGET_DISABLE_VENDOR_PRELOADAPP := true
+
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec5.mk
 
