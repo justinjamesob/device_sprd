@@ -51,16 +51,16 @@ BOARD_USE_SPRD_4IN1_GPS := true
 # WIFI configs
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_ittiam
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_sprdwl
 BOARD_HOSTAPD_DRIVER        := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_ittiam
-BOARD_WLAN_DEVICE           := ittiam
+BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_sprdwl
+BOARD_WLAN_DEVICE           := sprdwl
 WIFI_DRIVER_FW_PATH_PARAM   := "/data/misc/wifi/fwpath"
 WIFI_DRIVER_FW_PATH_STA     := "sta_mode"
 WIFI_DRIVER_FW_PATH_P2P     := "p2p_mode"
 WIFI_DRIVER_FW_PATH_AP      := "ap_mode"
-WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/ittiam.ko"
-WIFI_DRIVER_MODULE_NAME     := "ittiam"
+WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/sprdwl.ko"
+WIFI_DRIVER_MODULE_NAME     := "sprdwl"
 
 # select sensor
 #USE_INVENSENSE_LIB := true
