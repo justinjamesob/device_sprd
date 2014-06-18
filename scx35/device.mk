@@ -64,6 +64,7 @@ PRODUCT_PACKAGES += \
 	modemd \
 	engpc \
 	dns6 \
+	radvd \
 	modem_control\
 	libengappjni \
 	nvitemd \
