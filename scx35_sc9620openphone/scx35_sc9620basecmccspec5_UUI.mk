@@ -11,6 +11,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
+#CMCC Recommended AndManhua
+PRODUCT_PACKAGES += \
+    Manhua_CMCC
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
