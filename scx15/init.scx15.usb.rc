@@ -118,3 +118,14 @@ on property:sys.usb.config=mass_storage,adb
     write /sys/class/android_usb/android0/enable 1
     start adbd
     setprop sys.usb.state $sys.usb.config
+
+on property:sys.usb.config=vser
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/idVendor 1782
+    write /sys/class/android_usb/android0/idProduct 4d00
+    write /sys/class/android_usb/android0/functions vser
+    write /sys/class/android_usb/android0/iManufacturer Spreadtrum
+    write /sys/class/android_usb/android0/iProduct Spreadtrum Phone
+    write /sys/class/android_usb/android0/iSerial 19761202
+    write /sys/class/android_usb/android0/enable 1
+    setprop sys.usb.state $sys.usb.config

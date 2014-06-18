@@ -12,7 +12,8 @@ PRODUCT_PACKAGES := \
 	libril_sp \
 	libreference-ril_sp \
 	phoneserver  \
-	akmd8963
+	akmd8963 \
+	autotest
 
 else
 # for spreadtrum customer proprietories modules: only support direct copy
@@ -31,7 +32,8 @@ PROPMODS := \
 	system/bin/rild_sp \
 	system/lib/libril_sp.so \
 	system/lib/libreference-ril_sp.so \
-	system/bin/phoneserver
+	system/bin/phoneserver \
+	system/bin/autotest
 
 PRODUCT_COPY_FILES := $(foreach f,$(PROPMODS),vendor/sprd/proprietories/scx15/$(f):$(f))
 
