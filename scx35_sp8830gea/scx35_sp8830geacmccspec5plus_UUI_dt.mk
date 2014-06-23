@@ -22,6 +22,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
+#[[ for autotest
+PRODUCT_PACKAGES += autotest
+#]]
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 # That means the cmcc preloadapp will not be built into current products

@@ -504,3 +504,9 @@ service srtd /system/xbin/srtd
     user root
     group root
     oneshot
+
+service autotest /system/bin/autotest
+    class main
+    disabled
+    user root
+    oneshot

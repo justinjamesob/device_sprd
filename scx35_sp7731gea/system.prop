@@ -34,7 +34,7 @@ ro.modem.w.vbc=/dev/spipe_w6
 ro.modem.w.id=0
 ro.modem.w.fixnv_size=0x40000
 ro.modem.w.runnv_size=0x60000
-
+persist.sys.engpc.disable=0
 
 
 ro.config.ksm.support=true
