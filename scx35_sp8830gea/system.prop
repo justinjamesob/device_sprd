@@ -34,6 +34,7 @@ ro.modem.t.vbc=/dev/spipe_td6
 ro.modem.t.id=0
 ro.modem.t.fixnv_size=0x40000
 ro.modem.t.runnv_size=0x60000
+persist.sys.engpc.disable=0
 
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
