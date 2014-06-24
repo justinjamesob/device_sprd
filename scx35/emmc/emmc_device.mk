@@ -10,10 +10,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.storage.flash_type=2
 
 ifndef STORAGE_INTERNAL
-  STORAGE_INTERNAL := emulated
+  STORAGE_INTERNAL := physical
 endif
 ifndef STORAGE_PRIMARY
-  STORAGE_PRIMARY := internal
+  STORAGE_PRIMARY := external
 endif
 
 -include $(PLATDIR)/storage_device.mk

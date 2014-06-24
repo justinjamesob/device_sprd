@@ -29,13 +29,6 @@ ifeq ($(strip $(USE_SPRD_WCN)),true)
 $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_configure_8830g.mk)
 endif
 
-ifndef STORAGE_INTERNAL
-  STORAGE_INTERNAL := physical
-endif
-ifndef STORAGE_PRIMARY
-  STORAGE_PRIMARY := external
-endif
-
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
