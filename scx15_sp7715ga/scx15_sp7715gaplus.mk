@@ -34,6 +34,10 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
 ENABLE_LIBRECOVERY := true
+RECOVERY_EXTERNAL_STORAGE := /sdcard
+SYSTEM_FS_TYPE := ubifs
+SYSTEM_PARTITION_TYPE := UBI
+SYSTEM_LOCATION := /dev/ubi0_system
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
