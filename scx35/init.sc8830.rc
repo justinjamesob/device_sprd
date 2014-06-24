@@ -379,21 +379,21 @@ service lril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m
 #nvitemd
 service nvitemd_td /system/bin/nvitemd t 0
     class core
-    user system
+    user root
     disabled
     group system radio shell
     oneshot
 
 service nvitemd_w /system/bin/nvitemd w 0
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot
 
 service nvitemd_l /system/bin/nvitemd l 0
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot

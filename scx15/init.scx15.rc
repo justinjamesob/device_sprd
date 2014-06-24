@@ -345,20 +345,20 @@ service wril-daemon2 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -
 service nvitemd_td /system/bin/nvitemd t 0
     class core
     disabled
-    user system
+    user root
     group system radio shell
     oneshot
 
 service nvitemd_w /system/bin/nvitemd w 0
     class core
     disabled
-    user system
+    user root
     group system radio shell
     oneshot
 
 service nvitemd_l /system/bin/nvitemd l 0
     class core
-    user system
+    user root
     group system radio shell
     disabled
     oneshot
