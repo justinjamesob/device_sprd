@@ -8,5 +8,8 @@ PRODUCT_NAME := scx35_sc9620openphonecsfbbase_UUI
 PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.support.vt=false
 
+#[[ for autotest
+PRODUCT_PACKAGES += autotest
+#]]
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk

@@ -15,6 +15,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     Manhua_CMCC
 
+#[[ for autotest
+PRODUCT_PACKAGES += autotest
+#]]
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk

@@ -31,6 +31,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
+#[[ for autotest
+PRODUCT_PACKAGES += autotest
+#]]
+
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
