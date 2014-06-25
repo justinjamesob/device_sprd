@@ -59,10 +59,6 @@ PRODUCT_PACKAGES += \
         fm.$(TARGET_PLATFORM) \
         ValidationTools
 
-#[[ for autotest
-PRODUCT_PACKAGES += autotest
-#]]
-
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \

@@ -14,8 +14,7 @@ PRODUCT_PACKAGES := \
 	phoneserver \
 	librilproxy \
 	rilproxyd \
-	akmd8963 \
-	autotest
+	akmd8963
 
 else
 # for spreadtrum customer proprietories modules: only support direct copy
@@ -36,8 +35,7 @@ PROPMODS := \
 	system/lib/libreference-ril_sp.so \
 	system/bin/phoneserver \
 	system/lib/librilproxy.so \
-	system/bin/rilproxyd \
-	system/bin/autotest
+	system/bin/rilproxyd
 
 PRODUCT_COPY_FILES := $(foreach f,$(PROPMODS),vendor/sprd/proprietories/scx35/$(f):$(f))
 
