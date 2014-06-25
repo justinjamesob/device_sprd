@@ -19,6 +19,9 @@
 # emmc fstab
 TARGET_RECOVERY_FSTAB := device/sprd/scx35/emmc/recovery.fstab
 
+# not have selinux now
+NOT_HAVE_SELINUX := true
+
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sc9620openphone
 UBOOT_DEFCONFIG := sc9620openphone
