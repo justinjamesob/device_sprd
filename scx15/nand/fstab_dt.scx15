@@ -9,3 +9,4 @@
 /dev/ubi0_prodnv                     /productinfo    ubifs  noatime,nosuid,nodev,compr=lzo          wait
 
 /devices/sprd-sdhci.0/mmc_host/mmc1      auto         vfat defaults voldmanaged=sdcard0:auto,noemulatedsd
+/devices/dwc_otg.0/usb1/1-1/1-1:1.0      auto         vfat defaults voldmanaged=usbdisk:auto
