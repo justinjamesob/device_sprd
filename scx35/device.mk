@@ -132,7 +132,7 @@ PRODUCT_PACKAGES += \
         SGPS
 
 # Gecko/Gaia need below export value
-export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools/assets customize_apps/engSgps
+export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools_1.4/assets customize_apps/engSgps
 export PRODUCTION=1
 export MOZILLA_OFFICIAL=1
 export GAIA_DISTRIBUTION_DIR=$(PWD)/device/sprd/scx35_sp7730ec/
