@@ -20,7 +20,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	lmk.autocalc=false \
 	ro.board_ram_size=low
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay $(OPERATOR_OVERLAY)
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
