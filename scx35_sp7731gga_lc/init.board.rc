@@ -1,18 +1,9 @@
+
+import /init.storage.rc
+
 # add for mount cache to sdcard @{
 on init
     mkdir /cache2 0770 system cache
-# @}
-# add for physical external storage as primary @{
-on early-fs
-    export EXTERNAL_STORAGE /storage/sdcard0
-    export SECONDARY_STORAGE /storage/emulated/legacy
-
-    mkdir /storage/temp_sd 0700 root root
-    export TEMP_STORAGE /storage/temp_sd
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
-    setprop persist.storage.type 1
-    setprop sys.tempsd.enable 1
 # @}
 
 # add for board-relative touch screen driver for
