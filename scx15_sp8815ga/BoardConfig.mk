@@ -17,9 +17,6 @@
 -include device/sprd/scx15/BoardConfigCommon.mk
 -include device/sprd/scx15/nand/BoardConfigNand.mk
 
-# nand fstab
-TARGET_RECOVERY_FSTAB := device/sprd/scx15/nand/recovery.fstab
-
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := scx15_sp8815ga
 UBOOT_DEFCONFIG := sp8815ga

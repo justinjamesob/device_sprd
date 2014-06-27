@@ -15,9 +15,7 @@
 #
 
 -include device/sprd/scx15/BoardConfigCommon.mk
-
-# nand fstab
-TARGET_RECOVERY_FSTAB := device/sprd/scx15/nand/recovery.fstab
+-include device/sprd/scx15/nand/BoardConfigNand.mk
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := scx15_sp6815ga

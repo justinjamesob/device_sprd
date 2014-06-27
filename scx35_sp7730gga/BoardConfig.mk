@@ -17,9 +17,6 @@
 -include device/sprd/scx35/BoardConfigCommon.mk
 -include device/sprd/scx35/nand/BoardConfigNand.mk
 
-# nand fstab
-TARGET_RECOVERY_FSTAB := device/sprd/scx35/nand/recovery.fstab
-
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp7730gga
 UBOOT_DEFCONFIG := sp7730gga

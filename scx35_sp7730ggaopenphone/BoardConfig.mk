@@ -15,9 +15,7 @@
 #
 
 -include device/sprd/scx35/BoardConfigCommon.mk
-
-# nand fstab
-TARGET_RECOVERY_FSTAB := device/sprd/scx35/nand/recovery.fstab
+-include device/sprd/scx35/nand/BoardConfigNand.mk
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp7730ggaopenphone
