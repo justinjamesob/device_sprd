@@ -7,7 +7,7 @@ include device/sprd/scx15_sp7715ga/scx15_sp7715gaplushvga.mk
 
 PRODUCT_NAME := scx15_sp7715gaplus_UUIhvga
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 PRODUCT_VIDEO_WALLPAPERS := none
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk

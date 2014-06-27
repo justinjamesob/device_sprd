@@ -19,7 +19,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += autotest
 #]]
 
-DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(BOARDDIR)/overlay $(PLATDIR)/overlay
+DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 # That means the cmcc preloadapp will not be built into current products
 TARGET_DISABLE_VENDOR_PRELOADAPP := true
