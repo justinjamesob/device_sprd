@@ -55,3 +55,7 @@ ro.hotspot.enabled=1
 
 # this product does not support bt and softap coexist
 ro.btwifisoftap.coexist=false
+
+SPRD: add for mount cache to sdcard @{
+persist.sys.mount2sd_enable = true
+# @}
