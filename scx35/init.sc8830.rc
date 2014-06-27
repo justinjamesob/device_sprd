@@ -169,6 +169,7 @@ on property:ro.board_ram_size=min
 
 on property:ro.board_ram_size=low
     setprop zram.disksize 200
+    write /proc/sys/vm/extra_free_kbytes 1024
 
 on property:ro.board_ram_size=mid
     setprop zram.disksize 300
