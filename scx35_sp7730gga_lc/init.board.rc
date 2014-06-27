@@ -1,4 +1,7 @@
-
+# add for mount cache to sdcard @{
+on init
+    mkdir /cache2 0770 system cache
+# @}
 # add for physical external storage as primary @{
 on early-fs
     export EXTERNAL_STORAGE /storage/sdcard0
