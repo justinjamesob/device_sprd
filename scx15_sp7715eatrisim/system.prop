@@ -18,7 +18,7 @@ conn.connectivity_change_delay = 0
 ro.product.partitionpath=/dev/block/platform/sprd-sdhci.3/by-name/
 
 # Default ecclist
-ro.ril.ecclist=112,911,#911,*911
+ro.ril.ecclist=112,911,#911,*911,000,08,110,999,118,119,120,122,100
 
 persist.modem.w.enable=1
 ro.modem.w.dev=/dev/cpw
