@@ -108,6 +108,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES += \
         ro.moz.omx.hw.max_width=1920 \
         ro.moz.omx.hw.max_height=1080 \
+        ro.moz.wifi.unloaddriver=1 \
         ro.moz.ril.ipv6 = true
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
