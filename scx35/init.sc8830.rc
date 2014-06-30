@@ -173,6 +173,7 @@ on property:ro.board_ram_size=low
 
 on property:ro.board_ram_size=mid
     setprop zram.disksize 300
+    write /proc/sys/vm/extra_free_kbytes 2048
 
 on property:ro.config.zram.support=true
     setprop sys.vm.swappiness 100
