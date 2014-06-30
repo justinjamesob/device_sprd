@@ -1,7 +1,3 @@
--include vendor/sprd/operator/cucc/specA/res/boot/boot_res.mk
-
-$(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
-
 PRODUCT_THEME_PACKAGES := SimpleStyle HelloColor
 PRODUCT_THEME_FLAGS := shrink
 
@@ -25,6 +21,9 @@ DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
+ifeq ($(strip $(GMS_SUPPORT)), true)
+$(call inherit-product-if-exists, vendor/sprd/partner/google/products/gms.mk)
+endif
 
 # SprdLauncher2
 PRODUCT_PACKAGES += \
@@ -33,8 +32,4 @@ PRODUCT_PACKAGES += \
 #[[ for autotest
 PRODUCT_PACKAGES += autotest
 #]]
-
-
-#security support config
-$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 
