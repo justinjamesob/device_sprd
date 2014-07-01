@@ -22,6 +22,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
+# Remove video wallpaper application and resources
+PRODUCT_VIDEO_WALLPAPERS := none
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
