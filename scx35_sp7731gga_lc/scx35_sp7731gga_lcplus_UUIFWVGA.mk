@@ -25,9 +25,9 @@ ifeq ($(strip $(GMS_SUPPORT)), true)
 $(call inherit-product-if-exists, vendor/sprd/partner/google/products/gms.mk)
 endif
 
-# SprdLauncher2
+# SprdLauncher1
 PRODUCT_PACKAGES += \
-        SprdLauncher2
+        SprdLauncher1
 
 #[[ for autotest
 PRODUCT_PACKAGES += autotest

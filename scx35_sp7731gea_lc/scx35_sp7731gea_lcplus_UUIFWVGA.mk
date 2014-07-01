@@ -26,9 +26,9 @@ DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
-# SprdLauncher2
+# SprdLauncher1
 PRODUCT_PACKAGES += \
-        SprdLauncher2
+        SprdLauncher1
 
 #[[ for autotest
 PRODUCT_PACKAGES += autotest
