@@ -58,3 +58,5 @@ ro.btwifisoftap.coexist=false
 # SPRD: add for mount cache to sdcard @{
 persist.sys.mount2sd_enable = true
 # @}
+# SPRD: add support hwrotation
+ro.sf.hwrotation=0

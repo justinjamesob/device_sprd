@@ -64,3 +64,5 @@ drm.service.enabled=false
 
 # hotspot development
 ro.hotspot.enabled=1
+# SPRD: add support hwrotation
+ro.sf.hwrotation=0

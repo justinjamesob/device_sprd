@@ -54,3 +54,5 @@ ro.hotspot.enabled=1
 
 # this product does not support bt and softap coexist
 ro.btwifisoftap.coexist=false
+# SPRD: add support hwrotation
+ro.sf.hwrotation=0
