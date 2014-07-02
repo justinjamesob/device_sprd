@@ -35,6 +35,12 @@ PRODUCT_AAPT_CONFIG := mdpi
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
+ENABLE_LIBRECOVERY := true
+RECOVERY_EXTERNAL_STORAGE := /sdcard
+SYSTEM_FS_TYPE := ubifs
+SYSTEM_PARTITION_TYPE := UBI
+SYSTEM_LOCATION := /dev/ubi0_system
+
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
@@ -50,7 +56,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=160 \
 	lmk.autocalc=false \
 	ro.sf.lcd_width=36 \
-	ro.sf.lcd_height=54
+	ro.sf.lcd_height=54 \
+	ro.moz.ril.query_icc_count=true \
+	ro.moz.mute.call.to_ril=true \
+	ro.moz.ril.numclients=2 \
+        ro.moz.ril.data_reg_on_demand=true\
+        ro.moz.ril.radio_off_wo_card=true\
+        ro.moz.ril.0.network_types = gsm,wcdma\
+        ro.moz.ril.1.network_types = gsm
 
 # board-specific modules
 PRODUCT_PACKAGES += \
@@ -60,6 +73,9 @@ PRODUCT_PACKAGES += \
 
 # Remove video wallpaper application and resources
 PRODUCT_VIDEO_WALLPAPERS := none
+# for Gecko to support bluedroid stack
+PRODUCT_PACKAGES += \
+	bluetooth.default
 
 # Additional product packages
 -include vendor/sprd/open-source/common_packages.mk
@@ -71,6 +87,7 @@ PRODUCT_VIDEO_WALLPAPERS := none
 #
 # board-specific files
 PRODUCT_COPY_FILES += \
+	$(BOARDDIR)/init.recovery.board.rc:root/init.recovery.board.rc \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
 	$(BOARDDIR)/audio_params/tiny_hw.xml:system/etc/tiny_hw.xml \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
@@ -82,6 +99,8 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
 	frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml
+
+PRODUCT_COPY_FILES += $(BOARDDIR)/volume.cfg:system/etc/volume.cfg
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_cu_hvga.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
