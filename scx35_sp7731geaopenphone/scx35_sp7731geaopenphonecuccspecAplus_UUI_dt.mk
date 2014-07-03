@@ -25,7 +25,11 @@ $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 
 # SprdLauncher2
 PRODUCT_PACKAGES += \
-        SprdLauncher2
+        SprdLauncher2 \
+		Validator \
+		se_nena_nenamark2_5 \
+		VoiceCycle \
+		libnena_jni.so
 
 #[[ for autotest
 PRODUCT_PACKAGES += autotest
