@@ -231,6 +231,7 @@ on property:persist.storage.type=1
 
 on property:sys.internal.emulated=0
     stop sdcard
+    stop legacy_tempsd
 
 service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -w 1051 -l /data/media/temp_sd /storage/temp_sd
     disabled
