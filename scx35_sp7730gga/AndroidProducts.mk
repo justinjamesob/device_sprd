@@ -29,5 +29,6 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7730ggacuccspecAplus_UUI.mk \
 	$(LOCAL_DIR)/scx35_sp7730ggacuccspecAplus_UUI_dt.mk \
 	$(LOCAL_DIR)/scx35_sp7730ggacuccspecBplus_UUI.mk \
-	$(LOCAL_DIR)/scx35_sp7730ggaplus_UUI.mk
+	$(LOCAL_DIR)/scx35_sp7730ggaplus_UUI.mk \
+	$(LOCAL_DIR)/scx35_sp7730ggacuccspecBplus_UUI_dt.mk
 
