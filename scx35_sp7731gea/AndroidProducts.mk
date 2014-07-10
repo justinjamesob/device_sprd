@@ -27,5 +27,6 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35_sp7731geaplus_dt.mk \
 	$(LOCAL_DIR)/scx35_sp7731geacuccspecAplus_UUI.mk \
 	$(LOCAL_DIR)/scx35_sp7731geacuccspecAplus_UUI_dt.mk \
-	$(LOCAL_DIR)/scx35_sp7731geaplus_UUI_dt.mk
+	$(LOCAL_DIR)/scx35_sp7731geaplus_UUI_dt.mk \
+	$(LOCAL_DIR)/scx35_sp7731geacuccspecBplus_UUI_dt.mk
 	
