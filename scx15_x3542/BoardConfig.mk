@@ -59,6 +59,7 @@ TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 
 #select continuous auto focus
 TARGET_BOARD_CAMERA_CAF := false
+TARGET_BOARD_CAMERA_X3542 := true
 
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
