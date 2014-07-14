@@ -53,6 +53,6 @@
     <storage android:mountPoint="/storage/usbdisk"
             android:storageDescription="@string/storage_usb"
             android:removable="true"
-            android:allowMassStorage="true"
+            android:allowMassStorage="false"
             android:maxFileSize="4096" />
 </StorageList>
