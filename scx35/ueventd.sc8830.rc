@@ -24,7 +24,6 @@
 /dev/spipe_td6          0660     media       audio
 /dev/spipe_td7          0660     system      system
 /dev/spipe_td8          0660     system      system
-/dev/spipe_td*          0666     system      system
 /dev/stty_w*            0660     radio       system
 /dev/slog_w             0660     system      system
 /dev/spipe_w0           0660     system      system
