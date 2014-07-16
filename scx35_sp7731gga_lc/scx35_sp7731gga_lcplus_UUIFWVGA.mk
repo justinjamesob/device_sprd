@@ -1,3 +1,5 @@
+-include vendor/sprd/operator/cucc/specA/res/boot/boot_res_fwvga.mk
+
 PRODUCT_THEME_PACKAGES := SimpleStyle HelloColor
 PRODUCT_THEME_FLAGS := shrink
 
