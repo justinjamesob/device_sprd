@@ -51,6 +51,8 @@
 	<pga name="DACL Playback Volume" bit="8" />
 	<pga name="VBC DACL DG Set" bit="16" />
 	<pga name="VBC DACL DG Switch" bit="31" />
+	<pga name="VBC DACR DG Set" bit="16" />
+	<pga name="VBC DACR DG Switch" bit="31" /	
 </profile>
 
 <profile name="voice-speaker-l">
