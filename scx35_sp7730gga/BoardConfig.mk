@@ -51,6 +51,9 @@ TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 #select continuous auto focus
 TARGET_BOARD_CAMERA_CAF := true
 
+#image angle in different project
+TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 0
+
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := none
 TARGET_BOARD_BACK_CAMERA_MIPI := phyab

@@ -48,6 +48,9 @@ TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 
+#select continuous auto focus
+TARGET_BOARD_CAMERA_CAF := true
+
 #image angle in different project
 TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 180
 
