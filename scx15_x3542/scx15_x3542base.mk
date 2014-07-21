@@ -21,7 +21,7 @@ TARGET_BOARD := scx15_x3542
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 # include general common configs
-$(call inherit-product, $(PLATDIR)/device.mk)
+$(call inherit-product, $(BOARDDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/nand/nand_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
@@ -77,7 +77,7 @@ PRODUCT_COPY_FILES += \
 # Remove video wallpaper application and resources
 PRODUCT_VIDEO_WALLPAPERS := none
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_x3542.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
