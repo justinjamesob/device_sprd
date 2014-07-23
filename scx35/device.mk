@@ -75,7 +75,9 @@ PRODUCT_PACKAGES += \
 	libsprdstreamrecoder \
 	libvtmanager  \
 	zram.sh \
-	bdt
+	bdt \
+	blktrace \
+	blkparse
 
 # general configs
 PRODUCT_COPY_FILES += \
