@@ -47,7 +47,9 @@ ro.board_ram_size=low
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
-
+# SPRD: add front app kill switch @{
+sys.kill.frontapp=true
+# @}
 #if our product not support bt and softap coexist
 ro.btwifisoftap.coexist=false
 
