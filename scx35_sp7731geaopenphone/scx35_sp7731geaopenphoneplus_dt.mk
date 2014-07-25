@@ -63,7 +63,8 @@ PRODUCT_PACKAGES += \
 		Validator \
 		se_nena_nenamark2_5 \
 		VoiceCycle \
-		libnena_jni.so
+		libnena_jni.so\
+                SprdAutoSlt
 
 #[[ for autotest
 PRODUCT_PACKAGES += autotest
