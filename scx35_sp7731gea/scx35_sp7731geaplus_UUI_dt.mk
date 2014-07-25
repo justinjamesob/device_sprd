@@ -21,9 +21,12 @@ ifeq ($(strip $(GMS_SUPPORT)), true)
 $(call inherit-product-if-exists, vendor/sprd/partner/google/products/gms.mk)
 endif
 
+# Change to launcher3 and disable ThemeSettings ->
 # SprdLauncher2
-PRODUCT_PACKAGES += \
-        SprdLauncher2
+#PRODUCT_PACKAGES += \
+#        SprdLauncher2
+PRODUCT_PACKAGES := $(filter-out ThemeSettings,$(PRODUCT_PACKAGES))
+#<-
 
 #[[ for autotest
 PRODUCT_PACKAGES += autotest
