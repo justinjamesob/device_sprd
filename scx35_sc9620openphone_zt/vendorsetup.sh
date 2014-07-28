@@ -16,4 +16,5 @@
 
 add_lunch_combo scx35_sc9620basecmccspec5_UUI_zt-userdebug
 add_lunch_combo scx35_sc9620basecmccspec5_UUI_zt-user
-
+add_lunch_combo scx35_sc9620basecmccspec3_UUI_zt-user
+add_lunch_combo scx35_sc9620basecmccspec3_UUI_zt-userdebug
