@@ -133,20 +133,43 @@ PRODUCT_PACKAGES += \
         SGPS
 
 # Gecko/Gaia need below export value
+ifeq ($(strip $(GAIA_APP_SRCDIRS)),)
 export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools_1.4/assets customize_apps/engSgps
+endif
+
+ifeq ($(strip $(PRODUCTION)),)
 export PRODUCTION=1
+endif
+
+ifeq ($(strip $(MOZILLA_OFFICIAL)),)
 export MOZILLA_OFFICIAL=1
+endif
+
+ifeq ($(strip $(GAIA_DISTRIBUTION_DIR)),)
 export GAIA_DISTRIBUTION_DIR=$(PWD)/device/sprd/scx35_sp7730ec/
+endif
 
+ifeq ($(strip $(LOCALE_BASEDIR)),)
 export LOCALE_BASEDIR=$(PWD)/gaia-l10n/
+endif
+
+ifeq ($(strip $(LOCALES_FILE)),)
 export LOCALES_FILE=$(PWD)/device/sprd/scx35/languages.json
+endif
+
+ifeq ($(strip $(GAIA_DEFAULT_LOCALE)),)
 export GAIA_DEFAULT_LOCALE=en-US
+endif
+
+ifeq ($(strip $(GAIA_KEYBOARD_LAYOUTS)),)
 export GAIA_KEYBOARD_LAYOUTS=en,bn-Avro,bn-Probhat
+endif
 
-
+ifeq ($(strip $(NOFTU)),)
 ifeq ($(TARGET_BUILD_VARIANT), user)
 export NOFTU=0
 else
 export NOFTU=1
+endif
 endif
 
