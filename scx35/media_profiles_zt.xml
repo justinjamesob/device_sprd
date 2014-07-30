@@ -106,7 +106,7 @@
                    height="480"
                    frameRate="30" />
             <Audio codec="aac"
-                   bitRate="96000"
+                   bitRate="64000"
                    sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
@@ -129,7 +129,7 @@
                    height="480"
                    frameRate="30" />
             <Audio codec="aac"
-                   bitRate="96000"
+                   bitRate="64000"
                    sampleRate="44100"
                    channels="1" />
         </EncoderProfile>
