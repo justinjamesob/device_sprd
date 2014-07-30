@@ -1,3 +1,5 @@
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 # export original make file
 LOCAL_ORIGINAL_PRODUCT_MAKEFILE := device/sprd/scx35_sc9620openphone_zt/scx35_sc9620openphone_ztbase.mk
 
@@ -38,7 +40,4 @@ DEVICE_PACKAGE_OVERLAYS := $(PLATDIR)/overlay_full $(DEVICE_PACKAGE_OVERLAYS)
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec5.mk
-
-#security support config
-$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 
