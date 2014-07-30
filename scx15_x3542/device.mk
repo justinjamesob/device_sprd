@@ -115,7 +115,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.sys.sprd.modemreset=1 \
-	ro.adb.secure=1 \
+	ro.adb.secure=0 \
 	persist.sys.sprd.wcnreset=1 \
         persist.sys.engpc.disable=1
 
