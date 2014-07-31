@@ -60,26 +60,26 @@ TARGET_BOARD_BACK_CAMERA_MIPI := phya
 
 # select WCN
 BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_SPRD := true
+BOARD_HAVE_BLUETOOTH_SPRD := false 
 BOARD_HAVE_FM_TROUT := true
 BOARD_USE_SPRD_FMAPP := true
-
+BOARD_HAVE_BLUETOOTH_BCM := false
 #2351 GPS
 BOARD_USE_SPRD_4IN1_GPS := true
 
 # WIFI configs
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
-WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_sprdwl
+WPA_SUPPLICANT_VERSION      := VER_0_8_X
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
 BOARD_HOSTAPD_DRIVER        := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_sprdwl
-BOARD_WLAN_DEVICE           := sprdwl
-WIFI_DRIVER_FW_PATH_PARAM   := "/data/misc/wifi/fwpath"
-WIFI_DRIVER_FW_PATH_STA     := "sta_mode"
-WIFI_DRIVER_FW_PATH_P2P     := "p2p_mode"
-WIFI_DRIVER_FW_PATH_AP      := "ap_mode"
-WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/sprdwl.ko"
-WIFI_DRIVER_MODULE_NAME     := "sprdwl"
+BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_bcmdhd
+BOARD_WLAN_DEVICE           := bcmdhd
+WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
+WIFI_DRIVER_FW_PATH_STA     := "/etc/wifi/fw_bcmdhd.bin"
+WIFI_DRIVER_FW_PATH_P2P     := "/etc/wifi/fw_bcmdhd_p2p.bin"
+WIFI_DRIVER_FW_PATH_AP      := "/etc/wifi/fw_bcmdhd_apsta.bin"
+WIFI_DRIVER_MODULE_NAME     := "bcmdhd"
+WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/bcmdhd.ko"
 
 # select sensor
 #USE_INVENSENSE_LIB := true

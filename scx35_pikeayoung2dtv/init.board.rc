@@ -18,6 +18,7 @@ on post-fs
     insmod /system/lib/modules/focaltech_ts.ko
 
 on boot
+    chmod 666 /dev/ttyS0
     write /sys/class/gpio/export 167
     write /sys/class/gpio/gpio167/direction out
     write /sys/class/gpio/gpio167/value 1
