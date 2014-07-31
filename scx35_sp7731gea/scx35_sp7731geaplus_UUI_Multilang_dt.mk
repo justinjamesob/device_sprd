@@ -34,3 +34,8 @@ PRODUCT_LOCALES :=en_US en_AU en_CA en_GB en_IE en_IN en_NZ en_SG en_ZA zh_CN zh
 #Default language when first Boot
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.language=en
 PRODUCT_PROPERTY_OVERRIDES += ro.product.locale.region=US
+
+ifeq ($(MULTILANGUAGE_SUPPORT),true)
+PRODUCT_PACKAGES += IDooIME
+endif
+
