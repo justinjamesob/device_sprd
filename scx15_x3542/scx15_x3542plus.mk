@@ -109,8 +109,8 @@ $(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_con
 # Overrides
 PRODUCT_NAME := scx15_x3542plus
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := SP7715A
-PRODUCT_BRAND := Spreadtrum
-PRODUCT_MANUFACTURER := Spreadtrum
+PRODUCT_MODEL := GoFox F15
+PRODUCT_BRAND := Symphony
+PRODUCT_MANUFACTURER := Sprocomm
 
-PRODUCT_LOCALES := zh_CN zh_TW en_US
+PRODUCT_LOCALES := bn_BD en_US
