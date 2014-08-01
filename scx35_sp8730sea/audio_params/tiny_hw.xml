@@ -10,6 +10,11 @@
      <ctl name="DACL Playback Volume" val="7" />
      <ctl name="DACR Playback Volume" val="7" />
 
+     <ctl name="HPL CG Playback Volume1" val="63" />
+     <ctl name="HPR CG Playback Volume1" val="63" />
+     <ctl name="HPL CG Playback Volume2" val="7" />
+     <ctl name="HPR CG Playback Volume2" val="7" />
+
      <!-- DAC->Speaker -->
      <ctl name="SPKL Playback Volume" val="10" />
      <ctl name="SPKR Playback Volume" val="10" />

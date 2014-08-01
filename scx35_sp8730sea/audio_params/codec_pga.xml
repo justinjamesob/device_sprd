@@ -30,6 +30,16 @@
 	<pga name="VBC DACR DG Switch" bit="31" />
 </profile>
 
+<profile name="cg-pga-gain-l">
+	<pga name="HPL CG Playback Volume1" bit="3" />
+	<pga name="HPL CG Playback Volume2" bit="0" />
+</profile>
+
+<profile name="cg-pga-gain-r">
+	<pga name="HPR CG Playback Volume1" bit="3" />
+	<pga name="HPR CG Playback Volume2" bit="0" />
+</profile>
+
 <profile name="headphone-spk-l">
 	<pga name="SPKL Playback Volume" bit="0" />
 	<pga name="HPL Playback Volume" bit="4" />
@@ -300,6 +310,22 @@
 
 	<mixer name="VBC STL DG Set">
 		<attr max="127" inverse="0" />
+	</mixer>
+
+	<mixer name="HPL CG Playback Volume1">
+		<attr max="63" inverse="0" />
+	</mixer>
+
+	<mixer name="HPR CG Playback Volume1">
+		<attr max="63" inverse="0" />
+	</mixer>
+
+	<mixer name="HPL CG Playback Volume2">
+		<attr max="7" inverse="0" />
+	</mixer>
+
+	<mixer name="HPR CG Playback Volume2">
+		<attr max="7" inverse="0" />
 	</mixer>
 </attribute>
 
