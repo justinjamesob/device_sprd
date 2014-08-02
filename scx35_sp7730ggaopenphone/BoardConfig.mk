@@ -31,6 +31,7 @@ TARGET_GPU_DFS_MIN_FREQ := 104000
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 8M
+FRONT_CAMERA_SUPPORT_SIZE := 3M
 TARGET_BOARD_NO_FRONT_SENSOR := false
 TARGET_BOARD_CAMERA_FLASH_CTRL := false
 
@@ -52,6 +53,9 @@ TARGET_BOARD_CAMERA_CAF := true
 
 #image angle in different project
 TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 0
+
+#pre_allocate capture memory
+TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
 
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := none

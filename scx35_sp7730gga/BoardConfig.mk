@@ -54,6 +54,9 @@ TARGET_BOARD_CAMERA_CAF := true
 #image angle in different project
 TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 0
 
+#pre_allocate capture memory
+TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
+
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := none
 TARGET_BOARD_BACK_CAMERA_MIPI := phyab
