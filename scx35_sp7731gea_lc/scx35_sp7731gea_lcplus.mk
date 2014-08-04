@@ -43,6 +43,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
 PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.support.vt=false \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
 	ro.msms.phone_count=2 \

@@ -50,6 +50,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	persist.msms.phone_default=0 \
 	ro.modem.w.count=2 \
         persist.sys.modem.diag=,gser \
+        persist.sys.support.vt=false \
         sys.usb.gser.count=4
 
 # board-specific modules
