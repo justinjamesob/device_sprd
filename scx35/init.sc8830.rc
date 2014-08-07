@@ -404,12 +404,17 @@ service slog /system/bin/slog -t
     class main
     user root
 
-service refnotify /system/bin/refnotify -t 0
+service refnotify_td /system/bin/refnotify -t 0
     class main
     disabled
     user root
 
 service refnotify_w /system/bin/refnotify -t 1
+    class main
+    disabled
+    user root
+
+service refnotify_l /system/bin/refnotify -t 2
     class main
     disabled
     user root
@@ -427,10 +432,11 @@ on property:persist.modem.w.enable=1
     start nvitemd_w
 
 on property:persist.modem.t.enable=1
-    start refnotify
+    start refnotify_td
     start nvitemd_td
 
 on property:persist.modem.l.enable=1
+    start refnotify_l
     start nvitemd_l
 
 #create symlink
