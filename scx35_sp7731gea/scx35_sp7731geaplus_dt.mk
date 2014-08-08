@@ -82,7 +82,6 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
 	frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.mk)
