@@ -65,6 +65,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
         ro.moz.ril.0.network_types = gsm,wcdma\
         ro.moz.ril.1.network_types = gsm
 
+# use gaia default image resource
+GAIA_DEV_PIXELS_PER_PX := 1
+
 # board-specific modules
 PRODUCT_PACKAGES += \
         sensors.$(TARGET_PLATFORM) \
