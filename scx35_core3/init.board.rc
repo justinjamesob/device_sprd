@@ -14,7 +14,8 @@ on boot
     chmod 0664 /sys/class/gpio/gpio167/value
     chown root system /sys/class/gpio/gpio168/value
     chmod 0664 /sys/class/gpio/gpio168/value
-
+    
+    chmod 666 /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
