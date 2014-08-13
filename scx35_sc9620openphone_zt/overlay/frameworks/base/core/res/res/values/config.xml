@@ -20,6 +20,7 @@
 <resources>
 
     <bool name="config_showNavigationBar">false</bool>
+    <bool name="config_automatic_brightness_available">false</bool>
 
 </resources>
 
