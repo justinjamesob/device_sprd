@@ -58,6 +58,8 @@ on boot
     chmod 777 /system/bin/GPSenseEngine
     setprop gps.port ttyV1
 
+	write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 100000
+
 service GPSenseEngine /system/bin/GPSenseEngine
      class main
      user root
