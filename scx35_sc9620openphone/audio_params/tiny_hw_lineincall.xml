@@ -38,9 +38,9 @@
      <ctl name="HeadPhone Mute" val="0" />
   </path>
   <path name="off">
-     <ctl name="Line Function" val="0" />
      <ctl name="ADCL Mixer AILADCL Switch" val="0" />
      <ctl name="ADCR Mixer AIRADCR Switch" val="0" />
+     <ctl name="Line Function" val="0" />
   </path>
 </device>
 
@@ -52,9 +52,9 @@
      <ctl name="Speaker Function" val="1" />
    </path>
    <path name="off">
-     <ctl name="Speaker Function" val="0" />
      <ctl name="SPKL Mixer ADCLSPKL Switch" val="0" />
      <ctl name="SPKL Mixer ADCRSPKL Switch" val="0" />
+     <ctl name="Speaker Function" val="0" />
    </path>
 </device>
 
@@ -65,9 +65,9 @@
      <ctl name="HeadPhone Function" val="1" />
    </path>
    <path name="off">
-     <ctl name="HeadPhone Function" val="0" />
      <ctl name="HPL Mixer ADCRHPL Switch" val="0" />
      <ctl name="HPR Mixer ADCLHPR Switch" val="0" />
+     <ctl name="HeadPhone Function" val="0" />
    </path>
 </device>
 
