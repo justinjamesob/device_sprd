@@ -172,3 +172,8 @@ endif
 ifeq ($(strip $(MOZILLA_MLS_KEY_FILE)),)
 export MOZILLA_MLS_KEY_FILE=$(ANDROID_BUILD_TOP)/$(BOARDDIR)/mls.key
 endif
+
+ifneq ($(strip $(LOCAL_RELEASEKEY)),)
+	PRODUCT_DEFAULT_DEV_CERTIFICATE := $(LOCAL_RELEASEKEY)
+endif
+
