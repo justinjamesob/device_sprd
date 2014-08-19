@@ -10,6 +10,7 @@ on boot
     write /sys/class/gpio/gpio167/value 1
     write /sys/class/gpio/export 168
     write /sys/class/gpio/gpio168/direction out
+	write /proc/sys/kernel/hook_power_enable 0
     chown root system /sys/class/gpio/gpio167/value
     chmod 0664 /sys/class/gpio/gpio167/value
     chown root system /sys/class/gpio/gpio168/value
