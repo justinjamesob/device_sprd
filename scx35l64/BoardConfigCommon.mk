@@ -25,11 +25,7 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_BOARD_PLATFORM := sc8830
 
 # Enable dex-preoptimization
-ifeq ($(BUILD_FPGA),true)
-    WITH_DEXPREOPT := true
-else
-    WITH_DEXPREOPT := false
-endif
+WITH_DEXPREOPT := false
 
 # config u-boot
 TARGET_NO_BOOTLOADER := false
@@ -41,7 +37,7 @@ BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
 
 # config sepolicy
-BOARD_SEPOLICY_DIRS := device/sprd/scx35/sepolicy
+BOARD_SEPOLICY_DIRS := device/sprd/scx35l64/sepolicy
 
 BOARD_SEPOLICY_UNION := \
        file.te \
@@ -60,8 +56,8 @@ BOARD_SEPOLICY_UNION := \
        zygote.te
 
 # recovery configs
-TARGET_RECOVERY_FSTAB := device/sprd/scx35/recovery/recovery.fstab
-TARGET_RECOVERY_INITRC := device/sprd/scx35/recovery/init.rc
+TARGET_RECOVERY_FSTAB := device/sprd/scx35l64/recovery/recovery.fstab
+TARGET_RECOVERY_INITRC := device/sprd/scx35l64/recovery/init.rc
 TARGET_RECOVERY_UI_LIB := librecovery_ui_sp8830
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBA_8888"
 
@@ -90,15 +86,16 @@ USE_BOOT_AT_DIAG := true
 
 # graphics
 TARGET_GPU_PP_CORE := 2
-ifeq ($(strip $(BUILD_FPGA)),true)
-USE_SPRD_HWCOMPOSER  := false
-USE_OPENGL_RENDERER := false
-USE_OVERLAY_COMPOSER_GPU := false
-else
 USE_SPRD_HWCOMPOSER  := true
 USE_OPENGL_RENDERER := true
 USE_OVERLAY_COMPOSER_GPU := true
-endif
 
 # ota
 TARGET_RELEASETOOLS_EXTENSIONS := vendor/sprd/open-source/tools/ota
+
+# dt
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true
+
+# kernel uboot ARCH = arm64
+KERNEL_UBOOT_USE_ARCH_ARM64 := true

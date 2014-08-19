@@ -138,14 +138,10 @@ on boot
     chown media system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_freq
     chown media system /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_request
     chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    chown system system /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
-    chown media system /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
-    chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
     chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_freq
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
-    chmod 0666 /dev/iq_mem
 
 on charger
     class_start core
@@ -169,12 +165,9 @@ on property:ro.board_ram_size=min
 
 on property:ro.board_ram_size=low
     setprop zram.disksize 200
-    write /proc/sys/vm/extra_free_kbytes 1024
-    write /sys/module/zram/parameters/total_mem_usage_percent  35
 
 on property:ro.board_ram_size=mid
     setprop zram.disksize 300
-    write /proc/sys/vm/extra_free_kbytes 2048
 
 on property:ro.config.zram.support=true
     setprop sys.vm.swappiness 100
@@ -244,7 +237,6 @@ on property:persist.storage.type=1
 
 on property:sys.internal.emulated=0
     stop sdcard
-    stop legacy_tempsd
 
 service legacy_tempsd /system/bin/sdcard -u 1023 -g 1023 -w 1051 -l /data/media/temp_sd /storage/temp_sd
     disabled
@@ -306,20 +298,6 @@ service phoneserver_l /system/bin/phoneserver -m l
     class core
     user root
     group radio system shell dhcp
-    disabled
-    oneshot
-
-service phoneserver_tl /system/bin/phoneserver -m tl
-    class core
-    user root
-    group radio system shell
-    disabled
-    oneshot
-
-service phoneserver_lf /system/bin/phoneserver -m lf
-    class core
-    user root
-    group radio system shell
     disabled
     oneshot
 
@@ -392,25 +370,6 @@ service lril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m
     user root
     group radio cache inet misc audio sdcard_rw log shell
 
-#tl rild service
-service tlril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m tl -n 0
-    class core
-    socket tlrild stream 660 root radio
-    socket tlrild-debug stream 660 radio system
-    disabled
-    user root
-    group radio cache inet misc audio sdcard_rw log shell
-
-#lf rild service
-service lfril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m lf -n 0
-    class core
-    socket lfrild stream 660 root radio
-    socket lfrild-debug stream 660 radio system
-    disabled
-    user root
-    group radio cache inet misc audio sdcard_rw log shell
-
-
 #nvitemd
 service nvitemd_td /system/bin/nvitemd t 0
     class core
@@ -433,35 +392,16 @@ service nvitemd_l /system/bin/nvitemd l 0
     disabled
     oneshot
 
-service nvitemd_tl /system/bin/nvitemd tl 0
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service nvitemd_lf /system/bin/nvitemd lf 0
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
 service slog /system/bin/slog -t
     class main
     user root
 
-service refnotify_td /system/bin/refnotify -t 0
+service refnotify /system/bin/refnotify -t 0
     class main
     disabled
     user root
 
 service refnotify_w /system/bin/refnotify -t 1
-    class main
-    disabled
-    user root
-
-service refnotify_l /system/bin/refnotify -t 2
     class main
     disabled
     user root
@@ -476,16 +416,14 @@ on property:persist.modem.w.enable=1
     symlink /dev/spipe_w3 /dev/vbpipe3
     symlink /dev/spipe_w6 /dev/vbpipe6
     start refnotify_w
-#    start nvitemd_w
+    start nvitemd_w
 
 on property:persist.modem.t.enable=1
-    start refnotify_td
-#    start nvitemd_td
+    start refnotify
+    start nvitemd_td
 
 on property:persist.modem.l.enable=1
-    start refnotify_l
-#    start nvitemd_l
-
+    start nvitemd_l
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u
@@ -559,56 +497,4 @@ service srtd /system/xbin/srtd
     socket srtserver stream 0777 system system
     user root
     group root
-    oneshot
-
-service autotest /system/bin/autotest
-    class main
-    disabled
-    user root
-    oneshot
-# Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
-service watchdogd /sbin/watchdogd 10 20
-    class core
-    seclabel u:r:watchdogd:s0
-
-service engpcclientt /system/bin/engpc -p t -a /dev/ttyGS0 -d /dev/ttyGS1 -l /dev/ttyGS4
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientlte /system/bin/engpc -p l -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS7
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientwcn /system/bin/engpc -p wcn -a /dev/ttyGS2 -d /dev/ttyGS3
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientw /system/bin/engpc -p w -a /dev/ttyGS0 -d /dev/ttyGS1 -l /dev/ttyGS4
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclienttl /system/bin/engpc -p tl -a /dev/ttyGS2 -d /dev/ttyGS3 -l /dev/ttyGS3
-    class core
-    user root
-    group system radio shell
-    disabled
-    oneshot
-
-service engpcclientfl /system/bin/engpc -p fl -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS7
-    class core
-    user root
-    group system radio shell
-    disabled
     oneshot
