@@ -21,10 +21,10 @@ TARGET_BOARD := scx35_tsharkwsamsung
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 ifndef STORAGE_INTERNAL
-  STORAGE_INTERNAL := emulated
+	STORAGE_INTERNAL := emulated
 endif
 ifndef STORAGE_PRIMARY
-  STORAGE_PRIMARY := internal
+	TORAGE_PRIMARY := internal
 endif
 
 BOARD_KERNEL_PAGESIZE := 2048
