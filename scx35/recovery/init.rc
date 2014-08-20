@@ -110,6 +110,10 @@ on property:service.adb.root=1
     write /sys/class/android_usb/android0/enable 1
 
 on normal
+#SPRD:add for uboot operation permission @{
+    write /sys/block/mmcblk0boot0/force_ro 0
+    write /sys/block/mmcblk0boot1/force_ro 0
+# @}
     class_start recovery
     trigger adb_enable
 
