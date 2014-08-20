@@ -54,7 +54,7 @@ TARGET_BOARD_CAMERA_CAF := true
 TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 0
 
 #pre_allocate capture memory
-TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := false
+TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
 
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := none
