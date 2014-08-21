@@ -117,3 +117,6 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
+ifeq ($(strip $(EXPORT_DEVICE_PREFS)),)
+EXPORT_DEVICE_PREFS := device/sprd/$(TARGET_BOARD)
+endif
