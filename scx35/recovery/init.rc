@@ -161,6 +161,13 @@ service nvitemd_l /system/bin/nvitemd l 1
     disabled
     oneshot
 
+service nvitemd_tl /system/bin/nvitemd tl 1
+    class core
+    user root
+    group system radio shell
+    disabled
+    oneshot
+
 on property:persist.modem.w.enable=1
     start nvitemd_w
 
@@ -169,4 +176,8 @@ on property:persist.modem.t.enable=1
 
 on property:persist.modem.l.enable=1
     start nvitemd_l
+
+on property:persist.modem.tl.enable=1
+    start nvitemd_tl
+
 
