@@ -1,1 +1,1 @@
-pref("media.rtsp.video.enabled", true);
+//pref("media.rtsp.video.enabled", true);
