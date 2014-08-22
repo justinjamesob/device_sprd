@@ -53,7 +53,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # board-specific modules
 PRODUCT_PACKAGES += \
-        sensors.$(TARGET_PLATFORM) \
+        sensors.sc8830 \
         fm.$(TARGET_PLATFORM) \
         ValidationTools
 
