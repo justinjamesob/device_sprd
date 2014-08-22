@@ -29,6 +29,8 @@ DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
 
 PRODUCT_AAPT_CONFIG := hdpi
 
+PRODUCT_WIFI_DEVICE := bcm
+
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
@@ -73,7 +75,7 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
 $(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/gps/CellGuide_2351/device-sprd-gps.mk)
-ifeq ($(BOARD_HAVE_WIFI_BCM),true)
+ifeq ($(PRODUCT_WIFI_DEVICE),bcm)
 $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-bcm.mk)
 endif
 

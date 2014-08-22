@@ -68,9 +68,7 @@ BOARD_USE_SPRD_FMAPP := false
 BOARD_USE_SPRD_4IN1_GPS := false
 
 # WIFI configs
-BOARD_HAVE_WIFI_SPRD := false
-BOARD_HAVE_WIFI_BCM := true
-ifeq ($(strip $(BOARD_HAVE_WIFI_SPRD)),true)
+ifeq ($(strip $(PRODUCT_WIFI_DEVICE)),sprd)
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_sprdwl
@@ -84,7 +82,7 @@ WIFI_DRIVER_FW_PATH_AP      := "ap_mode"
 WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/sprdwl.ko"
 WIFI_DRIVER_MODULE_NAME     := "sprdwl"
 endif
-ifeq ($(strip $(BOARD_HAVE_WIFI_BCM)),true)
+ifeq ($(strip $(PRODUCT_WIFI_DEVICE)),bcm)
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
