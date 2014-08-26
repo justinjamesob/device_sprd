@@ -35,7 +35,7 @@
 -->
 
 <StorageList xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- internal storage -->
+    <!-- emulated internal storage -->
     <storage android:storageDescription="@string/storage_internal"
             android:primary="true"
             android:mtpReserve="100"
@@ -47,5 +47,11 @@
             android:allowMassStorage="true"
             android:removable="true"
             android:mtpReserve="100"
+            android:maxFileSize="4096" />
+    <!-- usb disk -->
+    <storage android:mountPoint="/storage/usbdisk"
+            android:storageDescription="@string/storage_usb"
+            android:removable="true"
+            android:allowMassStorage="false"
             android:maxFileSize="4096" />
 </StorageList>

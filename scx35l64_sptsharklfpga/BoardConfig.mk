@@ -15,9 +15,7 @@
 #
 
 -include device/sprd/scx35l64/BoardConfigCommon.mk
-
-# emmc fstab
-TARGET_RECOVERY_FSTAB := device/sprd/scx35l64/emmc/recovery.fstab
+-include device/sprd/scx35l64/emmc/BoardConfigEmmc.mk
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sptsharklfpga
@@ -79,7 +77,11 @@ BOARD_HAVE_PLS := LTR558ALS
 # ext4 partition layout
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 350000000
+ifeq ($(STORAGE_INTERNAL), physical)
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 1500000000
+else
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 3200000000
+endif
 BOARD_CACHEIMAGE_PARTITION_SIZE := 150000000
 BOARD_PRODNVIMAGE_PARTITION_SIZE := 5242880
 BOARD_FLASH_BLOCK_SIZE := 4096
