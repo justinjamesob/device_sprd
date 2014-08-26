@@ -34,28 +34,38 @@ TARGET_GPU_DFS_MIN_FREQ := 256000
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
 TARGET_BOARD_NO_FRONT_SENSOR := false
+TARGET_BOARD_FRONT_CAMERA_ROTATION := true
 TARGET_BOARD_CAMERA_FLASH_CTRL := false
 
 #face detect
 TARGET_BOARD_CAMERA_FACE_DETECT := false
 
+#snesor interface
 TARGET_BOARD_BACK_CAMERA_INTERFACE := mipi
 TARGET_BOARD_FRONT_CAMERA_INTERFACE := mipi
+
+#select camera zsl cap mode
+TARGET_BOARD_CAMERA_CAPTURE_MODE := false
+
+#rotation capture
+TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
+
+#select continuous auto focus
+TARGET_BOARD_CAMERA_CAF := false
+
+#image angle in different project
+TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 180
+
+#pre_allocate capture memory
+TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
 
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := phyb
 TARGET_BOARD_BACK_CAMERA_MIPI := phya
 
-#select camera zsl cap mode
-TARGET_BOARD_CAMERA_CAPTURE_MODE := true
-
-#rotation capture
-TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
-
-TARGET_BOARD_FRONT_CAMERA_ROTATION := true
-
-# select camera not support autofocus
-TARGET_BOARD_CAMERA_NO_AUTOFOCUS_DEV := true
+#select ccir pclk src(source0, source1)
+TARGET_BOARD_FRONT_CAMERA_CCIR_PCLK := source0
+TARGET_BOARD_BACK_CAMERA_CCIR_PCLK := source0
 
 # select WCN
 BOARD_HAVE_BLUETOOTH := true
