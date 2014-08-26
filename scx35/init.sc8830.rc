@@ -455,16 +455,19 @@ service refnotify_td /system/bin/refnotify -t 0
     class main
     disabled
     user root
+    oneshot
 
 service refnotify_w /system/bin/refnotify -t 1
     class main
     disabled
     user root
+    oneshot
 
 service refnotify_l /system/bin/refnotify -t 2
     class main
     disabled
     user root
+    oneshot
 
 on property:lmk.autocalc=false
     write /sys/module/lowmemorykiller/parameters/adj 0,1,3,5,9,15
@@ -486,6 +489,13 @@ on property:persist.modem.l.enable=1
     start refnotify_l
 #    start nvitemd_l
 
+on property:persist.modem.lf.enable=1
+    start refnotify_l
+#    start nvitemd_lf
+
+on property:persist.modem.tl.enable=1
+    start refnotify_l
+#    start nvitemd_tl
 
 #create symlink
 service smd_symlink /system/bin/ext_symlink.sh -u
