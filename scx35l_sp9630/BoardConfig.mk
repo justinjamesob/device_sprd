@@ -48,6 +48,9 @@ TARGET_BOARD_CAMERA_CAPTURE_MODE := false
 #rotation capture
 TARGET_BOARD_CAMERA_ROTATION_CAPTURE := true
 
+#select camera not support autofocus
+TARGET_BOARD_CAMERA_NO_AUTOFOCUS_DEV := true
+
 #select continuous auto focus
 TARGET_BOARD_CAMERA_CAF := false
 
