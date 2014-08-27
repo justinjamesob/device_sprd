@@ -18,13 +18,15 @@ on early-boot
     chmod 660 /proc/cptl/stop
     chmod 660 /proc/cptl/start
     chmod 660 /proc/cptl/modem
-    chmod 660 /proc/cptl/dsp
+    chmod 660 /proc/cptl/tgdsp
+    chmod 660 /proc/cptl/ldsp
 
     chown system root /proc/cptl/wdtirq
     chown system root /proc/cptl/stop
     chown system root /proc/cptl/start
     chown system root /proc/cptl/modem
-    chown system root /proc/cptl/dsp
+    chown system root /proc/cptl/ldsp
+    chown system root /proc/cptl/tgdsp
 
 on boot
     insmod /system/lib/modules/focaltech_ts.ko
