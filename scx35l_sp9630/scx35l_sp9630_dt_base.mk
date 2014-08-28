@@ -71,7 +71,7 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
 	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_8830s.mk)
+$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
