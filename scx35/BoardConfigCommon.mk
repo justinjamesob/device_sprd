@@ -64,6 +64,8 @@ TARGET_RECOVERY_FSTAB := device/sprd/scx35/recovery/recovery.fstab
 TARGET_RECOVERY_INITRC := device/sprd/scx35/recovery/init.rc
 TARGET_RECOVERY_UI_LIB := librecovery_ui_sp8830
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBA_8888"
+# SPRD: add nvmerge config
+TARGET_RECOVERY_NVMERGE_CONFIG := device/sprd/scx35/nvmerge.cfg
 
 # camera configs
 USE_CAMERA_STUB := true
