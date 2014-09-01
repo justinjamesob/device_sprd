@@ -43,7 +43,6 @@ ro.modem.tl.nv=/dev/spipe_lte1
 ro.modem.tl.assert=/dev/spipe_lte2
 ro.modem.tl.vbc=/dev/spipe_lte6
 ro.modem.tl.id=0
-ro.modem.tl.count=1
 ro.modem.tl.fixnv_size=0x40000
 ro.modem.tl.runnv_size=0x60000
 persist.modem.tl.nvp=tl_
