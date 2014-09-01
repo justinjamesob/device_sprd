@@ -8,6 +8,8 @@
 # XXX I will REVERT the config which is duplicated!
 
 # TODO Add the customized boot animation here.
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 
 include device/sprd/scx35l_sp9630/scx35l_sp9630_dt.mk
 
