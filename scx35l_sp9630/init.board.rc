@@ -116,8 +116,7 @@ service btld  /system/bin/btld -lpm 0 -hb 3000000
     oneshot
 
 service p2p_supplicant /system/bin/wpa_supplicant \
-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -N \
-    -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf -e/data/misc/wifi/entropy.bin -puse_p2p_group_interface=1 -g@android:wpa_wlan0 -dd
+    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -pp2p_device=1 -g@android:wpa_wlan0 -dd
     #   we will start as root and wpa_supplicant will switch to user wifi
     #   after setting up the capabilities required for WEXT
     #   user wifi
