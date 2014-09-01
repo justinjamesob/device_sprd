@@ -67,7 +67,8 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
-	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
+	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
+	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
