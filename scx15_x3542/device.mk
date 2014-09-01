@@ -130,7 +130,7 @@ endif # TARGET_BUILD_VARIANT == user
 
 # Gecko/Gaia need below export value
 ifeq ($(strip $(GAIA_APP_SRCDIRS)),)
-export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools_1.4/assets customize_apps/engSgps $(PWD)/firefoxos-telenor-customization/external-apps
+export GAIA_APP_SRCDIRS=apps external-apps outoftree_apps customize_apps/engmode/assets customize_apps/ValidationTools_1.4/assets $(PWD)/firefoxos-telenor-customization/external-apps
 endif
 
 ifeq ($(strip $(PRODUCTION)),)
