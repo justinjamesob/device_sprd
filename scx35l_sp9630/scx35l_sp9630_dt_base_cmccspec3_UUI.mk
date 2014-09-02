@@ -16,6 +16,12 @@ include device/sprd/scx35l_sp9630/scx35l_sp9630_dt.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec3.mk
 
+# board-specific modules
+ PRODUCT_PACKAGES += \
+            Validator \
+            se_nena_nenamark2_5 \
+            VoiceCycle \
+            libnena_jni.so
 # Overrides
 PRODUCT_NAME := scx35l_sp9630_dt_base_cmccspec3_UUI
 PRODUCT_DEVICE := $(TARGET_BOARD)
