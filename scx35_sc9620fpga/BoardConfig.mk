@@ -24,7 +24,8 @@ KERNEL_DEFCONFIG := sc9620fpga-native_defconfig
 
 TARGET_GPU_DFS_MAX_FREQ := 256000
 TARGET_GPU_DFS_MIN_FREQ := 104000
-
+# SPRD: add nvmerge config
+TARGET_RECOVERY_NVMERGE_CONFIG := device/sprd/scx35_sc9620fpga/nvmerge.cfg
 
 # select camera 2M,3M,5M,8M
 CAMERA_SUPPORT_SIZE := 5M
