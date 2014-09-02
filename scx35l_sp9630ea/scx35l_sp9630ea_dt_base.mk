@@ -17,8 +17,11 @@
 TARGET_PLATFORM := sc9630
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35l_sp9630
+TARGET_BOARD := scx35l_sp9630ea
 BOARDDIR := device/sprd/$(TARGET_BOARD)
+
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_SEPARATED_DT := true
 
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
@@ -26,7 +29,7 @@ $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
-
+BUILD_FPGA := false
 PRODUCT_AAPT_CONFIG := hdpi
 
 PRODUCT_WIFI_DEVICE := bcm
@@ -67,14 +70,13 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
-	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
-	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml
+	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
-include vendor/sprd/open-source/common_packages.mk
-include vendor/sprd/open-source/base_special_packages.mk
+$(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)
+$(call inherit-product-if-exists, vendor/sprd/open-source/base_special_packages.mk)
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/gps/CellGuide_2351/device-sprd-gps.mk)
 ifeq ($(PRODUCT_WIFI_DEVICE),bcm)
@@ -82,9 +84,9 @@ $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-b
 endif
 
 # Overrides
-PRODUCT_NAME := scx35l_sp9630
+PRODUCT_NAME := scx35l_sp9630ea_dt_base
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9630
+PRODUCT_MODEL := sp9630ea
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 

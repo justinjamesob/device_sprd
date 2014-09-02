@@ -17,11 +17,8 @@
 TARGET_PLATFORM := sc9630
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35l_sp9630
+TARGET_BOARD := scx35l_sp9630ea
 BOARDDIR := device/sprd/$(TARGET_BOARD)
-
-BOARD_KERNEL_PAGESIZE := 2048
-BOARD_KERNEL_SEPARATED_DT := true
 
 # include general common configs
 $(call inherit-product, $(PLATDIR)/device.mk)
@@ -29,7 +26,7 @@ $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
-BUILD_FPGA := false
+
 PRODUCT_AAPT_CONFIG := hdpi
 
 PRODUCT_WIFI_DEVICE := bcm
@@ -85,9 +82,9 @@ $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-b
 endif
 
 # Overrides
-PRODUCT_NAME := scx35l_sp9630_dt
+PRODUCT_NAME := scx35l_sp9630ea
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9630
+PRODUCT_MODEL := sp9630ea
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 

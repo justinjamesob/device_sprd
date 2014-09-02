@@ -18,12 +18,12 @@
 -include device/sprd/scx35/emmc/BoardConfigEmmc.mk
 
 # board configs
-TARGET_BOOTLOADER_BOARD_NAME := sp9630
-UBOOT_DEFCONFIG := sp9630
+TARGET_BOOTLOADER_BOARD_NAME := sp9630ea
+UBOOT_DEFCONFIG := sp9630ea
 ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
-KERNEL_DEFCONFIG := sp9630_dt_defconfig
+KERNEL_DEFCONFIG := sp9630ea_dt_defconfig
 else
-KERNEL_DEFCONFIG := sp9630_defconfig
+KERNEL_DEFCONFIG := sp9630ea_defconfig
 endif
 
 TARGET_GPU_DFS_MAX_FREQ := 256000

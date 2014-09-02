@@ -17,7 +17,7 @@
 TARGET_PLATFORM := sc9630
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35l_sp9630
+TARGET_BOARD := scx35l_sp9630ea
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 BOARD_KERNEL_PAGESIZE := 2048
@@ -85,9 +85,9 @@ $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-b
 endif
 
 # Overrides
-PRODUCT_NAME := scx35l_sp9630_dt_plus
+PRODUCT_NAME := scx35l_sp9630ea_dt_plus
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9630
+PRODUCT_MODEL := sp9630ea
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
