@@ -77,7 +77,7 @@ PRODUCT_PACKAGES += \
 
 # general configs
 PRODUCT_COPY_FILES += \
-	$(PLATDIR)/init.sc8830.rc:root/init.sc8830.rc \
+	$(PLATDIR)/init.sc8830.rc:root/init.tsharklboard.rc \
 	$(PLATDIR)/init.sc8830.usb.rc:root/init.sc8830.usb.rc \
 	$(PLATDIR)/ueventd.sc8830.rc:root/ueventd.sc8830.rc \
 	$(PLATDIR)/headset-keyboard.kl:system/usr/keylayout/headset-keyboard.kl \
