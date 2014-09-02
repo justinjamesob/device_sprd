@@ -17,3 +17,4 @@ allow zygote system_prop:property_service set;
 allow zygote system:unix_stream_socket { read write };
 allow zygote device:dir write;
 allow zygote shell_exec:file execute;
+allow zygote tmpfs:lnk_file create;
