@@ -16,6 +16,10 @@ include device/sprd/scx35l_sp9630/scx35l_sp9630_dt.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec3.mk
 
+# Build the SprdLauncher1
+PRODUCT_PACKAGES += \
+    SprdLauncher1
+
 # board-specific modules
  PRODUCT_PACKAGES += \
             Validator \

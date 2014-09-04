@@ -14,6 +14,10 @@ include device/sprd/scx35l_sp9630/scx35l_sp9630_dt.mk
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 
+# Build the SprdLauncher1
+PRODUCT_PACKAGES += \
+    SprdLauncher1
+
 # Overrides
 PRODUCT_NAME := scx35l_sp9630_dt_base_UUI
 PRODUCT_DEVICE := $(TARGET_BOARD)
