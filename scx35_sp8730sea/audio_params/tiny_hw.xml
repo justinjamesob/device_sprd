@@ -76,12 +76,20 @@
   <func name="Speaker Mute" val="0" />
 </private>
 
+<private name="spk2 mute">
+  <func name="Speaker2 Mute" val="0" />
+</private>
+
 <private name="earpiece mute">
   <func name="Earpiece Mute" val="0" />
 </private>
 
 <private name="hp mute">
   <func name="HeadPhone Mute" val="0" />
+</private>
+
+<private name="Aud Codec Info">
+  <func name="Aud Codec Info" val="0" />
 </private>
 
 <!-- END OF MUST NOT modify private field directly -->
