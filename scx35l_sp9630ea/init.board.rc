@@ -173,3 +173,6 @@ service iprenew_bnep0 /system/bin/dhcpcd -n
 
 on alarm
     insmod /system/lib/modules/focaltech_ts.ko
+
+on post-fs
+    insmod /system/lib/modules/bcmdhd.ko
