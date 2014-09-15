@@ -6,7 +6,8 @@
 # additional settings here about board, only add the vendor specific configs.
 
 # XXX I will REVERT the config which is duplicated!
-
+#security support config
+$(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 # TODO Add the customized boot animation here.
 
 include device/sprd/scx35l_sp9630ea/scx35l_sp9630ea_dt.mk
