@@ -106,6 +106,7 @@ WIFI_DRIVER_FW_PATH_PARAM   :="sys/module/bcmdhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_STA     := "system/vendor/firmware/fw_bcmdhd.bin"
 WIFI_DRIVER_FW_PATH_P2P     := "system/vendor/firmware/fw_bcmdhd.bin"
 WIFI_DRIVER_FW_PATH_AP      := "system/vendor/firmware/fw_bcmdhd_apsta.bin"
+WIFI_DRIVER_FW_PATH_MFG      := "system/vendor/firmware/fw_bcmdhd_mfg.bin"
 WIFI_DRIVER_MODULE_ARG      := "firmware_path=system/vendor/firmware/fw_bcmdhd.bin nvram_path=system/etc/wifi/bcmdhd.cal"
 WIFI_DRIVER_MODULE_NAME     := "bcmdhd"
 endif
