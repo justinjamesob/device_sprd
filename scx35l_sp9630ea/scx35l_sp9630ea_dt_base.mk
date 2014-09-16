@@ -29,6 +29,8 @@ $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
 
 DEVICE_PACKAGE_OVERLAYS := $(BOARDDIR)/overlay $(PLATDIR)/overlay
+# Remove video wallpaper feature
+PRODUCT_VIDEO_WALLPAPERS := none
 BUILD_FPGA := false
 PRODUCT_AAPT_CONFIG := hdpi
 
