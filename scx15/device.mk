@@ -9,10 +9,7 @@ PRODUCT_PACKAGES += \
 
 # graphics modules
 PRODUCT_PACKAGES += \
-	libEGL_mali.so \
-	libGLESv1_CM_mali.so \
-	libGLESv2_mali.so \
-	libMali.so \
+	libGLES_mali.so \
 	libboost.so \
 	mali.ko
 
