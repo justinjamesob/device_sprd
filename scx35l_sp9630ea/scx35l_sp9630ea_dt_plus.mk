@@ -65,6 +65,10 @@ PRODUCT_PACKAGES += \
         fm.$(TARGET_PLATFORM) \
         ValidationTools
 
+#[[ for autotest
+        PRODUCT_PACKAGES += autotest
+#]]
+
 # board-specific files
 PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/sprd-gpio-keys.kl:system/usr/keylayout/sprd-gpio-keys.kl \
