@@ -16,6 +16,9 @@ include device/sprd/scx35l_sp9630ea/scx35l_sp9630ea_dt_plus.mk
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
 include vendor/sprd/operator/cmcc/spec3.mk
 
+PRODUCT_PROPERTY_OVERRIDES += \
+                        persist.sys.support.vt=false
+
 # Build the SprdLauncher1
 PRODUCT_PACKAGES += \
     SprdLauncher1

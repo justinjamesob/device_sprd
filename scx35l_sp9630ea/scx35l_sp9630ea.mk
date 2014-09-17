@@ -48,6 +48,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=7 \
         ro.modem.external.enable=0 \
+        persist.sys.support.vt=false \
         persist.modem.tl.cs=0 \
         persist.modem.tl.ps=1 \
         persist.modem.tl.rsim=1 \
