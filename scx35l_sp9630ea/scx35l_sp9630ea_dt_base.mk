@@ -56,7 +56,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
         persist.radio.ssda.mode=tdd-csfb \
         persist.radio.ssda.testmode=7 \
         persist.support.oplpnn=true \
-        persist.support.cphsfirst=false
+        persist.support.cphsfirst=false \
+        lmk.autocalc=false
 
 # board-specific modules
 PRODUCT_PACKAGES += \

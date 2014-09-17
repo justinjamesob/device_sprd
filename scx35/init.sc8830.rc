@@ -120,6 +120,8 @@ on early-boot
     chown system root /proc/cpwcn/modem
     chown system root /proc/cpwcn/dsp
 
+    chown system root /sys/class/rtcc/rtcc_trigger
+
 on boot
     chown system system /sys/module/mali/parameters/gpu_cur_freq
     chown system system /sys/module/mali/parameters/gpufreq_max_limit
