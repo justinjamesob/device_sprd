@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 
-add_lunch_combo scx35l_sp9630ea_4mod-userdebug
-add_lunch_combo scx35l_sp9630ea_4mod_dt-userdebug
-add_lunch_combo scx35l_sp9630ea_4mod_dt_base-userdebug
-add_lunch_combo scx35l_sp9630ea_4mod_dt_plus-userdebug
+#add_lunch_combo scx35l_sp9630ea_4mod-userdebug
+#add_lunch_combo scx35l_sp9630ea_4mod_dt-userdebug
+#add_lunch_combo scx35l_sp9630ea_4mod_dt_base-userdebug
+#add_lunch_combo scx35l_sp9630ea_4mod_dt_plus-userdebug
 add_lunch_combo scx35l_sp9630ea_4mod_dt_base_cuccspec_UUI-userdebug
 add_lunch_combo scx35l_sp9630ea_4mod_dt_plus_cuccspec_UUI-userdebug
-add_lunch_combo scx35l_sp9630ea_4mod_dt_base_UUI-userdebug
+#add_lunch_combo scx35l_sp9630ea_4mod_dt_base_UUI-userdebug
