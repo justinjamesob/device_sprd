@@ -62,6 +62,9 @@ TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 180
 #pre_allocate capture memory
 TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
 
+#low capture memory
+TARGET_BOARD_LOW_CAPTURE_MEM := true
+
 #select mipi d-phy mode(none, phya, phyb, phyab)
 TARGET_BOARD_FRONT_CAMERA_MIPI := phyb
 TARGET_BOARD_BACK_CAMERA_MIPI := phya
