@@ -118,6 +118,7 @@ on cali
     class_start cali
     insmod /system/lib/modules/mali.ko
     insmod /system/lib/modules/trout_fm.ko
+	write /sys/class/backlight/sprd_backlight/brightness 0
 
 service engpcclient /system/bin/engpc
     class cali
