@@ -397,7 +397,7 @@
 
         <EncoderProfile quality="timelapseqcif" fileFormat="mp4" duration="60">
             <Video codec="m4v"
-                   bitRate="192000"
+                   bitRate="256000"
                    width="176"
                    height="144"
                    frameRate="15" />
