@@ -170,5 +170,5 @@ endif
 endif
 
 ifeq ($(strip $(MOZILLA_MLS_KEY_FILE)),)
-export MOZILLA_MLS_KEY_FILE=$(ANDROID_BUILD_TOP)/$(BOARDDIR)/mls.key
+export MOZILLA_MLS_KEY_FILE=$(ANDROID_BUILD_TOP)/$(PLATDIR)/mls.key
 endif
