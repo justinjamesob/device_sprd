@@ -79,18 +79,21 @@ Only the three quirks included above are recognized at this point:
     <Decoders>
         <MediaCodec name="OMX.sprd.mpeg4.decoder" type="video/mp4v-es">
             <Quirk name="requires-allocate-on-output-ports" />
+            <Quirk name="output-buffers-are-unreadable" />
             <Quirk name="defers-output-buffer-allocation" />
             <Quirk name="needs-flush-before-disable" />
         </MediaCodec>
 
         <MediaCodec name="OMX.sprd.h263.decoder" type="video/3gpp">
             <Quirk name="requires-allocate-on-output-ports" />
+            <Quirk name="output-buffers-are-unreadable" />
             <Quirk name="defers-output-buffer-allocation" />
             <Quirk name="needs-flush-before-disable" />
         </MediaCodec>
 
         <MediaCodec name="OMX.sprd.h264.decoder" type="video/avc">
             <Quirk name="requires-allocate-on-output-ports" />
+            <Quirk name="output-buffers-are-unreadable" />
             <Quirk name="defers-output-buffer-allocation" />
             <Quirk name="needs-flush-before-disable" />
         </MediaCodec>
@@ -116,12 +119,6 @@ Only the three quirks included above are recognized at this point:
         <MediaCodec name="OMX.google.imaadpcm.decoder" type="audio/ima-adpcm" />
         <MediaCodec name="OMX.google.vorbis.decoder" type="audio/vorbis" />
 
-        <MediaCodec name="OMX.sprd.soft.mpeg4.decoder" type="video/mp4v-es" />
-        <MediaCodec name="OMX.sprd.soft.h263.decoder" type="video/3gpp" />
-        <MediaCodec name="OMX.sprd.soft.h264.decoder" type="video/avc" />
-        <MediaCodec name="OMX.google.mpeg4.decoder" type="video/mp4v-es" />
-        <MediaCodec name="OMX.google.h263.decoder" type="video/3gpp" />
-        <MediaCodec name="OMX.google.h264.decoder" type="video/avc" />
         <MediaCodec name="OMX.google.vp8.decoder" type="video/x-vnd.on2.vp8" />
         <MediaCodec name="OMX.google.vp9.decoder" type="video/x-vnd.on2.vp9" />
         <MediaCodec name="OMX.google.mjpg.decoder" type="video/mjpg" />
