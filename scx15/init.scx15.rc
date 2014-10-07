@@ -429,6 +429,24 @@ service kill_w_phone /system/bin/ext_kill.sh  -w
     disabled
     oneshot
 
+#kill lte app
+service kill_l_phone /system/bin/ext_kill.sh  -l
+    user root
+    disabled
+    oneshot
+
+#kill td-lte app
+service kill_tl_phone /system/bin/ext_kill.sh  -tl
+    user root
+    disabled
+    oneshot
+
+#kill lte-fdd app
+service kill_lf_phone /system/bin/ext_kill.sh  -lf
+    user root
+    disabled
+    oneshot
+
 #change owner
 service chown_service /system/bin/ext_chown.sh  -c
     class main
