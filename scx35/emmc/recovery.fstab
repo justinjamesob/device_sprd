@@ -31,7 +31,8 @@
 /dev/block/platform/sprd-sdhci.3/by-name/lf_runtimenv2	/lfruntimenv2	emmc	defaults	defaults
 
 /dev/block/platform/sprd-sdhci.3/by-name/tl_modem		/tlmodem		emmc	defaults	defaults
-/dev/block/platform/sprd-sdhci.3/by-name/tl_tdsp		/tltdsp			emmc 	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/tl_tdsp               /tltdsp                 emmc    defaults        defaults
+/dev/block/platform/sprd-sdhci.3/by-name/tl_tgdsp		/tltgdsp		emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_ldsp		/tlldsp			emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_fixnv1		/tlfixnv1		emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_fixnv2		/tlfixnv2		emmc	defaults	defaults
