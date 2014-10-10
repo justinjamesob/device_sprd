@@ -31,7 +31,7 @@
 /dev/block/platform/sprd-sdhci.3/by-name/lf_runtimenv2	/lfruntimenv2	emmc	defaults	defaults
 
 /dev/block/platform/sprd-sdhci.3/by-name/tl_modem		/tlmodem		emmc	defaults	defaults
-/dev/block/platform/sprd-sdhci.3/by-name/tl_tdsp               /tltdsp                 emmc    defaults        defaults
+/dev/block/platform/sprd-sdhci.3/by-name/tl_tdsp		/tltdsp			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_tgdsp		/tltgdsp		emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_ldsp		/tlldsp			emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_fixnv1		/tlfixnv1		emmc	defaults	defaults
@@ -52,6 +52,7 @@
 /dev/block/platform/sprd-sdhci.3/by-name/wcnruntimenv2	/wcnruntimenv2	emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wcnmodem		/wcnmodem		emmc	defaults	defaults
 
+/dev/block/platform/sprd-sdhci.3/by-name/pm_sys			/pmsys			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/prodnv			/productinfo	ext4	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/logo			/logo			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/fbootlogo		/fbootlogo		emmc	defaults	defaults

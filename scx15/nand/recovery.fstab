@@ -32,6 +32,7 @@ lf_runtimenv2	/lfruntimenv2	ubi		defaults	defaults
 
 tl_modem		/tlmodem		ubi		defaults	defaults
 tl_tdsp			/tltdsp			ubi 	defaults	defaults
+tl_tgdsp		/tltgdsp		ubi 	defaults	defaults
 tl_ldsp			/tlldsp			ubi 	defaults	defaults
 tl_fixnv1		/tlfixnv1		ubi		defaults	defaults
 tl_fixnv2		/tlfixnv2		ubi		defaults	defaults
@@ -51,6 +52,7 @@ wcnruntimenv1	/wcnruntimenv1	ubi		defaults	defaults
 wcnruntimenv2	/wcnruntimenv2	ubi		defaults	defaults
 wcnmodem		/wcnmodem		ubi		defaults	defaults
 
+pm_sys			/pmsys			ubi		defaults	defaults
 prodnv			/productinfo	ubifs	defaults	defaults
 logo			/logo			ubi		defaults	defaults
 fbootlogo		/fbootlogo		mtd		defaults	defaults
