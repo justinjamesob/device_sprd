@@ -81,7 +81,7 @@ BOARD_HAVE_FM_TROUT := false
 BOARD_USE_SPRD_FMAPP := true
 
 #2351 GPS
-BOARD_USE_SPRD_4IN1_GPS := false
+BOARD_USE_SPRD_4IN1_GPS := true
 
 # WIFI configs
 ifeq ($(strip $(PRODUCT_WIFI_DEVICE)),sprd)
