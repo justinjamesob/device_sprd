@@ -69,6 +69,7 @@
 /dev/akm8975_dev        0660     system      system
 /dev/ts0710mux*         0660     radio       system
 /dev/ltr_558als         0660     system      system
+/dev/epl2182_pls        0660     system      system
 /dev/sttybt0            0660     bluetooth   system
 /dev/board_type         0660     bluetooth   system
 /dev/ttyV0		0660     system      system
