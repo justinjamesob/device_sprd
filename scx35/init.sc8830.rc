@@ -655,7 +655,7 @@ service engpcclienttl /system/bin/engpc -p tl -a /dev/ttyGS5 -d /dev/ttyGS6 -l /
     disabled
     oneshot
 
-service engpcclientfl /system/bin/engpc -p fl -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS7
+service engpcclientlf /system/bin/engpc -p lf -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS6
     class core
     user root
     group system radio shell
