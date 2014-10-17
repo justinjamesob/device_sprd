@@ -108,6 +108,15 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
 	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
 
+ifeq ($(strip GMS_SUPPORT),true)
+ifneq ($(strip $(wildcard frameworks/native/data/etc/gms.android.hardware.location.gps.xml)),)
+
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/gms.android.hardware.location.gps.xml:system/etc/permissions/gms.android.hardware.location.gps.xml
+
+endif # File exist
+endif # GMS_SUPPORT
+
 APN_VERSION := $(shell cat frameworks/base/core/res/res/xml/apns.xml|grep "<apns version"|cut -d \" -f 2)
 PRODUCT_COPY_FILES += vendor/sprd/operator/operator_res/apn/apns-conf_$(APN_VERSION).xml:system/etc/apns-conf.xml
 
