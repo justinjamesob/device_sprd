@@ -44,6 +44,8 @@ on init
     mkdir /storage/usbdisk 0000 system system
     symlink /storage/usbdisk /mnt/usbdisk
 # @}
+    chown system system /sys/class/power_supply/battery/hw_switch_point
+    chown system system /sys/class/power_supply/battery/save_capacity
 
 on fs
     ubiattach 0 ubipac
@@ -121,7 +123,6 @@ on early-boot
     chown system root /proc/cpwcn/dsp
 
     chown system root /sys/class/rtcc/rtcc_trigger
-
 on boot
     chown system system /sys/module/mali/parameters/gpu_cur_freq
     chown system system /sys/module/mali/parameters/gpufreq_max_limit
@@ -327,7 +328,8 @@ service phoneserver_lf /system/bin/phoneserver -m lf
 
 service batterysrv /bin/batterysrv
     class core
-    user root
+    user system
+    group system
     oneshot
 
 service charge /bin/charge
