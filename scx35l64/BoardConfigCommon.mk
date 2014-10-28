@@ -30,6 +30,9 @@ WITH_DEXPREOPT := false
 # config u-boot
 TARGET_NO_BOOTLOADER := false
 
+# SPRD: add nvmerge config
+TARGET_RECOVERY_NVMERGE_CONFIG := device/sprd/scx35l64/nvmerge.cfg
+
 # config kernel
 TARGET_NO_KERNEL := false
 USES_UNCOMPRESSED_KERNEL := true
