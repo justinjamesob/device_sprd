@@ -20,6 +20,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
                         persist.sys.support.vt=false \
 			ro.wcn=disabled
 
+## SPRD: bug365674 remove WLAN icon from Launcher's default workspace
+PRODUCT_PACKAGE_OVERLAYS += \
+ vendor/sprd/operator/cmcc/nowcn/overlay
+
 # Build the SprdLauncher1
 PRODUCT_PACKAGES += \
     SprdLauncher1
