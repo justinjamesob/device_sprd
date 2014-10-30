@@ -22,5 +22,7 @@ PRODUCT_MAKEFILES := \
 	$(LOCAL_DIR)/scx35l_sp9630ea_dt_base_cmccspec3_UUI.mk \
 	$(LOCAL_DIR)/scx35l_sp9630ea_dt_plus_cmccspec3_UUI.mk \
 	$(LOCAL_DIR)/scx35l_sp9630ea_dt_base_UUI.mk \
-	$(LOCAL_DIR)/scx35l_sp9630ea_dt_plus_cmccspec3_UUI_nowcn.mk
+	$(LOCAL_DIR)/scx35l_sp9630ea_dt_plus_cmccspec3_UUI_nowcn.mk \
+	$(LOCAL_DIR)/scx35l_sp9630ea_dt_plus_cmccspec3_UUI_1350MHZ.mk \
+  $(LOCAL_DIR)/scx35l_sp9630ea_dt_base_UUI.mk
 
