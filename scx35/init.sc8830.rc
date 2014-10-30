@@ -366,6 +366,11 @@ service slog /system/bin/slog -t
     class main
     user root
 
+service apr /system/bin/collect_apr
+	class main
+	user root
+	oneshot
+
 service refnotify_td /system/bin/refnotify -t 0
     class main
     disabled
