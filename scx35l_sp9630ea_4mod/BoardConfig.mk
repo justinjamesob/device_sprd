@@ -54,7 +54,7 @@ TARGET_BOARD_CAMERA_NO_AUTOFOCUS_DEV := true
 #select continuous auto focus
 TARGET_BOARD_CAMERA_CAF := false
 
-TARGET_BOARD_CAMERA_NO_FLASH_DEV := true
+TARGET_BOARD_CAMERA_NO_FLASH_DEV := false
 
 #image angle in different project
 TARGET_BOARD_CAMERA_ADAPTER_IMAGE := 180
