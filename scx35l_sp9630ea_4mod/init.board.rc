@@ -180,6 +180,30 @@ service iprenew_bt-pan /system/bin/dhcpcd -n
     disabled
     oneshot
 
+service phoneserver_lf /system/bin/phoneserver -m lf
+    class core
+    user root
+    group radio system shell
+    disabled
+    oneshot
+
+#lf rild service
+service lfril-daemon /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m lf -n 0
+    class core
+    socket lfrild stream 660 root radio
+    socket lfrild-debug stream 660 radio system
+    disabled
+    user root
+    group radio cache inet misc audio sdcard_rw log shell
+
+service lfril-daemon1 /system/bin/rild_sp -l /system/lib/libreference-ril_sp.so -m lf -n 1
+    class core
+    socket lfrild1 stream 660 root radio
+    socket lfrild-debug1 stream 660 radio system
+    disabled
+    user root
+    group radio cache inet misc audio sdcard_rw log shell
+
 on alarm
     insmod /system/lib/modules/focaltech_ts.ko
 
