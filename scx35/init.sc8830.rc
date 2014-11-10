@@ -149,6 +149,8 @@ on boot
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_freq
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
     chmod 0666 /dev/iq_mem
+    chmod 0660 /sys/class/graphics/fb0/dynamic_pclk
+    chmod 0660 /sys/class/graphics/fb0/dynamic_mipi_clk
 
 on charger
     class_start core
@@ -374,19 +376,19 @@ service apr /system/bin/collect_apr
 service refnotify_td /system/bin/refnotify -t 0
     class main
     disabled
-    user root
+    user system
     oneshot
 
 service refnotify_w /system/bin/refnotify -t 1
     class main
     disabled
-    user root
+    user system
     oneshot
 
 service refnotify_l /system/bin/refnotify -t 2
     class main
     disabled
-    user root
+    user system
     oneshot
 
 on property:lmk.autocalc=false
