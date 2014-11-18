@@ -73,6 +73,7 @@ PRODUCT_PACKAGES += \
 
 # board-specific files
 PRODUCT_COPY_FILES += \
+	$(BOARDDIR)/init.recovery.board.rc:root/init.recovery.board.rc \
 	$(BOARDDIR)/sprd-gpio-keys.kl:system/usr/keylayout/sprd-gpio-keys.kl \
 	$(BOARDDIR)/sprd-eic-keys.kl:system/usr/keylayout/sprd-eic-keys.kl \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
