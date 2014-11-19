@@ -203,6 +203,8 @@ on property:ro.debuggable=1
     write /proc/sys/kernel/core_pattern /data/corefile/core-%e-%p
     write /proc/sys/fs/suid_dumpable 1
     write /sys/module/smsg/parameters/debug_enable 1
+    setprop persist.sys.slog.enabled 1
+    # CTS for slog, enable the slog daemon in debug version anyway.
 
 on property:ro.modem.t.count=1
     write /proc/sim/0 t
@@ -367,6 +369,7 @@ service nvitemd_lf /system/bin/nvitemd lf 0
 service slog /system/bin/slog -t
     class main
     user root
+    disabled
 
 service apr /system/bin/collect_apr
 	class main
@@ -397,6 +400,29 @@ service refnotify_l /system/bin/refnotify -t 2
 on property:lmk.autocalc=false
     write /sys/module/lowmemorykiller/parameters/adj 0,1,3,5,9,15
     write /sys/module/lowmemorykiller/parameters/minfree 1024,2462,3569,4676,6766,7873
+
+# For CTS of slog ->
+# This action is to make sure that the shell user
+# can also enable the slog daemon
+
+# convert the debug to system
+on property:debug.slog.enabled=1
+    setprop persist.sys.slog.enabled 1
+
+# convert the debug to system
+on property:debug.slog.enabled=0
+    setprop persist.sys.slog.enabled 0
+
+# Start the daemon
+on property:persist.sys.slog.enabled=1
+    mkdir /data/local/tmp/slog 0777
+    start slog
+
+# Stop the daemon
+on property:persist.sys.slog.enabled=0
+    stop slog
+
+# For CTS of slog <-
 
 on property:persist.modem.w.enable=1
     symlink /dev/spipe_w1 /dev/vbpipe1
