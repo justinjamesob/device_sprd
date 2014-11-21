@@ -416,10 +416,13 @@ on property:debug.slog.enabled=0
 on property:persist.sys.slog.enabled=1
     mkdir /data/local/tmp/slog 0777
     start slog
+    start sprd_res_monitor
 
 # Stop the daemon
 on property:persist.sys.slog.enabled=0
     stop slog
+    stop sprd_res_monitor
+    rm /data/local/tmp/sprd_monitor.conf
 
 # For CTS of slog <-
 
