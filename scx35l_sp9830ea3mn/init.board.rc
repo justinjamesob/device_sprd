@@ -81,6 +81,12 @@ on boot
     chmod 777 /system/bin/GPSenseEngine
     setprop gps.port ttyV1
 
+service download /system/bin/download
+    class core
+    user root
+    group system shell wifi bluetooth
+    oneshot
+
 service GPSenseEngine /system/bin/GPSenseEngine
      class main
      user root
@@ -191,8 +197,6 @@ service iprenew_bt-pan /system/bin/dhcpcd -n
 on alarm
     insmod /system/lib/modules/focaltech_ts.ko
 
-on post-fs
-    insmod /system/lib/modules/bcmdhd.ko
 
 # set LMK watermark as {12M,16M,18M,26M,34M,42M}
 on property:lmk.autocalc=false
