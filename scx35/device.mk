@@ -74,7 +74,8 @@ PRODUCT_PACKAGES += \
 	zram.sh \
 	bdt \
 	blktrace \
-	blkparse
+	blkparse \
+	p2p_supplicant_marlin_inc.conf
 
 # general configs
 PRODUCT_COPY_FILES += \
@@ -103,7 +104,9 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.touchscreen.xml:system/etc/permissions/android.hardware.touchscreen.xml \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
 	frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
-	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml
+	frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml
+
 
 ifeq ($(strip GMS_SUPPORT),true)
 ifneq ($(strip $(wildcard frameworks/native/data/etc/gms.android.hardware.location.gps.xml)),)
