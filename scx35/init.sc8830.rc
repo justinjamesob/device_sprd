@@ -66,6 +66,7 @@ on post-fs
     insmod /system/lib/modules/trout_fm.ko
 
 on post-fs-data
+    mkdir /productinfo/bluetooth 0755 bluetooth bluetooth
     copy /system/etc/bluetooth/bt_stack.conf /data/misc/bluedroid/bt_stack.conf
     chown bluetooth system /data/misc/bluedroid/bt_stack.conf
     chmod 0640 /data/misc/bluedroid/bt_stack.conf

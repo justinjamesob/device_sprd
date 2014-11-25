@@ -93,43 +93,6 @@ service GPSenseEngine /system/bin/GPSenseEngine
      group root
      disabled
 
-service hfag /system/bin/sdptool add --channel=10 HFAG
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service hsag /system/bin/sdptool add --channel=11 HSAG
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service opush /system/bin/sdptool add --channel=12 OPUSH
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service pbap /system/bin/sdptool add --channel=19 PBAP
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-#service hciattach /system/bin/hciattach -n /dev/sttybt0 sprd_shark
-#    socket bluetooth stream 660 bluetooth bluetooth
-#    user bluetooth
-#    group wifi bluetooth net_bt_admin net_bt inet net_raw net_admin system
-#    disabled
-#    oneshot
-
-service btld  /system/bin/btld -lpm 0 -hb 3000000
-    user root
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
 service p2p_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -pp2p_device=1 -g@android:wpa_wlan0 -dd
     #   we will start as root and wpa_supplicant will switch to user wifi

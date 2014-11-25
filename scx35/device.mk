@@ -88,9 +88,6 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
-	vendor/sprd/open-source/res/productinfo/default_connectivity_configure.ini:system/etc/connectivity_configure.ini \
-	vendor/sprd/open-source/res/productinfo/connectivity_calibration.ini:prodnv/connectivity_calibration.ini \
-	vendor/sprd/open-source/res/productinfo/connectivity_calibration.ini:system/etc/connectivity_calibration.ini \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
 	vendor/sprd/open-source/libs/mali/egl.cfg:system/lib/egl/egl.cfg \
 	vendor/sprd/open-source/apps/scripts/ext_data.sh:system/bin/ext_data.sh \
