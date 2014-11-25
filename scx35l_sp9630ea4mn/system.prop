@@ -49,10 +49,10 @@ ro.modem.tl.fixnv_size=0x40000
 ro.modem.tl.runnv_size=0x60000
 persist.modem.tl.nvp=tl_
 
-ro.modem.wcn.enable=0
+ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn
 ro.modem.wcn.tty=/deiv/stty_wcn
-ro.modem.wcn.diag=/dev/slog_wcn
+ro.modem.wcn.diag=/dev/mdbg
 ro.modem.wcn.assert=/dev/spipe_wcn2
 ro.modem.wcn.id=1
 ro.modem.wcn.count=1

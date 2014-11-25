@@ -24,6 +24,7 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 
 # include general common configs
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_9830ea3mn.mk)
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
@@ -34,7 +35,7 @@ PRODUCT_VIDEO_WALLPAPERS := none
 BUILD_FPGA := false
 PRODUCT_AAPT_CONFIG := hdpi
 
-PRODUCT_WIFI_DEVICE := bcm
+PRODUCT_WIFI_DEVICE := sprd
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
