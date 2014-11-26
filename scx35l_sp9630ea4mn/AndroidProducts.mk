@@ -15,4 +15,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/scx35l_sp9630ea4mn_dt_plus_cmccspec3_UUI_1350MHZ.mk
+	$(LOCAL_DIR)/scx35l_sp9630ea4mn_dt_plus_cmccspec3_UUI.mk

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 The Android Open Source Project
+# Copyright (C) 2011 The Android Open-Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,6 @@
 # limitations under the License.
 #
 
-
-add_lunch_combo scx35l_sp9830ea3mn_dt_plus_cmccspec3_UUI_1350MHZ-userdebug
+PRODUCT_MAKEFILES := \
+	$(LOCAL_DIR)/scx35l_sp9630ea3mn_dt_plus_cmccspec3_UUI.mk
 

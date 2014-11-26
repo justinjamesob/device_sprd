@@ -17,14 +17,14 @@
 TARGET_PLATFORM := sc9630
 PLATDIR := device/sprd/scx35
 
-TARGET_BOARD := scx35l_sp9830ea3mn
+TARGET_BOARD := scx35l_sp9630ea3mn
 BOARDDIR := device/sprd/$(TARGET_BOARD)
 
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 
 # include general common configs
-$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_9830ea3mn.mk)
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_9630ea3mn.mk)
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
@@ -102,9 +102,9 @@ $(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-b
 endif
 
 # Overrides
-PRODUCT_NAME := scx35l_sp9830ea3mn_dt_plus
+PRODUCT_NAME := scx35l_sp9630ea3mn_dt_plus
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9830ea3mn
+PRODUCT_MODEL := sp9630ea3mn
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
