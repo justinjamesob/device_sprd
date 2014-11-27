@@ -45,18 +45,18 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
 	ro.msms.phone_count=2 \
-        ro.modem.tl.count=2 \
+        ro.modem.lf.count=2 \
 	persist.msms.phone_count=2 \
 	persist.msms.phone_default=0 \
         persist.sys.modem.diag=,gser \
         sys.usb.gser.count=7 \
         ro.modem.external.enable=0 \
         persist.sys.support.vt=false \
-        persist.modem.tl.cs=0 \
-        persist.modem.tl.ps=1 \
-        persist.modem.tl.rsim=1 \
-        persist.radio.ssda.mode=tdd-csfb \
-        persist.radio.ssda.testmode=7 \
+        persist.modem.lf.cs=0 \
+        persist.modem.lf.ps=1 \
+        persist.modem.lf.rsim=1 \
+        persist.radio.ssda.mode=fdd-csfb \
+        persist.radio.ssda.testmode=6 \
         persist.radio.ssda.testmode1=10 \
         persist.support.oplpnn=true \
         persist.support.cphsfirst=false \
@@ -84,13 +84,13 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
 	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
-	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
+	$(BOARDDIR)/msg2138_ts.idc:system/usr/idc/msg2138_ts.idc \
 	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
 	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
 	frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml
 
-$(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)
+$(call inherit-product, vendor/sprd/operator/cucc/specA/res/boot/boot_res_fwvga.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, vendor/sprd/open-source/common_packages.mk)

@@ -14,7 +14,7 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
 include device/sprd/scx35l_sp9630ea4mn/scx35l_sp9630ea4mn_dt_plus.mk
 
 include vendor/sprd/UniverseUI/ThemeRes/universeui.mk
-include vendor/sprd/operator/cmcc/spec3.mk
+include vendor/sprd/operator/cucc/specB.mk
 
 PRODUCT_PROPERTY_OVERRIDES += \
                         persist.sys.support.vt=false
