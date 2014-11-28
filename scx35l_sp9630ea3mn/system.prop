@@ -7,7 +7,7 @@ ro.product.hardware=SP9630_V1.0.1
 
 debug.hwui.render_dirty_regions=false
 # Bluetooth OPP low speed for save power
-debug.bt.lowspeed=true
+debug.bt.lowspeed=false
 
 persist.ttydev=ttyVUART0
 
