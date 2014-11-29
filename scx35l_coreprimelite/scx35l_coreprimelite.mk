@@ -82,6 +82,7 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
 	$(BOARDDIR)/audio_params/audio_para:system/etc/audio_para \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
+	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
 	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
 
 $(call inherit-product, vendor/sprd/open-source/res/boot/boot_res_zt.mk)

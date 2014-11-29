@@ -34,7 +34,6 @@ on boot
     write /sys/class/gpio/gpio167/value 1
     write /sys/class/gpio/export 168
     write /sys/class/gpio/gpio168/direction out
-    write /proc/sys/kernel/hook_power_enable 0
     chown root system /sys/class/gpio/gpio167/value
     chmod 0664 /sys/class/gpio/gpio167/value
     chown root system /sys/class/gpio/gpio168/value
@@ -65,8 +64,8 @@ on boot
     mkdir /data/cg/ 0777 system system
     mkdir /data/cg/online 0777 system system
     mkdir /data/cg/supl 0777 system system
-    chmod 777 /dev/ttyV1
-    chmod 777 /dev/ttyV0
+    chmod 660 /dev/ttyV1
+    chmod 660 /dev/ttyV0
     chmod 777 /system/etc/GPSenseEngine.xml
     chmod 777 /data/cg/online/HiMap.db
     chmod 777 /data/cg/online/Almanac.cg
