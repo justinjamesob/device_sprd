@@ -144,14 +144,16 @@ on boot
     chown media system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     chown media system /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
     chown media system /sys/devices/system/cpu/cpufreq/sprdemand/up_threshold
+    chown system system /sys/class/graphics/fb0/dynamic_pclk
+    chown system system /sys/class/graphics/fb0/dynamic_mipi_clk
     chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/up_threshold
     chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
     chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_freq
     chmod 0660 /sys/devices/platform/scxx30-dmcfreq.0/devfreq/scxx30-dmcfreq.0/ondemand/set_enable
     chmod 0666 /dev/iq_mem
-    chmod 0666 /sys/class/graphics/fb0/dynamic_pclk
-    chmod 0666 /sys/class/graphics/fb0/dynamic_mipi_clk
+    chmod 0660 /sys/class/graphics/fb0/dynamic_pclk
+    chmod 0660 /sys/class/graphics/fb0/dynamic_mipi_clk
 
 on charger
     class_start core
