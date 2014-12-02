@@ -77,6 +77,9 @@ on adb_enable
 on property:sys.powerctl=*
    powerctl ${sys.powerctl}
 
+on property:ro.bootmode=cali
+   setprop ro.config.engcplog.enable 1
+
 service ueventd /sbin/ueventd
     critical
 
