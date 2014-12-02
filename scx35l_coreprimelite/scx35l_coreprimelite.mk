@@ -96,7 +96,7 @@ $(call inherit-product-if-exists, vendor/sprd/open-source/plus_special_packages.
 $(call inherit-product, vendor/sprd/partner/shark/bluetooth/device-shark-bt.mk)
 $(call inherit-product, vendor/sprd/gps/CellGuide_2351/device-sprd-gps.mk)
 ifeq ($(PRODUCT_WIFI_DEVICE),bcm)
-$(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4343s/device-bcm.mk)
+$(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm43438/device-bcm.mk)
 endif
 
 # Overrides
