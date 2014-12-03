@@ -579,14 +579,14 @@ service engpcclientw /system/bin/engpc -p w -a /dev/ttyGS0 -d /dev/ttyGS1 -l /de
     disabled
     oneshot
 
-service engpcclienttl /system/bin/engpc -p tl -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS6
+service engpcclienttl /system/bin/engpc -p tl -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS7
     class core
     user root
     group system radio shell
     disabled
     oneshot
 
-service engpcclientlf /system/bin/engpc -p lf -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS6
+service engpcclientlf /system/bin/engpc -p lf -a /dev/ttyGS5 -d /dev/ttyGS6 -l /dev/ttyGS7
     class core
     user root
     group system radio shell
