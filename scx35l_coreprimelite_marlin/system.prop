@@ -6,6 +6,8 @@ ro.opengles.version=131072
 ro.product.hardware=SP9630_V1.0.1
 
 debug.hwui.render_dirty_regions=false
+# Bluetooth OPP low speed for save power
+debug.bt.lowspeed=false
 
 persist.ttydev=ttyVUART0
 
@@ -47,10 +49,10 @@ ro.modem.tl.fixnv_size=0x40000
 ro.modem.tl.runnv_size=0x60000
 persist.modem.tl.nvp=tl_
 
-ro.modem.wcn.enable=0
+ro.modem.wcn.enable=1
 ro.modem.wcn.dev=/dev/cpwcn
 ro.modem.wcn.tty=/deiv/stty_wcn
-ro.modem.wcn.diag=/dev/slog_wcn
+ro.modem.wcn.diag=/dev/mdbg
 ro.modem.wcn.assert=/dev/spipe_wcn2
 ro.modem.wcn.id=1
 ro.modem.wcn.count=1

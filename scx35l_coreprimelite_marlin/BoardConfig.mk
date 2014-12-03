@@ -75,12 +75,12 @@ BOARD_HAVE_BLUETOOTH_SPRD := true
 #BOARD_HAVE_BLUETOOTH_BCM := false 
 BOARD_HAVE_FM_TROUT := false
 BOARD_USE_SPRD_FMAPP := true
+SPRD_EXTERNAL_WCN :=true
 
 #2351 GPS
 BOARD_USE_SPRD_4IN1_GPS := true
 
 # WIFI configs
-ifeq ($(strip $(PRODUCT_WIFI_DEVICE)),sprd)
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_sprdwl
@@ -93,22 +93,6 @@ WIFI_DRIVER_FW_PATH_P2P     := "p2p_mode"
 WIFI_DRIVER_FW_PATH_AP      := "ap_mode"
 WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/sprdwl.ko"
 WIFI_DRIVER_MODULE_NAME     := "sprdwl"
-endif
-ifeq ($(strip $(PRODUCT_WIFI_DEVICE)),bcm)
-BOARD_WPA_SUPPLICANT_DRIVER := NL80211
-WPA_SUPPLICANT_VERSION      := VER_2_1_DEVEL
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_bcmdhd
-BOARD_HOSTAPD_DRIVER        := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_bcmdhd
-BOARD_WLAN_DEVICE           := bcmdhd
-WIFI_DRIVER_FW_PATH_PARAM   :="sys/module/bcmdhd/parameters/firmware_path"
-WIFI_DRIVER_FW_PATH_STA     := "system/vendor/firmware/fw_bcmdhd.bin"
-WIFI_DRIVER_FW_PATH_P2P     := "system/vendor/firmware/fw_bcmdhd.bin"
-WIFI_DRIVER_FW_PATH_AP      := "system/vendor/firmware/fw_bcmdhd_apsta.bin"
-WIFI_DRIVER_FW_PATH_MFG      := "system/vendor/firmware/fw_bcmdhd_mfg.bin"
-WIFI_DRIVER_MODULE_ARG      := "firmware_path=system/vendor/firmware/fw_bcmdhd.bin nvram_path=system/etc/wifi/bcmdhd.cal"
-WIFI_DRIVER_MODULE_NAME     := "bcmdhd"
-endif
 
 # select sensor
 #USE_INVENSENSE_LIB := true
