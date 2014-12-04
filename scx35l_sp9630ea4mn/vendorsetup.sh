@@ -15,3 +15,4 @@
 #
 
 add_lunch_combo scx35l_sp9630ea4mn_dt_plus_cmccspec3_UUI-userdebug
+add_lunch_combo scx35l_sp9630ea4mn_dt_plus_cmccspec3_UUI_1350MHZ-userdebug
