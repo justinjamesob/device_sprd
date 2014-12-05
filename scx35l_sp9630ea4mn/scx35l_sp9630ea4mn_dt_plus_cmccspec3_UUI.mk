@@ -23,12 +23,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
-# board-specific modules
- PRODUCT_PACKAGES += \
-            Validator \
-            se_nena_nenamark2_5 \
-            VoiceCycle \
-            libnena_jni.so
 # Overrides
 PRODUCT_NAME := scx35l_sp9630ea4mn_dt_plus_cmccspec3_UUI
 PRODUCT_DEVICE := $(TARGET_BOARD)

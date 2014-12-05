@@ -25,12 +25,6 @@ BOARD_KERNEL_SEPARATED_ARM_CLK_1350M := true
 PRODUCT_PACKAGES += \
     SprdLauncher1
 
-# board-specific modules
- PRODUCT_PACKAGES += \
-            Validator \
-            se_nena_nenamark2_5 \
-            VoiceCycle \
-            libnena_jni.so
 # Overrides
 PRODUCT_NAME := scx35l_sp9630ea_dt_plus_cmccspec3_UUI_1350MHZ
 PRODUCT_DEVICE := $(TARGET_BOARD)
