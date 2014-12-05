@@ -39,6 +39,15 @@
 /dev/block/platform/sprd-sdhci.3/by-name/tl_runtimenv1	/tlruntimenv1	emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/tl_runtimenv2	/tlruntimenv2	emmc	defaults	defaults
 
+/dev/block/platform/sprd-sdhci.3/by-name/wl_modem		/wlmodem		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_warm		/wlwarm			emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_gdsp		/wlgdsp 		emmc 	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_ldsp		/wlldsp			emmc 	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_fixnv1		/wlfixnv1		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_fixnv2		/wlfixnv2		emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_runtimenv1	/wlruntimenv1	emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wl_runtimenv2	/wlruntimenv2	emmc	defaults	defaults
+
 /dev/block/platform/sprd-sdhci.3/by-name/wmodem			/wmodem			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wdsp			/wdsp			emmc 	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/wfixnv1		/wfixnv1		emmc	defaults	defaults
@@ -53,6 +62,7 @@
 /dev/block/platform/sprd-sdhci.3/by-name/wcnmodem		/wcnmodem		emmc	defaults	defaults
 
 /dev/block/platform/sprd-sdhci.3/by-name/pm_sys			/pmsys			emmc	defaults	defaults
+/dev/block/platform/sprd-sdhci.3/by-name/wcnfdl			/wcnfdl			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/prodnv			/productinfo	ext4	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/logo			/logo			emmc	defaults	defaults
 /dev/block/platform/sprd-sdhci.3/by-name/fbootlogo		/fbootlogo		emmc	defaults	defaults

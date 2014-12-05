@@ -1,10 +1,13 @@
 LOCAL_PATH := $(call my-dir)
 
-$(call add-radio-file,modem_bins/tlmodem.bin)
-$(call add-radio-file,modem_bins/tlnvitem.bin)
-$(call add-radio-file,modem_bins/tlldsp.bin)
-$(call add-radio-file,modem_bins/tltgdsp.bin)
+$(call add-radio-file,modem_bins/wlmodem.bin)
+$(call add-radio-file,modem_bins/wlnvitem.bin)
+$(call add-radio-file,modem_bins/wlldsp.bin)
+$(call add-radio-file,modem_bins/wlgdsp.bin)
 $(call add-radio-file,modem_bins/pmsys.bin)
+$(call add-radio-file,modem_bins/wcnmodem.bin)
+$(call add-radio-file,modem_bins/wcnfdl.bin)
+$(call add-radio-file,modem_bins/wlwarm.bin)
 
 # Compile U-Boot
 ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)

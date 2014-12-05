@@ -5,6 +5,8 @@ $(call add-radio-file,modem_bins/tlnvitem.bin)
 $(call add-radio-file,modem_bins/tlldsp.bin)
 $(call add-radio-file,modem_bins/tltgdsp.bin)
 $(call add-radio-file,modem_bins/pmsys.bin)
+$(call add-radio-file,modem_bins/wcnmodem.bin)
+$(call add-radio-file,modem_bins/wcnfdl.bin)
 
 # Compile U-Boot
 ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)
