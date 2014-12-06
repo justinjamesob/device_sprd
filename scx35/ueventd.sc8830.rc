@@ -94,4 +94,3 @@
 /dev/sdiomux30          0660     media       audio
 /dev/akm8963_dev        0660     system      system
 /dev/download		0660     system      system
-/dev/mdbg		0660     system      system
