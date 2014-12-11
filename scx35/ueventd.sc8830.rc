@@ -94,7 +94,3 @@
 /dev/sdiomux30          0660     media       audio
 /dev/akm8963_dev        0660     system      system
 /dev/download		0660     system      system
-/proc/mdbg/assert       0660     system      system
-/proc/mdbg/wdtirq       0660     system      system
-/proc/mdbg/loopcheck    0660     system      system
-/proc/mdbg/at_cmd       0660     system      system

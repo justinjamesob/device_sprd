@@ -123,6 +123,18 @@ on early-boot
     chown system root /proc/cpwcn/modem
     chown system root /proc/cpwcn/dsp
 
+    chown system root /proc/mdbg
+    chown system root /proc/mdbg/assert
+    chown system root /proc/mdbg/wdtirq
+    chown system root /proc/mdbg/loopcheck
+    chown system root /proc/mdbg/at_cmd
+
+    chmod 766 /proc/mdbg
+    chmod 766 /proc/mdbg/assert
+    chmod 766 /proc/mdbg/wdtirq
+    chmod 766 /proc/mdbg/loopcheck
+    chmod 766 /proc/mdbg/at_cmd
+
     chown system root /sys/class/rtcc/rtcc_trigger
 on boot
     chown system system /sys/module/mali/parameters/gpu_cur_freq
