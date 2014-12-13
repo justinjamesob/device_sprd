@@ -25,6 +25,7 @@ BOARD_KERNEL_SEPARATED_DT := true
 
 
 # include general common configs
+$(call inherit-product, vendor/sprd/open-source/res/productinfo/connectivity_9630ea3mn.mk)
 $(call inherit-product, $(PLATDIR)/device.mk)
 $(call inherit-product, $(PLATDIR)/emmc/emmc_device.mk)
 $(call inherit-product, $(PLATDIR)/proprietories.mk)
