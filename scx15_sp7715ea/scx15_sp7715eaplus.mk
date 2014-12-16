@@ -33,6 +33,9 @@ PRODUCT_AAPT_CONFIG := hdpi
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.usb.config=mass_storage
 
+ENABLE_LIBRECOVERY := true
+RECOVERY_EXTERNAL_STORAGE := /sdcard
+
 PRODUCT_PROPERTY_OVERRIDES += \
 	keyguard.no_require_sim=true \
 	ro.com.android.dataroaming=false \
