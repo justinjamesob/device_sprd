@@ -307,7 +307,8 @@ service modemd /system/bin/modemd
 
 service wcnd /system/bin/wcnd
     class core
-    user system
+    #   we will start as root and wcnd will switch to user system
+    #	user system
     group system shell wifi inet net_bt_stack
     oneshot
 
