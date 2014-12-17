@@ -169,6 +169,14 @@ export NOFTU=0
 endif
 endif
 
+ifeq ($(strip $(DEVICE_DEBUG)),)
+ifeq ($(TARGET_BUILD_VARIANT), user)
+export DEVICE_DEBUG=0
+else
+export DEVICE_DEBUG=1
+endif
+endif
+
 ifeq ($(strip $(MOZILLA_MLS_KEY_FILE)),)
 export MOZILLA_MLS_KEY_FILE=$(ANDROID_BUILD_TOP)/$(PLATDIR)/mls.key
 endif
