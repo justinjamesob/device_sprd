@@ -312,6 +312,13 @@ service wcnd /system/bin/wcnd
     group system shell wifi inet net_bt_stack
     oneshot
 
+
+service wcnd_eng /system/bin/wcnd -G
+    class core
+    group system shell wifi inet net_bt_stack
+    disabled
+    oneshot
+
 service phoneserver_tl /system/bin/phoneserver -m tl
     class core
     user root
