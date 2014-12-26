@@ -97,6 +97,7 @@ service bdtd /system/bin/bdt
     class core
     user root
     group net_bt_stack
+    disable
     oneshot
 
 service p2p_supplicant /system/bin/wpa_supplicant \
