@@ -41,9 +41,10 @@
 /dev/vbpipe1            0660     system  system
 /dev/vbpipe0            0660     system  system
 /dev/vbpipe6            0660     media   audio
-/dev/stty_lte*            0660     radio       system
-/dev/slog_lte             0660     system      system
-/dev/spipe_lte*           0660     system      system
+/dev/stty_lte*          0660     radio       system
+/dev/sctrl_pmic         0660     system      system
+/dev/slog_lte           0660     system      system
+/dev/spipe_lte*         0660     system      system
 /dev/spipe_lte4         0660     media       audio
 /dev/spipe_lte6         0660     media       audio
 
