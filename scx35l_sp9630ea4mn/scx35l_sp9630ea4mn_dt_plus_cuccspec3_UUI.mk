@@ -6,7 +6,7 @@
 # additional settings here about board, only add the vendor specific configs.
 
 # XXX I will REVERT the config which is duplicated!
-
+$(call inherit-product, vendor/sprd/operator/cucc/specA/res/apn/apn_res.mk)
 # TODO Add the customized boot animation here.
 #security support config
 $(call inherit-product-if-exists, vendor/sprd/open-source/security_support.mk)
