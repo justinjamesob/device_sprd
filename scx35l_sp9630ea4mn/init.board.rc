@@ -93,13 +93,6 @@ service GPSenseEngine /system/bin/GPSenseEngine
      group root
      disabled
 
-service bdtd /system/bin/bdt
-    class core
-    user root
-    group net_bt_stack
-    disable
-    oneshot
-
 service p2p_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -N \
     -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf -I/system/etc/wifi/p2p_supplicant_marlin_inc.conf -e/data/misc/wifi/entropy.bin -puse_p2p_group_interface=0 -g@android:wpa_wlan0 -dd
