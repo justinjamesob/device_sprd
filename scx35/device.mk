@@ -56,6 +56,9 @@ PRODUCT_PACKAGES += \
 	mplayer \
 	e2fsck \
 	tinymix \
+	tinycap \
+	tinyplay \
+	factorytest \
 	audio_vbc_eq \
 	calibration_init \
 	modemd \
@@ -87,6 +90,7 @@ PRODUCT_COPY_FILES += \
 	$(PLATDIR)/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
 	$(PLATDIR)/media_codecs.xml:system/etc/media_codecs.xml \
 	$(PLATDIR)/media_profiles.xml:system/etc/media_profiles.xml \
+	$(PLATDIR)/engtest_sample.wav:system/media/engtest_sample.wav \
         vendor/sprd/open-source/res/spn/spn-conf.xml:system/etc/spn-conf.xml \
 	vendor/sprd/open-source/res/productinfo/productinfo.bin:prodnv/productinfo.bin \
 	vendor/sprd/open-source/res/CDROM/adb.iso:system/etc/adb.iso \
