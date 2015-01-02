@@ -80,6 +80,8 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/audio_params/audio_policy.conf:system/etc/audio_policy.conf \
 	$(BOARDDIR)/focaltech_ts.idc:system/usr/idc/focaltech_ts.idc \
 	$(BOARDDIR)/msg2138_ts.idc:system/usr/idc/msg2138_ts.idc \
+	frameworks/native/data/etc/android.hardware.camera.flash-noautofocus.xml:system/etc/permissions/android.hardware.camera.flash-noautofocus.xml \
+	frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
 	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
 	frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
 	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
