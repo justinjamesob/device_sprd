@@ -106,7 +106,7 @@ endif
 # Overrides
 PRODUCT_NAME := scx35l_sp9630ea4mn_dt_plus
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9630ea4mn
+PRODUCT_MODEL := SP7730A
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
