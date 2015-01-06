@@ -78,7 +78,8 @@ PRODUCT_PACKAGES += \
 	bdt \
 	blktrace \
 	blkparse \
-	p2p_supplicant_marlin_inc.conf
+	p2p_supplicant_marlin_inc.conf \
+	iperf
 
 # general configs
 PRODUCT_COPY_FILES += \

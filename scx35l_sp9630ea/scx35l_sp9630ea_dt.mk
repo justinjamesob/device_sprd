@@ -64,7 +64,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES += \
         sensors.sc8830 \
         fm.$(TARGET_PLATFORM) \
-        ValidationTools
+        ValidationTools \
+	wl
 
 #[[ for autotest
         PRODUCT_PACKAGES += autotest
