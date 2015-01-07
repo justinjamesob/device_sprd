@@ -103,5 +103,3 @@ PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
 PRODUCT_LOCALES := zh_CN zh_TW en_US
-# Open adb root permisson
-ENABLE_ADB_ROOT := 1
