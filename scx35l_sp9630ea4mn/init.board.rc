@@ -47,9 +47,11 @@ on boot
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
+    chmod 660 /sys/devices/platform/sprd_wcn.0/pa_enable
     chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/state
     chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/type
     chown bluetooth system /proc/bluetooth/sleep/proto
+    chown bluetooth net_bt_stack /sys/devices/platform/sprd_wcn.0/pa_enable
     chmod 660 /proc/bluetooth/sleep/btwrite
     chmod 660 /proc/bluetooth/sleep/lpm
     chown bluetooth system /proc/bluetooth/sleep/btwrite
