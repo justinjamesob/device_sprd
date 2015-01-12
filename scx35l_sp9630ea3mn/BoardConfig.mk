@@ -19,13 +19,13 @@
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp9630ea3mn
-ifeq ($(strip $(PRODUCT_SP9630EA6MNA)), true)
-UBOOT_DEFCONFIG := sp9630ea6mna
+ifeq ($(strip $(PRODUCT_SP9630EA6MN)), true)
+UBOOT_DEFCONFIG := sp9630ea6mn
 else
 UBOOT_DEFCONFIG := sp9630ea3mn
 endif
-ifeq ($(strip $(PRODUCT_SP9630EA6MNA)), true)
-KERNEL_DEFCONFIG := sp9630ea6mna_dt_defconfig
+ifeq ($(strip $(PRODUCT_SP9630EA6MN)), true)
+KERNEL_DEFCONFIG := sp9630ea6mn_dt_defconfig
 else ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
 KERNEL_DEFCONFIG := sp9630ea3mn_dt_defconfig
 else
