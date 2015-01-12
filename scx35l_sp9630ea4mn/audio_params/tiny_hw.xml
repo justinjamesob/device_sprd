@@ -92,6 +92,14 @@
   <func name="Aud Codec Info" val="0" />
 </private>
 
+<private name="fm da0 mux">
+  <func name="DA0 ADDFM MUX" val="0" />
+</private>
+
+<private name="fm da1 mux">
+  <func name="DA1 ADDFM MUX" val="0" />
+</private>
+
 <!-- END OF MUST NOT modify private field directly -->
 
 <device name="builtin-mic">
@@ -175,8 +183,6 @@
 	 <ctl name="Digital FM Function" val="1" />
 	 <ctl name="DA0 ADDST MUX" val="0" />
 	 <ctl name="DA1 ADDST MUX" val="0" />
-	 <ctl name="DA0 ADDFM MUX" val="1" />
-	 <ctl name="DA1 ADDFM MUX" val="1" />
      <ctl name="AD IISMUX" val="2" />
   </path>
   <path name="off">
