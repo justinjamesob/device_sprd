@@ -68,6 +68,7 @@
 /dev/mmc31xx            0666     system      compass
 /dev/al3006_pls         0666     system      system
 /dev/lis3dh_acc         0660     system      system
+/dev/mc3xxx             0660     system      system
 /dev/akm8975_dev        0660     system      system
 /dev/ts0710mux*         0660     radio       system
 /dev/ltr_558als         0660     system      system
