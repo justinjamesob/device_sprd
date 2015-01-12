@@ -16,4 +16,5 @@
 
 
 add_lunch_combo scx35l_sp9630ea3mn_dt_plus_cmccspec3_UUI-userdebug
+add_lunch_combo scx35l_sp9630ea6mn_dt_plus_cmccspec3_UUI-userdebug
 
