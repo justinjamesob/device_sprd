@@ -159,6 +159,7 @@ on boot
     chown system system /sys/class/graphics/fb0/dynamic_pclk
     chown system system /sys/class/graphics/fb0/dynamic_mipi_clk
     chown system system /dev/sprd_bm
+    chown system system /sys/module/cpuidle_scx35/parameters/light_sleep_en
     chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/up_threshold
     chmod 0660 /sys/devices/system/cpu/cpufreq/sprdemand/cpu_hotplug_disable
     chmod 0660 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
