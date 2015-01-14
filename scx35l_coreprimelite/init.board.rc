@@ -73,6 +73,18 @@ on boot
     chown dhcp system /data/misc/dhcp
     setprop wifi.interface wlan0
 
+# LSI GPS
+    chown root system /dev/ttyS3
+    chmod 0660 /dev/ttyS3
+    chown root system /sys/class/sec/gps/GPS_PWR_EN/value
+    chmod 0664 /sys/class/sec/gps/GPS_PWR_EN/value
+    chown root system /sys/class/sec/gps/GPS_RESET/value
+    chmod 0664 /sys/class/sec/gps/GPS_RESET/value
+    mkdir /data/system 0771 system system
+    chown system system /data/system
+    mkdir /data/system/gps 0771 system system
+    chown system system /data/system/gps
+
     mkdir /data/cg/ 0777 system system
     mkdir /data/cg/online 0777 system system
     mkdir /data/cg/supl 0777 system system
