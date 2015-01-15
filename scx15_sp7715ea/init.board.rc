@@ -1,16 +1,27 @@
 
+#add for internal sdcard support
+on init
+    mkdir /mnt/media_rw/sdcard 0700 media_rw media_rw
+    mkdir /storage/sdcard 0700 root root
 # add for emulated internal storage as primary @{
 on early-fs
     export EXTERNAL_STORAGE /storage/sdcard0
-    export SECONDARY_STORAGE /storage/emulated/legacy
+    #export SECONDARY_STORAGE /storage/emulated/legacy
+    export SECONDARY_STORAGE /storage/sdcard
 
-    mkdir /storage/temp_sd 0700 root root
-    export TEMP_STORAGE /storage/temp_sd
+    #mkdir /storage/temp_sd 0700 root root
+    #export TEMP_STORAGE /storage/temp_sd
     symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
+    symlink /storage/sdcard /mnt/internal-sdcard
     setprop persist.storage.type 1
     setprop sys.tempsd.enable 1
 # @}
+
+#add for internal sdcard support
+on post-fs-data      1
+    chown system system /sys/class/android_usb/android0/f_mass_storage/lun1/file
+    chmod 0660 /sys/class/android_usb/android0/f_mass_storage/lun1/file
 
 # add for board-relative touch screen driver for
 # alarm mode and normal mode.
@@ -173,3 +184,11 @@ service engpcclientwcn /system/bin/engpc -t 2 -a /dev/ttyGS2 -d /dev/ttyGS3
     group system radio shell
     disabled
     oneshot
+#add for internal sdcard support
+on property:sys.internal.emulated=0
+    stop sdcard
+
+# modify for physical internal storage
+service fuse_sdcard /system/bin/sdcard -u 1023 -g 1023 /mnt/media_rw/sdcard /storage/sdcard
+    class late_start
+    disabled

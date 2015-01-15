@@ -145,9 +145,6 @@ ifeq ($(strip $(MOZILLA_OFFICIAL)),)
 export MOZILLA_OFFICIAL=1
 endif
 
-ifeq ($(strip $(GAIA_DISTRIBUTION_DIR)),)
-export GAIA_DISTRIBUTION_DIR=$(PWD)/device/sprd/scx15_sp7715ga/
-endif
 
 ifeq ($(strip $(LOCALE_BASEDIR)),)
 export LOCALE_BASEDIR=$(PWD)/gaia-l10n/
