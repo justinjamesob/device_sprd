@@ -79,7 +79,8 @@ PRODUCT_PACKAGES += \
 	blktrace \
 	blkparse \
 	p2p_supplicant_marlin_inc.conf \
-	iperf
+	iperf \
+	wpa_cli
 
 # general configs
 PRODUCT_COPY_FILES += \
