@@ -26,7 +26,7 @@ PRODUCT_PACKAGES += \
     SprdLauncher1
 
 # Overrides
-PRODUCT_NAME := scx35l_sp9630ea4dot1_dt_plus_cuccspec3_UUI
+PRODUCT_NAME := scx35l_sp9630eb4mn_dt_plus_cuccspec3_UUI
 PRODUCT_DEVICE := $(TARGET_BOARD)
 PRODUCT_MODEL := SP7730A
 PRODUCT_BRAND := Spreadtrum
