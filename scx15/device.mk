@@ -71,6 +71,7 @@ PRODUCT_PACKAGES += \
 	batterysrv \
 	refnotify \
 	wcnd \
+	wpa_cli \
 	libsprdstreamrecoder \
 	libvtmanager  \
 	zram.sh \
