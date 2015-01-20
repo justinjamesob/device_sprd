@@ -39,6 +39,9 @@ on init
     # @}
     symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
+    # ensure clear the cache
+    setprop debug.xts.media.start 1
+
 # SPRD: add for OTG usb disk @{
     mkdir /mnt/media_rw/usbdisk 0700 media_rw media_rw
     mkdir /storage/usbdisk 0000 system system
@@ -208,6 +211,21 @@ service zram /system/xbin/zram.sh
         disabled
         oneshot
 
+########### xts workaround
+on property:debug.xts.media.start=1
+    mkdir /data/local/tmp/test 0777
+
+on property:debug.xts.media.running=-1
+    setprop debug.xts.media.start 0
+
+service rm_tmp_test /system/bin/rm -r /data/local/tmp/test
+    disabled
+    oneshot
+    user root
+
+on property:debug.xts.media.start=0
+    start rm_tmp_test
+############
 
 on property:ro.debuggable=1
     write /sys/kernel/debug/fatal_dump/enable 1
