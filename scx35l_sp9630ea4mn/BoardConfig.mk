@@ -19,8 +19,16 @@
 
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp9630ea4mn
+
+ifeq ($(strip $(PRODUCT_SP9630EA4DOT1)), true)
+UBOOT_DEFCONFIG := sp9630ea4dot1
+else
 UBOOT_DEFCONFIG := sp9630ea4mn
-ifeq ($(strip $(BOARD_KERNEL_SEPARATED_ARM_CLK_1350M)),true)
+endif
+
+ifeq ($(strip $(PRODUCT_SP9630EA4DOT1)), true)
+KERNEL_DEFCONFIG := sp9630ea4dot1_dt_defconfig
+else ifeq ($(strip $(BOARD_KERNEL_SEPARATED_ARM_CLK_1350M)),true)
 KERNEL_DEFCONFIG := sp9630ea4mn_dt_1350M_defconfig
 else ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
 KERNEL_DEFCONFIG := sp9630ea4mn_dt_defconfig
