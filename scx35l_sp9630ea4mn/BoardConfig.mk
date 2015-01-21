@@ -20,7 +20,7 @@
 # board configs
 TARGET_BOOTLOADER_BOARD_NAME := sp9630ea4mn
 
-ifeq ($(strip $(PRODUCT_SP9630EA4DOT1)), true)
+ifeq ($(strip $(PRODUCT_SP9630EB4MN)), true)
 UBOOT_DEFCONFIG := sp9630eb4mn
 else
 UBOOT_DEFCONFIG := sp9630ea4mn

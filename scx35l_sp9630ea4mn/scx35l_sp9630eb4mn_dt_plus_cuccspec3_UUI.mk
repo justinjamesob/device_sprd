@@ -19,7 +19,7 @@ include vendor/sprd/operator/cucc/specB.mk
 PRODUCT_PROPERTY_OVERRIDES += \
                         persist.sys.support.vt=false
 
-BOARD_KERNEL_SEPARATED_ARM_CLK_1350M := true
+PRODUCT_SP9630EB4MN := true
 
 # Build the SprdLauncher1
 PRODUCT_PACKAGES += \
