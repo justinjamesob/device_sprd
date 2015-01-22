@@ -27,9 +27,12 @@ on early-boot
     chown system root /proc/cptl/dsp
 
 
-on boot
+# add for board-relative touch screen driver for
+# alarm mode and normal mode.
+on post-fs
     insmod /system/lib/modules/focaltech_ts.ko
 
+on boot
     write /sys/class/gpio/export 167
     write /sys/class/gpio/gpio167/direction out
     write /sys/class/gpio/gpio167/value 1
