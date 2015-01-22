@@ -167,7 +167,7 @@ on property:ro.board_ram_size=low
     setprop zram.disksize 200
 
 on property:ro.board_ram_size=mid
-    setprop zram.disksize 300
+    setprop zram.disksize 400
 
 on property:ro.config.zram.support=true
     setprop sys.vm.swappiness 100

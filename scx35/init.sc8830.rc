@@ -199,7 +199,7 @@ on property:ro.board_ram_size=low
     write /sys/module/zram/parameters/total_mem_usage_percent  35
 
 on property:ro.board_ram_size=mid
-    setprop zram.disksize 300
+    setprop zram.disksize 400
     write /proc/sys/vm/extra_free_kbytes 2048
 
 on property:ro.config.zram.support=true
