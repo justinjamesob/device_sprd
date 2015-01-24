@@ -47,6 +47,7 @@
 /dev/spipe_lte*         0660     system      system
 /dev/spipe_lte4         0660     media       audio
 /dev/spipe_lte6         0660     media       audio
+/dev/spipe_lte14         0660     media       audio
 
 /dev/stty_gge*            0660     radio       system
 /dev/slog_gge             0660     system      system

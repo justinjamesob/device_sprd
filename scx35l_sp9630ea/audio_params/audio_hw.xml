@@ -6,6 +6,8 @@
 	<cp name="csfb" pipe="/dev/spipe_lte6" vbchannel="0" cpu_index="0"/>
 </modem>
 
+<cp_nbio_dump spipe="dev/spipe_lte14"/>
+
 <voip modem="csfb" pipe="/dev/spipe_lte4" vbchannel="0" enable="1" />
 <!-- <voip modem="w" pipe="/dev/spipe_w4" vbchannel="0" enable="1" /> -->
 
