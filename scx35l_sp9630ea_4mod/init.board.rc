@@ -42,12 +42,17 @@ on boot
     chmod 0664 /sys/class/gpio/gpio168/value
 
     chmod 666 /dev/ttyS0
+    chown bluetooth net_bt_stack /dev/ttyS0
     chmod 660 /proc/bluetooth/sleep/proto
     chmod 660 /sys/class/rfkill/rfkill0/state
     chmod 660 /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth system /proc/bluetooth/sleep/proto
+    chmod 660 /proc/bluetooth/sleep/btwrite
+    chmod 660 /proc/bluetooth/sleep/lpm
+    chown bluetooth system /proc/bluetooth/sleep/btwrite
+    chown bluetooth system /proc/bluetooth/sleep/lpm
     mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
     mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
