@@ -20,6 +20,7 @@ on early-boot
     chmod 660 /proc/cptl/modem
     chmod 660 /proc/cptl/tgdsp
     chmod 660 /proc/cptl/ldsp
+    chmod 660 /proc/cptl/warm
 
     chown system root /proc/cptl/wdtirq
     chown system root /proc/cptl/stop
@@ -27,6 +28,7 @@ on early-boot
     chown system root /proc/cptl/modem
     chown system root /proc/cptl/ldsp
     chown system root /proc/cptl/tgdsp
+    chown system root /proc/cptl/warm
 
 on boot
     insmod /system/lib/modules/focaltech_ts.ko
