@@ -26,7 +26,7 @@ PRODUCT_PACKAGES += \
 # Overrides
 PRODUCT_NAME := scx35l_sp9630ea_4mod_dt_base_cuccspec_UUI
 PRODUCT_DEVICE := $(TARGET_BOARD)
-PRODUCT_MODEL := sp9630ea_4mod
+PRODUCT_MODEL := SP9830A
 PRODUCT_BRAND := Spreadtrum
 PRODUCT_MANUFACTURER := Spreadtrum
 
