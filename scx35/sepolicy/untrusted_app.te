@@ -7,3 +7,6 @@ allow untrusted_app init:unix_stream_socket {read write getattr getopt};
 allow untrusted_app kernel:dir {getattr};
 allow untrusted_app system_data_file:file append;
 allow untrusted_app zygote:binder call;
+allow untrusted_app app_data_file:file execute_no_trans;
+allow untrusted_app zygote:unix_stream_socket {read write getattr getopt};
+allow untrusted_app self:process {execstack execheap ptrace};
