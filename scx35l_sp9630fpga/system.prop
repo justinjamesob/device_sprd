@@ -68,3 +68,7 @@ ro.board_ram_size=mid
 # SPRD: add low cost low memory @{
 ro.config.low_ram=true
 # @}
+
+# SPRD: add support gps @{
+ro.config.support_gps=false
+# @}
