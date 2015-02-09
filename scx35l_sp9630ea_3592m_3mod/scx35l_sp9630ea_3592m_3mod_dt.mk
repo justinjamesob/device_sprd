@@ -76,6 +76,7 @@ PRODUCT_COPY_FILES += \
 	$(BOARDDIR)/sprd-gpio-keys.kl:system/usr/keylayout/sprd-gpio-keys.kl \
 	$(BOARDDIR)/sprd-eic-keys.kl:system/usr/keylayout/sprd-eic-keys.kl \
 	$(BOARDDIR)/init.board.rc:root/init.board.rc \
+	$(BOARDDIR)/init.recovery.board.rc:root/init.recovery.board.rc \
 	$(BOARDDIR)/audio_params/tiny_hw.xml:system/etc/tiny_hw.xml \
 	$(BOARDDIR)/audio_params/codec_pga.xml:system/etc/codec_pga.xml \
 	$(BOARDDIR)/audio_params/audio_hw.xml:system/etc/audio_hw.xml \
